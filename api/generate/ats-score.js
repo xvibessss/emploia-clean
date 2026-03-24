@@ -4,27 +4,28 @@ import { getCurrentUser, incrementGenerations, FREE_LIMIT } from "../_lib/auth.j
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const user = await getCurrentUser(req);
-  if (!user) return res.status(401).json({ error: "Non authentifié" });
+  try {
+    const user = await getCurrentUser(req);
+    if (!user) return res.status(401).json({ error: "Non authentifié" });
 
-  if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
-    return res.status(402).json({ error: "Limite gratuite atteinte" });
-  }
+    if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
+      return res.status(402).json({ error: "Limite gratuite atteinte" });
+    }
 
-  const { cvText, jobOffer } = req.body;
-  if (!cvText || !jobOffer) {
-    return res.status(400).json({ error: "CV et offre requis" });
-  }
+    const { cvText, jobOffer } = req.body;
+    if (!cvText || !jobOffer) {
+      return res.status(400).json({ error: "CV et offre requis" });
+    }
 
-  const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5",
-    max_tokens: 8192,
-    messages: [
-      {
-        role: "user",
-        content: `Tu es un expert ATS (Applicant Tracking System) et en recrutement en France.
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5",
+      max_tokens: 8192,
+      messages: [
+        {
+          role: "user",
+          content: `Tu es un expert ATS (Applicant Tracking System) et en recrutement en France.
 
 OFFRE D'EMPLOI:
 ${jobOffer}
@@ -49,11 +50,15 @@ Analyse ce CV par rapport à cette offre d'emploi et fournis:
    - Actions spécifiques pour améliorer le score
 
 Sois précis et actionnable dans tes recommandations.`,
-      },
-    ],
-  });
+        },
+      ],
+    });
 
-  const result = response.content[0].type === "text" ? response.content[0].text : "";
-  await incrementGenerations(user);
-  return res.json({ result });
+    const result = response.content[0].type === "text" ? response.content[0].text : "";
+    await incrementGenerations(user);
+    return res.json({ result });
+  } catch (err) {
+    console.error("ATS score error:", err);
+    return res.status(500).json({ error: "Erreur lors de la génération" });
+  }
 }

@@ -1,4 +1,9 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
+
+const kv = createClient({
+  url: process.env.STORAGE_KV_REST_API_URL || process.env.KV_REST_API_URL,
+  token: process.env.STORAGE_KV_REST_API_TOKEN || process.env.KV_REST_API_TOKEN,
+});
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-prod";
