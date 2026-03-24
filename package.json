@@ -63,7 +63,6 @@
     "wouter": "^3.3.5",
     "zod": "^3.23.8",
     "@anthropic-ai/sdk": "^0.30.0",
-    "@vercel/kv": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2"
   },

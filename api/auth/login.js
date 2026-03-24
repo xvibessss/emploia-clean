@@ -1,6 +1,5 @@
-import { kv } from "@vercel/kv";
 import bcrypt from "bcryptjs";
-import { signToken, setCookieHeader } from "../_lib/auth.js";
+import { signToken, setCookieHeader, kvGet } from "../_lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -10,7 +9,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Email et mot de passe requis" });
   }
 
-  const user = await kv.get(`user:${email.toLowerCase()}`);
+  const user = await kvGet(`user:${email.toLowerCase()}`);
   if (!user) {
     return res.status(401).json({ error: "Email ou mot de passe incorrect" });
   }

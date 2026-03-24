@@ -1,6 +1,5 @@
-import { kv } from "@vercel/kv";
 import bcrypt from "bcryptjs";
-import { signToken, setCookieHeader } from "../_lib/auth.js";
+import { signToken, setCookieHeader, kvGet, kvSet } from "../_lib/auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
@@ -13,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Le mot de passe doit faire au moins 8 caractères" });
   }
 
-  const existing = await kv.get(`user:${email.toLowerCase()}`);
+  const existing = await kvGet(`user:${email.toLowerCase()}`);
   if (existing) {
     return res.status(409).json({ error: "Un compte avec cet email existe déjà" });
   }
@@ -29,8 +28,8 @@ export default async function handler(req, res) {
     plan: "free",
   };
 
-  await kv.set(`user:${email.toLowerCase()}`, user);
-  await kv.set(`userid:${id}`, email.toLowerCase());
+  await kvSet(`user:${email.toLowerCase()}`, user);
+  await kvSet(`userid:${id}`, email.toLowerCase());
 
   const token = signToken(id);
   res.setHeader("Set-Cookie", setCookieHeader(token));
