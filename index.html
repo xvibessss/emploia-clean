@@ -1,29 +1,761 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>EmploiA - Assistant CV avec IA</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  <!--Start of Tawk.to Script-->
-  <script type="text/javascript">
-  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/69bfb3f783f0e01c3aab2a65/1jkaddvvt';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-  })();
-  </script>
-  <!--End of Tawk.to Script-->
-  </body>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EmploiIA — Trouve un emploi 3x plus vite avec l'IA</title>
+  <meta name="description" content="Générez des CV sur-mesure, des lettres de motivation percutantes et passez les filtres ATS en quelques secondes. 100% en français." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue-50: #eff6ff;
+      --blue-100: #dbeafe;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --blue-900: #1e3a8a;
+      --indigo-600: #4f46e5;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-xl: 0 20px 60px rgba(0,0,0,.12), 0 8px 20px rgba(0,0,0,.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--slate-800);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--slate-200);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      font-size: 20px; font-weight: 800; color: var(--blue-700);
+      text-decoration: none; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot { width: 8px; height: 8px; background: var(--blue-500); border-radius: 50%; }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .btn-ghost {
+      padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--slate-600); cursor: pointer; border: none; background: none;
+      text-decoration: none; transition: all .15s;
+    }
+    .btn-ghost:hover { background: var(--slate-100); color: var(--slate-800); }
+    .btn-primary {
+      padding: 9px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      color: white; background: var(--blue-600); border: none; cursor: pointer;
+      text-decoration: none; transition: all .15s;
+      box-shadow: 0 1px 3px rgba(37,99,235,.3);
+    }
+    .btn-primary:hover { background: var(--blue-700); box-shadow: 0 4px 12px rgba(37,99,235,.35); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 140px 24px 100px;
+      background: linear-gradient(160deg, #f0f7ff 0%, #ffffff 50%, #f5f3ff 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(59,130,246,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--blue-50); border: 1px solid var(--blue-100);
+      color: var(--blue-700); font-size: 13px; font-weight: 600;
+      padding: 6px 14px; border-radius: 100px; margin-bottom: 28px;
+    }
+    .hero-badge-dot { width: 6px; height: 6px; background: var(--blue-500); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 68px); font-weight: 900; line-height: 1.08;
+      letter-spacing: -2px; color: var(--slate-900); margin-bottom: 24px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 18px; color: var(--slate-500); max-width: 560px;
+      margin: 0 auto 40px; line-height: 1.7;
+    }
+    .hero-ctas { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn-hero {
+      padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700;
+      color: white; background: var(--blue-600); border: none; cursor: pointer;
+      text-decoration: none; transition: all .2s;
+      box-shadow: 0 4px 20px rgba(37,99,235,.35);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero:hover { background: var(--blue-700); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,.4); }
+    .btn-hero-outline {
+      padding: 14px 24px; border-radius: 10px; font-size: 15px; font-weight: 600;
+      color: var(--slate-700); background: white; border: 1.5px solid var(--slate-200);
+      cursor: pointer; text-decoration: none; transition: all .2s;
+    }
+    .btn-hero-outline:hover { border-color: var(--blue-300); color: var(--blue-700); transform: translateY(-1px); }
+    .hero-note {
+      margin-top: 16px; font-size: 13px; color: var(--slate-400);
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+    }
+    .hero-note span { display: flex; align-items: center; gap: 5px; }
+
+    /* Preview card */
+    .hero-preview {
+      margin: 60px auto 0; max-width: 780px;
+      background: white; border-radius: 16px; border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-xl); overflow: hidden;
+    }
+    .preview-bar {
+      background: var(--slate-50); border-bottom: 1px solid var(--slate-200);
+      padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .preview-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .preview-url {
+      margin-left: 8px; flex: 1; background: white; border: 1px solid var(--slate-200);
+      border-radius: 6px; padding: 4px 12px; font-size: 12px; color: var(--slate-400);
+      max-width: 300px;
+    }
+    .preview-body { padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .preview-input {
+      background: var(--slate-50); border: 1px solid var(--slate-200);
+      border-radius: 10px; padding: 16px;
+    }
+    .preview-input-label { font-size: 11px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+    .preview-line { height: 8px; border-radius: 4px; background: var(--slate-200); margin-bottom: 8px; }
+    .preview-output {
+      background: linear-gradient(135deg, var(--blue-50), #f5f3ff);
+      border: 1px solid var(--blue-100); border-radius: 10px; padding: 16px;
+    }
+    .preview-output-label { font-size: 11px; font-weight: 600; color: var(--blue-600); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .preview-tag {
+      display: inline-block; background: var(--blue-600); color: white;
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 10px;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      background: var(--slate-900); padding: 48px 24px;
+    }
+    .stats-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+      text-align: center;
+    }
+    .stat-number { font-size: 36px; font-weight: 900; color: white; letter-spacing: -1px; }
+    .stat-label { font-size: 13px; color: var(--slate-400); margin-top: 4px; }
+
+    /* ── SECTION HEADERS ── */
+    .section { padding: 96px 24px; }
+    .section-alt { background: var(--slate-50); }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      color: var(--blue-600); text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+      color: var(--slate-900); letter-spacing: -1px; margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--slate-500); max-width: 540px; line-height: 1.7;
+    }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header .section-sub { margin: 0 auto; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; position: relative; }
+    .steps::before {
+      content: '';
+      position: absolute; top: 36px; left: calc(16.6% + 20px); right: calc(16.6% + 20px);
+      height: 2px; background: linear-gradient(90deg, var(--blue-200), var(--blue-300), var(--blue-200));
+    }
+    .step { text-align: center; padding: 32px 24px; }
+    .step-number {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: white; border: 2px solid var(--blue-200);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; position: relative; z-index: 1;
+      font-size: 22px; font-weight: 900; color: var(--blue-600);
+      box-shadow: 0 0 0 6px var(--blue-50);
+    }
+    .step h3 { font-size: 17px; font-weight: 700; color: var(--slate-800); margin-bottom: 10px; }
+    .step p { font-size: 14px; color: var(--slate-500); line-height: 1.65; }
+
+    /* ── FEATURES ── */
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: white; border: 1px solid var(--slate-200);
+      border-radius: var(--radius); padding: 32px 28px;
+      transition: all .2s; position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue-500), var(--indigo-600));
+      opacity: 0; transition: opacity .2s;
+    }
+    .feature-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--blue-100); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--blue-50); display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 700; color: var(--slate-800); margin-bottom: 10px; }
+    .feature-card p { font-size: 14px; color: var(--slate-500); line-height: 1.65; }
+    .feature-badge {
+      display: inline-block; margin-top: 16px;
+      background: var(--blue-50); color: var(--blue-700);
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px;
+    }
+
+    /* ── SOCIAL PROOF ── */
+    .testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: white; border: 1px solid var(--slate-200);
+      border-radius: var(--radius); padding: 28px; transition: all .2s;
+    }
+    .testimonial-card:hover { box-shadow: var(--shadow-md); }
+    .stars { color: #f59e0b; font-size: 14px; margin-bottom: 14px; letter-spacing: 1px; }
+    .testimonial-text { font-size: 14px; color: var(--slate-600); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-500), var(--indigo-600));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 15px; font-weight: 700;
+    }
+    .author-name { font-size: 14px; font-weight: 700; color: var(--slate-800); }
+    .author-role { font-size: 12px; color: var(--slate-400); }
+
+    /* ── PRICING ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+    .pricing-card {
+      background: white; border: 1.5px solid var(--slate-200);
+      border-radius: 16px; padding: 36px 32px; position: relative;
+    }
+    .pricing-card.popular {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.08), var(--shadow-lg);
+    }
+    .popular-badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: var(--blue-600); color: white;
+      font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 100px;
+      white-space: nowrap;
+    }
+    .plan-name { font-size: 14px; font-weight: 700; color: var(--slate-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .plan-price { font-size: 48px; font-weight: 900; color: var(--slate-900); letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
+    .plan-price span { font-size: 16px; font-weight: 500; color: var(--slate-400); vertical-align: top; padding-top: 10px; display: inline-block; }
+    .plan-period { font-size: 13px; color: var(--slate-400); margin-bottom: 28px; }
+    .plan-divider { height: 1px; background: var(--slate-100); margin-bottom: 24px; }
+    .plan-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 10px; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--slate-600); }
+    .plan-features li::before { content: '✓'; color: var(--blue-600); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .plan-features li.muted { color: var(--slate-300); }
+    .plan-features li.muted::before { color: var(--slate-300); }
+    .btn-plan {
+      width: 100%; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 700;
+      cursor: pointer; border: none; transition: all .2s;
+    }
+    .btn-plan-outline { background: white; border: 1.5px solid var(--slate-200); color: var(--slate-700); }
+    .btn-plan-outline:hover { border-color: var(--blue-500); color: var(--blue-700); }
+    .btn-plan-filled { background: var(--blue-600); color: white; box-shadow: 0 4px 14px rgba(37,99,235,.3); }
+    .btn-plan-filled:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.4); }
+
+    /* ── FAQ ── */
+    .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: white; border: 1px solid var(--slate-200);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .faq-question {
+      padding: 20px 24px; font-size: 15px; font-weight: 600; color: var(--slate-800);
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      user-select: none;
+    }
+    .faq-icon { font-size: 18px; color: var(--blue-600); transition: transform .2s; flex-shrink: 0; }
+    .faq-answer {
+      padding: 0 24px 20px; font-size: 14px; color: var(--slate-500); line-height: 1.7;
+      display: none;
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    /* ── DIFFERENTIATOR BANNER ── */
+    .diff-banner {
+      background: linear-gradient(135deg, var(--blue-700), var(--indigo-600));
+      padding: 64px 24px; text-align: center;
+    }
+    .diff-banner h2 { font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; margin-bottom: 12px; }
+    .diff-banner p { font-size: 17px; color: rgba(255,255,255,.75); margin-bottom: 32px; }
+    .diff-grid { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; margin-bottom: 40px; }
+    .diff-item { color: white; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .diff-check { font-size: 18px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--slate-900); color: var(--slate-400);
+      padding: 48px 24px 32px;
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 32px; }
+    .footer-logo { font-size: 20px; font-weight: 800; color: white; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .footer-tagline { font-size: 13px; color: var(--slate-500); max-width: 220px; line-height: 1.6; }
+    .footer-links-group h4 { font-size: 12px; font-weight: 700; color: var(--slate-300); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .footer-links-group a { display: block; font-size: 13px; color: var(--slate-500); text-decoration: none; margin-bottom: 10px; transition: color .15s; }
+    .footer-links-group a:hover { color: white; }
+    .footer-bottom { border-top: 1px solid var(--slate-800); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom p { font-size: 12px; }
+    .footer-fr { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate-500); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links .btn-ghost { display: none; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+      .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .testimonials { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .diff-grid { gap: 24px; }
+      .footer-top { flex-direction: column; }
+      .preview-body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-dot"></div>
+      EmploiIA
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="btn-ghost">Fonctionnalités</a>
+      <a href="#pricing" class="btn-ghost">Tarifs</a>
+      <a href="#faq" class="btn-ghost">FAQ</a>
+      <a href="/connexion" class="btn-ghost">Connexion</a>
+      <a href="/app" class="btn-primary">Essai gratuit →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    🇫🇷 100% en français — Premier outil IA tout-en-un
+  </div>
+
+  <h1>
+    Trouve un emploi<br />
+    <span class="gradient">3x plus vite</span> avec l'IA
+  </h1>
+
+  <p class="hero-sub">
+    CV sur-mesure, lettre de motivation percutante, score ATS optimisé.<br/>
+    Généré en quelques secondes. Adapté à chaque offre.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="/app" class="btn-hero">
+      ✨ Commencer gratuitement
+    </a>
+    <a href="#how" class="btn-hero-outline">Voir comment ça marche</a>
+  </div>
+
+  <div class="hero-note">
+    <span>✓ 5 générations offertes</span>
+    <span>✓ Aucune carte bancaire requise</span>
+    <span>✓ Résultat en 30 secondes</span>
+  </div>
+
+  <!-- App Preview -->
+  <div class="hero-preview">
+    <div class="preview-bar">
+      <div class="preview-dot" style="background:#ff5f56"></div>
+      <div class="preview-dot" style="background:#ffbd2e"></div>
+      <div class="preview-dot" style="background:#27c93f"></div>
+      <div class="preview-url">emploia.fr/app</div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-input">
+        <div class="preview-input-label">📋 Offre d'emploi</div>
+        <div class="preview-line" style="width:90%"></div>
+        <div class="preview-line" style="width:75%"></div>
+        <div class="preview-line" style="width:85%"></div>
+        <div class="preview-input-label" style="margin-top:16px">👤 Votre profil</div>
+        <div class="preview-line" style="width:80%"></div>
+        <div class="preview-line" style="width:65%"></div>
+        <div style="margin-top:16px; background:var(--blue-600); color:white; padding:10px 16px; border-radius:8px; font-size:13px; font-weight:700; text-align:center;">
+          ✨ Générer avec l'IA
+        </div>
+      </div>
+      <div class="preview-output">
+        <div class="preview-output-label">
+          <span>🎯 CV généré</span>
+          <div class="preview-tag">ATS ✓</div>
+        </div>
+        <div class="preview-line" style="width:70%; background:var(--blue-200)"></div>
+        <div class="preview-line" style="width:90%; background:var(--blue-100)"></div>
+        <div class="preview-line" style="width:60%; background:var(--blue-100)"></div>
+        <div class="preview-line" style="width:85%; background:var(--blue-100); margin-top:14px"></div>
+        <div class="preview-line" style="width:75%; background:var(--blue-100)"></div>
+        <div class="preview-line" style="width:80%; background:var(--blue-100)"></div>
+        <div style="margin-top:14px; display:flex; gap:6px;">
+          <div style="background:rgba(37,99,235,.15); color:var(--blue-700); font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px;">Score ATS : 94/100</div>
+          <div style="background:rgba(37,99,235,.15); color:var(--blue-700); font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px;">✓ Mots-clés</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<section class="stats">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-number">2 400+</div>
+      <div class="stat-label">CV générés ce mois</div>
+    </div>
+    <div>
+      <div class="stat-number">94%</div>
+      <div class="stat-label">Taux de passage ATS moyen</div>
+    </div>
+    <div>
+      <div class="stat-number">3x</div>
+      <div class="stat-label">Plus de réponses positives</div>
+    </div>
+    <div>
+      <div class="stat-number">30s</div>
+      <div class="stat-label">Pour générer un CV complet</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="section section-alt" id="how">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Comment ça marche</div>
+      <h2 class="section-title">Postuler n'a jamais été aussi simple</h2>
+      <p class="section-sub">En 3 étapes et 30 secondes, votre candidature est prête à être envoyée.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Collez l'offre d'emploi</h3>
+        <p>Copiez-collez la description du poste qui vous intéresse. EmploiIA analyse les mots-clés, le ton et les exigences.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Ajoutez votre profil</h3>
+        <p>Décrivez vos expériences, compétences et formations. Quelques lignes suffisent, l'IA fait le reste.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Téléchargez et postulez</h3>
+        <p>Obtenez un CV et une lettre optimisés pour cette offre précise. Prêts à envoyer au recruteur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Fonctionnalités</div>
+      <h2 class="section-title">Tout ce qu'il faut pour décrocher le poste</h2>
+      <p class="section-sub">Une suite complète pensée pour maximiser vos chances à chaque étape de la candidature.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>CV Optimisé ATS</h3>
+        <p>Votre CV est automatiquement adapté aux mots-clés exacts de l'offre pour passer les filtres automatiques des recruteurs.</p>
+        <span class="feature-badge">Passe les filtres ATS</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Lettre de motivation</h3>
+        <p>Une lettre unique, personnalisée et percutante qui met en avant votre profil face aux attentes précises du recruteur.</p>
+        <span class="feature-badge">Personnalisée à 100%</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Score ATS</h3>
+        <p>Évaluez la compatibilité de votre CV avant d'envoyer et recevez des conseils concrets pour améliorer votre score.</p>
+        <span class="feature-badge">Score sur 100</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>Préparation entretien</h3>
+        <p>Anticipez les questions de l'entretien basées sur le poste et votre profil. Entraînez-vous avec l'IA avant le jour J.</p>
+        <span class="feature-badge">Bientôt disponible</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Suivi de candidatures</h3>
+        <p>Centralisez et suivez toutes vos candidatures en un seul endroit. Relances automatiques et tableau de bord clair.</p>
+        <span class="feature-badge">Bientôt disponible</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🇫🇷</div>
+        <h3>100% en français</h3>
+        <p>Contrairement à nos concurrents anglophones (Teal, Kickresume), EmploiIA est entièrement conçu pour le marché français.</p>
+        <span class="feature-badge">Seul outil FR</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="section section-alt">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Témoignages</div>
+      <h2 class="section-title">Ils ont trouvé leur emploi avec EmploiIA</h2>
+    </div>
+    <div class="testimonials">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"En reconversion vers le marketing digital, je galérais à adapter mon CV. EmploiIA a complètement transformé ma façon de postuler. J'ai eu 3 entretiens en une semaine."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SL</div>
+          <div>
+            <div class="author-name">Sophie L.</div>
+            <div class="author-role">En reconversion professionnelle, Lyon</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Fraîchement diplômé, je ne savais pas comment valoriser mon profil junior. Le score ATS m'a montré exactement quoi changer. Embauché en 3 semaines !"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">TM</div>
+          <div>
+            <div class="author-name">Thomas M.</div>
+            <div class="author-role">Jeune diplômé, Paris</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Je cherchais discrètement sans avoir le temps de tout rédiger. EmploiIA génère une candidature complète en 30 secondes. Un gain de temps incroyable."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">CR</div>
+          <div>
+            <div class="author-name">Claire R.</div>
+            <div class="author-role">Cadre en recherche discrète, Bordeaux</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRICING ═══ -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">Tarifs</div>
+      <h2 class="section-title">Des tarifs simples et transparents</h2>
+      <p class="section-sub">Commencez gratuitement. Passez Pro quand vous êtes prêt.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-name">Découverte</div>
+        <div class="plan-price"><span style="font-size:24px;padding-top:6px">€</span>0</div>
+        <div class="plan-period">Pour tester EmploiIA</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>5 générations offertes</li>
+          <li>CV sur-mesure ATS</li>
+          <li>Lettre de motivation</li>
+          <li>Score ATS basique</li>
+          <li class="muted">Générations illimitées</li>
+          <li class="muted">Support prioritaire</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline">Commencer gratuitement</button>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">⭐ Le plus populaire</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><span>€</span>19</div>
+        <div class="plan-period">par mois — sans engagement</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Générations illimitées</li>
+          <li>CV sur-mesure ATS</li>
+          <li>Lettre de motivation</li>
+          <li>Score ATS avancé + conseils</li>
+          <li>Modèles CV premium</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <button class="btn-plan btn-plan-filled">Devenir Pro →</button>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-name">Annuel</div>
+        <div class="plan-price"><span>€</span>99</div>
+        <div class="plan-period">par an — économisez 40%</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Tout le plan Pro</li>
+          <li>Préparation entretien IA</li>
+          <li>Suivi des candidatures</li>
+          <li>Export PDF premium</li>
+          <li>Accès anticipé nouvelles fonctions</li>
+          <li>Support prioritaire 24h</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline">Choisir l'annuel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DIFFERENTIATOR ═══ -->
+<div class="diff-banner">
+  <h2>Pourquoi choisir EmploiIA ?</h2>
+  <p>Le seul outil tout-en-un de recherche d'emploi entièrement en français</p>
+  <div class="diff-grid">
+    <div class="diff-item"><span class="diff-check">✓</span> 100% en français</div>
+    <div class="diff-item"><span class="diff-check">✓</span> Adapté au marché français</div>
+    <div class="diff-item"><span class="diff-check">✓</span> Résultat en 30 secondes</div>
+    <div class="diff-item"><span class="diff-check">✓</span> Sans carte bancaire</div>
+  </div>
+  <a href="/app" class="btn-hero" style="font-size:15px; padding:12px 28px;">
+    ✨ Essayer gratuitement maintenant
+  </a>
+</div>
+
+<!-- ═══ FAQ ═══ -->
+<section class="section section-alt" id="faq">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">FAQ</div>
+      <h2 class="section-title">Questions fréquentes</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Mes données sont-elles sécurisées ?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Vos données sont chiffrées et ne sont jamais partagées avec des tiers. Elles sont uniquement utilisées pour générer vos documents et ne sont pas conservées après la session.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Puis-je annuler mon abonnement à tout moment ?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Oui, sans engagement. Vous pouvez annuler en un clic depuis votre espace personnel. Aucun frais de résiliation, aucune question posée.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          EmploiIA fonctionne-t-il pour tous les secteurs d'activité ?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Oui, l'IA s'adapte à tous les secteurs : tech, commerce, santé, finance, communication, industrie, etc. Plus votre description de profil est précise, meilleur sera le résultat.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Quelle différence avec ChatGPT ou d'autres outils IA ?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">EmploiIA est spécialisé dans la recherche d'emploi en France. Il connaît les codes du marché français, optimise spécifiquement pour les ATS des recruteurs français et génère des documents directement utilisables, sans effort de mise en forme.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Combien de temps faut-il pour générer un CV ?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Environ 30 secondes. Collez l'offre d'emploi, décrivez votre profil, cliquez sur Générer. Votre CV et votre lettre sont prêts à télécharger.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">EmploiIA</div>
+        <div class="footer-tagline">L'outil tout-en-un pour trouver un emploi 3x plus vite avec l'IA. 100% en français.</div>
+      </div>
+      <div class="footer-links-group">
+        <h4>Produit</h4>
+        <a href="#features">Fonctionnalités</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="#how">Comment ça marche</a>
+      </div>
+      <div class="footer-links-group">
+        <h4>Ressources</h4>
+        <a href="#">Blog conseils emploi</a>
+        <a href="#">Guide CV ATS</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="footer-links-group">
+        <h4>Légal</h4>
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+        <a href="#">CGU</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 EmploiIA. Tous droits réservés.</p>
+      <div class="footer-fr">🇫🇷 Conçu pour le marché français</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    item.classList.toggle('open');
+  }
+</script>
+
+</body>
 </html>
