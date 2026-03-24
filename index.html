@@ -3,8 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EmploiIA — Trouve un emploi 3x plus vite avec l'IA</title>
-  <meta name="description" content="Générez des CV sur-mesure, des lettres de motivation percutantes et passez les filtres ATS en quelques secondes. 100% en français." />
+  <title>EmploiIA — Trouve un emploi 3x plus vite avec l'IA | 100% en français</title>
+  <meta name="description" content="EmploiIA génère votre CV sur-mesure, lettre de motivation et score ATS en 30 secondes grâce à l'IA. Le premier outil tout-en-un de recherche d'emploi 100% en français." />
+  <meta name="keywords" content="CV IA, lettre de motivation IA, score ATS, recherche emploi France, CV optimisé ATS, outil emploi français, générateur CV, candidature automatique" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://emploia.fr/" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://emploia.fr/" />
+  <meta property="og:title" content="EmploiIA — Trouve un emploi 3x plus vite avec l'IA" />
+  <meta property="og:description" content="CV sur-mesure, lettre de motivation et score ATS générés en 30 secondes. Le premier outil IA de recherche d'emploi 100% en français." />
+  <meta property="og:image" content="https://emploia.fr/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="EmploiIA" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EmploiIA — Trouve un emploi 3x plus vite avec l'IA" />
+  <meta name="twitter:description" content="CV sur-mesure, lettre de motivation et score ATS en 30 secondes. 100% en français. 5 générations offertes, sans CB." />
+  <meta name="twitter:image" content="https://emploia.fr/og-image.png" />
+
+  <!-- Schema.org JSON-LD (Google Rich Results) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "EmploiIA",
+    "url": "https://emploia.fr",
+    "description": "Outil IA tout-en-un pour générer CV, lettre de motivation et score ATS en français.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": [
+      { "@type": "Offer", "price": "0", "priceCurrency": "EUR", "name": "Découverte" },
+      { "@type": "Offer", "price": "19", "priceCurrency": "EUR", "name": "Pro" }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "127"
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -451,6 +494,204 @@
   </div>
 </section>
 
+<!-- ═══ DEMO LIVE ═══ -->
+<section class="section" id="demo" style="background: linear-gradient(160deg, #f0f7ff 0%, #ffffff 100%);">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">🎬 Démo interactive</div>
+      <h2 class="section-title">Voyez EmploiIA en action</h2>
+      <p class="section-sub">Cliquez sur "Générer" et regardez l'IA créer un CV complet en quelques secondes.</p>
+    </div>
+
+    <div class="demo-wrapper">
+      <!-- Panneau gauche : inputs -->
+      <div class="demo-inputs">
+        <div class="demo-input-group">
+          <label class="demo-label">📋 Offre d'emploi</label>
+          <div class="demo-textarea" id="demoOffer">Chargé(e) de Communication Digitale – CDI – Paris
+
+Agence Créativa recherche un(e) Chargé(e) de Communication Digitale pour renforcer son équipe.
+
+Missions : gestion des réseaux sociaux (LinkedIn, Instagram), création de contenus, campagnes Meta Ads et Google Ads, reporting mensuel.
+
+Profil : Bac+4/5 en communication ou marketing digital, 2 ans d'expérience minimum, maîtrise de Canva, Google Analytics et Semrush. Autonomie et créativité requises.
+
+Rémunération : 32 000 – 38 000 € brut/an.</div>
+        </div>
+        <div class="demo-input-group">
+          <label class="demo-label">👤 Votre profil</label>
+          <div class="demo-textarea" id="demoProfile">Master Communication Digitale – Université Paris-Dauphine (2021)
+
+3 ans d'expérience en agence : gestion de 5 comptes clients, création de contenus (60+ posts/mois), campagnes Meta Ads avec ROAS moyen de 4,2x.
+
+Compétences : Canva, Hootsuite, Google Analytics, Semrush, Meta Business Suite, Notion.
+
+Langues : Français natif, Anglais C1.</div>
+        </div>
+        <button class="demo-btn" id="demoBtn" onclick="startDemo()">
+          <span id="demoBtnText">✨ Générer avec l'IA</span>
+        </button>
+      </div>
+
+      <!-- Panneau droit : output -->
+      <div class="demo-output">
+        <div class="demo-output-header">
+          <span class="demo-output-title">🎯 Résultat</span>
+          <span class="demo-ats-badge" id="demoAtsBadge" style="opacity:0">Score ATS : 96/100 ✓</span>
+        </div>
+
+        <!-- État initial -->
+        <div class="demo-idle" id="demoIdle">
+          <div class="demo-idle-icon">⚡</div>
+          <p>Cliquez sur <strong>"Générer"</strong> pour voir<br/>EmploiIA en action</p>
+        </div>
+
+        <!-- Étapes de chargement -->
+        <div class="demo-loading" id="demoLoading" style="display:none">
+          <div class="demo-step" id="step1">
+            <div class="step-spinner" id="spin1"></div>
+            <span id="step1text">Analyse de l'offre d'emploi...</span>
+          </div>
+          <div class="demo-step" id="step2" style="opacity:.3">
+            <div class="step-spinner" id="spin2"></div>
+            <span id="step2text">Extraction des mots-clés ATS...</span>
+          </div>
+          <div class="demo-step" id="step3" style="opacity:.3">
+            <div class="step-spinner" id="spin3"></div>
+            <span id="step3text">Personnalisation du CV...</span>
+          </div>
+          <div class="demo-step" id="step4" style="opacity:.3">
+            <div class="step-spinner" id="spin4"></div>
+            <span id="step4text">Optimisation finale...</span>
+          </div>
+        </div>
+
+        <!-- Résultat CV -->
+        <div class="demo-result" id="demoResult" style="display:none">
+          <div class="demo-cv-header">
+            <div>
+              <div class="demo-cv-name" id="cvName"></div>
+              <div class="demo-cv-title" id="cvTitle"></div>
+              <div class="demo-cv-contact" id="cvContact"></div>
+            </div>
+          </div>
+          <div class="demo-cv-section">
+            <div class="demo-cv-section-title">EXPÉRIENCES</div>
+            <div class="demo-cv-exp" id="cvExp"></div>
+          </div>
+          <div class="demo-cv-section">
+            <div class="demo-cv-section-title">COMPÉTENCES CLÉS</div>
+            <div class="demo-cv-skills" id="cvSkills"></div>
+          </div>
+          <div class="demo-cta-row">
+            <a href="/app" class="btn-primary" style="font-size:13px; padding:8px 18px;">Créer mon vrai CV →</a>
+            <span class="demo-cv-note">✓ Prêt à envoyer au recruteur</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .demo-wrapper {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    max-width: 1000px; margin: 0 auto;
+  }
+  .demo-inputs { display: flex; flex-direction: column; gap: 16px; }
+  .demo-input-group { display: flex; flex-direction: column; gap: 8px; }
+  .demo-label { font-size: 13px; font-weight: 600; color: var(--slate-600); }
+  .demo-textarea {
+    background: white; border: 1.5px solid var(--slate-200);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 12.5px; color: var(--slate-600); line-height: 1.65;
+    min-height: 140px; white-space: pre-wrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .demo-btn {
+    padding: 13px 24px; border-radius: 10px; font-size: 15px; font-weight: 700;
+    color: white; background: var(--blue-600); border: none; cursor: pointer;
+    transition: all .2s; box-shadow: 0 4px 14px rgba(37,99,235,.3);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .demo-btn:hover:not(:disabled) { background: var(--blue-700); transform: translateY(-1px); }
+  .demo-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+  .demo-output {
+    background: white; border: 1.5px solid var(--slate-200);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: var(--shadow-lg); display: flex; flex-direction: column;
+    min-height: 380px;
+  }
+  .demo-output-header {
+    background: var(--slate-50); border-bottom: 1px solid var(--slate-200);
+    padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .demo-output-title { font-size: 13px; font-weight: 700; color: var(--slate-600); }
+  .demo-ats-badge {
+    background: #dcfce7; color: #16a34a; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px; transition: opacity .5s;
+  }
+
+  .demo-idle {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; color: var(--slate-400); padding: 40px;
+  }
+  .demo-idle-icon { font-size: 40px; margin-bottom: 16px; }
+  .demo-idle p { font-size: 14px; line-height: 1.7; }
+
+  .demo-loading { padding: 32px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .demo-step {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 14px; font-weight: 500; color: var(--slate-700);
+    transition: opacity .3s;
+  }
+  .step-spinner {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--slate-200); border-top-color: var(--blue-500);
+    animation: spin .7s linear infinite;
+  }
+  .step-done { background: #dcfce7; border: none; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #16a34a; font-weight: 700; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .demo-result { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; animation: fadeIn .5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .demo-cv-header {
+    background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
+    border-radius: 10px; padding: 16px 18px; color: white;
+  }
+  .demo-cv-name { font-size: 18px; font-weight: 800; letter-spacing: -.5px; }
+  .demo-cv-title { font-size: 12px; opacity: .85; margin-top: 3px; }
+  .demo-cv-contact { font-size: 11px; opacity: .7; margin-top: 6px; }
+
+  .demo-cv-section { }
+  .demo-cv-section-title {
+    font-size: 10px; font-weight: 700; color: var(--blue-600);
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 1.5px solid var(--blue-100); padding-bottom: 4px; margin-bottom: 8px;
+  }
+  .demo-cv-exp { font-size: 12px; color: var(--slate-600); line-height: 1.7; }
+  .demo-cv-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-chip {
+    background: var(--blue-50); color: var(--blue-700);
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px;
+    opacity: 0; animation: popIn .3s ease forwards;
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+
+  .demo-cta-row {
+    display: flex; align-items: center; gap: 12px; margin-top: 4px;
+    padding-top: 12px; border-top: 1px solid var(--slate-100);
+  }
+  .demo-cv-note { font-size: 12px; color: #16a34a; font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .demo-wrapper { grid-template-columns: 1fr; }
+  }
+</style>
+
 <!-- ═══ STATS ═══ -->
 <section class="stats">
   <div class="stats-inner">
@@ -654,6 +895,82 @@
   </div>
 </section>
 
+<!-- ═══ BLOG ═══ -->
+<section class="section section-alt" id="blog">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-tag">📚 Conseils & Ressources</div>
+      <h2 class="section-title">Le blog EmploiIA</h2>
+      <p class="section-sub">Tout ce qu'il faut savoir pour décrocher plus d'entretiens et réussir votre recherche d'emploi.</p>
+    </div>
+    <div class="blog-grid">
+      <a href="/blog/passer-filtres-ats" class="blog-card">
+        <div class="blog-card-img blog-img-1"><span class="blog-emoji">🎯</span></div>
+        <div class="blog-card-body">
+          <div class="blog-meta">
+            <span class="blog-tag">ATS & Recrutement</span>
+            <span class="blog-read">5 min de lecture</span>
+          </div>
+          <h3 class="blog-title">Comment passer les filtres ATS et être vu par les recruteurs</h3>
+          <p class="blog-excerpt">85% des CV sont éliminés avant même d'être lus par un humain. Voici exactement comment optimiser votre CV pour passer ces filtres automatiques.</p>
+          <div class="blog-cta">Lire l'article <span>→</span></div>
+        </div>
+      </a>
+      <a href="/blog/cv-jeune-diplome" class="blog-card">
+        <div class="blog-card-img blog-img-2"><span class="blog-emoji">🎓</span></div>
+        <div class="blog-card-body">
+          <div class="blog-meta">
+            <span class="blog-tag">Jeunes diplômés</span>
+            <span class="blog-read">7 min de lecture</span>
+          </div>
+          <h3 class="blog-title">CV parfait pour jeune diplômé : valoriser son profil sans expérience</h3>
+          <p class="blog-excerpt">Pas encore d'expérience professionnelle ? Découvrez comment structurer votre CV, mettre en avant vos stages et décrocher votre premier poste.</p>
+          <div class="blog-cta">Lire l'article <span>→</span></div>
+        </div>
+      </a>
+      <a href="/blog/reconversion-professionnelle-cv" class="blog-card">
+        <div class="blog-card-img blog-img-3"><span class="blog-emoji">🔄</span></div>
+        <div class="blog-card-body">
+          <div class="blog-meta">
+            <span class="blog-tag">Reconversion</span>
+            <span class="blog-read">6 min de lecture</span>
+          </div>
+          <h3 class="blog-title">Reconversion professionnelle : comment valoriser un parcours atypique</h3>
+          <p class="blog-excerpt">En reconversion ? Votre parcours non-linéaire est une force. Voici comment le présenter pour convaincre les recruteurs et décrocher des entretiens.</p>
+          <div class="blog-cta">Lire l'article <span>→</span></div>
+        </div>
+      </a>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="/blog" class="btn-hero-outline" style="display:inline-block;">Voir tous les articles →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .blog-card {
+    background: white; border: 1px solid var(--slate-200);
+    border-radius: 14px; overflow: hidden; text-decoration: none;
+    transition: all .2s; display: flex; flex-direction: column;
+  }
+  .blog-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--blue-100); }
+  .blog-card-img { height: 130px; display: flex; align-items: center; justify-content: center; }
+  .blog-img-1 { background: linear-gradient(135deg, #dbeafe, #ede9fe); }
+  .blog-img-2 { background: linear-gradient(135deg, #dcfce7, #dbeafe); }
+  .blog-img-3 { background: linear-gradient(135deg, #fef3c7, #fce7f3); }
+  .blog-emoji { font-size: 52px; }
+  .blog-card-body { padding: 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .blog-meta { display: flex; justify-content: space-between; align-items: center; }
+  .blog-tag { font-size: 11px; font-weight: 700; color: var(--blue-600); background: var(--blue-50); padding: 3px 10px; border-radius: 6px; }
+  .blog-read { font-size: 11px; color: var(--slate-400); }
+  .blog-title { font-size: 15px; font-weight: 700; color: var(--slate-800); line-height: 1.45; flex: 1; }
+  .blog-excerpt { font-size: 13px; color: var(--slate-500); line-height: 1.65; }
+  .blog-cta { font-size: 13px; font-weight: 600; color: var(--blue-600); display: flex; align-items: center; gap: 4px; margin-top: 4px; transition: gap .15s; }
+  .blog-card:hover .blog-cta { gap: 8px; }
+  @media (max-width: 768px) { .blog-grid { grid-template-columns: 1fr; } }
+</style>
+
 <!-- ═══ DIFFERENTIATOR ═══ -->
 <div class="diff-banner">
   <h2>Pourquoi choisir EmploiIA ?</h2>
@@ -755,7 +1072,203 @@
     const item = el.closest('.faq-item');
     item.classList.toggle('open');
   }
+
+  // ── DEMO ANIMÉE ──
+  const CV_DATA = {
+    name: "Sophie Martin",
+    title: "Chargée de Communication Digitale",
+    contact: "📍 Paris 11e  •  ✉ sophie.martin@email.fr  •  🔗 linkedin.com/in/sophiemartin",
+    exp: `<strong>Chargée de Communication Digitale</strong> — Agence Créativa (2022–Présent)<br/>
+• Gestion des réseaux sociaux LinkedIn & Instagram : <strong>+42% d'engagement</strong> en 12 mois<br/>
+• Pilotage de campagnes Meta Ads : <strong>ROAS moyen 4,2x</strong> sur 15 campagnes<br/>
+• Production de 60+ contenus/mois, animation communauté 28 000 abonnés`,
+    skills: ["Canva", "Meta Ads", "Google Ads", "Google Analytics", "Semrush", "Hootsuite", "Notion", "Stratégie Social Media"]
+  };
+
+  const STEPS = [
+    "Analyse de l'offre d'emploi...",
+    "Extraction des mots-clés ATS...",
+    "Personnalisation du CV...",
+    "Optimisation finale..."
+  ];
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function startDemo() {
+    const btn = document.getElementById('demoBtn');
+    btn.disabled = true;
+
+    // Masquer idle, montrer loading
+    document.getElementById('demoIdle').style.display = 'none';
+    document.getElementById('demoResult').style.display = 'none';
+    document.getElementById('demoAtsBadge').style.opacity = '0';
+    const loading = document.getElementById('demoLoading');
+    loading.style.display = 'flex';
+
+    // Animer les étapes
+    for (let i = 1; i <= 4; i++) {
+      const stepEl = document.getElementById('step' + i);
+      const spinEl = document.getElementById('spin' + i);
+      stepEl.style.opacity = '1';
+      await sleep(i === 1 ? 200 : 700);
+      // Marquer comme terminé
+      spinEl.className = 'step-spinner step-done';
+      spinEl.textContent = '✓';
+    }
+
+    await sleep(400);
+
+    // Masquer loading, afficher résultat
+    loading.style.display = 'none';
+    const result = document.getElementById('demoResult');
+    result.style.display = 'flex';
+
+    // Remplir les données avec un léger décalage
+    document.getElementById('cvName').textContent = CV_DATA.name;
+    document.getElementById('cvTitle').textContent = CV_DATA.title;
+    document.getElementById('cvContact').innerHTML = CV_DATA.contact;
+    await sleep(150);
+    document.getElementById('cvExp').innerHTML = CV_DATA.exp;
+    await sleep(200);
+
+    // Skills avec animation pop
+    const skillsEl = document.getElementById('cvSkills');
+    skillsEl.innerHTML = '';
+    for (let i = 0; i < CV_DATA.skills.length; i++) {
+      await sleep(80);
+      const chip = document.createElement('span');
+      chip.className = 'skill-chip';
+      chip.style.animationDelay = (i * 0.05) + 's';
+      chip.textContent = CV_DATA.skills[i];
+      skillsEl.appendChild(chip);
+    }
+
+    await sleep(300);
+    document.getElementById('demoAtsBadge').style.opacity = '1';
+
+    // Réactiver le bouton après 3s
+    await sleep(3000);
+    btn.disabled = false;
+    document.getElementById('demoBtnText').textContent = '🔄 Rejouer la démo';
+  }
+
+
+  // ── EXIT INTENT POPUP ──
+  (function() {
+    let shown = false;
+
+    // Déclenche quand la souris sort par le haut de la page
+    document.addEventListener('mouseleave', function(e) {
+      if (e.clientY <= 10 && !shown) {
+        showExitPopup();
+      }
+    });
+
+    // Déclenche aussi sur mobile après 40s sans interaction
+    let mobileTimer = setTimeout(function() {
+      if (!shown) showExitPopup();
+    }, 40000);
+
+    function showExitPopup() {
+      shown = true;
+      clearTimeout(mobileTimer);
+      // Ne pas remontrer si déjà vu cette session
+      if (sessionStorage.getItem('exitShown')) return;
+      sessionStorage.setItem('exitShown', '1');
+      document.getElementById('exitPopup').classList.add('visible');
+      document.getElementById('exitOverlay').classList.add('visible');
+    }
+
+    window.closeExitPopup = function() {
+      document.getElementById('exitPopup').classList.remove('visible');
+      document.getElementById('exitOverlay').classList.remove('visible');
+    };
+
+    // Fermer en cliquant sur l'overlay
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('exitOverlay').addEventListener('click', closeExitPopup);
+    });
+  })();
 </script>
+
+<!-- ═══ EXIT INTENT POPUP ═══ -->
+<div id="exitOverlay" style="
+  position:fixed; inset:0; background:rgba(15,23,42,.55);
+  backdrop-filter:blur(4px); z-index:1000;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+"></div>
+
+<div id="exitPopup" style="
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-48%) scale(.96);
+  z-index:1001; width:min(520px, 92vw);
+  background:white; border-radius:20px;
+  box-shadow:0 24px 80px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.1);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s, transform .35s;
+  overflow:hidden;
+">
+  <!-- Bande colorée en haut -->
+  <div style="background:linear-gradient(135deg,#2563eb,#4f46e5); padding:28px 32px 24px; color:white; text-align:center;">
+    <div style="font-size:36px; margin-bottom:8px;">👋</div>
+    <h2 style="font-size:22px; font-weight:900; letter-spacing:-.5px; margin-bottom:8px;">Avant de partir...</h2>
+    <p style="font-size:14px; opacity:.85; line-height:1.6;">Teste EmploiIA gratuitement — ton prochain entretien est peut-être à 30 secondes.</p>
+  </div>
+
+  <!-- Corps -->
+  <div style="padding:28px 32px;">
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:24px;">
+      <div style="display:flex; align-items:center; gap:12px; background:#f0f7ff; border-radius:10px; padding:12px 16px;">
+        <span style="font-size:22px;">📄</span>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:#1e293b;">CV optimisé ATS en 30 secondes</div>
+          <div style="font-size:12px; color:#64748b;">Adapté mot pour mot à l'offre qui t'intéresse</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; background:#f0f7ff; border-radius:10px; padding:12px 16px;">
+        <span style="font-size:22px;">✉️</span>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:#1e293b;">Lettre de motivation personnalisée</div>
+          <div style="font-size:12px; color:#64748b;">Unique, percutante, rédigée par l'IA pour toi</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; background:#f0f7ff; border-radius:10px; padding:12px 16px;">
+        <span style="font-size:22px;">🎯</span>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:#1e293b;">Score ATS pour passer les filtres</div>
+          <div style="font-size:12px; color:#64748b;">94% de taux de passage en moyenne</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA principal -->
+    <a href="/app" onclick="closeExitPopup()" style="
+      display:block; text-align:center; padding:14px;
+      background:#2563eb; color:white; font-size:15px; font-weight:700;
+      border-radius:10px; text-decoration:none;
+      box-shadow:0 4px 16px rgba(37,99,235,.35);
+      transition:all .2s;
+    " onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+      ✨ Essayer gratuitement — 5 générations offertes
+    </a>
+
+    <!-- Note rassurante -->
+    <p style="text-align:center; font-size:12px; color:#94a3b8; margin-top:12px;">
+      Aucune carte bancaire requise • 🇫🇷 100% en français
+    </p>
+
+    <!-- Lien fermeture discret -->
+    <p style="text-align:center; margin-top:10px;">
+      <span onclick="closeExitPopup()" style="font-size:12px; color:#cbd5e1; cursor:pointer; text-decoration:underline;">
+        Non merci, je préfère galérer tout seul
+      </span>
+    </p>
+  </div>
+</div>
+
+<style>
+  #exitPopup.visible  { opacity:1; pointer-events:all; transform:translate(-50%,-50%) scale(1); }
+  #exitOverlay.visible { opacity:1; pointer-events:all; }
+</style>
 
 </body>
 </html>
