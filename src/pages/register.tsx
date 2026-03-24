@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useRegister } from "@workspace/api-client-react";
+import { useRegister } from "@/lib/api-client";
 import { Button, Input, Card } from "@/components/ui-blocks";
 import { Mail, Lock, User, ArrowRight, AlertCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";

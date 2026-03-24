@@ -1,4 +1,4 @@
-import { useGetMe, useLogout } from "@workspace/api-client-react";
+import { useGetMe, useLogout } from "@/lib/api-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 

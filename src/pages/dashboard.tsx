@@ -5,7 +5,7 @@ import {
   useGenerateCv, 
   useGenerateCoverLetter, 
   useGenerateAtsScore 
-} from "@workspace/api-client-react";
+} from "@/lib/api-client";
 import { Button, Textarea, Card } from "@/components/ui-blocks";
 import { 
   LogOut, Crown, Copy, Check, FileText, Briefcase, Target, 
