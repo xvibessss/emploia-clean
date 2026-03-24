@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none">
+  <defs>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icône : document stylisé avec étincelle IA -->
+  <rect x="2" y="4" width="32" height="40" rx="5" fill="url(#iconGrad)"/>
+
+  <!-- Lignes "texte" sur le document -->
+  <rect x="8" y="14" width="14" height="2.5" rx="1.25" fill="white" opacity="0.9"/>
+  <rect x="8" y="20" width="20" height="2.5" rx="1.25" fill="white" opacity="0.6"/>
+  <rect x="8" y="26" width="17" height="2.5" rx="1.25" fill="white" opacity="0.6"/>
+  <rect x="8" y="32" width="12" height="2.5" rx="1.25" fill="white" opacity="0.4"/>
+
+  <!-- Étincelle IA (coin haut droit de l'icône) -->
+  <circle cx="30" cy="6" r="7" fill="#0f172a"/>
+  <circle cx="30" cy="6" r="6" fill="url(#sparkGrad)"/>
+  <!-- Étoile / sparkle -->
+  <path d="M30 2.5 L30.6 5.4 L33.5 6 L30.6 6.6 L30 9.5 L29.4 6.6 L26.5 6 L29.4 5.4 Z" fill="white"/>
+
+  <!-- Wordmark : EmploiIA -->
+  <text x="44" y="32" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="800" letter-spacing="-0.8" fill="#0f172a">Emploi</text>
+  <text x="138" y="32" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="800" letter-spacing="-0.8" fill="url(#iconGrad)">IA</text>
+</svg>
