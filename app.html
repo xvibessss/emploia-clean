@@ -86,7 +86,7 @@
     /* SCORE CARD */
     .score-card { margin:16px 24px; background:linear-gradient(135deg,var(--blue-600),var(--indigo-600)); border-radius:12px; padding:20px 24px; color:white; display:none; }
     .score-card.visible { display:block; }
-  .score-value { font-size:48px; font-weight:900; letter-spacing:-2px; }
+    .score-value { font-size:48px; font-weight:900; letter-spacing:-2px; }
     .score-label { font-size:13px; opacity:.8; margin-top:2px; }
     .score-bar-wrap { background:rgba(255,255,255,.2); border-radius:4px; height:6px; margin-top:12px; overflow:hidden; }
     .score-bar { height:100%; border-radius:4px; background:white; transition:width 1s cubic-bezier(.4,0,.2,1); }
@@ -119,9 +119,12 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="/" class="logo"><div class="logo-dot"></div>EmploiIA</a>
-    <div class="credits-badge">
-      ⚡ <span class="credits-count" id="creditsCount">5</span> générations restantes
+    <a href="/" class="logo"><div class="logo-dot"></div>Emploia</a>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="/dashboard" style="font-size:13px;font-weight:600;color:var(--slate-500);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">📊 Mes candidatures</a>
+      <div class="credits-badge">
+        ⚡ <span class="credits-count" id="creditsCount">5</span> générations restantes
+      </div>
     </div>
   </div>
 </nav>
@@ -228,7 +231,7 @@ Compétences : Canva, Google Analytics, Semrush..."></textarea>
 <script>
   const LABELS = {
     cv:     { tab:'CV',           badge:'📄 CV',            profile:'Votre profil & expériences',  btn:'✨ Générer mon CV' },
- lettre: { tab:'Lettre',       badge:'✉️ Lettre',        profile:'Votre profil & expériences',  btn:'✨ Générer la lettre' },
+    lettre: { tab:'Lettre',       badge:'✉️ Lettre',        profile:'Votre profil & expériences',  btn:'✨ Générer la lettre' },
     ats:    { tab:'Score ATS',    badge:'🎯 Score ATS',     profile:'Votre CV complet (texte)',     btn:'✨ Analyser mon score ATS' },
   };
 
