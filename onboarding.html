@@ -3,468 +3,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bienvenue sur EmploiIA 👋</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <title>Emploia — Commencer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue-50: #eff6ff; --blue-100: #dbeafe;
-      --blue-500: #3b82f6; --blue-600: #2563eb; --blue-700: #1d4ed8;
-      --indigo-600: #4f46e5;
-      --slate-100: #f1f5f9; --slate-200: #e2e8f0; --slate-300: #cbd5e1;
-      --slate-400: #94a3b8; --slate-500: #64748b; --slate-600: #475569;
-      --slate-700: #334155; --slate-800: #1e293b; --slate-900: #0f172a;
-      --green-500: #22c55e; --green-100: #dcfce7;
+      --bg: #0a0f1e; --surface: #111827; --surface-2: #1a2236; --surface-3: #1e2a40;
+      --border: rgba(255,255,255,.07); --border-h: rgba(255,255,255,.13);
+      --blue: #3b82f6; --blue-b: #60a5fa; --blue-d: rgba(59,130,246,.12);
+      --indigo: #6366f1; --indigo-b: #818cf8;
+      --green: #10b981; --green-b: #34d399; --green-d: rgba(16,185,129,.1);
+      --text: #f1f5f9; --text-2: #94a3b8; --text-3: #475569;
     }
+    html, body { height: 100%; font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(ellipse 80% 50% at 20% 0%, rgba(99,102,241,.1) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59,130,246,.08) 0%, transparent 60%); }
 
-    html, body {
-      height: 100%; font-family: 'Inter', sans-serif;
-      background: #f8fafc; color: var(--slate-800);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── LAYOUT ── */
-    .page {
-      min-height: 100vh; display: grid;
-      grid-template-columns: 340px 1fr;
-    }
+    .page { min-height: 100vh; display: grid; grid-template-columns: 320px 1fr; position: relative; z-index: 1; }
 
     /* ── SIDEBAR ── */
-    .sidebar {
-      background: linear-gradient(160deg, #1e3a8a 0%, #1d4ed8 60%, #4338ca 100%);
-      padding: 48px 36px; display: flex; flex-direction: column;
-      position: sticky; top: 0; height: 100vh;
-    }
-    .sidebar-logo {
-      font-size: 22px; font-weight: 900; color: white;
-      letter-spacing: -.5px; margin-bottom: 52px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .sidebar-logo-dot { width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; }
+    .sidebar { background: linear-gradient(160deg, rgba(99,102,241,.15) 0%, rgba(59,130,246,.08) 100%); border-right: 1px solid var(--border); padding: 48px 32px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .s-logo { font-size: 18px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin-bottom: 56px; text-decoration: none; }
+    .s-logo-mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--blue), var(--indigo)); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: white; }
 
-    .sidebar-steps { display: flex; flex-direction: column; gap: 0; flex: 1; }
-    .sidebar-step { display: flex; gap: 16px; position: relative; padding-bottom: 36px; }
-    .sidebar-step:last-child { padding-bottom: 0; }
-    .sidebar-step:not(:last-child)::after {
-      content: ''; position: absolute; left: 19px; top: 40px;
-      width: 2px; bottom: 0;
-      background: rgba(255,255,255,.15);
-    }
-    .sidebar-step.done::after { background: rgba(255,255,255,.4); }
-
-    .step-circle {
-      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 800; transition: all .3s;
-      border: 2px solid rgba(255,255,255,.25); color: rgba(255,255,255,.5);
-      background: rgba(255,255,255,.08);
-    }
-    .sidebar-step.done .step-circle {
-      background: var(--green-500); border-color: var(--green-500);
-      color: white; font-size: 16px;
-    }
-    .sidebar-step.active .step-circle {
-      background: white; border-color: white; color: var(--blue-700);
-    }
+    .s-steps { flex: 1; display: flex; flex-direction: column; gap: 0; }
+    .s-step { display: flex; gap: 16px; position: relative; padding-bottom: 40px; }
+    .s-step:last-child { padding-bottom: 0; }
+    .s-step:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 42px; bottom: 0; width: 1px; background: var(--border); }
+    .s-step.done::after { background: linear-gradient(180deg, var(--blue), var(--border)); }
+    .step-circle { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--text-3); flex-shrink: 0; transition: all .3s; background: var(--surface); }
+    .s-step.active .step-circle { border-color: var(--blue); color: var(--blue-b); background: var(--blue-d); box-shadow: 0 0 16px rgba(59,130,246,.2); }
+    .s-step.done .step-circle { border-color: var(--green); color: var(--green-b); background: var(--green-d); }
     .step-info { padding-top: 8px; }
-    .step-label {
-      font-size: 11px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 1px; color: rgba(255,255,255,.45); margin-bottom: 3px;
-    }
-    .sidebar-step.active .step-label { color: rgba(255,255,255,.7); }
-    .sidebar-step.done .step-label { color: rgba(255,255,255,.5); }
-    .step-name {
-      font-size: 15px; font-weight: 700; color: rgba(255,255,255,.4);
-      line-height: 1.3;
-    }
-    .sidebar-step.active .step-name { color: white; }
-    .sidebar-step.done .step-name { color: rgba(255,255,255,.6); }
+    .step-label-small { font-size: 10px; color: var(--text-3); font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+    .step-name { font-size: 14px; font-weight: 700; color: var(--text-3); margin-top: 2px; transition: color .3s; }
+    .s-step.active .step-name { color: var(--text); }
+    .s-step.done .step-name { color: var(--green-b); }
 
-    .sidebar-footer { margin-top: auto; }
-    .sidebar-note {
-      background: rgba(255,255,255,.1); border-radius: 12px;
-      padding: 16px; color: rgba(255,255,255,.7); font-size: 13px; line-height: 1.6;
-    }
-    .sidebar-note strong { color: white; }
+    .s-footer { margin-top: 40px; background: rgba(59,130,246,.06); border: 1px solid rgba(59,130,246,.12); border-radius: 12px; padding: 16px; }
+    .s-footer-text { font-size: 12px; color: var(--text-2); line-height: 1.65; }
+    .s-footer strong { color: var(--blue-b); }
 
-    /* ── MAIN CONTENT ── */
-    .main { padding: 60px 72px; display: flex; flex-direction: column; justify-content: center; }
-    .main-inner { max-width: 560px; }
+    /* ── MAIN ── */
+    .main { padding: 64px 56px; overflow-y: auto; }
+    .main-inner { max-width: 580px; }
 
-    /* Steps */
-    .step-view { display: none; animation: slideIn .35s ease; }
+    /* Progress */
+    .progress-wrap { height: 3px; background: var(--surface-2); border-radius: 2px; margin-bottom: 48px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, var(--blue), var(--indigo)); border-radius: 2px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+
+    .step-view { display: none; animation: fadeIn .3s ease; }
     .step-view.active { display: block; }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .step-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--blue-50); border: 1px solid var(--blue-100);
-      color: var(--blue-600); font-size: 12px; font-weight: 700;
-      padding: 5px 12px; border-radius: 100px; margin-bottom: 20px;
-    }
-    .step-tag-dot { width: 6px; height: 6px; background: var(--blue-500); border-radius: 50%; }
+    .step-tag { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; color: var(--blue-b); text-transform: uppercase; letter-spacing: 1px; background: var(--blue-d); border: 1px solid rgba(59,130,246,.2); padding: 4px 12px; border-radius: 6px; margin-bottom: 20px; }
+    .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    h1 {
-      font-size: 36px; font-weight: 900; letter-spacing: -1.2px;
-      color: var(--slate-900); line-height: 1.1; margin-bottom: 12px;
-    }
-    .step-sub { font-size: 16px; color: var(--slate-500); line-height: 1.65; margin-bottom: 36px; }
+    h1 { font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -1.2px; margin-bottom: 10px; line-height: 1.1; }
+    .step-sub { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 32px; }
 
-    /* Form elements */
-    .form-group { margin-bottom: 20px; }
-    label {
-      display: block; font-size: 13px; font-weight: 600;
-      color: var(--slate-700); margin-bottom: 7px;
-    }
-    input[type="text"], input[type="email"], textarea, select {
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+    input[type=text], input[type=email], textarea {
       width: 100%; padding: 13px 16px; border-radius: 10px;
-      border: 1.5px solid var(--slate-200); font-family: 'Inter', sans-serif;
-      font-size: 15px; color: var(--slate-800); background: white;
-      transition: border-color .15s, box-shadow .15s; outline: none;
-      line-height: 1.6;
+      border: 1.5px solid var(--border); background: var(--surface);
+      font-family: 'Sora', sans-serif; font-size: 13px; color: var(--text);
+      transition: border-color .15s, box-shadow .15s; outline: none; resize: vertical; line-height: 1.7;
     }
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--blue-500);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
-    }
-    textarea { resize: vertical; min-height: 140px; }
+    input:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.1); background: var(--surface-2); }
+    input::placeholder, textarea::placeholder { color: var(--text-3); }
 
-    /* Choix type de profil */
-    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    .profile-option {
-      border: 1.5px solid var(--slate-200); border-radius: 12px;
-      padding: 16px 14px; cursor: pointer; transition: all .15s; background: white;
-    }
-    .profile-option:hover { border-color: var(--blue-300); background: var(--blue-50); }
-    .profile-option.selected {
-      border-color: var(--blue-600); background: var(--blue-50);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    }
-    .profile-option-icon { font-size: 24px; margin-bottom: 8px; }
-    .profile-option-name { font-size: 13px; font-weight: 700; color: var(--slate-800); margin-bottom: 2px; }
-    .profile-option-desc { font-size: 11px; color: var(--slate-400); line-height: 1.4; }
+    /* Profile options */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+    .profile-opt { border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 14px; cursor: pointer; transition: all .2s; }
+    .profile-opt:hover { border-color: var(--border-h); background: var(--surface-2); }
+    .profile-opt.selected { border-color: var(--blue); background: var(--blue-d); }
+    .profile-opt-icon { font-size: 22px; margin-bottom: 8px; }
+    .profile-opt-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .profile-opt-desc { font-size: 11px; color: var(--text-3); margin-top: 3px; }
 
-    /* Progress bar */
-    .progress-bar-wrap {
-      background: var(--slate-100); border-radius: 4px; height: 4px;
-      margin-bottom: 36px; overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--blue-500), var(--indigo-600));
-      transition: width .5s cubic-bezier(.4,0,.2,1);
-    }
+    /* Buttons */
+    .btn-next { width: 100%; padding: 14px; border-radius: 11px; font-size: 15px; font-weight: 800; color: white; background: linear-gradient(135deg, var(--blue), var(--indigo)); border: none; cursor: pointer; transition: all .2s; box-shadow: 0 4px 20px rgba(99,102,241,.3); font-family: 'Sora', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-next:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99,102,241,.45); }
+    .btn-next:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-back { background: none; border: none; cursor: pointer; color: var(--text-3); font-size: 13px; font-weight: 600; margin-top: 14px; font-family: 'Sora', sans-serif; padding: 6px 0; transition: color .15s; }
+    .btn-back:hover { color: var(--text-2); }
 
-    /* Boutons */
-    .btn-next {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 15px; border-radius: 11px;
-      background: var(--blue-600); color: white;
-      font-size: 16px; font-weight: 700; border: none; cursor: pointer;
-      transition: all .2s; box-shadow: 0 4px 16px rgba(37,99,235,.3);
-      margin-top: 28px;
-    }
-    .btn-next:hover { background: var(--blue-700); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,99,235,.4); }
-    .btn-next:active { transform: translateY(0); }
-    .btn-back {
-      background: none; border: none; color: var(--slate-400);
-      font-size: 14px; cursor: pointer; padding: 8px 0; margin-top: 12px;
-      display: block; width: 100%; text-align: center; transition: color .15s;
-    }
-    .btn-back:hover { color: var(--slate-600); }
-
-    /* Step 3 : résultat */
-    .result-card {
-      background: white; border: 1.5px solid var(--blue-100);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 8px 32px rgba(37,99,235,.1);
-      margin-bottom: 24px; display: none;
-    }
-    .result-card.visible { display: block; animation: fadeUp .4s ease; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .result-card-header {
-      background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
-      padding: 18px 22px; color: white;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .result-card-title { font-size: 15px; font-weight: 800; }
-    .result-ats {
-      background: rgba(255,255,255,.2); font-size: 12px; font-weight: 700;
-      padding: 4px 12px; border-radius: 100px;
-    }
-    .result-card-body { padding: 20px 22px; }
-    .result-section-title {
-      font-size: 10px; font-weight: 700; color: var(--blue-600);
-      text-transform: uppercase; letter-spacing: 1px;
-      border-bottom: 1.5px solid var(--blue-100); padding-bottom: 5px; margin-bottom: 10px;
-    }
-    .result-text { font-size: 13px; color: var(--slate-600); line-height: 1.7; margin-bottom: 16px; }
-    .result-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .result-chip {
-      background: var(--blue-50); color: var(--blue-700);
-      font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px;
-    }
-
-    /* Loading animation */
-    .loading-steps { display: none; flex-direction: column; gap: 14px; padding: 24px 0; }
-    .loading-steps.visible { display: flex; }
-    .loading-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--slate-600); opacity: .4; transition: opacity .3s; }
-    .loading-item.active { opacity: 1; color: var(--blue-700); }
-    .loading-item.done { opacity: 1; color: var(--green-500); }
-    .loading-spinner {
-      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
-      border: 2px solid var(--slate-200); border-top-color: var(--blue-500);
-      animation: spin .7s linear infinite;
-    }
-    .loading-check { width: 18px; height: 18px; flex-shrink: 0; text-align: center; font-size: 14px; }
+    /* Loading */
+    .loading-list { display: none; flex-direction: column; gap: 14px; margin: 28px 0; }
+    .loading-list.vis { display: flex; }
+    .li-item { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; color: var(--text-3); opacity: .4; transition: opacity .3s; }
+    .li-item.active { opacity: 1; color: var(--blue-b); }
+    .li-item.done { opacity: 1; color: var(--green-b); }
+    .li-spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--blue); animation: spin .7s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .li-check { width: 18px; flex-shrink: 0; text-align: center; }
 
-    /* Step 4 : succès */
-    .success-icon { font-size: 56px; margin-bottom: 16px; }
+    /* Result */
+    .result-wrap { display: none; margin-top: 24px; }
+    .result-wrap.vis { display: block; }
+    .result-header { background: linear-gradient(135deg, var(--blue), var(--indigo)); border-radius: 12px 12px 0 0; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .result-header-title { font-size: 14px; font-weight: 700; color: white; }
+    .ats-badge { font-size: 11px; font-weight: 800; background: rgba(255,255,255,.2); color: white; padding: 4px 12px; border-radius: 100px; }
+    .result-body { background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 20px; font-size: 12px; line-height: 1.9; color: var(--text-2); white-space: pre-wrap; max-height: 320px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; }
+    .result-body::-webkit-scrollbar { width: 4px; }
+    .result-body::-webkit-scrollbar-thumb { background: var(--border-h); border-radius: 4px; }
+    .result-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-copy-res { padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s; }
+    .btn-copy-res:hover { color: var(--text); border-color: var(--border-h); }
+    .btn-copy-res.ok { background: var(--green-d); color: var(--green-b); border-color: rgba(16,185,129,.2); }
+
+    /* Success */
+    .success-icon { font-size: 52px; margin-bottom: 16px; }
     .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
-    .action-card {
-      border: 1.5px solid var(--slate-200); border-radius: 12px;
-      padding: 18px 16px; text-align: center; cursor: pointer;
-      text-decoration: none; transition: all .2s;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .action-card:hover { border-color: var(--blue-300); box-shadow: 0 4px 16px rgba(37,99,235,.1); transform: translateY(-2px); }
-    .action-card-icon { font-size: 28px; }
-    .action-card-name { font-size: 13px; font-weight: 700; color: var(--slate-800); }
-    .action-card-desc { font-size: 11px; color: var(--slate-400); line-height: 1.4; }
+    .action-card { border: 1px solid var(--border); border-radius: 12px; padding: 20px 16px; text-align: center; cursor: pointer; text-decoration: none; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--surface); }
+    .action-card:hover { border-color: var(--border-h); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+    .action-icon { font-size: 28px; }
+    .action-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .action-desc { font-size: 11px; color: var(--text-3); line-height: 1.4; }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .page { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      .main { padding: 40px 24px; }
-    }
+    @media (max-width: 900px) { .page { grid-template-columns: 1fr; } .sidebar { display: none; } .main { padding: 40px 24px; } }
   </style>
 </head>
 <body>
-
 <div class="page">
 
-  <!-- ═══ SIDEBAR ═══ -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-dot"></div>
-      EmploiIA
-    </div>
-
-    <div class="sidebar-steps">
-      <div class="sidebar-step active" id="nav-1">
+    <a href="/" class="s-logo"><div class="s-logo-mark">E</div>Emploia</a>
+    <div class="s-steps">
+      <div class="s-step active" id="nav-1">
         <div class="step-circle" id="circle-1">1</div>
         <div class="step-info">
-          <div class="step-label">Étape 1 sur 3</div>
+          <div class="step-label-small">Étape 1 sur 3</div>
           <div class="step-name">Votre profil</div>
         </div>
       </div>
-      <div class="sidebar-step" id="nav-2">
+      <div class="s-step" id="nav-2">
         <div class="step-circle" id="circle-2">2</div>
         <div class="step-info">
-          <div class="step-label">Étape 2 sur 3</div>
+          <div class="step-label-small">Étape 2 sur 3</div>
           <div class="step-name">L'offre d'emploi</div>
         </div>
       </div>
-      <div class="sidebar-step" id="nav-3">
+      <div class="s-step" id="nav-3">
         <div class="step-circle" id="circle-3">3</div>
         <div class="step-info">
-          <div class="step-label">Étape 3 sur 3</div>
+          <div class="step-label-small">Étape 3 sur 3</div>
           <div class="step-name">Votre premier CV IA</div>
         </div>
       </div>
     </div>
-
-    <div class="sidebar-footer">
-      <div class="sidebar-note">
-        <strong>⚡ En moyenne 90 secondes</strong> pour générer un CV complet et optimisé pour l'offre que vous ciblez.
-      </div>
+    <div class="s-footer">
+      <div class="s-footer-text"><strong>⚡ En moyenne 30 secondes</strong> pour générer un CV complet et optimisé ATS pour votre offre cible.</div>
     </div>
   </aside>
 
-  <!-- ═══ MAIN ═══ -->
+  <!-- MAIN -->
   <main class="main">
     <div class="main-inner">
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:5%"></div></div>
 
-      <!-- Barre de progression -->
-      <div class="progress-bar-wrap">
-        <div class="progress-bar" id="progressBar" style="width: 5%"></div>
-      </div>
-
-      <!-- ── STEP 1 : Profil ── -->
+      <!-- STEP 1 -->
       <div class="step-view active" id="step-1">
-        <div class="step-tag"><div class="step-tag-dot"></div> Bienvenue 👋</div>
+        <div class="step-tag"><div class="tag-dot"></div>Bienvenue 👋</div>
         <h1>Parlez-nous de vous</h1>
-        <p class="step-sub">Quelques infos pour personnaliser votre expérience EmploiIA.</p>
-
+        <p class="step-sub">Quelques infos pour personnaliser votre première candidature avec Emploia.</p>
         <div class="form-group">
           <label>Votre prénom</label>
           <input type="text" id="firstName" placeholder="ex : Sophie" autocomplete="given-name" />
         </div>
-
-        <div class="form-group">
-          <label>Votre email</label>
-          <input type="email" id="email" placeholder="sophie@email.fr" autocomplete="email" />
+        <div class="form-group" style="margin-bottom:20px">
+          <label>Votre situation</label>
         </div>
-
-        <div class="form-group">
-          <label>Votre situation actuelle</label>
-        </div>
-        <div class="profile-grid">
-          <div class="profile-option selected" data-value="jeune-diplome" onclick="selectProfile(this)">
-            <div class="profile-option-icon">🎓</div>
-            <div class="profile-option-name">Jeune diplômé(e)</div>
-            <div class="profile-option-desc">Moins de 2 ans d'expérience</div>
+        <div class="profile-grid" id="profileGrid">
+          <div class="profile-opt selected" data-value="jeune-diplome" onclick="selectProfile(this)">
+            <div class="profile-opt-icon">🎓</div>
+            <div class="profile-opt-name">Jeune diplômé(e)</div>
+            <div class="profile-opt-desc">Moins de 2 ans d'expérience</div>
           </div>
-          <div class="profile-option" data-value="experience" onclick="selectProfile(this)">
-            <div class="profile-option-icon">💼</div>
-            <div class="profile-option-name">En poste</div>
-            <div class="profile-option-desc">Recherche discrète ou active</div>
+          <div class="profile-opt" data-value="experience" onclick="selectProfile(this)">
+            <div class="profile-opt-icon">💼</div>
+            <div class="profile-opt-name">En poste</div>
+            <div class="profile-opt-desc">Recherche discrète ou active</div>
           </div>
-          <div class="profile-option" data-value="reconversion" onclick="selectProfile(this)">
-            <div class="profile-option-icon">🔄</div>
-            <div class="profile-option-name">En reconversion</div>
-            <div class="profile-option-desc">Changement de secteur</div>
+          <div class="profile-opt" data-value="reconversion" onclick="selectProfile(this)">
+            <div class="profile-opt-icon">🔄</div>
+            <div class="profile-opt-name">En reconversion</div>
+            <div class="profile-opt-desc">Changement de secteur</div>
           </div>
-          <div class="profile-option" data-value="demandeur" onclick="selectProfile(this)">
-            <div class="profile-option-icon">🔍</div>
-            <div class="profile-option-name">En recherche active</div>
-            <div class="profile-option-desc">France Travail / APEC</div>
+          <div class="profile-opt" data-value="recherche" onclick="selectProfile(this)">
+            <div class="profile-opt-icon">🔍</div>
+            <div class="profile-opt-name">En recherche active</div>
+            <div class="profile-opt-desc">France Travail / APEC</div>
           </div>
         </div>
-
-        <button class="btn-next" onclick="goToStep(2)">
-          Continuer <span>→</span>
-        </button>
+        <button class="btn-next" onclick="goStep(2)">Continuer →</button>
       </div>
 
-      <!-- ── STEP 2 : Offre ── -->
+      <!-- STEP 2 -->
       <div class="step-view" id="step-2">
-        <div class="step-tag"><div class="step-tag-dot"></div> Étape 2 sur 3</div>
-        <h1 id="step2-title">Quelle offre vous intéresse ?</h1>
-        <p class="step-sub">Copiez-collez la description du poste. Plus c'est complet, meilleur sera votre CV.</p>
-
+        <div class="step-tag"><div class="tag-dot"></div>Étape 2 sur 3</div>
+        <h1 id="step2title">Quelle offre vous intéresse ?</h1>
+        <p class="step-sub">Copiez-collez la description du poste. Plus c'est complet, meilleur sera le CV généré.</p>
         <div class="form-group">
           <label>Description de l'offre d'emploi</label>
-          <textarea id="jobOffer" placeholder="Collez ici le texte complet de l'offre d'emploi...
+          <textarea id="jobOffer" rows="8" placeholder="Collez ici la description complète du poste...
 
 Exemple :
 Chargé(e) de Communication Digitale – CDI – Paris
-
-Missions : gestion des réseaux sociaux, création de contenus, campagnes Meta Ads...
-
-Profil : Bac+4/5, 2 ans d'expérience, maîtrise de Canva et Google Analytics..." rows="9"></textarea>
+Missions : réseaux sociaux, campagnes Meta Ads, reporting...
+Profil : Bac+4/5, 2 ans d'expérience, Canva, Google Analytics..."></textarea>
         </div>
-
         <div class="form-group">
-          <label>Vos expériences & compétences <span style="color:var(--slate-400); font-weight:400">(quelques lignes suffisent)</span></label>
-          <textarea id="userProfile" placeholder="Décrivez brièvement votre parcours...
-
-Exemple :
-Master Marketing Digital – Paris-Dauphine (2022)
-3 ans en agence : gestion réseaux sociaux, campagnes Meta Ads, ROAS 4x
-Compétences : Canva, Google Analytics, Semrush, Notion" rows="6"></textarea>
+          <label>Vos expériences & compétences <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-3)">(quelques lignes suffisent)</span></label>
+          <textarea id="userProfile" rows="5" placeholder="Ex : Master Marketing Digital – Paris-Dauphine (2022)
+3 ans en agence : réseaux sociaux, ROAS 4x
+Canva, Google Analytics, Semrush, Notion"></textarea>
         </div>
-
-        <button class="btn-next" onclick="goToStep(3)">
-          ✨ Générer mon CV maintenant
-        </button>
-        <button class="btn-back" onclick="goToStep(1)">← Retour</button>
+        <button class="btn-next" onclick="startGeneration()">✨ Générer mon CV maintenant</button>
+        <button class="btn-back" onclick="goStep(1)">← Retour</button>
       </div>
 
-      <!-- ── STEP 3 : Génération ── -->
+      <!-- STEP 3 -->
       <div class="step-view" id="step-3">
-        <div class="step-tag"><div class="step-tag-dot"></div> Étape 3 sur 3</div>
+        <div class="step-tag"><div class="tag-dot"></div>Étape 3 sur 3</div>
         <h1>Votre CV est en cours…</h1>
-        <p class="step-sub" id="step3-sub">L'IA analyse votre offre et personnalise votre candidature.</p>
+        <p class="step-sub" id="step3sub">L'IA analyse votre offre et personnalise votre candidature.</p>
 
-        <!-- Loading -->
-        <div class="loading-steps visible" id="loadingSteps">
-          <div class="loading-item active" id="li-1">
-            <div class="loading-spinner" id="ls-1"></div>
-            <span>Analyse de l'offre d'emploi et extraction des mots-clés ATS...</span>
+        <div class="loading-list vis" id="loadingList">
+          <div class="li-item active" id="li1"><div class="li-spin" id="ls1"></div>Analyse de l'offre et extraction des mots-clés ATS...</div>
+          <div class="li-item" id="li2"><div class="li-spin" id="ls2"></div>Mise en correspondance avec votre profil...</div>
+          <div class="li-item" id="li3"><div class="li-spin" id="ls3"></div>Génération du CV optimisé...</div>
+          <div class="li-item" id="li4"><div class="li-spin" id="ls4"></div>Calcul du score ATS...</div>
+        </div>
+
+        <div class="result-wrap" id="resultWrap">
+          <div class="result-header">
+            <div class="result-header-title">📄 Votre CV ATS-optimisé</div>
+            <span class="ats-badge" id="atsBadge">—</span>
           </div>
-          <div class="loading-item" id="li-2">
-            <div class="loading-spinner" id="ls-2"></div>
-            <span>Mise en correspondance avec votre profil...</span>
-          </div>
-          <div class="loading-item" id="li-3">
-            <div class="loading-spinner" id="ls-3"></div>
-            <span>Rédaction et structuration du CV...</span>
-          </div>
-          <div class="loading-item" id="li-4">
-            <div class="loading-spinner" id="ls-4"></div>
-            <span>Optimisation finale et calcul du score ATS...</span>
+          <div class="result-body" id="resultBody"></div>
+          <div class="result-actions">
+            <button class="btn-copy-res" id="copyBtn" onclick="copyResult()">📋 Copier</button>
           </div>
         </div>
 
-        <!-- Résultat -->
-        <div class="result-card" id="resultCard">
-          <div class="result-card-header">
-            <div>
-              <div class="result-card-title" id="rc-name">Sophie Martin</div>
-              <div style="font-size:12px; opacity:.8; margin-top:2px" id="rc-title">Chargée de Communication Digitale</div>
-            </div>
-            <div class="result-ats" id="rc-ats">Score ATS : 96/100 ✓</div>
+        <!-- Success -->
+        <div id="successBlock" style="display:none;margin-top:28px;text-align:center">
+          <div class="success-icon">🎉</div>
+          <h1 style="margin-bottom:8px" id="successTitle">Votre CV est prêt !</h1>
+          <p class="step-sub" id="successSub">Il est optimisé pour passer les filtres ATS. Que voulez-vous faire maintenant ?</p>
+          <div class="actions-grid">
+            <a href="/app" class="action-card">
+              <div class="action-icon">✨</div>
+              <div class="action-name">Générer encore</div>
+              <div class="action-desc">Lettre, score ATS, ou un autre CV</div>
+            </a>
+            <a href="/dashboard" class="action-card">
+              <div class="action-icon">📊</div>
+              <div class="action-name">Suivre mes candidatures</div>
+              <div class="action-desc">Kanban pour organiser votre recherche</div>
+            </a>
           </div>
-          <div class="result-card-body">
-            <div class="result-section-title">EXPÉRIENCE CLÉ</div>
-            <div class="result-text" id="rc-exp">
-              <strong>Chargée de Communication Digitale</strong> — Agence Créativa<br/>
-              • Gestion réseaux sociaux : +42% d'engagement en 12 mois<br/>
-              • Campagnes Meta Ads : ROAS moyen de 4,2x sur 15 campagnes<br/>
-              • Production 60+ contenus/mois, communauté 28 000 abonnés
-            </div>
-            <div class="result-section-title">MOTS-CLÉS ATS INTÉGRÉS</div>
-            <div class="result-chips" id="rc-chips"></div>
-          </div>
-        </div>
-
-        <button class="btn-next" id="step3-btn" onclick="goToStep(4)" style="display:none">
-          🎉 Voir mon espace complet →
-        </button>
-        <button class="btn-back" onclick="goToStep(2)" id="step3-back">← Modifier</button>
-      </div>
-
-      <!-- ── STEP 4 : Succès ── -->
-      <div class="step-view" id="step-4">
-        <div class="success-icon">🎉</div>
-        <h1 id="success-title">Bravo, votre CV est prêt !</h1>
-        <p class="step-sub">Votre première candidature est générée et optimisée. Que voulez-vous faire ensuite ?</p>
-
-        <div class="actions-grid">
-          <a href="/app?tab=cv" class="action-card">
-            <div class="action-card-icon">📄</div>
-            <div class="action-card-name">Télécharger le CV</div>
-            <div class="action-card-desc">Export PDF ou Word, prêt à envoyer</div>
-          </a>
-          <a href="/app?tab=lettre" class="action-card">
-            <div class="action-card-icon">✉️</div>
-            <div class="action-card-name">Générer la lettre</div>
-            <div class="action-card-desc">Lettre de motivation personnalisée</div>
-          </a>
-          <a href="/app?tab=ats" class="action-card">
-            <div class="action-card-icon">🎯</div>
-            <div class="action-card-name">Voir le score ATS</div>
-            <div class="action-card-desc">Analyse détaillée et conseils</div>
-          </a>
-          <a href="/app" class="action-card">
-            <div class="action-card-icon">🚀</div>
-            <div class="action-card-name">Mon espace</div>
-            <div class="action-card-desc">Tableau de bord & candidatures</div>
-          </a>
-        </div>
-
-        <div style="text-align:center; margin-top:20px; font-size:13px; color:var(--slate-400)">
-          Il vous reste <strong style="color:var(--blue-600)">4 générations gratuites</strong>
         </div>
       </div>
 
@@ -473,152 +277,115 @@ Compétences : Canva, Google Analytics, Semrush, Notion" rows="6"></textarea>
 </div>
 
 <script>
-  const STEPS_CONFIG = {
-    1: { progress: 5,   nav: 'nav-1' },
-    2: { progress: 40,  nav: 'nav-2' },
-    3: { progress: 75,  nav: 'nav-3' },
-    4: { progress: 100, nav: 'nav-3' },
-  };
-
   let currentStep = 1;
+  let generatedResult = '';
   let selectedProfile = 'jeune-diplome';
 
-  // Sélection du profil
+  function goStep(n) {
+    document.getElementById('step-'+currentStep).classList.remove('active');
+    // Update sidebar
+    ['nav-1','nav-2','nav-3'].forEach((id,i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('active','done');
+      if (i+1 < n) el.classList.add('done');
+      if (i+1 === n) el.classList.add('active');
+    });
+    currentStep = n;
+    document.getElementById('step-'+n).classList.add('active');
+    const prog = { 1: '5%', 2: '40%', 3: '75%' };
+    document.getElementById('progressBar').style.width = prog[n] || '5%';
+
+    // Personalize step 2
+    if (n === 2) {
+      const name = document.getElementById('firstName').value.trim();
+      document.getElementById('step2title').textContent = name ? `${name}, quelle offre vous intéresse ?` : 'Quelle offre vous intéresse ?';
+    }
+  }
+
   function selectProfile(el) {
-    document.querySelectorAll('.profile-option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.profile-opt').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
     selectedProfile = el.dataset.value;
   }
 
-  // Navigation entre étapes
-  function goToStep(n) {
-    // Validation step 1
-    if (currentStep === 1 && n === 2) {
-      const firstName = document.getElementById('firstName').value.trim();
-      if (!firstName) {
-        document.getElementById('firstName').focus();
-        shake(document.getElementById('firstName'));
-        return;
+  async function startGeneration() {
+    const jobOffer = document.getElementById('jobOffer').value.trim();
+    const userProfile = document.getElementById('userProfile').value.trim();
+    if (!jobOffer || !userProfile) {
+      alert('Veuillez remplir les deux champs avant de continuer.');
+      return;
+    }
+    goStep(3);
+    runLoadingAnimation();
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'cv', jobOffer, userProfile }),
+      });
+      const data = await res.json();
+      finishLoading();
+      if (data.success) {
+        generatedResult = data.result;
+        showResult(data.result);
+        // Save a credit use
+        const credits = parseInt(localStorage.getItem('emploia_credits') ?? '5') - 1;
+        localStorage.setItem('emploia_credits', Math.max(0, credits));
+      } else {
+        document.getElementById('step3sub').textContent = 'Erreur : ' + (data.error || 'Veuillez réessayer.');
       }
-      // Personnaliser le titre step 2
-      document.getElementById('step2-title').textContent = `Quelle offre vous intéresse, ${firstName} ?`;
+    } catch(e) {
+      finishLoading();
+      document.getElementById('step3sub').textContent = 'Erreur réseau. Vérifiez votre connexion.';
     }
-
-    // Masquer étape actuelle
-    document.getElementById('step-' + currentStep).classList.remove('active');
-
-    // Mise à jour sidebar
-    const prevNav = document.getElementById('nav-' + currentStep);
-    if (prevNav && currentStep < n) {
-      prevNav.classList.remove('active');
-      prevNav.classList.add('done');
-      prevNav.querySelector('.step-circle').textContent = '✓';
-    }
-
-    currentStep = n;
-
-    // Afficher nouvelle étape
-    const stepEl = document.getElementById('step-' + n);
-    if (stepEl) stepEl.classList.add('active');
-
-    // Progress bar
-    document.getElementById('progressBar').style.width = STEPS_CONFIG[n].progress + '%';
-
-    // Nav sidebar
-    if (n <= 3) {
-      const nav = document.getElementById('nav-' + n);
-      if (nav) { nav.classList.remove('done'); nav.classList.add('active'); }
-    }
-
-    // Lancer l'animation de génération à l'étape 3
-    if (n === 3) runGeneration();
-
-    // Personnaliser succès
-    if (n === 4) {
-      const firstName = document.getElementById('firstName').value.trim();
-      if (firstName) document.getElementById('success-title').textContent = `Bravo ${firstName}, votre CV est prêt !`;
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Animation de génération
-  async function runGeneration() {
-    const delays = [900, 700, 900, 700];
-    const chips = ['Communication digitale', 'Meta Ads', 'Google Analytics', 'Canva', 'Réseaux sociaux', 'Semrush', 'Content marketing', 'ROAS'];
-
-    for (let i = 1; i <= 4; i++) {
-      await sleep(i === 1 ? 300 : delays[i-2]);
-      const item = document.getElementById('li-' + i);
-      const spinner = document.getElementById('ls-' + i);
-
-      // Terminer l'étape précédente
-      if (i > 1) {
-        const prev = document.getElementById('li-' + (i-1));
-        const prevSpin = document.getElementById('ls-' + (i-1));
-        prev.classList.remove('active'); prev.classList.add('done');
-        prevSpin.outerHTML = `<div class="loading-check" id="ls-${i-1}">✓</div>`;
+  let loadingTimer;
+  function runLoadingAnimation() {
+    const items = ['li1','li2','li3','li4'];
+    let i = 0;
+    items.forEach(id => document.getElementById(id).className = 'li-item');
+    document.getElementById('li1').classList.add('active');
+    loadingTimer = setInterval(() => {
+      if (i < items.length - 1) {
+        document.getElementById(items[i]).className = 'li-item done';
+        i++;
+        document.getElementById(items[i]).classList.add('active');
       }
-
-      item.classList.add('active');
-    }
-
-    // Terminer la dernière
-    await sleep(800);
-    const last = document.getElementById('li-4');
-    const lastSpin = document.getElementById('ls-4');
-    last.classList.remove('active'); last.classList.add('done');
-    lastSpin.outerHTML = `<div class="loading-check" id="ls-4">✓</div>`;
-
-    await sleep(300);
-
-    // Personnaliser le résultat avec le prénom
-    const firstName = document.getElementById('firstName').value.trim();
-    if (firstName) document.getElementById('rc-name').textContent = firstName + ' ' + getInitial();
-
-    // Ajouter chips avec animation
-    const chipsEl = document.getElementById('rc-chips');
-    for (let i = 0; i < chips.length; i++) {
-      await sleep(70);
-      const chip = document.createElement('span');
-      chip.className = 'result-chip';
-      chip.textContent = chips[i];
-      chipsEl.appendChild(chip);
-    }
-
-    await sleep(200);
-
-    // Afficher le résultat
-    document.getElementById('resultCard').classList.add('visible');
-    document.getElementById('step3-sub').textContent = '✅ Votre CV est prêt et optimisé pour cette offre !';
-    document.getElementById('step3-btn').style.display = 'flex';
-    document.getElementById('step3-back').style.display = 'none';
+    }, 1500);
   }
 
-  function getInitial() {
-    const email = document.getElementById('email').value;
-    if (email.includes('@')) {
-      const domain = email.split('@')[1].split('.')[0];
-      return domain.charAt(0).toUpperCase() + '.';
-    }
-    return 'M.';
+  function finishLoading() {
+    clearInterval(loadingTimer);
+    ['li1','li2','li3','li4'].forEach(id => document.getElementById(id).className = 'li-item done');
   }
 
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function showResult(text) {
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('resultBody').textContent = text;
+    document.getElementById('resultWrap').classList.add('vis');
 
-  function shake(el) {
-    el.style.animation = 'shake .4s ease';
-    setTimeout(() => el.style.animation = '', 400);
+    // Extract ATS score
+    const match = text.match(/Score\s*:\s*(\d+)\/100/i) || text.match(/SCORE ATS[^:]*:\s*(\d+)/i);
+    document.getElementById('atsBadge').textContent = match ? `Score ATS : ${match[1]}/100 ✓` : 'CV ATS-ready ✓';
+
+    setTimeout(() => {
+      document.getElementById('loadingList').classList.remove('vis');
+      document.getElementById('step3sub').textContent = '';
+      const name = document.getElementById('firstName').value.trim();
+      document.getElementById('successTitle').textContent = name ? `${name}, votre CV est prêt !` : 'Votre CV est prêt !';
+      document.getElementById('successBlock').style.display = 'block';
+    }, 800);
+  }
+
+  function copyResult() {
+    if (!generatedResult) return;
+    navigator.clipboard.writeText(generatedResult).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ Copié !'; btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = '📋 Copier'; btn.classList.remove('ok'); }, 2000);
+    });
   }
 </script>
-
-<style>
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
-  }
-</style>
-
 </body>
 </html>

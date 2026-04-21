@@ -3,220 +3,173 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EmploiIA — Mon espace</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <title>Emploia — Générateur IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --blue-50:#eff6ff; --blue-100:#dbeafe; --blue-500:#3b82f6;
-      --blue-600:#2563eb; --blue-700:#1d4ed8; --indigo-600:#4f46e5;
-      --slate-50:#f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0;
-      --slate-300:#cbd5e1; --slate-400:#94a3b8; --slate-500:#64748b;
-      --slate-600:#475569; --slate-700:#334155; --slate-800:#1e293b;
-      --slate-900:#0f172a; --green-500:#22c55e; --green-100:#dcfce7;
-      --red-500:#ef4444; --red-100:#fee2e2;
+      --bg: #0a0f1e; --surface: #111827; --surface-2: #1a2236;
+      --border: rgba(255,255,255,.08); --border-h: rgba(255,255,255,.15);
+      --blue: #3b82f6; --blue-b: #60a5fa; --blue-d: rgba(59,130,246,.12);
+      --indigo: #6366f1; --green: #10b981; --green-d: rgba(16,185,129,.12);
+      --red: #ef4444; --red-d: rgba(239,68,68,.1);
+      --text: #f1f5f9; --text-2: #94a3b8; --text-3: #475569; --radius: 14px;
     }
-    html, body { height:100%; font-family:'Inter',sans-serif; background:var(--slate-50); color:var(--slate-800); -webkit-font-smoothing:antialiased; }
+    html,body { height:100%; font-family:'Sora',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+    body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(99,102,241,.12) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(59,130,246,.10) 0%,transparent 60%); }
 
-    /* NAV */
-    nav { background:white; border-bottom:1px solid var(--slate-200); padding:0 24px; position:sticky; top:0; z-index:50; }
-    .nav-inner { max-width:1200px; margin:0 auto; height:60px; display:flex; align-items:center; justify-content:space-between; }
-    .logo { font-size:18px; font-weight:900; color:var(--blue-700); text-decoration:none; letter-spacing:-.5px; display:flex; align-items:center; gap:6px; }
-    .logo-dot { width:7px; height:7px; background:var(--blue-500); border-radius:50%; }
-    .credits-badge { background:var(--blue-50); border:1px solid var(--blue-100); color:var(--blue-700); font-size:13px; font-weight:700; padding:5px 14px; border-radius:100px; display:flex; align-items:center; gap:6px; }
-    .credits-count { font-size:16px; font-weight:900; }
+    nav { position:sticky; top:0; z-index:100; background:rgba(10,15,30,.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:0 24px; }
+    .nav-inner { max-width:1280px; margin:0 auto; height:62px; display:flex; align-items:center; justify-content:space-between; }
+    .logo { font-size:17px; font-weight:800; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; letter-spacing:-.4px; }
+    .logo-mark { width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,var(--blue),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; color:white; box-shadow:0 2px 12px rgba(99,102,241,.4); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .nav-link { font-size:13px; font-weight:500; color:var(--text-2); text-decoration:none; padding:6px 12px; border-radius:8px; transition:all .15s; }
+    .nav-link:hover { background:var(--surface-2); color:var(--text); }
+    .credits-pill { background:var(--blue-d); border:1px solid rgba(59,130,246,.25); color:var(--blue-b); font-size:12px; font-weight:700; padding:5px 14px; border-radius:100px; display:flex; align-items:center; gap:6px; }
+    .credits-num { font-size:15px; font-weight:800; }
 
-    /* LAYOUT */
-    .page { max-width:1200px; margin:0 auto; padding:32px 24px; display:grid; grid-template-columns:1fr 1fr; gap:24px; min-height:calc(100vh - 60px); }
+    .page { max-width:1280px; margin:0 auto; padding:28px 24px 48px; display:grid; grid-template-columns:1fr 1fr; gap:20px; position:relative; z-index:1; }
+    .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color .2s; }
+    .panel:hover { border-color:var(--border-h); }
+    .panel-header { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .panel-title { font-size:12px; font-weight:700; color:var(--text-3); letter-spacing:.8px; text-transform:uppercase; }
+    .panel-body { padding:22px; }
 
-    /* PANEL */
-    .panel { background:white; border:1px solid var(--slate-200); border-radius:16px; overflow:hidden; }
-    .panel-header { padding:20px 24px; border-bottom:1px solid var(--slate-100); display:flex; align-items:center; justify-content:space-between; }
-    .panel-title { font-size:15px; font-weight:700; color:var(--slate-800); }
-    .panel-body { padding:24px; }
+    .tabs { display:flex; gap:4px; background:var(--bg); border-radius:10px; padding:4px; margin-bottom:20px; }
+    .tab { flex:1; padding:9px 12px; border-radius:7px; font-size:12px; font-weight:700; color:var(--text-3); cursor:pointer; border:none; background:none; transition:all .15s; text-align:center; font-family:'Sora',sans-serif; }
+    .tab.active { background:var(--surface-2); color:var(--blue-b); border:1px solid rgba(59,130,246,.2); }
+    .tab:hover:not(.active) { color:var(--text-2); }
 
-    /* TABS */
-    .tabs { display:flex; gap:4px; background:var(--slate-100); border-radius:10px; padding:4px; margin-bottom:20px; }
-    .tab { flex:1; padding:9px 12px; border-radius:8px; font-size:13px; font-weight:600; color:var(--slate-500); cursor:pointer; border:none; background:none; transition:all .15s; text-align:center; }
-    .tab.active { background:white; color:var(--blue-700); box-shadow:0 1px 4px rgba(0,0,0,.08); }
-    .tab:hover:not(.active) { color:var(--slate-700); }
-
-    /* FORM */
-    .form-group { margin-bottom:16px; }
-    label { display:block; font-size:12px; font-weight:700; color:var(--slate-600); text-transform:uppercase; letter-spacing:.5px; margin-bottom:7px; }
-    textarea { width:100%; padding:14px 16px; border-radius:10px; border:1.5px solid var(--slate-200); font-family:'Inter',sans-serif; font-size:14px; color:var(--slate-800); background:var(--slate-50); transition:border-color .15s, box-shadow .15s; outline:none; resize:vertical; line-height:1.65; }
-    textarea:focus { border-color:var(--blue-500); box-shadow:0 0 0 3px rgba(59,130,246,.1); background:white; }
-    textarea::placeholder { color:var(--slate-400); }
-
-    /* GENERATE BUTTON */
-    .btn-generate { width:100%; padding:14px; border-radius:11px; font-size:15px; font-weight:800; color:white; background:var(--blue-600); border:none; cursor:pointer; transition:all .2s; box-shadow:0 4px 16px rgba(37,99,235,.3); display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
-    .btn-generate:hover:not(:disabled) { background:var(--blue-700); transform:translateY(-1px); box-shadow:0 6px 24px rgba(37,99,235,.4); }
-    .btn-generate:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
-
-    /* RESULT PANEL */
-    .result-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; text-align:center; color:var(--slate-400); padding:40px; }
-    .result-empty-icon { font-size:48px; margin-bottom:16px; opacity:.5; }
-    .result-empty p { font-size:14px; line-height:1.7; }
-
-    /* LOADING */
-    .result-loading { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:20px; padding:40px; }
-    .result-loading.visible { display:flex; }
-    .loading-ring { width:48px; height:48px; border:3px solid var(--blue-100); border-top-color:var(--blue-600); border-radius:50%; animation:spin .8s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .loading-steps-list { display:flex; flex-direction:column; gap:10px; width:100%; max-width:300px; }
-    .lsi { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--slate-500); opacity:.4; transition:opacity .3s; }
-    .lsi.active { opacity:1; color:var(--blue-700); font-weight:600; }
-    .lsi.done { opacity:1; color:var(--green-500); font-weight:600; }
-    .lsi-dot { width:8px; height:8px; border-radius:50%; background:currentColor; flex-shrink:0; }
-
-    /* RESULT */
-    .result-content { display:none; height:100%; }
-    .result-content.visible { display:flex; flex-direction:column; }
-    .result-toolbar { padding:12px 20px; background:var(--slate-50); border-bottom:1px solid var(--slate-100); display:flex; align-items:center; justify-content:space-between; gap:8px; }
-    .result-type-badge { font-size:11px; font-weight:700; color:var(--blue-600); background:var(--blue-50); padding:3px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:.5px; }
-    .result-actions { display:flex; gap:6px; }
-    .btn-action { padding:6px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all .15s; display:flex; align-items:center; gap:5px; }
-    .btn-copy { background:var(--slate-100); color:var(--slate-700); }
-    .btn-copy:hover { background:var(--slate-200); }
-    .btn-copy.copied { background:var(--green-100); color:var(--green-500); }
-    .btn-regen { background:var(--blue-50); color:var(--blue-700); }
-    .btn-regen:hover { background:var(--blue-100); }
-    .result-text { padding:24px; font-size:13.5px; line-height:1.85; color:var(--slate-700); white-space:pre-wrap; font-family:'Inter',sans-serif; flex:1; overflow-y:auto; max-height:620px; }
-
-    /* SCORE CARD */
-    .score-card { margin:16px 24px; background:linear-gradient(135deg,var(--blue-600),var(--indigo-600)); border-radius:12px; padding:20px 24px; color:white; display:none; }
-    .score-card.visible { display:block; }
-    .score-value { font-size:48px; font-weight:900; letter-spacing:-2px; }
-    .score-label { font-size:13px; opacity:.8; margin-top:2px; }
-    .score-bar-wrap { background:rgba(255,255,255,.2); border-radius:4px; height:6px; margin-top:12px; overflow:hidden; }
-    .score-bar { height:100%; border-radius:4px; background:white; transition:width 1s cubic-bezier(.4,0,.2,1); }
-
-    /* ERROR */
-    .result-error { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:200px; gap:12px; padding:32px; text-align:center; }
-    .result-error.visible { display:flex; }
-    .error-icon { font-size:36px; }
-    .error-msg { font-size:14px; color:var(--red-500); font-weight:600; }
-    .error-detail { font-size:12px; color:var(--slate-400); }
-
-    /* NO CREDITS */
-    .no-credits-banner { background:var(--red-100); border:1px solid #fca5a5; border-radius:10px; padding:14px 18px; margin-bottom:16px; font-size:13px; color:var(--red-500); font-weight:600; display:none; align-items:center; gap:10px; }
+    .no-credits-banner { background:var(--red-d); border:1px solid rgba(239,68,68,.2); border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:var(--red); font-weight:600; display:none; align-items:center; gap:10px; }
     .no-credits-banner.visible { display:flex; }
 
-    /* HISTORY */
-    .history-list { display:flex; flex-direction:column; gap:8px; }
-    .history-item { background:var(--slate-50); border:1px solid var(--slate-200); border-radius:10px; padding:12px 16px; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:space-between; }
-    .history-item:hover { border-color:var(--blue-200); background:var(--blue-50); }
-    .history-item-type { font-size:11px; font-weight:700; color:var(--blue-600); background:var(--blue-50); padding:2px 8px; border-radius:5px; border:1px solid var(--blue-100); }
-    .history-item-preview { font-size:12px; color:var(--slate-500); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:280px; }
-    .history-item-date { font-size:11px; color:var(--slate-400); flex-shrink:0; }
+    .form-group { margin-bottom:16px; }
+    label { display:block; font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px; }
+    textarea { width:100%; padding:14px 16px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); font-family:'Sora',sans-serif; font-size:13px; color:var(--text); transition:border-color .15s,box-shadow .15s; outline:none; resize:vertical; line-height:1.7; }
+    textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,.12); }
+    textarea::placeholder { color:var(--text-3); }
 
-    @media (max-width:900px) {
-      .page { grid-template-columns:1fr; }
-    }
+    .btn-generate { width:100%; padding:14px; border-radius:11px; font-size:14px; font-weight:800; color:white; background:linear-gradient(135deg,var(--blue) 0%,var(--indigo) 100%); border:none; cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(99,102,241,.3); display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; font-family:'Sora',sans-serif; }
+    .btn-generate:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 30px rgba(99,102,241,.45); }
+    .btn-generate:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    .result-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:440px; text-align:center; padding:48px; }
+    .empty-icon { width:64px; height:64px; border-radius:16px; background:var(--blue-d); border:1px solid rgba(59,130,246,.2); display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:20px; }
+    .empty-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .empty-sub { font-size:13px; color:var(--text-3); line-height:1.7; max-width:220px; }
+
+    .result-loading { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:440px; gap:28px; padding:40px; }
+    .result-loading.visible { display:flex; }
+    .loading-orb { width:56px; height:56px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--blue); animation:spin .75s linear infinite; box-shadow:0 0 20px rgba(59,130,246,.3); }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-steps { display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px; }
+    .ls { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-3); opacity:.4; transition:opacity .3s; font-weight:500; }
+    .ls.active { opacity:1; color:var(--blue-b); }
+    .ls.done { opacity:1; color:var(--green); }
+    .ls-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+    .result-content { display:none; height:100%; flex-direction:column; }
+    .result-content.visible { display:flex; }
+    .result-toolbar { padding:12px 18px; background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .type-badge { font-size:10px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--blue-b); background:var(--blue-d); border:1px solid rgba(59,130,246,.2); padding:3px 10px; border-radius:6px; }
+    .result-actions { display:flex; gap:6px; }
+    .btn-action { padding:6px 13px; border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; border:none; transition:all .15s; display:flex; align-items:center; gap:5px; font-family:'Sora',sans-serif; }
+    .btn-copy { background:var(--surface-2); color:var(--text-2); border:1px solid var(--border); }
+    .btn-copy:hover { color:var(--text); }
+    .btn-copy.copied { background:var(--green-d); color:var(--green); border-color:rgba(16,185,129,.2); }
+    .btn-regen { background:var(--blue-d); color:var(--blue-b); border:1px solid rgba(59,130,246,.2); }
+    .btn-regen:hover { background:rgba(59,130,246,.2); }
+    .result-text { padding:24px; font-size:12.5px; line-height:1.9; color:var(--text-2); white-space:pre-wrap; font-family:'JetBrains Mono',monospace; flex:1; overflow-y:auto; max-height:580px; }
+    .result-text::-webkit-scrollbar { width:4px; }
+    .result-text::-webkit-scrollbar-thumb { background:var(--border-h); border-radius:4px; }
+
+    .score-card { margin:18px 18px 0; padding:20px 22px; background:linear-gradient(135deg,var(--blue) 0%,var(--indigo) 100%); border-radius:12px; display:none; box-shadow:0 8px 30px rgba(99,102,241,.3); }
+    .score-card.visible { display:block; }
+    .score-row { display:flex; align-items:baseline; gap:8px; }
+    .score-num { font-size:52px; font-weight:900; letter-spacing:-3px; color:white; }
+    .score-denom { font-size:20px; color:rgba(255,255,255,.6); font-weight:600; }
+    .score-label { font-size:12px; color:rgba(255,255,255,.7); margin-top:4px; }
+    .score-bar-wrap { background:rgba(255,255,255,.2); border-radius:4px; height:5px; margin-top:14px; overflow:hidden; }
+    .score-bar { height:100%; border-radius:4px; background:white; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+
+    .result-error { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:200px; gap:12px; padding:32px; text-align:center; }
+    .result-error.visible { display:flex; }
+    .error-title { font-size:14px; color:var(--red); font-weight:700; }
+    .error-detail { font-size:12px; color:var(--text-3); }
+
+    @media (max-width:900px) { .page { grid-template-columns:1fr; } }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
   </style>
 </head>
 <body>
-
 <nav>
   <div class="nav-inner">
-    <a href="/" class="logo"><div class="logo-dot"></div>Emploia</a>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <a href="/dashboard" style="font-size:13px;font-weight:600;color:var(--slate-500);text-decoration:none;padding:6px 12px;border-radius:7px;transition:all .15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">📊 Mes candidatures</a>
-      <div class="credits-badge">
-        ⚡ <span class="credits-count" id="creditsCount">5</span> générations restantes
-      </div>
+    <a href="/" class="logo"><div class="logo-mark">E</div>Emploia</a>
+    <div class="nav-right">
+      <a href="/dashboard" class="nav-link">📊 Mes candidatures</a>
+      <div class="credits-pill">⚡ <span class="credits-num" id="creditsCount">5</span> générés</div>
     </div>
   </div>
 </nav>
 
 <div class="page">
-
-  <!-- PANNEAU GAUCHE : Formulaire -->
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title">✍️ Votre candidature</div>
-    </div>
+    <div class="panel-header"><div class="panel-title">✍️ Votre candidature</div></div>
     <div class="panel-body">
-
-      <!-- Alerte no credits -->
-      <div class="no-credits-banner" id="noCreditsAlert">
-        😕 Plus de générations disponibles — <a href="/index.html#pricing" style="color:inherit;font-weight:800;margin-left:4px;">Passer Pro →</a>
-      </div>
-
-      <!-- Tabs -->
+      <div class="no-credits-banner" id="noCreditsAlert">😕 Plus de générations disponibles — <a href="/#pricing" style="color:inherit;font-weight:800;margin-left:4px;">Passer Pro →</a></div>
       <div class="tabs">
         <button class="tab active" onclick="switchTab('cv',this)">📄 CV</button>
         <button class="tab" onclick="switchTab('lettre',this)">✉️ Lettre</button>
         <button class="tab" onclick="switchTab('ats',this)">🎯 Score ATS</button>
       </div>
-
       <div class="form-group">
         <label>Offre d'emploi</label>
-        <textarea id="jobOffer" rows="7" placeholder="Collez ici la description complète du poste...
-
-Ex: Chargé(e) de Communication Digitale — CDI — Paris
-Missions : gestion des réseaux sociaux, campagnes Meta Ads...
-Profil : Bac+4/5, 2 ans d'expérience, maîtrise Canva..."></textarea>
+        <textarea id="jobOffer" rows="7" placeholder="Collez ici la description complète du poste..."></textarea>
       </div>
-
       <div class="form-group">
         <label id="profileLabel">Votre profil & expériences</label>
-        <textarea id="userProfile" rows="7" placeholder="Décrivez votre parcours, compétences et formations...
-
-Ex: Master Marketing Digital — Paris-Dauphine (2022)
-3 ans en agence : réseaux sociaux, campagnes Meta Ads ROAS 4x
-Compétences : Canva, Google Analytics, Semrush..."></textarea>
+        <textarea id="userProfile" rows="7" placeholder="Décrivez votre parcours, compétences et formations..."></textarea>
       </div>
-
       <button class="btn-generate" id="generateBtn" onclick="generate()">
         <span id="generateBtnText">✨ Générer avec l'IA</span>
       </button>
-
     </div>
   </div>
 
-  <!-- PANNEAU DROIT : Résultat -->
   <div class="panel" style="display:flex;flex-direction:column;">
     <div class="panel-header">
       <div class="panel-title">🎯 Résultat</div>
-      <div id="resultTypeBadge" style="display:none" class="result-type-badge">CV</div>
+      <span class="type-badge" id="resultBadgeTop" style="display:none">CV</span>
     </div>
-
-    <!-- Score ATS card (visible only for ATS tab) -->
     <div class="score-card" id="scoreCard">
-      <div class="score-value" id="scoreValue">--</div>
-      <div class="score-label">Score ATS / 100</div>
+      <div class="score-row"><div class="score-num" id="scoreValue">--</div><div class="score-denom">/100</div></div>
+      <div class="score-label">Score de compatibilité ATS</div>
       <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%"></div></div>
     </div>
-
-    <!-- Empty state -->
     <div class="result-empty" id="resultEmpty">
-      <div class="result-empty-icon">✨</div>
-      <p>Remplissez les champs<br/>et cliquez sur <strong>Générer</strong><br/>pour voir votre résultat ici.</p>
+      <div class="empty-icon">✨</div>
+      <div class="empty-title">Prêt à générer</div>
+      <div class="empty-sub">Remplissez les champs à gauche et cliquez sur Générer</div>
     </div>
-
-    <!-- Loading -->
     <div class="result-loading" id="resultLoading">
-      <div class="loading-ring"></div>
-      <div class="loading-steps-list">
-        <div class="lsi active" id="lsi1"><div class="lsi-dot"></div>Analyse de l'offre...</div>
-        <div class="lsi" id="lsi2"><div class="lsi-dot"></div>Extraction des mots-clés ATS...</div>
-        <div class="lsi" id="lsi3"><div class="lsi-dot"></div>Génération du contenu...</div>
-        <div class="lsi" id="lsi4"><div class="lsi-dot"></div>Optimisation finale...</div>
+      <div class="loading-orb"></div>
+      <div class="loading-steps">
+        <div class="ls active" id="ls1"><div class="ls-dot"></div>Analyse de l'offre...</div>
+        <div class="ls" id="ls2"><div class="ls-dot"></div>Extraction des mots-clés ATS...</div>
+        <div class="ls" id="ls3"><div class="ls-dot"></div>Génération du contenu...</div>
+        <div class="ls" id="ls4"><div class="ls-dot"></div>Optimisation finale...</div>
       </div>
     </div>
-
-    <!-- Error -->
     <div class="result-error" id="resultError">
-      <div class="error-icon">⚠️</div>
-      <div class="error-msg" id="errorMsg">Une erreur est survenue</div>
+      <span style="font-size:32px">⚠️</span>
+      <div class="error-title" id="errorMsg">Une erreur est survenue</div>
       <div class="error-detail" id="errorDetail">Vérifiez votre connexion et réessayez.</div>
     </div>
-
-    <!-- Result content -->
     <div class="result-content" id="resultContent">
       <div class="result-toolbar">
-        <span class="result-type-badge" id="resultBadge">CV</span>
+        <span class="type-badge" id="resultBadge">CV</span>
         <div class="result-actions">
           <button class="btn-action btn-copy" id="copyBtn" onclick="copyResult()">📋 Copier</button>
           <button class="btn-action btn-regen" onclick="generate()">🔄 Régénérer</button>
@@ -224,193 +177,114 @@ Compétences : Canva, Google Analytics, Semrush..."></textarea>
       </div>
       <div class="result-text" id="resultText"></div>
     </div>
-
   </div>
 </div>
 
 <script>
   const LABELS = {
-    cv:     { tab:'CV',           badge:'📄 CV',            profile:'Votre profil & expériences',  btn:'✨ Générer mon CV' },
-    lettre: { tab:'Lettre',       badge:'✉️ Lettre',        profile:'Votre profil & expériences',  btn:'✨ Générer la lettre' },
-    ats:    { tab:'Score ATS',    badge:'🎯 Score ATS',     profile:'Votre CV complet (texte)',     btn:'✨ Analyser mon score ATS' },
+    cv:     { profile:'Votre profil & expériences', btn:'✨ Générer mon CV',        badge:'CV' },
+    lettre: { profile:'Votre profil & expériences', btn:'✨ Générer la lettre',      badge:'LETTRE' },
+    ats:    { profile:'Votre CV complet (texte)',   btn:'✨ Analyser mon score ATS', badge:'SCORE ATS' },
   };
-
-  let currentTab = 'cv';
-  let currentResult = '';
-  let credits = parseInt(localStorage.getItem('emploiia_credits') ?? '5');
-
-  // Init credits
+  let currentTab='cv', currentResult='', loadingTimer=null;
+  let credits = parseInt(localStorage.getItem('emploia_credits') ?? '5');
   updateCredits();
 
   function updateCredits() {
     document.getElementById('creditsCount').textContent = credits;
-    if (credits <= 0) {
-      document.getElementById('noCreditsAlert').classList.add('visible');
-      document.getElementById('generateBtn').disabled = true;
-    }
+    if (credits <= 0) { document.getElementById('noCreditsAlert').classList.add('visible'); document.getElementById('generateBtn').disabled = true; }
   }
-
   function switchTab(tab, el) {
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
-    const cfg = LABELS[tab];
-    document.getElementById('profileLabel').textContent = cfg.profile;
-    document.getElementById('generateBtnText').textContent = cfg.btn;
-    // Reset result
+    document.getElementById('profileLabel').textContent = LABELS[tab].profile;
+    document.getElementById('generateBtnText').textContent = LABELS[tab].btn;
     showEmpty();
   }
-
   function showEmpty() {
-    document.getElementById('resultEmpty').style.display = 'flex';
+    document.getElementById('resultEmpty').style.display='flex';
     document.getElementById('resultLoading').classList.remove('visible');
     document.getElementById('resultContent').classList.remove('visible');
     document.getElementById('resultError').classList.remove('visible');
     document.getElementById('scoreCard').classList.remove('visible');
+    document.getElementById('resultBadgeTop').style.display='none';
   }
-
   function showLoading() {
-    document.getElementById('resultEmpty').style.display = 'none';
+    document.getElementById('resultEmpty').style.display='none';
     document.getElementById('resultLoading').classList.add('visible');
     document.getElementById('resultContent').classList.remove('visible');
     document.getElementById('resultError').classList.remove('visible');
     document.getElementById('scoreCard').classList.remove('visible');
   }
-
   function showResult(text) {
-    document.getElementById('resultEmpty').style.display = 'none';
+    document.getElementById('resultEmpty').style.display='none';
     document.getElementById('resultLoading').classList.remove('visible');
     document.getElementById('resultContent').classList.add('visible');
     document.getElementById('resultError').classList.remove('visible');
-    document.getElementById('resultText').textContent = text;
-    document.getElementById('resultBadge').textContent = LABELS[currentTab].badge;
-
-    // Score ATS card
-    if (currentTab === 'ats') {
-      const match = text.match(/SCORE ATS GLOBAL\s*:\s*(\d+)/i) || text.match(/Score\s*:\s*(\d+)/i);
+    document.getElementById('resultText').textContent=text;
+    const badge = LABELS[currentTab].badge;
+    document.getElementById('resultBadge').textContent=badge;
+    document.getElementById('resultBadgeTop').textContent=badge;
+    document.getElementById('resultBadgeTop').style.display='';
+    if (currentTab==='ats') {
+      const match = text.match(/SCORE ATS GLOBAL\s*:\s*(\d+)/i)||text.match(/Score\s*:\s*(\d+)/i);
       const score = match ? parseInt(match[1]) : null;
-      if (score !== null) {
-        document.getElementById('scoreValue').textContent = score;
+      if (score!==null) {
+        document.getElementById('scoreValue').textContent=score;
         document.getElementById('scoreCard').classList.add('visible');
-        setTimeout(() => {
-          document.getElementById('scoreBar').style.width = score + '%';
-        }, 100);
+        setTimeout(()=>{ document.getElementById('scoreBar').style.width=score+'%'; },100);
       }
     }
   }
-
-  function showError(msg, detail) {
-    document.getElementById('resultEmpty').style.display = 'none';
+  function showError(msg,detail) {
+    document.getElementById('resultEmpty').style.display='none';
     document.getElementById('resultLoading').classList.remove('visible');
     document.getElementById('resultContent').classList.remove('visible');
     document.getElementById('resultError').classList.add('visible');
-    document.getElementById('errorMsg').textContent = msg;
-    document.getElementById('errorDetail').textContent = detail || '';
+    document.getElementById('errorMsg').textContent=msg;
+    document.getElementById('errorDetail').textContent=detail||'';
     document.getElementById('scoreCard').classList.remove('visible');
   }
-
-  let loadingTimer = null;
   function animateLoading() {
-    const steps = ['lsi1','lsi2','lsi3','lsi4'];
-    let i = 0;
-    steps.forEach(id => { document.getElementById(id).className = 'lsi'; });
-    document.getElementById('lsi1').classList.add('active');
-
-    loadingTimer = setInterval(() => {
-      if (i < steps.length - 1) {
-        document.getElementById(steps[i]).className = 'lsi done';
-        i++;
-        document.getElementById(steps[i]).classList.add('active');
-      }
-    }, 1200);
+    const steps=['ls1','ls2','ls3','ls4']; let i=0;
+    steps.forEach(id=>{ document.getElementById(id).className='ls'; });
+    document.getElementById('ls1').classList.add('active');
+    loadingTimer=setInterval(()=>{ if(i<steps.length-1){ document.getElementById(steps[i]).className='ls done'; i++; document.getElementById(steps[i]).classList.add('active'); } },1400);
   }
-
-  function stopLoading() {
-    clearInterval(loadingTimer);
-  }
-
+  function stopLoading() { clearInterval(loadingTimer); }
   async function generate() {
-    const jobOffer = document.getElementById('jobOffer').value.trim();
-    const userProfile = document.getElementById('userProfile').value.trim();
-
-    if (!jobOffer) { document.getElementById('jobOffer').focus(); shake(document.getElementById('jobOffer')); return; }
-    if (!userProfile) { document.getElementById('userProfile').focus(); shake(document.getElementById('userProfile')); return; }
-    if (credits <= 0) return;
-
-    const btn = document.getElementById('generateBtn');
-    btn.disabled = true;
-    document.getElementById('generateBtnText').textContent = '⏳ Génération en cours...';
-
-    showLoading();
-    animateLoading();
-
+    const jobOffer=document.getElementById('jobOffer').value.trim();
+    const userProfile=document.getElementById('userProfile').value.trim();
+    if(!jobOffer){ shake(document.getElementById('jobOffer')); return; }
+    if(!userProfile){ shake(document.getElementById('userProfile')); return; }
+    if(credits<=0) return;
+    const btn=document.getElementById('generateBtn');
+    btn.disabled=true;
+    document.getElementById('generateBtnText').textContent='⏳ Génération en cours...';
+    showLoading(); animateLoading();
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: currentTab, jobOffer, userProfile }),
-      });
-
-      const data = await res.json();
-      stopLoading();
-
-      if (!res.ok || !data.success) {
-        showError(
-          data.error || 'Erreur lors de la génération',
-          data.details ? String(data.details).slice(0, 120) : 'Veuillez réessayer.'
-        );
-      } else {
-        credits--;
-        localStorage.setItem('emploiia_credits', credits);
-        updateCredits();
-        currentResult = data.result;
-        showResult(data.result);
-        saveHistory(currentTab, jobOffer, data.result);
-      }
-
-    } catch(err) {
-      stopLoading();
-      showError('Erreur réseau', 'Vérifiez votre connexion et réessayez.');
-    }
-
-    btn.disabled = (credits <= 0);
-    document.getElementById('generateBtnText').textContent = LABELS[currentTab].btn;
+      const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:currentTab,jobOffer,userProfile})});
+      const data=await res.json(); stopLoading();
+      if(!res.ok||!data.success) { showError(data.error||'Erreur lors de la génération', data.details?String(data.details).slice(0,120):'Veuillez réessayer.'); }
+      else { credits--; localStorage.setItem('emploia_credits',credits); updateCredits(); currentResult=data.result; showResult(data.result); saveHistory(currentTab,jobOffer,data.result); }
+    } catch(err) { stopLoading(); showError('Erreur réseau','Vérifiez votre connexion et réessayez.'); }
+    btn.disabled=(credits<=0);
+    document.getElementById('generateBtnText').textContent=LABELS[currentTab].btn;
   }
-
   function copyResult() {
-    if (!currentResult) return;
-    navigator.clipboard.writeText(currentResult).then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.textContent = '✅ Copié !';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '📋 Copier'; btn.classList.remove('copied'); }, 2000);
+    if(!currentResult) return;
+    navigator.clipboard.writeText(currentResult).then(()=>{
+      const btn=document.getElementById('copyBtn'); btn.textContent='✅ Copié !'; btn.classList.add('copied');
+      setTimeout(()=>{ btn.textContent='📋 Copier'; btn.classList.remove('copied'); },2000);
     });
   }
-
-  function saveHistory(type, jobOffer, result) {
-    const history = JSON.parse(localStorage.getItem('emploiia_history') || '[]');
-    history.unshift({
-      type,
-      preview: jobOffer.slice(0, 60) + '...',
-      result,
-      date: new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'short' }),
-    });
-    localStorage.setItem('emploiia_history', JSON.stringify(history.slice(0, 20)));
+  function saveHistory(type,jobOffer,result) {
+    const history=JSON.parse(localStorage.getItem('emploia_history')||'[]');
+    history.unshift({type,preview:jobOffer.slice(0,60)+'...',result,date:new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})});
+    localStorage.setItem('emploia_history',JSON.stringify(history.slice(0,20)));
   }
-
-  function shake(el) {
-    el.style.animation = 'shake .4s ease';
-    setTimeout(() => el.style.animation = '', 400);
-  }
+  function shake(el) { el.style.animation='shake .4s ease'; setTimeout(()=>el.style.animation='',400); }
 </script>
-
-<style>
-  @keyframes shake {
-    0%,100% { transform:translateX(0); }
-    20%,60% { transform:translateX(-6px); }
-    40%,80% { transform:translateX(6px); }
-  }
-</style>
-
 </body>
 </html>
