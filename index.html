@@ -5,6 +5,47 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Emploia — Le copilote IA qui vous fait décrocher des entretiens | 100% français</title>
   <meta name="description" content="Emploia génère votre CV ATS-optimisé, votre lettre et analyse votre score en 30 secondes. Trouvez stages, alternances et emplois en France. Premier outil IA 100% français. Gratuit."/>
+  <link rel="canonical" href="https://emploia.fr/"/>
+  <meta property="og:title" content="Emploia — Le copilote IA 100% français pour décrocher des entretiens"/>
+  <meta property="og:description" content="CV ATS-optimisé, lettre de motivation, score ATS — en 30 secondes. Trouvez votre stage, alternance ou CDI en France."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/"/>
+  <meta property="og:image" content="https://emploia.fr/og-image.svg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Emploia — Le copilote IA 100% français"/>
+  <meta name="twitter:description" content="CV ATS-optimisé en 30 secondes. Gratuit pour commencer."/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Emploia",
+    "url": "https://emploia.fr",
+    "logo": "https://emploia.fr/logo.svg",
+    "description": "Le copilote de candidature IA 100% français. CV ATS-optimisé, lettre de motivation, score ATS en 30 secondes.",
+    "sameAs": ["https://www.linkedin.com/company/emploia"],
+    "contactPoint": { "@type": "ContactPoint", "email": "contact@emploia.fr", "contactType": "customer support" }
+  }
+  <\/script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Emploia",
+    "url": "https://emploia.fr",
+    "potentialAction": { "@type": "SearchAction", "target": "https://emploia.fr/jobs?q={search_term_string}", "query-input": "required name=search_term_string" }
+  }
+  <\/script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "C'est quoi un ATS ?", "acceptedAnswer": { "@type": "Answer", "text": "Un ATS (Applicant Tracking System) est un logiciel utilisé par 78% des grandes entreprises pour filtrer automatiquement les CVs avant qu'un humain ne les lise." } },
+      { "@type": "Question", "name": "Emploia est-il gratuit ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui, Emploia est gratuit avec 5 générations IA offertes. La version Pro est à 9€/mois avec un essai de 7 jours gratuit." } },
+      { "@type": "Question", "name": "Emploia fonctionne-t-il pour les stages et alternances ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui, Emploia est conçu pour tous les types de contrats français : CDI, CDD, stage, alternance. Les CV et lettres sont adaptés au marché français." } }
+    ]
+  }
+  <\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -273,7 +314,20 @@
     .pm-close{position:absolute;top:20px;right:20px;width:30px;height:30px;border-radius:8px;border:none;background:var(--s2);cursor:pointer;color:var(--t2);font-size:14px;display:flex;align-items:center;justify-content:center;}
     .pm-secure{font-size:11px;color:var(--t3);text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;}
 
-    @media(max-width:900px){.mbody,.feat-grid,.testi-grid,.price-grid,.jobs-preview-grid{grid-template-columns:1fr;}.stats-band{grid-template-columns:repeat(2,1fr);}.nav-a{display:none;}.story-item{grid-template-columns:60px 1fr;gap:16px;}.hs-row{flex-wrap:wrap;}}
+    /* HAMBURGER */
+    .hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--brd);background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;}
+    .hamburger span{display:block;width:16px;height:2px;background:var(--t2);border-radius:2px;transition:all .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;width:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    /* MOBILE DRAWER */
+    .mobile-nav{display:none;position:fixed;top:78px;left:16px;right:16px;background:rgba(4,8,15,.97);backdrop-filter:blur(24px);border:1px solid var(--brdh);border-radius:18px;padding:12px;z-index:199;flex-direction:column;gap:4px;}
+    .mobile-nav.open{display:flex;animation:fadeDown .2s ease both;}
+    .mobile-nav a{display:block;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600;color:var(--t2);text-decoration:none;transition:all .15s;}
+    .mobile-nav a:hover{background:var(--s2);color:var(--t1);}
+    .mobile-nav .mm-div{height:1px;background:var(--brd);margin:4px 0;}
+    .mobile-nav .mm-cta{background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:800;border-radius:10px;padding:13px 16px;text-align:center;margin-top:4px;box-shadow:0 4px 16px rgba(99,102,241,.3);}
+    @media(max-width:900px){.mbody,.feat-grid,.testi-grid,.price-grid,.jobs-preview-grid{grid-template-columns:1fr;}.stats-band{grid-template-columns:repeat(2,1fr);}.nav-a{display:none;}.hamburger{display:flex;}.story-item{grid-template-columns:60px 1fr;gap:16px;}.hs-row{flex-wrap:wrap;}}
   </style>
 </head>
 <body>
@@ -283,14 +337,29 @@
   <div class="nav-pill">
     <a href="/" class="logo"><div class="logo-m">E</div>Emploia <span class="beta">BÊTA</span></a>
     <div class="nav-links">
-      <a href="/jobs" class="nav-a">🔍 Offres</a>
+      <a href="/jobs" class="nav-a">Offres</a>
       <a href="#features" class="nav-a">Fonctionnalités</a>
+      <a href="/blog" class="nav-a">Blog</a>
       <a href="#pricing" class="nav-a">Tarifs</a>
       <a href="#faq" class="nav-a">FAQ</a>
       <a href="/app" class="btn-nav">Commencer gratuitement →</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="#features">Fonctionnalités</a>
+  <a href="/blog">Blog</a>
+  <a href="/interview">Simulateur entretien</a>
+  <a href="#pricing">Tarifs</a>
+  <a href="#faq">FAQ</a>
+  <div class="mm-div"></div>
+  <a href="/referral">Parrainage 🎁</a>
+  <a href="/app" class="mm-cta">Commencer gratuitement →</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -643,6 +712,21 @@
   </div>
 </section>
 
+<!-- PARRAINAGE -->
+<section style="padding:60px 24px;border-top:1px solid var(--brd);background:rgba(99,102,241,.02);" class="reveal">
+  <div class="section-inner" style="text-align:center">
+    <div class="section-tag">Parrainage</div>
+    <h2 class="section-title" style="margin:0 auto 12px">Parrainez vos amis.<br/>Gagnez jusqu'à 6 mois Pro.</h2>
+    <p class="section-sub" style="margin:0 auto 32px">Pour chaque ami inscrit via votre lien, vous gagnez <strong style="color:var(--t1)">1 mois Pro offert</strong>. Cumulable jusqu'à 6 mois. Votre filleul reçoit <strong style="color:var(--t1)">7 jours bonus</strong>.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-bottom:32px;">
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--gnb)">+1 mois</div><div style="font-size:12px;color:var(--t3);margin-top:4px">Pro par filleul</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#c084fc">6 mois max</div><div style="font-size:12px;color:var(--t3);margin-top:4px">cumulables</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--blb)">+7 jours</div><div style="font-size:12px;color:var(--t3);margin-top:4px">bonus pour votre filleul</div></div>
+    </div>
+    <a href="/referral" style="display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));text-decoration:none;box-shadow:0 4px 20px rgba(99,102,241,.3);transition:all .2s">Obtenir mon lien de parrainage →</a>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-banner reveal">
   <div class="cta-g1"></div>
@@ -671,13 +755,16 @@
         <a href="/jobs">Offres d'emploi</a>
         <a href="/app">Générateur IA</a>
         <a href="/dashboard">Suivi candidatures</a>
+        <a href="/interview">Simulateur entretien</a>
         <a href="#pricing">Tarifs</a>
       </div>
       <div class="footer-links">
         <h4>Ressources</h4>
+        <a href="/blog">Blog & Guides</a>
         <a href="#features">Fonctionnalités</a>
         <a href="#faq">FAQ</a>
         <a href="/onboarding">Démarrer</a>
+        <a href="/referral">Parrainage</a>
       </div>
       <div class="footer-links">
         <h4>Contact</h4>
@@ -685,7 +772,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2025 Emploia. Tous droits réservés.</p>
+      <p>© <span id="yr"></span> Emploia. Tous droits réservés.</p>
       <p>🇫🇷 Fait en France · Propulsé par Claude AI</p>
     </div>
   </div>
@@ -712,6 +799,30 @@
 </div>
 
 <script>
+  // Mobile nav
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    const nav = document.getElementById('mobileNav');
+    const btn = document.getElementById('hamburger');
+    if (!nav.contains(e.target) && !btn.contains(e.target)) {
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+    }
+  });
+  // Close mobile nav on link click
+  document.querySelectorAll('.mobile-nav a').forEach(a => a.addEventListener('click', () => {
+    document.getElementById('mobileNav').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }));
+
+  // Copyright year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
   // Hero search
   let hsActiveType = 'tous';
   function hsType(btn) {
@@ -794,6 +905,42 @@
   }
 
   document.addEventListener('keydown', e => { if(e.key==='Escape') closePayment(); });
+</script>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-text">Emploia utilise des cookies pour améliorer votre expérience et mesurer l'audience. <a href="#" style="color:var(--blb)">Politique de confidentialité</a></div>
+  <div class="cookie-btns">
+    <button class="btn-cookie-ok" onclick="acceptCookies()">Accepter</button>
+    <button class="btn-cookie-no" onclick="declineCookies()">Refuser</button>
+  </div>
+</div>
+
+<style>
+.cookie-banner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:400;background:var(--s1);border:1px solid var(--brdh);border-radius:14px;padding:14px 18px;max-width:620px;width:calc(100% - 32px);display:flex;align-items:center;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.cookie-text{font-size:12px;color:var(--t2);line-height:1.55;flex:1;}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0;}
+.btn-cookie-ok{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;font-family:'Sora',sans-serif;}
+.btn-cookie-no{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600;color:var(--t3);background:transparent;border:1px solid var(--brd);cursor:pointer;font-family:'Sora',sans-serif;}
+@media(max-width:600px){.cookie-banner{flex-direction:column;}.cookie-btns{width:100%;}.btn-cookie-ok,.btn-cookie-no{flex:1;text-align:center;}}
+</style>
+
+<script>
+  const _ck='emploia_cookie_consent';
+  if(localStorage.getItem(_ck)) document.getElementById('cookieBanner').style.display='none';
+  function acceptCookies(){
+    localStorage.setItem(_ck,'accepted');
+    document.getElementById('cookieBanner').style.display='none';
+    const s=document.createElement('script');s.defer=true;s.dataset.domain='emploia.fr';s.src='https://plausible.io/js/script.js';document.head.appendChild(s);
+  }
+  function declineCookies(){
+    localStorage.setItem(_ck,'declined');
+    document.getElementById('cookieBanner').style.display='none';
+  }
+  // Load analytics if already accepted
+  if(localStorage.getItem(_ck)==='accepted'){
+    const s=document.createElement('script');s.defer=true;s.dataset.domain='emploia.fr';s.src='https://plausible.io/js/script.js';document.head.appendChild(s);
+  }
 </script>
 </body>
 </html>
