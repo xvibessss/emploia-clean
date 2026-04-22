@@ -2,6 +2,7 @@
   "outputDirectory": ".",
   "functions": {
     "api/generate.js": { "maxDuration": 30 },
+    "api/chat.js": { "maxDuration": 20 },
     "api/auth/login.js": { "maxDuration": 10 },
     "api/auth/register.js": { "maxDuration": 10 },
     "api/auth/me.js": { "maxDuration": 10 },
