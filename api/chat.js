@@ -43,7 +43,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
         max_tokens: 1024,
-        system: SYSTEM,
+        system: system_override || SYSTEM,
         messages: messages.slice(-10), // keep last 10 messages for context
       }),
     });
