@@ -3,6 +3,8 @@
   "functions": {
     "api/generate.js": { "maxDuration": 30 },
     "api/chat.js": { "maxDuration": 20 },
+    "api/jobs.js": { "maxDuration": 15 },
+    "api/stripe-checkout.js": { "maxDuration": 10 },
     "api/auth/login.js": { "maxDuration": 10 },
     "api/auth/register.js": { "maxDuration": 10 },
     "api/auth/me.js": { "maxDuration": 10 },
@@ -11,7 +13,8 @@
   "rewrites": [
     { "source": "/app", "destination": "/app.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/onboarding", "destination": "/onboarding.html" }
+    { "source": "/onboarding", "destination": "/onboarding.html" },
+    { "source": "/jobs", "destination": "/jobs.html" }
   ],
   "headers": [
     {
@@ -26,8 +29,7 @@
       "source": "/(.*)\\.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     }
   ]
