@@ -153,7 +153,22 @@
     /* DEMO NOTICE */
     .demo-notice{background:var(--yld);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:11px 16px;margin-bottom:16px;font-size:12px;color:var(--ylb);display:flex;align-items:center;gap:8px;}
 
-    @media(max-width:900px){.main-content{grid-template-columns:1fr;}.filters-sidebar{display:none;}.search-row{flex-wrap:wrap;}.search-loc{width:100%;}}
+    /* HAMBURGER */
+    .hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--brd);background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;}
+    .hamburger span{display:block;width:16px;height:2px;background:var(--t2);border-radius:2px;transition:all .25s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;width:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-nav{display:none;position:fixed;top:68px;left:16px;right:16px;background:rgba(4,8,15,.97);backdrop-filter:blur(24px);border:1px solid var(--brdh);border-radius:18px;padding:12px;z-index:199;flex-direction:column;gap:4px;}
+    .mobile-nav.open{display:flex;animation:fadeDown .2s ease both;}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .mobile-nav a{display:block;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600;color:var(--t2);text-decoration:none;transition:all .15s;}
+    .mobile-nav a:hover{background:var(--s2);color:var(--t1);}
+    .mobile-nav .mm-div{height:1px;background:var(--brd);margin:4px 0;}
+    .mobile-nav .mm-cta{background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:800;border-radius:10px;padding:13px 16px;text-align:center;margin-top:4px;}
+    /* MOBILE FILTERS DRAWER */
+    .mobile-filters-btn{display:none;width:100%;padding:10px 16px;border-radius:10px;border:1px solid var(--brd);background:var(--s1);color:var(--t2);font-size:13px;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;margin-bottom:14px;text-align:left;}
+    @media(max-width:900px){.main-content{grid-template-columns:1fr;}.filters-sidebar{display:none;}.search-row{flex-wrap:wrap;}.search-loc{width:100%;}.nav-a{display:none;}.hamburger{display:flex;}.mobile-filters-btn{display:flex;align-items:center;justify-content:space-between;}}
   </style>
 </head>
 <body>
@@ -161,16 +176,26 @@
   <div class="nav-inner">
     <a href="/" class="logo"><div class="logo-m">E</div>Emploia</a>
     <div class="nav-links">
-      <a href="/jobs" class="nav-a active">🔍 Offres</a>
-      <a href="/app" class="nav-a">✨ Générer CV</a>
-      <a href="/dashboard" class="nav-a">📊 Suivi</a>
+      <a href="/jobs" class="nav-a active">Offres</a>
+      <a href="/app" class="nav-a">Générer CV</a>
+      <a href="/interview" class="nav-a">Entretien IA</a>
+      <a href="/dashboard" class="nav-a">Candidatures</a>
       <a href="/app" class="btn-try">Essai gratuit →</a>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/dashboard">Suivi candidatures</a>
+  <div class="mm-div"></div>
+  <a href="/app" class="mm-cta">Essai gratuit →</a>
+</div>
 
 <div class="hero">
-  <div class="hero-badge"><div class="live-dot"></div> Offres mises à jour en temps réel</div>
+  <div class="hero-badge" id="liveBadge" style="display:none"><div class="live-dot"></div> Offres en temps réel · France Travail</div>
+  <div class="hero-badge" id="demoBadge" style="background:var(--yld);border-color:rgba(245,158,11,.2);color:var(--ylb)">Mode démo — offres représentatives</div>
   <h1>Trouvez votre <span class="h1-grad">prochain poste</span><br/>et postulez en 30 secondes</h1>
   <p class="hero-sub">Stage, alternance, CDI, CDD — toutes les offres françaises au même endroit. Emploia génère votre CV ATS-optimisé pour chaque poste instantanément.</p>
 
@@ -201,20 +226,20 @@
   <aside class="filters-sidebar">
     <div class="filter-panel">
       <div class="filter-title">Expérience</div>
-      <div class="filter-option"><input type="checkbox" id="exp0" /><label for="exp0">Débutant (0-1 an)</label><span class="count">124</span></div>
-      <div class="filter-option"><input type="checkbox" id="exp1" /><label for="exp1">Junior (1-3 ans)</label><span class="count">289</span></div>
-      <div class="filter-option"><input type="checkbox" id="exp2" /><label for="exp2">Confirmé (3-5 ans)</label><span class="count">412</span></div>
-      <div class="filter-option"><input type="checkbox" id="exp3" /><label for="exp3">Senior (5+ ans)</label><span class="count">187</span></div>
+      <div class="filter-option"><input type="checkbox" id="exp0" value="debutant" onchange="doSearch()" /><label for="exp0">Débutant (0-1 an)</label><span class="count">124</span></div>
+      <div class="filter-option"><input type="checkbox" id="exp1" value="junior" onchange="doSearch()" /><label for="exp1">Junior (1-3 ans)</label><span class="count">289</span></div>
+      <div class="filter-option"><input type="checkbox" id="exp2" value="confirme" onchange="doSearch()" /><label for="exp2">Confirmé (3-5 ans)</label><span class="count">412</span></div>
+      <div class="filter-option"><input type="checkbox" id="exp3" value="senior" onchange="doSearch()" /><label for="exp3">Senior (5+ ans)</label><span class="count">187</span></div>
     </div>
     <div class="filter-panel">
       <div class="filter-title">Télétravail</div>
-      <div class="filter-option"><input type="checkbox" id="rem1" /><label for="rem1">Full remote</label><span class="count">156</span></div>
-      <div class="filter-option"><input type="checkbox" id="rem2" /><label for="rem2">Hybride</label><span class="count">334</span></div>
-      <div class="filter-option"><input type="checkbox" id="rem3" /><label for="rem3">Présentiel</label><span class="count">522</span></div>
+      <div class="filter-option"><input type="checkbox" id="rem1" value="remote" onchange="doSearch()" /><label for="rem1">Full remote</label><span class="count">156</span></div>
+      <div class="filter-option"><input type="checkbox" id="rem2" value="hybride" onchange="doSearch()" /><label for="rem2">Hybride</label><span class="count">334</span></div>
+      <div class="filter-option"><input type="checkbox" id="rem3" value="presentiel" onchange="doSearch()" /><label for="rem3">Présentiel</label><span class="count">522</span></div>
     </div>
     <div class="filter-panel">
       <div class="filter-title">Secteur</div>
-      <select class="filter-select" onchange="doSearch()">
+      <select class="filter-select" id="filterSecteur" onchange="doSearch()">
         <option value="">Tous les secteurs</option>
         <option>Tech & IT</option>
         <option>Marketing & Communication</option>
@@ -228,7 +253,7 @@
     </div>
     <div class="filter-panel">
       <div class="filter-title">Salaire annuel</div>
-      <select class="filter-select" onchange="doSearch()">
+      <select class="filter-select" id="filterSalaire" onchange="doSearch()">
         <option value="">Tous les salaires</option>
         <option>< 30 000€</option>
         <option>30 000 - 40 000€</option>
@@ -254,6 +279,15 @@
 </div>
 
 <script>
+
+function hashScore(id) {
+  let h = 0;
+  for (let i = 0; i < String(id).length; i++) {
+    h = (Math.imul(31, h) + String(id).charCodeAt(i)) | 0;
+  }
+  return 82 + Math.abs(h % 15);
+}
+
 let currentType = 'tous', currentPage = 0, totalJobs = 0;
 const saved = new Set(JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'));
 
@@ -280,12 +314,24 @@ async function loadJobs() {
     const params = new URLSearchParams({ q, page: currentPage });
     if (currentType !== 'tous') params.set('type', currentType);
     if (loc) params.set('location', loc);
+    // Sidebar filters — built BEFORE fetch
+    const exp = [...document.querySelectorAll('#exp0,#exp1,#exp2,#exp3')].filter(c=>c.checked).map(c=>c.value);
+    const rem = [...document.querySelectorAll('#rem1,#rem2,#rem3')].filter(c=>c.checked).map(c=>c.value);
+    const secteur = document.getElementById('filterSecteur')?.value||'';
+    const salaire = document.getElementById('filterSalaire')?.value||'';
+    if(exp.length) params.set('exp', exp.join(','));
+    if(rem.length) params.set('remote', rem.join(','));
+    if(secteur) params.set('secteur', secteur);
+    if(salaire) params.set('salaire', salaire);
 
     const res = await fetch(`/api/jobs?${params}`);
     const data = await res.json();
 
     totalJobs = data.total || 0;
-    document.getElementById('demoNotice').style.display = data.demo ? 'flex' : 'none';
+    const isDemo = data.demo !== false;
+    document.getElementById('demoNotice').style.display = isDemo ? 'flex' : 'none';
+    document.getElementById('liveBadge').style.display = isDemo ? 'none' : 'inline-flex';
+    document.getElementById('demoBadge').style.display = isDemo ? 'inline-flex' : 'none';
 
     if (!data.jobs?.length) {
       document.getElementById('jobsList').innerHTML = '<div class="jobs-empty"><div style="font-size:40px;margin-bottom:16px">🔍</div><div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px">Aucune offre trouvée</div><div style="font-size:13px">Essayez d\'autres mots-clés ou un autre type de contrat.</div></div>';
@@ -312,7 +358,9 @@ function renderJob(job) {
   const typeClass = {'CDI':'cdi','CDD':'cdd','Stage':'stage','Alternance':'alternance','Freelance':'freelance'}[job.type] || 'cdi';
   const emoji = {'CDI':'💼','CDD':'📋','Stage':'🎓','Alternance':'🔄','Freelance':'⚡'}[job.type] || '💼';
   const companyEmoji = job.company?.charAt(0) || '🏢';
-  const matchScore = Math.floor(Math.random() * 15) + 82;
+  // Deterministic score from job ID — stable across renders
+  function hashScore(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h)+str.charCodeAt(i);return 82+(Math.abs(h)%15);}
+  const matchScore = hashScore(job.id||job.title||'');
 
   return `<div class="job-card" id="job-${esc(job.id)}">
     <div class="match-score">✨ ${matchScore}% match</div>
@@ -376,8 +424,30 @@ function toggleSave(id, btn) {
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-// Handle Enter key
+// Mobile nav
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  if(nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+    nav.classList.remove('open'); btn.classList.remove('open');
+  }
+});
+
+// Read URL params & load
 document.addEventListener('DOMContentLoaded', () => {
+  const urlP = new URLSearchParams(window.location.search);
+  if(urlP.get('q')) document.getElementById('searchInput').value = urlP.get('q');
+  if(urlP.get('location')) document.getElementById('locationInput').value = urlP.get('location');
+  if(urlP.get('type') && urlP.get('type') !== 'tous') {
+    const btn = document.querySelector(`.type-btn[data-type="${urlP.get('type')}"]`);
+    if(btn) setType(btn);
+  }
   document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
   document.getElementById('locationInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
   loadJobs();
