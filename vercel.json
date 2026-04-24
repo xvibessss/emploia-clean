@@ -1,32 +1,27 @@
 {
+  "version": 2,
+  "framework": null,
+  "buildCommand": "echo ok",
   "outputDirectory": ".",
+  "installCommand": "echo ok",
   "functions": {
-    "api/generate.js": { "maxDuration": 30 },
-    "api/chat.js": { "maxDuration": 20 },
-    "api/jobs.js": { "maxDuration": 15 },
+    "api/generate.js":        { "maxDuration": 30 },
+    "api/chat.js":            { "maxDuration": 20 },
+    "api/jobs.js":            { "maxDuration": 15 },
     "api/stripe-checkout.js": { "maxDuration": 10 },
-    "api/auth/login.js": { "maxDuration": 10 },
-    "api/auth/register.js": { "maxDuration": 10 },
-    "api/auth/me.js": { "maxDuration": 10 },
-    "api/auth/logout.js": { "maxDuration": 5 }
+    "api/auth/login.js":      { "maxDuration": 10 },
+    "api/auth/register.js":   { "maxDuration": 10 },
+    "api/auth/me.js":         { "maxDuration": 10 },
+    "api/auth/logout.js":     { "maxDuration": 5  }
   },
   "rewrites": [
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/app",        "destination": "/app.html" },
+    { "source": "/dashboard",  "destination": "/dashboard.html" },
+    { "source": "/jobs",       "destination": "/jobs.html" },
+    { "source": "/blog",       "destination": "/blog.html" },
+    { "source": "/interview",  "destination": "/interview.html" },
+    { "source": "/referral",   "destination": "/referral.html" },
     { "source": "/onboarding", "destination": "/onboarding.html" },
-    { "source": "/jobs", "destination": "/jobs.html" },
-    { "source": "/blog", "destination": "/blog.html" },
-    { "source": "/interview", "destination": "/interview.html" },
-    { "source": "/referral", "destination": "/referral.html" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
-      ]
-    }
+    { "source": "/cv-builder", "destination": "/cv-builder.html" }
   ]
 }
