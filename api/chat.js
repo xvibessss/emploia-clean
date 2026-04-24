@@ -1,22 +1,20 @@
 export const config = { runtime: 'edge' };
 
-const SYSTEM = `Tu es Orion, le copilote IA d'Emploia — l'assistant de recherche d'emploi 100% français.
+const SYSTEM_DEFAULT = `Tu es Orion, le copilote IA d'Emploia — le seul assistant de recherche d'emploi 100% spécialisé sur le marché français.
 
-Tu aides les candidats français à :
-- Optimiser leur CV et le rendre ATS-ready
-- Rédiger des lettres de motivation percutantes  
-- Préparer leurs entretiens d'embauche
-- Comprendre le marché du travail français
-- Négocier leur salaire
-- Optimiser leur profil LinkedIn
-- Choisir entre plusieurs offres d'emploi
-- Gérer le stress de la recherche d'emploi
+Ton expertise couvre :
+- Optimisation CV et lettres pour les ATS français (SAP SuccessFactors, Talentsoft, Workday)
+- Préparation aux entretiens (STAR, pitch, questions pièges)
+- Négociation salariale selon les grilles françaises (APEC, conventions collectives)
+- Marché du travail : secteurs qui recrutent, codes RH français, CDI/CDD/alternance/stage
+- LinkedIn et personal branding pour le marché français
+- Reconversion professionnelle et bilan de compétences
 
-Style : bienveillant, direct, actionnable. Tu donnes des conseils concrets et personnalisés. Tu connais parfaitement les codes du marché du travail français (APEC, France Travail, secteurs porteurs, codes RH, ATS comme SAP SuccessFactors et Talentsoft). Tu réponds toujours en français.
+Style : bienveillant, direct, concret. Donne des conseils actionnables immédiatement.
+Tu réponds TOUJOURS en français, en moins de 200 mots sauf si on te demande quelque chose de long.
+Si la question porte sur la génération d'un CV ou d'une lettre complète, invite à utiliser l'outil dans /app.`;
 
-Si on te demande de générer un CV ou une lettre complète, redirige vers /app.`;
-
-const headers = {
+const H = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -24,39 +22,42 @@ const headers = {
 };
 
 export default async function handler(req) {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
 
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
+  try { body = await req.json(); }
+  catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
-  const { messages } = body;
-  if (!messages || !Array.isArray(messages)) return new Response(JSON.stringify({ error: 'messages requis' }), { status: 400, headers });
+  const { messages, system_override } = body;
+  if (!Array.isArray(messages) || !messages.length)
+    return new Response(JSON.stringify({ error: 'messages[] requis' }), { status: 400, headers: H });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return new Response(JSON.stringify({ error: 'Clé API manquante' }), { status: 500, headers });
+  if (!apiKey)
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY manquante' }), { status: 500, headers: H });
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
         max_tokens: 1024,
-        system: system_override || SYSTEM,
-        messages: messages.slice(-10), // keep last 10 messages for context
+        system: system_override || SYSTEM_DEFAULT,
+        messages: messages.slice(-12),
       }),
     });
 
-    if (!response.ok) {
-      const err = await response.text();
-      return new Response(JSON.stringify({ error: 'Erreur API', details: err }), { status: 502, headers });
+    if (!res.ok) {
+      const err = await res.text();
+      return new Response(JSON.stringify({ error: 'Erreur API', details: err.slice(0,200) }), { status: 502, headers: H });
     }
 
-    const data = await response.json();
+    const data = await res.json();
     const reply = data.content?.[0]?.text ?? '';
-    return new Response(JSON.stringify({ reply }), { status: 200, headers });
+    return new Response(JSON.stringify({ reply }), { status: 200, headers: H });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers });
+    return new Response(JSON.stringify({ error: 'Erreur réseau', details: String(err).slice(0,200) }), { status: 500, headers: H });
   }
 }
