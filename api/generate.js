@@ -1,155 +1,187 @@
 export const config = { runtime: 'edge' };
 
+const SYSTEM = `Tu es un expert RH français senior avec 15 ans d'expérience en recrutement. Tu maîtrises parfaitement les ATS utilisés en France (SAP SuccessFactors, Talentsoft, Workday, Greenhouse), les codes du marché du travail français, et la rédaction de documents de candidature percutants. Tu réponds toujours en français.`;
+
 const PROMPTS = {
-  cv: (jobOffer, userProfile) => `Tu es un expert RH français spécialisé dans la rédaction de CV optimisés ATS pour le marché du travail français.
+  cv: (job, profile) => `OFFRE D'EMPLOI :
+${job}
 
-OFFRE D'EMPLOI :
-${jobOffer}
+PROFIL CANDIDAT :
+${profile}
 
-PROFIL DU CANDIDAT :
-${userProfile}
+Rédige un CV professionnel complet, ATS-optimisé pour ce poste précis.
 
-Ta mission : Rédige un CV professionnel complet et optimisé ATS en français.
+FORMAT OBLIGATOIRE (respecte exactement cette structure) :
 
-Format OBLIGATOIRE :
+═══════════════════════════════════════
+[PRÉNOM NOM]
+[Titre du poste ciblé — max 80 caractères]
+📧 email@exemple.com | 📱 06 XX XX XX XX | 📍 Ville | 💼 linkedin.com/in/profil
+═══════════════════════════════════════
 
-NOM PRÉNOM
-Titre du poste ciblé
-Email | Téléphone | Ville | LinkedIn
+▌ PROFIL PROFESSIONNEL
+[2-3 phrases d'accroche ultra-ciblées qui reprennent exactement les termes de l'offre. Quantifie si possible.]
 
-── PROFIL ──
-[2-3 phrases percutantes qui correspondent exactement au poste]
+▌ EXPÉRIENCES PROFESSIONNELLES
 
-── EXPÉRIENCES PROFESSIONNELLES ──
-[Poste] | [Entreprise] | [Dates]
-• [Réalisation quantifiée avec les mots-clés de l'offre]
+[Intitulé exact du poste] | [Entreprise] | [Ville] | [MM/AAAA – MM/AAAA]
+• [Réalisation 1 quantifiée avec verbe d'action fort + chiffre + contexte]
+• [Réalisation 2 avec mots-clés de l'offre]
+• [Réalisation 3 impactante]
+
+[Poste précédent] | [Entreprise] | [Ville] | [MM/AAAA – MM/AAAA]
 • [Réalisation quantifiée]
-• [Réalisation quantifiée]
+• [Réalisation]
 
-── FORMATION ──
-[Diplôme] | [École] | [Année]
+▌ FORMATION
+[Diplôme + spécialité] | [École/Université] | [Ville] | [Année]
+[Certifications, formations complémentaires si pertinentes]
 
-── COMPÉTENCES ──
-Techniques : [liste des compétences techniques de l'offre]
-Outils : [liste des outils]
-Langues : [langues]
+▌ COMPÉTENCES CLÉS
+Techniques : [liste séparée par " · " — reprendre les compétences de l'offre]
+Outils : [outils logiciels mentionnés dans l'offre]
+Soft skills : [3-4 compétences comportementales clés pour ce poste]
+Langues : [Français (natif), Anglais (niveau), ...]
 
-── SCORE ATS ──
-Score : [X]/100
-Mots-clés intégrés : [liste]
-Points forts : [2-3 points]
-À améliorer : [1-2 suggestions]
+▌ SCORE ATS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score global : [X]/100
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Mots-clés présents : [liste des mots-clés de l'offre intégrés]
+📋 Recommandations : [2 points d'amélioration concrets]`,
 
-Adapte tout le contenu à l'offre. Quantifie les réalisations. Utilise les mots-clés exacts.`,
+  lettre: (job, profile) => `OFFRE D'EMPLOI :
+${job}
 
-  lettre: (jobOffer, userProfile) => `Tu es un expert en recrutement français qui rédige des lettres de motivation percutantes.
+PROFIL CANDIDAT :
+${profile}
 
-OFFRE D'EMPLOI :
-${jobOffer}
+Rédige une lettre de motivation professionnelle, percutante et personnalisée.
 
-PROFIL DU CANDIDAT :
-${userProfile}
+FORMAT OBLIGATOIRE :
 
-Rédige une lettre de motivation professionnelle et percutante en français.
+[Prénom Nom]
+[Ville], le ${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}
 
-Format OBLIGATOIRE :
-
-[Ville], le ${new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'})}
-
-Objet : Candidature au poste de [titre exact de l'offre]
+Objet : Candidature au poste de [titre exact de l'offre] — Réf. [ref si mentionnée]
 
 Madame, Monsieur,
 
-[Accroche percutante — 2-3 phrases qui montrent que tu connais l'entreprise et le poste]
+[ACCROCHE — 1-2 phrases qui montrent que tu as fait tes recherches sur l'entreprise et que tu sais exactement pourquoi ce poste t'intéresse. Sois spécifique, jamais générique.]
 
-[Paragraphe 1 - Pourquoi ce poste : lien entre le poste et ta motivation, 3-4 phrases]
+[PARAGRAPHE 1 — POURQUOI VOUS ? 3-4 phrases. Présente ta valeur ajoutée unique pour CE poste précis. Cite 1-2 réalisations concrètes et chiffrées directement liées aux missions de l'offre.]
 
-[Paragraphe 2 - Ce que tu apportes : 2-3 réalisations concrètes et quantifiées]
+[PARAGRAPHE 2 — POURQUOI EUX ? 2-3 phrases. Montre ta connaissance de l'entreprise : un projet récent, leur culture, leur mission, ce qui t'attire vraiment. Sois précis.]
 
-[Paragraphe 3 - Pourquoi cette entreprise : recherches faites, culture, mission, 2-3 phrases]
+[PARAGRAPHE 3 — PROJECTION. 2 phrases. Comment tu vas contribuer concrètement dès les premiers mois.]
 
-Dans l'attente de vous rencontrer, je reste à votre disposition pour tout entretien.
+Dans l'attente de vous rencontrer pour échanger sur ma candidature, je reste disponible pour tout entretien à votre convenance.
 
 Cordialement,
 [Prénom Nom]
+📱 [téléphone] | 📧 [email]
 
-~300-350 mots. Ton naturel et professionnel. Zéro formule creuse.`,
+[285-320 mots. Ton naturel, professionnel, jamais robot. Zéro formule creuse.]`,
 
-  ats: (jobOffer, userProfile) => `Tu es un expert ATS spécialisé dans l'analyse de candidatures pour le marché français.
+  ats: (job, profile) => `OFFRE D'EMPLOI :
+${job}
 
-OFFRE D'EMPLOI :
-${jobOffer}
+CV / PROFIL DU CANDIDAT :
+${profile}
 
-CV / PROFIL :
-${userProfile}
+Analyse la compatibilité ATS en détail et fournis un rapport complet.
 
-Analyse la compatibilité ATS et fournis un rapport détaillé.
+FORMAT OBLIGATOIRE :
 
-Format OBLIGATOIRE :
+┌─────────────────────────────────────┐
+│  SCORE ATS GLOBAL : [X]/100         │
+│  [████████░░] Niveau : [Bon/Moyen]  │
+└─────────────────────────────────────┘
 
-SCORE ATS GLOBAL : [X]/100
+📊 ANALYSE PAR CRITÈRE
 
-📊 ANALYSE DÉTAILLÉE
+Titre/Intitulé de poste    [XX]/20  [████████░░]
+Compétences techniques     [XX]/25  [██████████]
+Expérience requise         [XX]/20  [████░░░░░░]
+Formation & diplômes       [XX]/15  [████████░░]
+Mots-clés & vocabulaire    [XX]/20  [██████░░░░]
 
-Mots-clés présents (✅) :
-[liste des mots-clés de l'offre présents dans le profil]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Mots-clés manquants (❌) :
-[liste des mots-clés importants absents du profil]
+✅ MOTS-CLÉS PRÉSENTS (points forts)
+[Liste des mots-clés de l'offre déjà dans le profil]
 
-📋 RAPPORT PAR CRITÈRE
+❌ MOTS-CLÉS MANQUANTS (à ajouter en priorité)
+[Liste des mots-clés importants absents]
 
-Titre/Poste : [score /20] — [commentaire]
-Compétences techniques : [score /25] — [commentaire]
-Expérience requise : [score /25] — [commentaire]
-Formation : [score /15] — [commentaire]
-Mots-clés généraux : [score /15] — [commentaire]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 RECOMMANDATIONS PRIORITAIRES
+🎯 ACTIONS PRIORITAIRES
 
-1. [Action concrète — la plus impactante]
-2. [Deuxième action]
+1. [Action la plus impactante — formulation exacte à utiliser dans le CV]
+2. [Deuxième action avec exemple concret]
 3. [Troisième action]
-4. [Quatrième action si besoin]
+4. [Quatrième action]
 
-💡 PHRASES À AJOUTER DANS LE CV
-[2-3 exemples de phrases optimisées avec les mots-clés manquants]
+💡 PHRASES OPTIMISÉES À COPIER-COLLER
 
-Sois précis, actionnable, et bienveillant.`,
+"[Phrase 1 avec les mots-clés manquants intégrés naturellement]"
+"[Phrase 2]"
+"[Phrase 3]"
 
-  linkedin: (jobOffer, userProfile) => `Tu es un expert LinkedIn et personal branding pour le marché français.
+⚡ VERDICT
+[3-4 phrases de conclusion bienveillante avec les 2 points les plus urgents à corriger]`,
 
-PROFIL DU CANDIDAT :
-${userProfile}
+  linkedin: (job, profile) => `POSTE CIBLÉ :
+${job}
 
-POSTE CIBLÉ :
-${jobOffer}
+PROFIL CANDIDAT :
+${profile}
 
-Rédige un profil LinkedIn complet et optimisé.
+Génère un profil LinkedIn complet et optimisé pour ce secteur.
 
-Format OBLIGATOIRE :
+FORMAT OBLIGATOIRE :
 
-🎯 TITRE LINKEDIN
-[Titre accrocheur 120 caractères max — poste + valeur ajoutée + mots-clés]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TITRE LINKEDIN (max 220 caractères)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Titre accrocheur : Fonction | Spécialité | Valeur ajoutée | Secteur]
+Exemple de format : "Product Manager | Growth & Data Analytics | SaaS B2B | Open to work"
 
-📝 RÉSUMÉ (About)
-[3-4 paragraphes percutants, 2000 caractères max]
-- Paragraphe 1 : Qui tu es et ta valeur unique
-- Paragraphe 2 : Tes réalisations clés quantifiées  
-- Paragraphe 3 : Ce que tu recherches / ta vision
-- Appel à l'action final
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 RÉSUMÉ "À PROPOS" (max 2 000 caractères)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Accroche — 1 phrase forte qui résume ta valeur unique]
 
-🔑 COMPÉTENCES TOP 5
-[5 compétences LinkedIn à ajouter en priorité pour ce secteur]
+[Paragraphe 1 — Qui tu es, ton expertise clé, ton secteur. 2-3 phrases.]
 
-💬 ACCROCHE MESSAGE DE CONNEXION
-[Message de connexion de 300 caractères max, naturel et personnalisé]
+[Paragraphe 2 — Tes 2-3 réalisations les plus impressionnantes, chiffrées.]
 
-📌 CONSEILS PERSONNALISÉS
-[3 conseils spécifiques pour optimiser le profil pour ce poste]`
+[Paragraphe 3 — Ce que tu recherches et ce que tu apportes.]
+
+🔑 Compétences clés : [mot-clé 1] · [mot-clé 2] · [mot-clé 3] · [mot-clé 4] · [mot-clé 5]
+
+📩 Parlons-en : [email ou "Message LinkedIn"]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 TOP 10 COMPÉTENCES À AJOUTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Liste numérotée des 10 compétences LinkedIn les plus pertinentes pour ce secteur]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💬 MESSAGE DE CONNEXION (max 300 caractères)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Message naturel, personnalisé, qui donne envie de répondre]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 3 CONSEILS PERSONNALISÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. [Conseil spécifique à ce profil/secteur]
+2. [Conseil]
+3. [Conseil]`
 };
 
-const headers = {
+const H = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -157,41 +189,50 @@ const headers = {
 };
 
 export default async function handler(req) {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
 
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
+  try { body = await req.json(); }
+  catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
   const { type, jobOffer, userProfile } = body;
-  if (!type || !jobOffer || !userProfile) return new Response(JSON.stringify({ error: 'Paramètres manquants' }), { status: 400, headers });
-  if (!['cv', 'lettre', 'ats', 'linkedin'].includes(type)) return new Response(JSON.stringify({ error: 'Type invalide' }), { status: 400, headers });
+  if (!type || !jobOffer?.trim() || !userProfile?.trim())
+    return new Response(JSON.stringify({ error: 'Paramètres manquants : type, jobOffer, userProfile requis' }), { status: 400, headers: H });
+  if (!['cv','lettre','ats','linkedin'].includes(type))
+    return new Response(JSON.stringify({ error: 'Type invalide. Valeurs : cv, lettre, ats, linkedin' }), { status: 400, headers: H });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return new Response(JSON.stringify({ error: 'Clé API manquante — configure ANTHROPIC_API_KEY dans Vercel' }), { status: 500, headers });
+  if (!apiKey)
+    return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY manquante dans les variables Vercel' }), { status: 500, headers: H });
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 2048,
+        max_tokens: 2500,
+        system: SYSTEM,
         messages: [{ role: 'user', content: PROMPTS[type](jobOffer.trim(), userProfile.trim()) }],
       }),
     });
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error('Anthropic error:', err);
-      return new Response(JSON.stringify({ error: 'Erreur API Anthropic', details: err }), { status: 502, headers });
+    if (!res.ok) {
+      const err = await res.text();
+      return new Response(JSON.stringify({ error: 'Erreur Anthropic API', details: err.slice(0,300) }), { status: 502, headers: H });
     }
 
-    const data = await response.json();
+    const data = await res.json();
     const result = data.content?.[0]?.text ?? '';
-    return new Response(JSON.stringify({ success: true, result, type }), { status: 200, headers });
+    if (!result) return new Response(JSON.stringify({ error: 'Réponse vide de l\'IA' }), { status: 502, headers: H });
+
+    return new Response(JSON.stringify({ success: true, result, type }), { status: 200, headers: H });
   } catch (err) {
-    console.error('Fetch error:', err);
-    return new Response(JSON.stringify({ error: 'Erreur réseau', details: String(err) }), { status: 500, headers });
+    return new Response(JSON.stringify({ error: 'Erreur réseau', details: String(err).slice(0,200) }), { status: 500, headers: H });
   }
 }
