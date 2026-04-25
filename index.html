@@ -908,7 +908,7 @@
 </script>
 
 <!-- COOKIE BANNER -->
-<div class="cookie-banner" id="cookieBanner">
+<div class="cookie-banner" id="cookieBanner" style="display:none">
   <div class="cookie-text">Emploia utilise des cookies pour améliorer votre expérience et mesurer l'audience. <a href="#" style="color:var(--blb)">Politique de confidentialité</a></div>
   <div class="cookie-btns">
     <button class="btn-cookie-ok" onclick="acceptCookies()">Accepter</button>
@@ -927,7 +927,8 @@
 
 <script>
   const _ck='emploia_cookie_consent';
-  if(localStorage.getItem(_ck)) document.getElementById('cookieBanner').style.display='none';
+  // Show banner only if no consent recorded
+  if(!localStorage.getItem(_ck)) document.getElementById('cookieBanner').style.display='flex';
   function acceptCookies(){
     localStorage.setItem(_ck,'accepted');
     document.getElementById('cookieBanner').style.display='none';
