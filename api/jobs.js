@@ -36,7 +36,7 @@ async function fetchAdzuna(q, type, location, page) {
     });
     if (TYPE_MAP[type]) params.set('contract_type', TYPE_MAP[type]);
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const tid = setTimeout(() => ctrl.abort(), 12000);
     const res = await fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/1?${params}`, { signal: ctrl.signal });
     clearTimeout(tid);
     if (!res.ok) return [];
@@ -108,7 +108,13 @@ async function fetchArbeitnow(q, type, page) {
     const data = await res.json();
     const filtered = (data.data || []).filter(j => {
       const loc = (j.location || '').toLowerCase();
-      return j.remote || loc.includes('france') || loc.includes('paris') || loc.includes('remote');
+      const title = (j.title || '').toLowerCase();
+      const desc = (j.description || '').toLowerCase();
+      const isFR = loc.includes('france') || loc.includes('paris') || loc.includes('lyon') || loc.includes('bordeaux');
+      const isRemote = j.remote && (loc.includes('europe') || loc.includes('worldwide') || loc === 'remote' || loc.includes('anywhere'));
+      // Exclure les offres en allemand
+      const isGerman = title.includes('(m/w/d)') || title.includes('minijob') || title.includes('werkstudent') || desc.includes('deutsch');
+      return (isFR || isRemote) && !isGerman;
     });
     return filtered.slice(0, 5).map(j => ({
       id: 'ab_' + j.slug,
