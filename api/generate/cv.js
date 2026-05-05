@@ -1,29 +1,40 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { getCurrentUser, incrementGenerations, FREE_LIMIT } from "../_lib/auth.js";
+export const config = { runtime: 'edge' };
+import { getCurrentUser, incrementGenerations, FREE_LIMIT, sanitizeString, getAllowedOrigin } from "../_lib/auth.js";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+export default async function handler(req) {
+  const origin = getAllowedOrigin(req);
+  const H = { "Content-Type": "application/json", "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true", "Vary": "Origin" };
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...H, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" } });
+  if (req.method !== "POST") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers: H });
+
+  const user = await getCurrentUser(req);
+  if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
+
+  if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
+    return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
+  }
+
+  let body;
+  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
+
+  const jobOffer = sanitizeString(body.jobOffer, 8000);
+  const profile = sanitizeString(body.profile, 8000);
+  if (!jobOffer || !profile) {
+    return new Response(JSON.stringify({ error: "Offre et profil requis" }), { status: 400, headers: H });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return new Response(JSON.stringify({ error: "Service temporairement indisponible" }), { status: 500, headers: H });
 
   try {
-    const user = await getCurrentUser(req);
-    if (!user) return res.status(401).json({ error: "Non authentifié" });
-
-    if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
-      return res.status(402).json({ error: "Limite gratuite atteinte" });
-    }
-
-    const { jobOffer, profile } = req.body;
-    if (!jobOffer || !profile) {
-      return res.status(400).json({ error: "Offre et profil requis" });
-    }
-
-    const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5",
-      max_tokens: 8192,
-      messages: [
-        {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5",
+        max_tokens: 4096,
+        messages: [{
           role: "user",
           content: `Tu es un expert en rédaction de CV professionnels en France.
 
@@ -41,15 +52,21 @@ Génère un CV complet et professionnel en français, parfaitement adapté à ce
 - Être concis et percutant
 
 Format: texte structuré clair avec des tirets et des sections bien délimitées.`,
-        },
-      ],
+        }],
+      }),
     });
 
-    const result = response.content[0].type === "text" ? response.content[0].text : "";
+    if (!res.ok) {
+      console.error("CV generation error:", res.status);
+      return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 502, headers: H });
+    }
+
+    const data = await res.json();
+    const result = data.content?.[0]?.type === "text" ? data.content[0].text : "";
     await incrementGenerations(user);
-    return res.json({ result });
+    return new Response(JSON.stringify({ result }), { status: 200, headers: H });
   } catch (err) {
     console.error("CV generation error:", err);
-    return res.status(500).json({ error: "Erreur lors de la génération" });
+    return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H });
   }
 }

@@ -48,7 +48,6 @@ export default async function handler(req) {
       status: 429, headers: { ...H_JSON, 'Retry-After': '3600' }
     });
 
-  const { system_override } = body;
   const rawMessages = body.messages;
   if (!Array.isArray(rawMessages) || !rawMessages.length)
     return new Response(JSON.stringify({ error: 'messages[] requis' }), { status: 400, headers: H_JSON });
@@ -74,7 +73,7 @@ export default async function handler(req) {
         model: 'claude-haiku-4-5',
         max_tokens: 1024,
         stream: true,
-        system: system_override || SYSTEM,
+        system: SYSTEM,
         messages: messages.slice(-16),
       }),
     });

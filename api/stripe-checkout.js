@@ -73,6 +73,7 @@ export default async function handler(req) {
 
     return new Response(JSON.stringify({ url: sessionData.url }), { status: 200, headers });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur paiement', details: String(err) }), { status: 500, headers });
+    console.error("Stripe checkout error:", err);
+    return new Response(JSON.stringify({ error: 'Erreur paiement' }), { status: 500, headers });
   }
 }
