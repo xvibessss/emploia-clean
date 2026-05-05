@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+// Node.js runtime — process.env supported
 
 const H = {
   'Access-Control-Allow-Origin': '*',
