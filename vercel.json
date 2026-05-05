@@ -1,0 +1,305 @@
+{
+  "version": 2,
+  "framework": null,
+  "buildCommand": "echo ok",
+  "outputDirectory": ".",
+  "installCommand": "echo ok",
+  "functions": {
+    "api/generate.js": {
+      "maxDuration": 45
+    },
+    "api/chat.js": {
+      "maxDuration": 25
+    },
+    "api/jobs.js": {
+      "maxDuration": 20
+    },
+    "api/jobs-search.js": {
+      "maxDuration": 20
+    },
+    "api/stripe-checkout.js": {
+      "maxDuration": 15
+    },
+    "api/auth/login.js": {
+      "maxDuration": 15
+    },
+    "api/auth/register.js": {
+      "maxDuration": 15
+    },
+    "api/auth/me.js": {
+      "maxDuration": 10
+    },
+    "api/auth/logout.js": {
+      "maxDuration": 5
+    },
+    "api/health.js": {
+      "maxDuration": 5
+    },
+    "api/stripe-webhook.js": {
+      "maxDuration": 10
+    },
+    "api/sitemap.js": {
+      "maxDuration": 5
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/jobs",
+      "destination": "/jobs.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/interview",
+      "destination": "/interview.html"
+    },
+    {
+      "source": "/referral",
+      "destination": "/referral.html"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/onboarding.html"
+    },
+    {
+      "source": "/cv-builder",
+      "destination": "/cv-builder.html"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/404",
+      "destination": "/404.html"
+    },
+    {
+      "source": "/profil",
+      "destination": "/profil.html"
+    },
+    {
+      "source": "/offre/:id",
+      "destination": "/offre.html"
+    },
+    {
+      "source": "/recherche",
+      "destination": "/recherche.html"
+    },
+    {
+      "source": "/legal",
+      "destination": "/legal.html"
+    },
+    {
+      "source": "/api/webhook/stripe",
+      "destination": "/api/stripe-webhook"
+    },
+    {
+      "source": "/emploi/paris",
+      "destination": "/emploi/paris.html"
+    },
+    {
+      "source": "/emploi/lyon",
+      "destination": "/emploi/lyon.html"
+    },
+    {
+      "source": "/emploi/marseille",
+      "destination": "/emploi/marseille.html"
+    },
+    {
+      "source": "/emploi/bordeaux",
+      "destination": "/emploi/bordeaux.html"
+    },
+    {
+      "source": "/emploi/toulouse",
+      "destination": "/emploi/toulouse.html"
+    },
+    {
+      "source": "/emploi/nantes",
+      "destination": "/emploi/nantes.html"
+    },
+    {
+      "source": "/emploi/lille",
+      "destination": "/emploi/lille.html"
+    },
+    {
+      "source": "/emploi/remote",
+      "destination": "/emploi/remote.html"
+    },
+    {
+      "source": "/metier/developpeur",
+      "destination": "/metier/developpeur.html"
+    },
+    {
+      "source": "/metier/marketing",
+      "destination": "/metier/marketing.html"
+    },
+    {
+      "source": "/metier/data",
+      "destination": "/metier/data.html"
+    },
+    {
+      "source": "/metier/design",
+      "destination": "/metier/design.html"
+    },
+    {
+      "source": "/metier/finance",
+      "destination": "/metier/finance.html"
+    },
+    {
+      "source": "/metier/rh",
+      "destination": "/metier/rh.html"
+    },
+    {
+      "source": "/metier/commercial",
+      "destination": "/metier/commercial.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(self), usb=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.html|app|dashboard|jobs|blog|interview|referral|onboarding|cv-builder|/)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.anthropic.com https://emploia.fr https://emploia-clean.vercel.app https://remotive.com https://www.arbeitnow.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/public/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/jobs(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=120, stale-while-revalidate=600"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/emploi/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/metier/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ],
+  "redirects": []
+}

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — Emploia</title>
+  <meta name="description" content="Gérez toutes vos candidatures, générez des CVs ATS-optimisés et suivez vos entretiens depuis votre dashboard Emploia."/>
+  <link rel="canonical" href="https://emploia.fr/dashboard"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    body { background: var(--bg3); }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    .dash-layout {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 24px 100px;
+    }
+
+    /* ── WELCOME BANNER ─────────────────────── */
+    .welcome-banner {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad-primary);
+    }
+
+    .wb-glow {
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(99,102,241,.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .wb-left { position: relative; z-index: 1; }
+
+    .wb-greeting {
+      font-size: 13px;
+      color: var(--t3);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wb-name {
+      font-size: clamp(20px, 2.5vw, 26px);
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -.6px;
+      margin-bottom: 10px;
+    }
+
+    .wb-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .wb-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--t3);
+    }
+
+    .wb-stat strong { color: var(--t2); font-weight: 700; }
+
+    .wb-right {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── ONBOARDING PROGRESS ────────────────── */
+    .onboarding-card {
+      background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(99,102,241,.06));
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+
+    .ob-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ob-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ob-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .ob-step {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+
+    .ob-step:hover { border-color: var(--brdh); background: rgba(255,255,255,.07); }
+    .ob-step.done { border-color: rgba(16,185,129,.25); background: rgba(16,185,129,.06); }
+
+    .ob-step-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      background: var(--s3);
+    }
+
+    .ob-step.done .ob-step-icon { background: var(--gnd); }
+
+    .ob-step-text { flex: 1; }
+    .ob-step-label { font-size: 12px; font-weight: 700; color: var(--t2); }
+    .ob-step.done .ob-step-label { color: var(--gnb); }
+    .ob-step-sub { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+    .ob-check { font-size: 14px; color: var(--gnb); }
+
+    /* ── STATS ROW ──────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all .2s;
+      cursor: default;
+    }
+
+    .stat-card:hover { border-color: var(--brdh); transform: translateY(-1px); }
+
+    .sc-icon {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .sc-value {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .sc-label { font-size: 11px; color: var(--t3); }
+
+    .sc-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .sc-delta.up { color: var(--gnb); }
+    .sc-delta.down { color: var(--rnb); }
+
+    /* ── MAIN GRID ──────────────────────────── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── TABS ───────────────────────────────── */
+    .dash-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .dash-tab {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+
+    .dash-tab:hover { color: var(--t2); background: rgba(255,255,255,.04); }
+
+    .dash-tab.active {
+      background: var(--grad-primary);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99,102,241,.3);
+    }
+
+    .tab-count {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.2);
+    }
+
+    .dash-tab:not(.active) .tab-count {
+      background: var(--s3);
+      color: var(--t3);
+    }
+
+    /* ── KANBAN ─────────────────────────────── */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kanban-col {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .kc-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kc-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .kc-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .dot-applied { background: var(--blue); }
+    .dot-interview { background: var(--ylw); }
+    .dot-offer { background: var(--grn); }
+    .dot-rejected { background: var(--red); }
+
+    .kc-count {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--t3);
+      background: var(--s3);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .kc-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+
+    .kanban-card {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .kanban-card:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+
+    .kcard-company { font-size: 10px; font-weight: 700; color: var(--t3); margin-bottom: 4px; }
+    .kcard-title { font-size: 12px; font-weight: 700; color: var(--t1); margin-bottom: 8px; line-height: 1.3; }
+    .kcard-footer { display: flex; align-items: center; justify-content: space-between; }
+    .kcard-date { font-size: 10px; color: var(--t3); }
+    .kcard-actions { display: flex; gap: 4px; }
+
+    .kcard-btn {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: none;
+      background: var(--s4);
+      cursor: pointer;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+
+    .kcard-btn:hover { background: var(--bld); }
+
+    .kc-add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t3);
+      cursor: pointer;
+      border: 1px dashed var(--brd);
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .kc-add:hover { border-color: var(--blue); color: var(--blb); background: var(--bls); }
+
+    /* ── LIST VIEW ──────────────────────────── */
+    .list-view { display: none; flex-direction: column; gap: 10px; }
+
+    .list-view.active { display: flex; }
+
+    .list-item {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all .2s;
+      cursor: pointer;
+    }
+
+    .list-item:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+
+    .li-logo {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .li-info { flex: 1; }
+    .li-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+    .li-company { font-size: 12px; color: var(--t2); margin-bottom: 6px; }
+    .li-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .li-meta-item { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 4px; }
+
+    .li-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── GENERATE PANEL (RIGHT) ─────────────── */
+    .generate-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    .gen-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .gen-card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gen-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .gen-card-body { padding: 16px 18px; }
+
+    .gen-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+      background: var(--s3);
+      border-radius: 10px;
+      padding: 4px;
+    }
+
+    .gen-tab {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+      text-align: center;
+    }
+
+    .gen-tab.active {
+      background: var(--grad-primary);
+      color: #fff;
+    }
+
+    .gen-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1.5px solid var(--brd);
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--t1);
+      font-family: 'Sora', sans-serif;
+      outline: none;
+      resize: none;
+      line-height: 1.65;
+      transition: border-color .15s;
+      margin-bottom: 10px;
+    }
+
+    .gen-textarea:focus { border-color: var(--blue); }
+    .gen-textarea::placeholder { color: var(--t3); }
+
+    /* RESULT AREA */
+    .gen-result {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 120px;
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .gen-result.has-content {
+      align-items: flex-start;
+      text-align: left;
+      color: var(--t1);
+      white-space: pre-wrap;
+    }
+
+    /* USAGE BAR */
+    .usage-bar {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .usage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .usage-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; }
+    .usage-count { font-size: 12px; font-weight: 700; color: var(--blb); }
+
+    /* RECENT ACTIVITY */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item:first-child { padding-top: 0; }
+
+    .activity-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .activity-text { flex: 1; }
+    .activity-title { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.4; }
+    .activity-title strong { color: var(--t1); }
+    .activity-time { font-size: 10px; color: var(--t3); margin-top: 3px; }
+
+    /* VIEW TOGGLE */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--s3);
+      border-radius: 9px;
+      padding: 3px;
+    }
+
+    .vt-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+    }
+
+    .vt-btn.active { background: var(--s2); color: var(--t1); }
+
+    /* SKELETON CARDS */
+    .skel-card-dash {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* UPGRADE BANNER */
+    .upgrade-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.08));
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ub-text { font-size: 12px; color: var(--t2); line-height: 1.5; }
+    .ub-text strong { color: var(--t1); }
+
+    @media (max-width: 1100px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .generate-panel { display: none; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .kanban-board { grid-template-columns: repeat(2, 1fr); }
+      .ob-steps { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .kanban-board { grid-template-columns: 1fr; }
+      .ob-steps { grid-template-columns: 1fr; }
+      .welcome-banner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/dashboard" class="emp-nav-a active">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="dash-layout page-enter">
+
+  <!-- WELCOME BANNER -->
+  <div class="welcome-banner">
+    <div class="wb-glow"></div>
+    <div class="wb-left">
+      <div class="wb-greeting">
+        <span id="greetingEmoji">👋</span>
+        <span id="greetingText">Bonjour</span>
+      </div>
+      <div class="wb-name">Thomas Renard</div>
+      <div class="wb-stats">
+        <div class="wb-stat"><span>📋</span> <strong>24</strong> candidatures</div>
+        <div class="wb-stat"><span>🎯</span> <strong>8</strong> entretiens</div>
+        <div class="wb-stat"><span>✨</span> <strong>3</strong> générations restantes</div>
+        <div class="wb-stat"><span>⭐</span> Plan <strong>Gratuit</strong></div>
+      </div>
+    </div>
+    <div class="wb-right">
+      <a href="/jobs" class="btn btn-ghost btn-sm">📋 Chercher une offre</a>
+      <a href="/app" class="btn btn-primary btn-sm">✨ Générer un CV</a>
+    </div>
+  </div>
+
+  <!-- ONBOARDING STEPS -->
+  <div class="onboarding-card" id="onboardingCard">
+    <div class="ob-header">
+      <div class="ob-title">🚀 Complétez votre profil pour de meilleures recommandations
+        <span class="badge badge-blue">72% complété</span>
+      </div>
+      <button onclick="document.getElementById('onboardingCard').style.display='none'" style="background:transparent;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:4px">✕</button>
+    </div>
+    <div class="ob-steps">
+      <a href="/app" class="ob-step done">
+        <div class="ob-step-icon">✨</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Premier CV généré</div>
+          <div class="ob-step-sub">Complété</div>
+        </div>
+        <span class="ob-check">✓</span>
+      </a>
+      <a href="/profil" class="ob-step done">
+        <div class="ob-step-icon">👤</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Profil créé</div>
+          <div class="ob-step-sub">Complété</div>
+        </div>
+        <span class="ob-check">✓</span>
+      </a>
+      <a href="/jobs" class="ob-step">
+        <div class="ob-step-icon">📋</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Première candidature</div>
+          <div class="ob-step-sub">Postulez à une offre</div>
+        </div>
+      </a>
+      <a href="/interview" class="ob-step">
+        <div class="ob-step-icon">🎤</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Simuler un entretien</div>
+          <div class="ob-step-sub">Préparez-vous</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--bld)">📤</div>
+      <div class="sc-value">24</div>
+      <div class="sc-label">Candidatures envoyées</div>
+      <div class="sc-delta up">↑ +3 cette semaine</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--yld)">🎤</div>
+      <div class="sc-value">8</div>
+      <div class="sc-label">Entretiens obtenus</div>
+      <div class="sc-delta up">↑ Taux 33%</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--gnd)">🏆</div>
+      <div class="sc-value">2</div>
+      <div class="sc-label">Offres reçues</div>
+      <div class="sc-delta up">↑ En cours</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--ind2)">📄</div>
+      <div class="sc-value">94</div>
+      <div class="sc-label">Meilleur score ATS</div>
+      <div class="sc-delta up">↑ +53 pts vs avant</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:rgba(139,92,246,.1)">⏳</div>
+      <div class="sc-value">5</div>
+      <div class="sc-label">En attente de réponse</div>
+      <div class="sc-delta down">↓ 3 relances à faire</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dash-grid">
+
+    <!-- LEFT: KANBAN / LIST -->
+    <div>
+      <!-- TOOLBAR -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="dash-tabs">
+          <button class="dash-tab active" onclick="setDashTab('all',this)">Toutes <span class="tab-count">24</span></button>
+          <button class="dash-tab" onclick="setDashTab('applied',this)">Envoyées <span class="tab-count">14</span></button>
+          <button class="dash-tab" onclick="setDashTab('interview',this)">Entretiens <span class="tab-count">7</span></button>
+          <button class="dash-tab" onclick="setDashTab('offer',this)">Offres <span class="tab-count">2</span></button>
+          <button class="dash-tab" onclick="setDashTab('rejected',this)">Refus <span class="tab-count">1</span></button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="view-toggle">
+            <button class="vt-btn active" id="vtKanban" onclick="setView('kanban')">⊞ Kanban</button>
+            <button class="vt-btn" id="vtList" onclick="setView('list')">≡ Liste</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="empToast('Ajout de candidature','info')">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- KANBAN VIEW -->
+      <div id="kanbanView">
+        <div class="kanban-board">
+          <!-- ENVOYÉE -->
+          <div class="kanban-col">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-applied"></div>Envoyée</div>
+              <span class="kc-count">5</span>
+            </div>
+            <div class="kc-body">
+              <div class="kanban-card" onclick="empToast('Ouverture détail candidature','info')">
+                <div class="kcard-company">BNP Paribas</div>
+                <div class="kcard-title">Dev Full Stack React</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date">Il y a 2j</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn" title="Relancer">📧</button>
+                    <button class="kcard-btn" title="Déplacer">→</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="kcard-company">Doctolib</div>
+                <div class="kcard-title">Alternance Business Dev</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date">Il y a 5j</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">📧</button>
+                    <button class="kcard-btn">→</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="kcard-company">L'Oréal</div>
+                <div class="kcard-title">Stage Marketing Digital</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date">Il y a 1sem</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">📧</button>
+                    <button class="kcard-btn">→</button>
+                  </div>
+                </div>
+              </div>
+              <button class="kc-add" onclick="empToast('Ajout d\'une candidature','info')">+ Ajouter</button>
+            </div>
+          </div>
+
+          <!-- ENTRETIEN -->
+          <div class="kanban-col">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-interview"></div>Entretien</div>
+              <span class="kc-count">3</span>
+            </div>
+            <div class="kc-body">
+              <div class="kanban-card" style="border-color:rgba(245,158,11,.2)">
+                <div class="kcard-company">Capgemini</div>
+                <div class="kcard-title">Dev Backend Python</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date" style="color:var(--ylb);font-weight:700">🗓 Demain 14h</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">🎤</button>
+                    <button class="kcard-btn">→</button>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-card">
+                <div class="kcard-company">Alan</div>
+                <div class="kcard-title">Ingénieur Full Stack</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date">Vendredi 10h</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">🎤</button>
+                    <button class="kcard-btn">→</button>
+                  </div>
+                </div>
+              </div>
+              <button class="kc-add">+ Ajouter</button>
+            </div>
+          </div>
+
+          <!-- OFFRE -->
+          <div class="kanban-col">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-offer"></div>Offre reçue</div>
+              <span class="kc-count">2</span>
+            </div>
+            <div class="kc-body">
+              <div class="kanban-card" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)">
+                <div class="kcard-company" style="color:var(--gnb)">Société Générale ✓</div>
+                <div class="kcard-title">Dev React Senior</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date" style="color:var(--gnb);font-weight:700">48k€/an</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">📝</button>
+                    <button class="kcard-btn">✓</button>
+                  </div>
+                </div>
+              </div>
+              <button class="kc-add">+ Ajouter</button>
+            </div>
+          </div>
+
+          <!-- REFUS -->
+          <div class="kanban-col">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-rejected"></div>Refus</div>
+              <span class="kc-count">1</span>
+            </div>
+            <div class="kc-body">
+              <div class="kanban-card" style="opacity:.6">
+                <div class="kcard-company">Orange</div>
+                <div class="kcard-title">Dev Mobile React Native</div>
+                <div class="kcard-footer">
+                  <span class="kcard-date">Il y a 3sem</span>
+                  <div class="kcard-actions">
+                    <button class="kcard-btn">🗑</button>
+                  </div>
+                </div>
+              </div>
+              <button class="kc-add">+ Ajouter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div class="list-view" id="listView">
+        <div class="list-item">
+          <div class="li-logo">🏦</div>
+          <div class="li-info">
+            <div class="li-title">Développeur Full Stack React</div>
+            <div class="li-company">BNP Paribas</div>
+            <div class="li-meta">
+              <div class="li-meta-item">📍 Paris 9e</div>
+              <div class="li-meta-item">💰 45–55k€</div>
+              <div class="li-meta-item">📅 Il y a 2 jours</div>
+            </div>
+          </div>
+          <span class="badge badge-blue">Envoyée</span>
+          <div class="li-actions">
+            <button class="btn btn-ghost btn-sm" onclick="empToast('Relance envoyée','success')">📧 Relancer</button>
+            <button class="btn btn-primary btn-sm">Voir →</button>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-logo">🏥</div>
+          <div class="li-info">
+            <div class="li-title">Développeur Backend Python</div>
+            <div class="li-company">Capgemini</div>
+            <div class="li-meta">
+              <div class="li-meta-item">📍 Paris 8e</div>
+              <div class="li-meta-item">💰 42–50k€</div>
+              <div class="li-meta-item" style="color:var(--ylb)">🗓 Entretien demain 14h</div>
+            </div>
+          </div>
+          <span class="badge badge-yellow">Entretien</span>
+          <div class="li-actions">
+            <a href="/interview" class="btn btn-ghost btn-sm">🎤 S'entraîner</a>
+            <button class="btn btn-primary btn-sm">Voir →</button>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-logo">🌊</div>
+          <div class="li-info">
+            <div class="li-title">Développeur React Senior</div>
+            <div class="li-company">Société Générale</div>
+            <div class="li-meta">
+              <div class="li-meta-item">📍 Paris La Défense</div>
+              <div class="li-meta-item" style="color:var(--gnb)">💰 Offre 48k€/an reçue</div>
+            </div>
+          </div>
+          <span class="badge badge-green">Offre reçue</span>
+          <div class="li-actions">
+            <button class="btn btn-primary btn-sm" onclick="empToast('Félicitations ! Analysez l\'offre','success')">Analyser →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPGRADE -->
+      <div class="upgrade-banner" style="margin-top:16px">
+        <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, des alertes email et l'export CSV complet.</div>
+        <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: GENERATE + ACTIVITY -->
+    <div class="generate-panel">
+
+      <!-- GENERATE CARD -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">✨ Générer</div>
+          <span class="badge badge-blue">3 crédits restants</span>
+        </div>
+        <div class="gen-card-body">
+          <div class="gen-tabs">
+            <button class="gen-tab active" onclick="setGenTab(this,'cv')">📄 CV</button>
+            <button class="gen-tab" onclick="setGenTab(this,'lettre')">✉️ Lettre</button>
+            <button class="gen-tab" onclick="setGenTab(this,'ats')">🎯 ATS</button>
+          </div>
+
+          <textarea class="gen-textarea" id="genOffer" rows="4" placeholder="Collez l'offre d'emploi ici..."></textarea>
+          <textarea class="gen-textarea" id="genProfile" rows="3" placeholder="Votre profil / expériences..."></textarea>
+
+          <div class="gen-result" id="genResult">
+            <div style="color:var(--t3);font-size:12px">
+              <div style="font-size:32px;margin-bottom:10px">✨</div>
+              Remplissez les champs et cliquez sur Générer
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="genBtn" style="width:100%" onclick="handleGen()">
+            ✨ Générer avec l'IA
+          </button>
+
+          <div style="margin-top:10px">
+            <div class="usage-bar">
+              <div class="usage-header">
+                <div class="usage-label">Crédits utilisés</div>
+                <div class="usage-count">2 / 5</div>
+              </div>
+              <div class="emp-progress-track">
+                <div class="emp-progress-fill" style="width:40%"></div>
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--t3)">3 générations restantes · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY CARD -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">⚡ Activité récente</div>
+        </div>
+        <div class="gen-card-body" style="padding-top:4px">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-text">
+                <div class="activity-title">CV généré pour <strong>BNP Paribas</strong> (Score ATS: 94)</div>
+                <div class="activity-time">Il y a 2 heures</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🎤</div>
+              <div class="activity-text">
+                <div class="activity-title">Entretien simulé — <strong>Développeur Backend</strong></div>
+                <div class="activity-time">Hier à 16h30</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">✉️</div>
+              <div class="activity-text">
+                <div class="activity-title">Lettre générée pour <strong>Capgemini</strong></div>
+                <div class="activity-time">Il y a 2 jours</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">⭐</div>
+              <div class="activity-text">
+                <div class="activity-title">Offre sauvegardée — <strong>Alan (Full Stack)</strong></div>
+                <div class="activity-time">Il y a 3 jours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">💡 Conseil du jour</div>
+        </div>
+        <div class="gen-card-body">
+          <div style="font-size:13px;color:var(--t2);line-height:1.7">
+            Vous avez un entretien <strong style="color:var(--ylb)">demain chez Capgemini</strong>. Simulez un entretien technique maintenant pour vous préparer au mieux.
+          </div>
+          <a href="/interview" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">🎤 Simuler l'entretien →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item active"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  // Greeting
+  const h = new Date().getHours();
+  document.getElementById('greetingText').textContent = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('greetingEmoji').textContent = h < 12 ? '☀️' : h < 18 ? '👋' : '🌙';
+
+  // View toggle
+  function setView(v) {
+    const kanban = document.getElementById('kanbanView');
+    const list = document.getElementById('listView');
+    const kb = document.getElementById('vtKanban');
+    const lv = document.getElementById('vtList');
+    if (v === 'kanban') {
+      kanban.style.display = 'block';
+      list.classList.remove('active');
+      kb.classList.add('active');
+      lv.classList.remove('active');
+    } else {
+      kanban.style.display = 'none';
+      list.classList.add('active');
+      kb.classList.remove('active');
+      lv.classList.add('active');
+    }
+  }
+
+  // Tab
+  function setDashTab(tab, btn) {
+    document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Gen tabs
+  let curGenTab = 'cv';
+  function setGenTab(btn, tab) {
+    document.querySelectorAll('.gen-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    curGenTab = tab;
+    document.getElementById('genResult').className = 'gen-result';
+    document.getElementById('genResult').innerHTML = '<div style="color:var(--t3);font-size:12px"><div style="font-size:32px;margin-bottom:10px">✨</div>Remplissez les champs et cliquez sur Générer</div>';
+  }
+
+  // Generate
+  async function handleGen() {
+    const offer = document.getElementById('genOffer').value.trim();
+    const profile = document.getElementById('genProfile').value.trim();
+    if (!offer || !profile) { empToast('Veuillez remplir tous les champs', 'error'); return; }
+
+    const btn = document.getElementById('genBtn');
+    const result = document.getElementById('genResult');
+    btn.disabled = true;
+    btn.textContent = '⏳ Génération en cours...';
+    result.className = 'gen-result';
+    result.innerHTML = '<div class="spin"></div>';
+
+    try {
+      const endpoints = { cv: '/api/generate/cv', lettre: '/api/generate/cover-letter', ats: '/api/generate/ats-score' };
+      const body = curGenTab === 'ats' ? { jobOffer: offer, cvText: profile } : { jobOffer: offer, profile };
+      const res = await fetch(endpoints[curGenTab], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: body })
+      });
+      const data = await res.json();
+      if (data.result) {
+        result.className = 'gen-result has-content';
+        result.textContent = data.result;
+        empToast('Génération réussie !', 'success');
+      } else throw new Error(data.error || 'Erreur');
+    } catch(e) {
+      result.innerHTML = '<div style="color:var(--rnb);font-size:12px">⚠️ Erreur de génération. Réessayez.</div>';
+      empToast('Erreur lors de la génération', 'error');
+    }
+    btn.disabled = false;
+    btn.textContent = '✨ Générer avec l\'IA';
+  }
+
+  // Export CSV
+  function exportCSV() {
+    const data = [
+      ['Poste', 'Entreprise', 'Statut', 'Date'],
+      ['Dev Full Stack React', 'BNP Paribas', 'Envoyée', '2024-01-13'],
+      ['Dev Backend Python', 'Capgemini', 'Entretien', '2024-01-10'],
+      ['Dev React Senior', 'Société Générale', 'Offre reçue', '2024-01-05'],
+    ];
+    const csv = data.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'candidatures-emploia.csv';
+    a.click();
+    empToast('Export CSV téléchargé', 'success');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Entretien IA — Préparez votre entretien d'embauche · Emploia</title>
+  <meta name="description" content="Simulez votre entretien d'embauche avec une IA. Questions personnalisées selon votre poste, feedback en temps réel."/>
+  <link rel="canonical" href="https://emploia.fr/interview"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    body { background: var(--bg3); height: 100vh; overflow: hidden; }
+
+    .iv-page {
+      padding-top: 64px;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+    }
+
+    /* ── SIDEBAR LEFT ───────────────────── */
+    .iv-sidebar {
+      background: var(--bg);
+      border-right: 1px solid var(--brd);
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .iv-sidebar h3 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 8px;
+    }
+
+    .iv-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 1.5px solid var(--brd);
+      background: var(--bg);
+      font-size: 12.5px;
+      color: var(--t1);
+      font-family: 'Sora', sans-serif;
+      outline: none;
+      margin-bottom: 8px;
+      transition: border-color .15s;
+    }
+
+    .field-input:focus { border-color: var(--blue); }
+
+    .level-select {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .lvl-btn {
+      padding: 7px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t3);
+      background: var(--bg);
+      border: 1.5px solid var(--brd);
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+    }
+
+    .lvl-btn:hover { border-color: var(--brdh); color: var(--t2); }
+    .lvl-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .iv-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .iv-stat {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 11px;
+      padding: 10px;
+      text-align: center;
+    }
+    .iv-stat-val { font-size: 20px; font-weight: 800; color: var(--t1); margin-bottom: 1px; letter-spacing: -.7px; }
+    .iv-stat-lbl { font-size: 9.5px; color: var(--t3); text-transform: uppercase; letter-spacing: .4px; }
+
+    .templates-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .tpl-card {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--brd);
+      background: var(--bg);
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--t2);
+    }
+
+    .tpl-card:hover { border-color: var(--brdh); color: var(--t1); }
+    .tpl-card.active { border-color: var(--blue); background: var(--bld); color: var(--blb); }
+    .tpl-card-emoji { font-size: 16px; }
+
+    /* ── CHAT MAIN ────────────────────────── */
+    .iv-chat-area {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 64px);
+      background: var(--bg2);
+    }
+
+    .iv-chat-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--s2);
+    }
+
+    .iv-chat-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .iv-avatar {
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(99,102,241,.4);
+      position: relative;
+    }
+
+    .iv-avatar::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 11px; height: 11px;
+      background: var(--gnb);
+      border: 2px solid var(--s2);
+      border-radius: 50%;
+    }
+
+    .iv-chat-title h2 {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.4px;
+      margin-bottom: 1px;
+    }
+
+    .iv-chat-title p {
+      font-size: 11px;
+      color: var(--t3);
+    }
+
+    /* MESSAGES */
+    .iv-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .iv-msg {
+      display: flex;
+      gap: 10px;
+      animation: msgIn .3s ease;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .iv-msg.user { flex-direction: row-reverse; }
+
+    .iv-msg-avatar {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .iv-msg.bot .iv-msg-avatar { background: var(--grad-primary); }
+    .iv-msg.user .iv-msg-avatar { background: var(--s4); }
+
+    .iv-msg-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--t1);
+    }
+
+    .iv-msg.bot .iv-msg-bubble {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-top-left-radius: 4px;
+    }
+
+    .iv-msg.user .iv-msg-bubble {
+      background: var(--grad-primary);
+      color: #fff;
+      border-top-right-radius: 4px;
+    }
+
+    .iv-msg-time {
+      font-size: 10px;
+      color: var(--t3);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    /* TYPING INDICATOR */
+    .iv-typing {
+      display: flex;
+      gap: 10px;
+    }
+
+    .iv-typing .iv-msg-bubble {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      padding: 14px 18px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px; height: 6px;
+      background: var(--t3);
+      border-radius: 50%;
+      animation: typingBounce 1.2s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: .15s; }
+    .typing-dot:nth-child(3) { animation-delay: .3s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: .5; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* WELCOME */
+    .iv-welcome {
+      max-width: 600px;
+      margin: 40px auto;
+      text-align: center;
+      padding: 32px;
+    }
+
+    .iv-welcome h2 { font-size: 24px; font-weight: 800; letter-spacing: -.8px; margin-bottom: 10px; }
+    .iv-welcome p { font-size: 13.5px; color: var(--t2); line-height: 1.7; margin-bottom: 24px; }
+
+    .iv-suggestions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .iv-sug {
+      padding: 12px 14px;
+      border-radius: 11px;
+      border: 1px solid var(--brd);
+      background: var(--s2);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--t2);
+      text-align: left;
+      transition: all .15s;
+      font-family: 'Sora', sans-serif;
+      line-height: 1.5;
+    }
+
+    .iv-sug:hover { border-color: var(--brdh); color: var(--t1); transform: translateY(-1px); }
+
+    /* INPUT BAR */
+    .iv-input-area {
+      padding: 16px 20px;
+      border-top: 1px solid var(--brd);
+      background: var(--s2);
+    }
+
+    .iv-input-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      background: var(--bg);
+      border: 1.5px solid var(--brd);
+      border-radius: 14px;
+      padding: 8px;
+      transition: border-color .15s;
+    }
+
+    .iv-input-wrap:focus-within { border-color: var(--blue); }
+
+    .iv-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--t1);
+      font-size: 13.5px;
+      font-family: 'Sora', sans-serif;
+      outline: none;
+      resize: none;
+      min-height: 32px;
+      max-height: 120px;
+      padding: 6px 8px;
+      line-height: 1.5;
+    }
+
+    .iv-input-wrap button {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: var(--grad-primary);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: all .15s;
+      box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    }
+
+    .iv-input-wrap button:hover:not(:disabled) { transform: scale(1.05); }
+    .iv-input-wrap button:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+
+    .iv-mic-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--brd);
+      background: transparent;
+      color: var(--t3);
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: all .15s;
+    }
+
+    .iv-mic-btn:hover { color: var(--t1); border-color: var(--brdh); }
+    .iv-mic-btn.recording { background: var(--red); border-color: var(--red); color: #fff; animation: micPulse 1s infinite; }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
+      50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+    }
+
+    .iv-input-hint {
+      font-size: 10px;
+      color: var(--t3);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ── PANEL RIGHT (Coach) ────────────── */
+    .iv-coach {
+      background: var(--bg);
+      border-left: 1px solid var(--brd);
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .coach-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .coach-card h4 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feedback-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 8px 0;
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.5;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .feedback-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .feedback-emoji { font-size: 14px; flex-shrink: 0; }
+
+    .quick-tip {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--bld);
+      border: 1px solid rgba(59,130,246,.2);
+      font-size: 11.5px;
+      color: var(--blb);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .quick-tip:last-child { margin-bottom: 0; }
+
+    /* MOBILE TOGGLES */
+    .iv-mobile-tabs {
+      display: none;
+      background: var(--s2);
+      border-bottom: 1px solid var(--brd);
+      padding: 8px;
+      gap: 4px;
+    }
+
+    .iv-mt {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--t3);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .iv-mt.active { background: var(--s4); color: var(--t1); }
+
+    @media (max-width: 1100px) {
+      .iv-page { grid-template-columns: 1fr; }
+      .iv-sidebar, .iv-coach { display: none; }
+      .iv-mobile-tabs { display: flex; }
+      .iv-page.show-sidebar .iv-sidebar { display: flex; grid-column: 1; }
+      .iv-page.show-sidebar .iv-chat-area { display: none; }
+      .iv-page.show-coach .iv-coach { display: flex; grid-column: 1; }
+      .iv-page.show-coach .iv-chat-area { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a active">Entretien IA</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+</div>
+
+<div class="iv-mobile-tabs">
+  <button class="iv-mt" onclick="showMobile('sidebar')">⚙️ Config</button>
+  <button class="iv-mt active" onclick="showMobile('chat')">💬 Chat</button>
+  <button class="iv-mt" onclick="showMobile('coach')">🎯 Coach</button>
+</div>
+
+<div class="iv-page" id="ivPage">
+
+  <!-- LEFT SIDEBAR : Config -->
+  <aside class="iv-sidebar">
+    <h3>⚙️ Configuration</h3>
+    <div class="iv-card">
+      <input class="field-input" id="cfgRole" placeholder="Poste visé (ex: Dev Frontend Senior)"/>
+      <input class="field-input" id="cfgCompany" placeholder="Entreprise (optionnel)"/>
+      <div class="level-select">
+        <button class="lvl-btn active" data-lvl="junior" onclick="setLevel(this)">Junior</button>
+        <button class="lvl-btn" data-lvl="mid" onclick="setLevel(this)">Confirmé</button>
+        <button class="lvl-btn" data-lvl="senior" onclick="setLevel(this)">Senior</button>
+        <button class="lvl-btn" data-lvl="lead" onclick="setLevel(this)">Lead</button>
+      </div>
+      <button class="btn btn-primary btn-sm" style="width:100%" onclick="startInterview()">
+        🚀 Démarrer simulation
+      </button>
+    </div>
+
+    <h3 style="margin-top:8px">📊 Cette session</h3>
+    <div class="iv-stats">
+      <div class="iv-stat"><div class="iv-stat-val" id="statQ">0</div><div class="iv-stat-lbl">Questions</div></div>
+      <div class="iv-stat"><div class="iv-stat-val" id="statT">00:00</div><div class="iv-stat-lbl">Durée</div></div>
+      <div class="iv-stat"><div class="iv-stat-val" id="statW">0</div><div class="iv-stat-lbl">Mots</div></div>
+      <div class="iv-stat"><div class="iv-stat-val" id="statS">—</div><div class="iv-stat-lbl">Score</div></div>
+    </div>
+
+    <h3 style="margin-top:8px">📋 Templates rapides</h3>
+    <div class="templates-list">
+      <button class="tpl-card" onclick="loadTpl('rh')">
+        <span class="tpl-card-emoji">👥</span>Entretien RH classique
+      </button>
+      <button class="tpl-card" onclick="loadTpl('tech')">
+        <span class="tpl-card-emoji">💻</span>Entretien technique
+      </button>
+      <button class="tpl-card" onclick="loadTpl('compo')">
+        <span class="tpl-card-emoji">🧠</span>Comportemental (STAR)
+      </button>
+      <button class="tpl-card" onclick="loadTpl('manager')">
+        <span class="tpl-card-emoji">👔</span>Avec le manager
+      </button>
+      <button class="tpl-card" onclick="loadTpl('case')">
+        <span class="tpl-card-emoji">📊</span>Étude de cas
+      </button>
+      <button class="tpl-card" onclick="loadTpl('salary')">
+        <span class="tpl-card-emoji">💰</span>Négociation salariale
+      </button>
+    </div>
+  </aside>
+
+  <!-- CHAT MAIN -->
+  <div class="iv-chat-area">
+    <div class="iv-chat-header">
+      <div class="iv-chat-title">
+        <div class="iv-avatar">🤖</div>
+        <div>
+          <h2>Coach Emploia</h2>
+          <p><span style="color:var(--gnb)">●</span> En ligne · IA Claude</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="exportChat()">⬇ Exporter</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetChat()">🔄 Reset</button>
+      </div>
+    </div>
+
+    <div class="iv-messages" id="ivMessages">
+      <div class="iv-welcome">
+        <div style="font-size:54px;margin-bottom:14px">🎤</div>
+        <h2>Préparez-vous à briller</h2>
+        <p>Configurez votre poste à gauche et démarrez votre simulation. Je vous poserai des questions ciblées et vous donnerai un feedback détaillé après chaque réponse.</p>
+        <div class="iv-suggestions">
+          <button class="iv-sug" onclick="quickStart('Entretien pour Développeur Frontend Senior')">💻 <strong>Tech Senior</strong> — Entretien Dev Frontend</button>
+          <button class="iv-sug" onclick="quickStart('Entretien Product Manager')">📊 <strong>Product</strong> — Product Manager</button>
+          <button class="iv-sug" onclick="quickStart('Premier emploi sortie d\\'études')">🎓 <strong>Junior</strong> — Premier emploi</button>
+          <button class="iv-sug" onclick="quickStart('Reconversion vers la data')">🔄 <strong>Reconversion</strong> — Vers la Data</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="iv-input-area">
+      <div class="iv-input-wrap">
+        <button class="iv-mic-btn" id="micBtn" onclick="toggleMic()" title="Micro">🎤</button>
+        <textarea class="iv-textarea" id="ivInput" placeholder="Tapez votre réponse... (Maj+Entrée pour saut de ligne)" rows="1" oninput="autoResize(this);countWords()"></textarea>
+        <button id="ivSendBtn" onclick="sendMsg()" title="Envoyer">↑</button>
+      </div>
+      <div class="iv-input-hint">Entrée pour envoyer · Maj+Entrée pour saut de ligne · 🎤 pour parler</div>
+    </div>
+  </div>
+
+  <!-- COACH RIGHT -->
+  <aside class="iv-coach">
+    <div class="coach-card">
+      <h4>🎯 Feedback temps réel</h4>
+      <div id="feedbackList">
+        <div class="feedback-item"><span class="feedback-emoji">💡</span><div>Démarrez une session pour recevoir un feedback en temps réel sur vos réponses.</div></div>
+      </div>
+    </div>
+
+    <div class="coach-card">
+      <h4>📚 Conseils du moment</h4>
+      <div class="quick-tip">💪 Utilisez la méthode <strong>STAR</strong> : Situation, Tâche, Action, Résultat — pour structurer vos réponses comportementales.</div>
+      <div class="quick-tip">🎯 Quantifiez vos résultats. "Augmenté de 40%" est plus impactant que "amélioré".</div>
+      <div class="quick-tip">⏱ Restez concis : 90 à 180 secondes par réponse, pas plus.</div>
+    </div>
+
+    <div class="coach-card">
+      <h4>❓ Questions fréquentes</h4>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <button class="tpl-card" onclick="askQ('Parlez-moi de vous')">Parlez-moi de vous</button>
+        <button class="tpl-card" onclick="askQ('Vos plus grandes forces ?')">Vos plus grandes forces ?</button>
+        <button class="tpl-card" onclick="askQ('Une faiblesse à améliorer ?')">Une faiblesse ?</button>
+        <button class="tpl-card" onclick="askQ('Pourquoi cette entreprise ?')">Pourquoi cette entreprise ?</button>
+        <button class="tpl-card" onclick="askQ('Où vous voyez-vous dans 5 ans ?')">Dans 5 ans ?</button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item active"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  let level = 'junior';
+  let messages = [];
+  let questionCount = 0;
+  let totalWords = 0;
+  let startTime = null;
+  let timerInterval = null;
+  let isRecording = false;
+
+  function setLevel(btn) {
+    document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    level = btn.dataset.lvl;
+  }
+
+  function showMobile(tab) {
+    document.querySelectorAll('.iv-mt').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    const page = document.getElementById('ivPage');
+    page.classList.remove('show-sidebar', 'show-coach');
+    if (tab === 'sidebar') page.classList.add('show-sidebar');
+    else if (tab === 'coach') page.classList.add('show-coach');
+  }
+
+  function autoResize(t) {
+    t.style.height = 'auto';
+    t.style.height = Math.min(t.scrollHeight, 120) + 'px';
+    document.getElementById('ivSendBtn').disabled = !t.value.trim();
+  }
+
+  function countWords() {
+    const txt = document.getElementById('ivInput').value;
+    const w = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+    // Live word count for current input
+  }
+
+  function pushMsg(role, text, ts) {
+    messages.push({ role, text, ts: ts || Date.now() });
+    if (messages.length === 1) {
+      document.getElementById('ivMessages').innerHTML = '';
+    }
+
+    const time = new Date(ts || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const div = document.createElement('div');
+    div.className = 'iv-msg ' + role;
+    div.innerHTML = `
+      <div class="iv-msg-avatar">${role === 'bot' ? '🤖' : '🧑'}</div>
+      <div>
+        <div class="iv-msg-bubble">${text.replace(/\n/g,'<br>')}</div>
+        <div class="iv-msg-time" style="${role==='user'?'text-align:right':''}">${time}</div>
+      </div>`;
+    document.getElementById('ivMessages').appendChild(div);
+    document.getElementById('ivMessages').scrollTop = document.getElementById('ivMessages').scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.id = 'typingIndicator';
+    div.className = 'iv-typing iv-msg bot';
+    div.innerHTML = `
+      <div class="iv-msg-avatar">🤖</div>
+      <div class="iv-msg-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    document.getElementById('ivMessages').appendChild(div);
+    document.getElementById('ivMessages').scrollTop = document.getElementById('ivMessages').scrollHeight;
+  }
+
+  function hideTyping() {
+    document.getElementById('typingIndicator')?.remove();
+  }
+
+  function startInterview() {
+    const role = document.getElementById('cfgRole').value.trim() || 'votre poste';
+    const company = document.getElementById('cfgCompany').value.trim();
+
+    if (!startTime) {
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    const greeting = `Parfait ! Démarrons une simulation d'entretien pour le poste de **${role}**${company?' chez **'+company+'**':''}, niveau **${level}**.\n\nVoici ma première question :\n\n💼 *Pourriez-vous vous présenter en 60 secondes et m'expliquer pourquoi ce poste vous intéresse particulièrement ?*`;
+
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      pushMsg('bot', greeting);
+      questionCount++;
+      updateStats();
+      addFeedback('💡', 'Conseil : structurez votre réponse en 3 points : qui vous êtes, ce que vous savez faire, pourquoi ce poste.');
+    }, 1100);
+  }
+
+  function quickStart(prompt) {
+    document.getElementById('cfgRole').value = prompt;
+    startInterview();
+  }
+
+  function loadTpl(tpl) {
+    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+    event.target.closest('.tpl-card').classList.add('active');
+    const prompts = {
+      rh: 'Entretien RH classique',
+      tech: 'Entretien technique avec questions de code',
+      compo: 'Entretien comportemental (méthode STAR)',
+      manager: 'Entretien avec le manager hiérarchique',
+      case: 'Étude de cas concret',
+      salary: 'Négociation salariale et package'
+    };
+    document.getElementById('cfgRole').value = prompts[tpl] || '';
+    empToast(`Template "${prompts[tpl]}" chargé`, 'info');
+  }
+
+  async function sendMsg() {
+    const inp = document.getElementById('ivInput');
+    const text = inp.value.trim();
+    if (!text) return;
+
+    pushMsg('user', text);
+    totalWords += text.split(/\s+/).length;
+    inp.value = '';
+    autoResize(inp);
+    updateStats();
+
+    showTyping();
+    addFeedback('⏱', 'Réponse de ' + text.split(/\s+/).length + ' mots — ' + (text.length > 200 ? 'bonne longueur' : 'pourrait être étoffée'));
+
+    // Simulate AI response
+    setTimeout(() => {
+      hideTyping();
+      const responses = [
+        "Très bonne réponse ! 👏\n\nPour aller plus loin, pourriez-vous me donner un **exemple concret** d'une situation où vous avez dû gérer un conflit dans votre équipe ? Utilisez la méthode STAR si possible.",
+        "Intéressant, j'aime votre approche.\n\nQuestion suivante : *Décrivez-moi un projet dont vous êtes particulièrement fier·e. Quel a été votre rôle et quels résultats avez-vous obtenus ?*",
+        "Bonne réflexion !\n\nMaintenant, parlons technique : *Quels sont les principaux défis techniques que vous avez rencontrés sur votre dernier projet ? Comment les avez-vous surmontés ?*",
+        "Excellent angle !\n\nDernière question pour cette section : *Quelle est votre plus grande zone d'amélioration et que faites-vous concrètement pour progresser ?*"
+      ];
+      pushMsg('bot', responses[questionCount % responses.length]);
+      questionCount++;
+      updateStats();
+
+      const tips = [
+        '✅ Bien : vous avez donné un exemple concret',
+        '💡 Astuce : quantifiez plus vos résultats',
+        '🎯 Pensez à parler des leçons apprises',
+        '⭐ Excellente structure de réponse !'
+      ];
+      addFeedback(tips[questionCount % tips.length].split(' ')[0], tips[questionCount % tips.length].substring(2));
+    }, 1300);
+  }
+
+  function askQ(q) {
+    pushMsg('bot', `Question : *${q}*\n\nPrenez votre temps pour répondre.`);
+    questionCount++;
+    updateStats();
+    if (!startTime) {
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+  }
+
+  function addFeedback(emoji, text) {
+    const list = document.getElementById('feedbackList');
+    if (list.querySelector('.feedback-item')?.textContent.includes('Démarrez une session')) {
+      list.innerHTML = '';
+    }
+    const item = document.createElement('div');
+    item.className = 'feedback-item';
+    item.innerHTML = `<span class="feedback-emoji">${emoji}</span><div>${text}</div>`;
+    list.insertBefore(item, list.firstChild);
+    if (list.children.length > 6) list.lastChild.remove();
+  }
+
+  function updateStats() {
+    document.getElementById('statQ').textContent = questionCount;
+    document.getElementById('statW').textContent = totalWords;
+    if (questionCount > 0) {
+      const score = Math.min(60 + questionCount * 4 + Math.min(totalWords / 10, 20), 95);
+      document.getElementById('statS').textContent = Math.round(score) + '%';
+    }
+  }
+
+  function updateTimer() {
+    if (!startTime) return;
+    const sec = Math.floor((Date.now() - startTime) / 1000);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    document.getElementById('statT').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  function toggleMic() {
+    const btn = document.getElementById('micBtn');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      empToast('Reconnaissance vocale non supportée par votre navigateur', 'error');
+      return;
+    }
+    isRecording = !isRecording;
+    btn.classList.toggle('recording', isRecording);
+    btn.textContent = isRecording ? '⏹' : '🎤';
+    if (isRecording) {
+      empToast('🎤 Enregistrement... cliquez pour arrêter', 'info');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SR();
+      rec.lang = 'fr-FR';
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.onresult = e => {
+        const txt = [...e.results].map(r => r[0].transcript).join('');
+        document.getElementById('ivInput').value = txt;
+        autoResize(document.getElementById('ivInput'));
+      };
+      rec.onerror = () => { isRecording = false; btn.classList.remove('recording'); btn.textContent = '🎤'; };
+      window._rec = rec;
+      rec.start();
+    } else {
+      window._rec?.stop();
+    }
+  }
+
+  function exportChat() {
+    if (!messages.length) return empToast('Aucun message à exporter', 'info');
+    const txt = messages.map(m => `[${new Date(m.ts).toLocaleString('fr-FR')}] ${m.role === 'bot' ? '🤖 Coach' : '🧑 Vous'}\n${m.text}\n`).join('\n---\n\n');
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `entretien-emploia-${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+    empToast('Conversation exportée !', 'success');
+  }
+
+  function resetChat() {
+    if (!confirm('Réinitialiser cette session ?')) return;
+    messages = [];
+    questionCount = 0;
+    totalWords = 0;
+    startTime = null;
+    clearInterval(timerInterval);
+    document.getElementById('statQ').textContent = '0';
+    document.getElementById('statT').textContent = '00:00';
+    document.getElementById('statW').textContent = '0';
+    document.getElementById('statS').textContent = '—';
+    document.getElementById('ivMessages').innerHTML = `
+      <div class="iv-welcome">
+        <div style="font-size:54px;margin-bottom:14px">🎤</div>
+        <h2>Préparez-vous à briller</h2>
+        <p>Configurez votre poste à gauche et démarrez votre simulation.</p>
+      </div>`;
+    document.getElementById('feedbackList').innerHTML = '<div class="feedback-item"><span class="feedback-emoji">💡</span><div>Démarrez une session pour recevoir un feedback en temps réel.</div></div>';
+  }
+
+  // Keyboard
+  document.getElementById('ivInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMsg();
+    }
+  });
+
+  // Init
+  document.getElementById('ivSendBtn').disabled = true;
+</script>
+</body>
+</html>

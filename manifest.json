@@ -1,0 +1,21 @@
+{
+  "name": "Emploia — Copilote IA pour l'emploi",
+  "short_name": "Emploia",
+  "description": "Générez votre CV ATS-optimisé, lettre de motivation et préparez vos entretiens avec l'IA.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#04080f",
+  "theme_color": "#6366f1",
+  "lang": "fr",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/public/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "categories": ["productivity", "business"],
+  "shortcuts": [
+    { "name": "Offres d'emploi", "url": "/jobs", "description": "Voir les offres" },
+    { "name": "Générer un CV", "url": "/app", "description": "Créer un CV IA" },
+    { "name": "Simulateur entretien", "url": "/interview", "description": "S'entraîner" }
+  ]
+}

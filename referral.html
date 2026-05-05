@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA" />
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Emploia"/>
+  <link rel="apple-touch-icon" href="favicon.svg"/>
+<title>Emploia — Parrainez vos amis &amp; gagnez des mois Pro</title>
+<meta name="description" content="Parrainez vos amis sur Emploia et gagnez 1 mois Pro gratuit par filleul. Jusqu'à 6 mois offerts !"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04080f;--s1:#0d1424;--s2:#111827;--s3:#1a2236;--s4:#1e2a40;
+  --brd:rgba(255,255,255,.07);--brdh:rgba(255,255,255,.13);
+  --blue:#3b82f6;--blb:#60a5fa;--bld:rgba(59,130,246,.12);
+  --ind:#6366f1;--inb:#818cf8;--ind2:rgba(99,102,241,.1);
+  --grn:#10b981;--gnb:#34d399;--gnd:rgba(16,185,129,.1);
+  --ylw:#f59e0b;--ylb:#fbbf24;--yld:rgba(245,158,11,.1);
+  --pur:#a855f7;--pub:rgba(168,85,247,.12);
+  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.018;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(99,102,241,.14) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 85% 80%,rgba(168,85,247,.08) 0%,transparent 60%);}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:0 24px;}
+.nav-inner{max-width:1100px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-size:16px;font-weight:800;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:9px;letter-spacing:-.4px;}
+.logo-m{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;}
+.nav-links{display:flex;align-items:center;gap:6px;}
+.nav-a{font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .15s;}
+.nav-a:hover{background:var(--s3);color:var(--t1);}
+.btn-nav-cta{font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;padding:7px 16px;border-radius:8px;text-decoration:none;transition:all .2s;}
+.btn-nav-cta:hover{transform:translateY(-1px);}
+
+/* HERO */
+.hero{padding:80px 24px 60px;text-align:center;position:relative;z-index:1;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--pub);border:1px solid rgba(168,85,247,.2);color:#c084fc;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:6px 16px;border-radius:100px;margin-bottom:24px;}
+.hero h1{font-size:clamp(34px,5vw,60px);font-weight:900;letter-spacing:-2.5px;line-height:1.05;margin-bottom:16px;}
+.grad-pur{background:linear-gradient(135deg,var(--blb),#c084fc,var(--ylb));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:16px;color:var(--t2);max-width:500px;margin:0 auto 40px;line-height:1.75;}
+
+/* REWARDS ROW */
+.rewards-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:56px;}
+.reward-card{background:var(--s2);border:1px solid var(--brd);border-radius:16px;padding:22px 24px;text-align:center;min-width:160px;transition:all .2s;}
+.reward-card:hover{border-color:var(--brdh);transform:translateY(-2px);}
+.reward-icon{font-size:28px;margin-bottom:10px;}
+.reward-val{font-size:20px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;}
+.reward-label{font-size:11px;color:var(--t3);line-height:1.4;}
+.reward-card.highlight{border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.06);}
+
+/* MAIN GRID */
+.main{max-width:1100px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;}
+
+/* LEFT — SHARE CARD */
+.share-card{background:var(--s2);border:1px solid var(--brdh);border-radius:20px;padding:32px;position:sticky;top:80px;}
+.share-card h2{font-size:18px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;}
+.share-card p{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6;}
+
+.ref-link-box{background:var(--bg);border:1.5px solid var(--brd);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+.ref-link-val{font-size:13px;color:var(--blb);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.btn-copy{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.btn-copy:hover{transform:translateY(-1px);}
+.btn-copy.copied{background:var(--grn);color:#fff;}
+
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;}
+.share-btn{padding:11px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid var(--brd);background:var(--s3);color:var(--t2);cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;}
+.share-btn:hover{border-color:var(--brdh);color:var(--t1);transform:translateY(-1px);}
+.share-btn.whatsapp:hover{border-color:rgba(37,211,102,.3);color:#25D366;background:rgba(37,211,102,.06);}
+.share-btn.linkedin:hover{border-color:rgba(10,102,194,.3);color:#0A66C2;background:rgba(10,102,194,.06);}
+.share-btn.email:hover{border-color:rgba(99,102,241,.3);color:var(--inb);background:var(--ind2);}
+.share-btn.twitter:hover{border-color:rgba(29,161,242,.3);color:#1DA1F2;background:rgba(29,161,242,.06);}
+
+.ref-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.ref-stat{background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:14px;text-align:center;}
+.ref-stat-num{font-size:24px;font-weight:900;letter-spacing:-1px;line-height:1;}
+.ref-stat-label{font-size:10px;color:var(--t3);margin-top:4px;}
+
+/* RIGHT — PROGRESS + TIERS */
+.right-col{display:flex;flex-direction:column;gap:16px;}
+
+.progress-card{background:var(--s2);border:1px solid var(--brd);border-radius:16px;padding:24px;}
+.progress-card h3{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:16px;}
+.tier-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd);position:relative;}
+.tier-row:last-child{border-bottom:none;}
+.tier-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tier-info{flex:1;}
+.tier-name{font-size:12px;font-weight:700;color:var(--t1);}
+.tier-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.tier-status{font-size:10px;font-weight:800;padding:3px 10px;border-radius:100px;}
+.tier-done{background:var(--gnd);color:var(--gnb);}
+.tier-next{background:var(--ind2);color:var(--inb);}
+.tier-locked{background:rgba(71,85,105,.15);color:var(--t3);}
+
+.progress-bar-wrap{margin-top:6px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:6px;}
+.progress-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--pur));transition:width 1s cubic-bezier(.16,1,.3,1);}
+
+/* HOW IT WORKS */
+.how-card{background:var(--s2);border:1px solid var(--brd);border-radius:16px;padding:24px;}
+.how-card h3{font-size:14px;font-weight:700;margin-bottom:16px;}
+.how-step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--brd);}
+.how-step:last-child{border-bottom:none;}
+.how-num{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;}
+.how-body{font-size:12px;color:var(--t2);line-height:1.6;}
+.how-body strong{color:var(--t1);}
+
+/* LEADERBOARD */
+.lb-card{background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden;}
+.lb-header{padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;}
+.lb-header h3{font-size:14px;font-weight:700;}
+.lb-period{font-size:11px;color:var(--t3);}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--brd);transition:background .15s;}
+.lb-row:hover{background:var(--s3);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-size:13px;font-weight:800;color:var(--t3);width:20px;flex-shrink:0;text-align:center;}
+.lb-rank.gold{color:var(--ylb);}
+.lb-rank.silver{color:#94a3b8;}
+.lb-rank.bronze{color:#cd7c2f;}
+.lb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.lb-name{flex:1;font-size:13px;font-weight:600;color:var(--t1);}
+.lb-refs{font-size:12px;color:var(--gnb);font-weight:700;}
+.lb-you{background:rgba(99,102,241,.06);border-left:2px solid var(--ind);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--s3);border:1px solid var(--brdh);color:var(--t1);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 16px 50px rgba(0,0,0,.5);display:flex;align-items:center;gap:9px;transition:all .25s;transform:translateY(80px);opacity:0;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* COOKIE BANNER */
+.cookie-banner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:400;background:var(--s2);border:1px solid var(--brdh);border-radius:14px;padding:16px 20px;max-width:560px;width:calc(100% - 32px);display:flex;align-items:center;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.cookie-text{font-size:12px;color:var(--t2);line-height:1.55;flex:1;}
+.cookie-text a{color:var(--blb);text-decoration:none;}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0;}
+.btn-cookie-ok{padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;}
+.btn-cookie-no{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;color:var(--t3);background:transparent;border:1px solid var(--brd);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .share-card{position:static;}
+  .rewards-row{gap:10px;}
+  .reward-card{min-width:120px;}
+}
+
+/* Page transitions */
+.page-transition{animation:pageFadeIn .25s ease;}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo"><div class="logo-m">E</div>Emploia</a>
+    <div class="nav-links">
+      <a href="/jobs" class="nav-a">Offres</a>
+      <a href="/app" class="nav-a">Générer CV</a>
+      <a href="/dashboard" class="nav-a">Candidatures</a>
+      <a href="/app" class="btn-nav-cta">Commencer →</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Parrainage</div>
+  <h1>Parrainez, gagnez.<br/><span class="grad-pur">Jusqu'à 6 mois Pro offerts.</span></h1>
+  <p>Invitez vos amis à utiliser Emploia. Pour chaque filleul qui s'inscrit, vous gagnez <strong style="color:var(--t1)">1 mois Pro gratuit</strong> — et eux aussi bénéficient de <strong style="color:var(--t1)">7 jours d'essai bonus</strong>.</p>
+
+  <div class="rewards-row">
+    <div class="reward-card">
+      <div class="reward-icon">🎁</div>
+      <div class="reward-val" style="color:var(--gnb)">+1 mois</div>
+      <div class="reward-label">Pro offert<br/>par filleul inscrit</div>
+    </div>
+    <div class="reward-card highlight">
+      <div class="reward-icon">🏆</div>
+      <div class="reward-val" style="color:#c084fc">6 mois</div>
+      <div class="reward-label">Pro max cumulable<br/>= 6 filleuls</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-icon">✨</div>
+      <div class="reward-val" style="color:var(--blb)">+7 jours</div>
+      <div class="reward-label">d'essai bonus<br/>pour votre filleul</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-icon">🔄</div>
+      <div class="reward-val" style="color:var(--ylb)">Illimité</div>
+      <div class="reward-label">Parrainez autant<br/>de personnes que voulu</div>
+    </div>
+  </div>
+</section>
+
+<div class="main">
+  <!-- LEFT: SHARE -->
+  <div>
+    <div class="share-card">
+      <h2>Votre lien de parrainage</h2>
+      <p>Partagez ce lien unique — chaque inscription via ce lien vous est automatiquement attribuée.</p>
+
+      <div class="ref-link-box">
+        <span class="ref-link-val" id="refLink">emploia.fr/r/...</span>
+        <button class="btn-copy" id="copyBtn" onclick="copyLink()">Copier</button>
+      </div>
+
+      <div class="share-btns">
+        <a class="share-btn whatsapp" id="shareWhatsapp" href="#" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a class="share-btn linkedin" id="shareLinkedin" href="#" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="share-btn email" id="shareEmail" href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+          Email
+        </a>
+        <a class="share-btn twitter" id="shareTwitter" href="#" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.737-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X / Twitter
+        </a>
+      </div>
+
+      <div class="ref-stats">
+        <div class="ref-stat">
+          <div class="ref-stat-num" id="statInvites" style="color:var(--blb)">0</div>
+          <div class="ref-stat-label">Invitations envoyées</div>
+        </div>
+        <div class="ref-stat">
+          <div class="ref-stat-num" id="statSignups" style="color:var(--gnb)">0</div>
+          <div class="ref-stat-label">Filleuls inscrits</div>
+        </div>
+        <div class="ref-stat">
+          <div class="ref-stat-num" id="statMonths" style="color:#c084fc">0</div>
+          <div class="ref-stat-label">Mois Pro gagnés</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <!-- PROGRESS -->
+    <div class="progress-card">
+      <h3>Votre progression</h3>
+
+      <div class="tier-row">
+        <div class="tier-icon" style="background:var(--gnd)">🌱</div>
+        <div class="tier-info">
+          <div class="tier-name">Starter — 1 filleul</div>
+          <div class="tier-desc">+1 mois Pro offert</div>
+        </div>
+        <span class="tier-status" id="tier1Status">locked</span>
+      </div>
+      <div class="tier-row">
+        <div class="tier-icon" style="background:var(--bld)">🚀</div>
+        <div class="tier-info">
+          <div class="tier-name">Booster — 3 filleuls</div>
+          <div class="tier-desc">+3 mois Pro + badge exclusif</div>
+        </div>
+        <span class="tier-status" id="tier2Status">locked</span>
+      </div>
+      <div class="tier-row">
+        <div class="tier-icon" style="background:var(--pub)">👑</div>
+        <div class="tier-info">
+          <div class="tier-name">Ambassadeur — 6 filleuls</div>
+          <div class="tier-desc">6 mois Pro + accès bêta + coaching 1:1</div>
+        </div>
+        <span class="tier-status" id="tier3Status">locked</span>
+      </div>
+
+      <div class="progress-bar-wrap" style="margin-top:16px;">
+        <div class="progress-label">
+          <span id="progressLabel">0 / 6 filleuls pour Ambassadeur</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="how-card">
+      <h3>Comment ça marche</h3>
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-body"><strong>Copiez votre lien unique</strong><br/>Il vous identifie automatiquement comme parrain.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-body"><strong>Partagez à vos amis</strong><br/>Via WhatsApp, LinkedIn, email — ou copiez le lien.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-body"><strong>Votre filleul s'inscrit</strong><br/>Il obtient 7 jours d'essai bonus. Vous êtes crédité.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-body"><strong>Vous gagnez 1 mois Pro</strong><br/>Appliqué automatiquement à votre compte. Cumulable jusqu'à 6 mois.</div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="lb-card">
+      <div class="lb-header">
+        <h3>Classement du mois</h3>
+        <span class="lb-period">Avril 2026</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank gold">1</span>
+        <div class="lb-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">A</div>
+        <span class="lb-name">Alexandre D.</span>
+        <span class="lb-refs">12 filleuls</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank silver">2</span>
+        <div class="lb-av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6)">C</div>
+        <span class="lb-name">Clara M.</span>
+        <span class="lb-refs">8 filleuls</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank bronze">3</span>
+        <div class="lb-av" style="background:linear-gradient(135deg,#10b981,#3b82f6)">R</div>
+        <span class="lb-name">Romain B.</span>
+        <span class="lb-refs">6 filleuls</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">4</span>
+        <div class="lb-av">S</div>
+        <span class="lb-name">Sophie L.</span>
+        <span class="lb-refs">5 filleuls</span>
+      </div>
+      <div class="lb-row lb-you">
+        <span class="lb-rank" style="color:var(--inb)">—</span>
+        <div class="lb-av" style="background:linear-gradient(135deg,var(--blue),var(--ind))" id="lbYouAv">?</div>
+        <span class="lb-name" style="color:var(--inb)">Vous</span>
+        <span class="lb-refs" id="lbYouRefs">0 filleul</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-text">Emploia utilise des cookies pour améliorer votre expérience et mesurer l'audience. <a href="/legal/privacy" style="color:var(--t2)">Politique de confidentialité</a> · <a href="/legal/cgu" style="color:var(--t2)">CGU</a></div>
+  <div class="cookie-btns">
+    <button class="btn-cookie-ok" onclick="acceptCookies()">Accepter</button>
+    <button class="btn-cookie-no" onclick="declineCookies()">Refuser</button>
+  </div>
+</div>
+
+<script>
+// ── REFERRAL CODE ──────────────────────────────────────────────
+const KEY = 'emploia_ref_data';
+function loadRef() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+function saveRef(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 8; i++) c += chars[Math.floor(Math.random() * chars.length)];
+  return c;
+}
+
+let refData = loadRef();
+if (!refData.code) { refData.code = genCode(); refData.invites = 0; refData.signups = 0; saveRef(refData); }
+
+// Check if arrived via referral link
+const urlParams = new URLSearchParams(window.location.search);
+const incomingRef = urlParams.get('ref');
+if (incomingRef && incomingRef !== refData.code) {
+  localStorage.setItem('emploia_referred_by', incomingRef);
+}
+
+const BASE = 'https://emploia.fr/r/';
+const myLink = BASE + refData.code;
+
+document.getElementById('refLink').textContent = myLink;
+document.getElementById('lbYouAv').textContent = refData.code.charAt(0);
+
+// Update share button hrefs dynamically
+const shareMsg = encodeURIComponent(`🎯 J'utilise Emploia pour optimiser mes candidatures avec l'IA ! Rejoins-moi et génère ton CV ATS en 30 secondes 👉 ${myLink}`);
+document.getElementById('shareWhatsapp').href = `https://wa.me/?text=${shareMsg}`;
+document.getElementById('shareLinkedin').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(myLink)}`;
+document.getElementById('shareEmail').href = `mailto:?subject=Découvre Emploia — CV IA gratuit&body=Bonjour,%0A%0AJe voulais te partager cet outil qui génère des CVs optimisés pour les ATS en 30 secondes grâce à l'IA.%0A%0AEssaie gratuitement ici : ${myLink}%0A%0ABonne chance dans tes candidatures !`;
+document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${shareMsg}`;
+
+// Simulate some signups from localStorage (demo)
+const signups = refData.signups || 0;
+const invites = refData.invites || 0;
+updateStats(signups, invites);
+
+function updateStats(s, i) {
+  document.getElementById('statInvites').textContent = i;
+  document.getElementById('statSignups').textContent = s;
+  document.getElementById('statMonths').textContent = Math.min(s, 6);
+  document.getElementById('lbYouRefs').textContent = s + (s === 1 ? ' filleul' : ' filleuls');
+  
+  const pct = Math.min(s / 6 * 100, 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = Math.round(pct) + '%';
+  document.getElementById('progressLabel').textContent = s + ' / 6 filleuls pour Ambassadeur';
+  
+  // Tier statuses
+  const t1 = document.getElementById('tier1Status');
+  const t2 = document.getElementById('tier2Status');
+  const t3 = document.getElementById('tier3Status');
+  
+  if (s >= 1) { t1.textContent = 'Débloqué'; t1.className = 'tier-status tier-done'; }
+  else { t1.textContent = 'Prochain'; t1.className = 'tier-status tier-next'; }
+  
+  if (s >= 3) { t2.textContent = 'Débloqué'; t2.className = 'tier-status tier-done'; }
+  else if (s >= 1) { t2.textContent = s + '/3'; t2.className = 'tier-status tier-next'; }
+  else { t2.textContent = 'Verrouillé'; t2.className = 'tier-status tier-locked'; }
+  
+  if (s >= 6) { t3.textContent = 'Débloqué'; t3.className = 'tier-status tier-done'; }
+  else if (s >= 3) { t3.textContent = s + '/6'; t3.className = 'tier-status tier-next'; }
+  else { t3.textContent = 'Verrouillé'; t3.className = 'tier-status tier-locked'; }
+}
+
+// ── COPY LINK ──────────────────────────────────────────────────
+function copyLink() {
+  navigator.clipboard.writeText(myLink).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2500);
+    refData.invites = (refData.invites || 0) + 1;
+    saveRef(refData);
+    updateStats(refData.signups || 0, refData.invites);
+    showToast('Lien copié — partagez-le maintenant !');
+  });
+}
+
+// ── SHARE BUTTONS ──────────────────────────────────────────────
+const msg = encodeURIComponent(`Je cherche un emploi avec Emploia — le 1er outil IA 100% français pour optimiser son CV. Essaie gratuitement : ${myLink}`);
+document.getElementById('shareWhatsapp').href = `https://wa.me/?text=${msg}`;
+document.getElementById('shareLinkedin').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(myLink)}`;
+document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent('Je t\'invite sur Emploia')}&body=${msg}`;
+document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${msg}`;
+
+document.querySelectorAll('.share-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    refData.invites = (refData.invites || 0) + 1;
+    saveRef(refData);
+    updateStats(refData.signups || 0, refData.invites);
+  });
+});
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── COOKIE BANNER ──────────────────────────────────────────────
+const cookieKey = 'emploia_cookie_consent';
+if (localStorage.getItem(cookieKey)) {
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+function acceptCookies() {
+  localStorage.setItem(cookieKey, 'accepted');
+  document.getElementById('cookieBanner').style.display = 'none';
+  // Load Plausible analytics
+  const s = document.createElement('script');
+  s.defer = true; s.dataset.domain = 'emploia.fr';
+  s.src = 'https://plausible.io/js/script.js';
+  document.head.appendChild(s);
+  showToast('Préférences enregistrées');
+}
+function declineCookies() {
+  localStorage.setItem(cookieKey, 'declined');
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+
+// Demo: simulate a signup from URL param
+if (urlParams.get('signup') === '1') {
+  refData.signups = (refData.signups || 0) + 1;
+  saveRef(refData);
+  updateStats(refData.signups, refData.invites || 0);
+  showToast('Un filleul vient de s\'inscrire ! +1 mois Pro');
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

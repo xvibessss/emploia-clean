@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Mon Profil — Emploia</title>
+  <meta name="description" content="Gérez votre profil candidat, vos expériences, compétences et préférences de recherche d'emploi."/>
+  <link rel="canonical" href="https://emploia.fr/profil"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .profile-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+    }
+
+    /* ── SIDEBAR ────────────────────────────── */
+    .profile-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    .profile-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 900;
+      color: #fff;
+      border: 3px solid var(--brd);
+    }
+
+    .avatar-edit {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--s3);
+      border: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+
+    .avatar-edit:hover { background: var(--s4); }
+
+    .profile-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: -.5px;
+      margin-bottom: 4px;
+    }
+
+    .profile-title {
+      font-size: 13px;
+      color: var(--t2);
+      margin-bottom: 16px;
+    }
+
+    .profile-completion {
+      background: var(--s3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 4px;
+    }
+
+    .pc-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--t3);
+      margin-bottom: 8px;
+    }
+
+    .pc-pct { font-weight: 700; color: var(--blb); }
+
+    .pc-track {
+      height: 5px;
+      border-radius: 3px;
+      background: var(--s4);
+      overflow: hidden;
+    }
+
+    .pc-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--grad-primary);
+      width: 72%;
+      transition: width 1s ease;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pstat {
+      background: var(--s3);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .pstat-num {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--blb);
+    }
+
+    .pstat-label { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+    /* SIDEBAR NAV */
+    .profile-nav { display: flex; flex-direction: column; gap: 4px; }
+
+    .pnav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t2);
+      cursor: pointer;
+      transition: all .15s;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      text-align: left;
+      text-decoration: none;
+    }
+
+    .pnav-item:hover { background: var(--s3); color: var(--t1); }
+    .pnav-item.active { background: var(--bld); color: var(--blb); }
+    .pnav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* ── MAIN CONTENT ───────────────────────── */
+    .profile-main { display: flex; flex-direction: column; gap: 20px; }
+
+    .section-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .sc-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sc-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sc-body { padding: 24px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+
+    /* EXPERIENCE ITEMS */
+    .exp-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .exp-item {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color .15s;
+    }
+
+    .exp-item:hover { border-color: var(--brdh); }
+
+    .exp-logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--s4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .exp-info { flex: 1; }
+
+    .exp-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+    .exp-company { font-size: 12px; color: var(--t2); margin-bottom: 6px; }
+    .exp-period { font-size: 11px; color: var(--t3); }
+    .exp-desc { font-size: 12px; color: var(--t2); line-height: 1.6; margin-top: 8px; }
+
+    .exp-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    .icon-btn {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--brd);
+      background: transparent;
+      cursor: pointer;
+      color: var(--t3);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+
+    .icon-btn:hover { background: var(--s4); color: var(--t1); }
+
+    /* SKILLS */
+    .skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+
+    .skill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t2);
+      transition: all .15s;
+    }
+
+    .skill-tag:hover { border-color: var(--brdh); color: var(--t1); }
+
+    .skill-tag .remove {
+      cursor: pointer;
+      color: var(--t3);
+      font-size: 10px;
+      transition: color .15s;
+    }
+
+    .skill-tag .remove:hover { color: var(--rnb); }
+
+    .skill-level-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .level-expert { background: var(--gnb); }
+    .level-advanced { background: var(--blb); }
+    .level-intermediate { background: var(--ylb); }
+    .level-beginner { background: var(--t3); }
+
+    .skill-input-row { display: flex; gap: 8px; }
+
+    /* PREFERENCES */
+    .pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .pref-item {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .pref-label { font-size: 12px; font-weight: 600; color: var(--t2); }
+    .pref-value { font-size: 13px; font-weight: 700; color: var(--t1); }
+
+    /* TOGGLE SWITCH */
+    .emp-toggle {
+      width: 38px; height: 22px;
+      background: var(--s4);
+      border: 1px solid var(--brd);
+      border-radius: 100px;
+      cursor: pointer;
+      position: relative;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+
+    .emp-toggle.on { background: var(--blue); border-color: var(--blue); }
+
+    .emp-toggle-knob {
+      width: 16px; height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px; left: 2px;
+      transition: left .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+
+    .emp-toggle.on .emp-toggle-knob { left: 18px; }
+
+    /* DOCUMENTS */
+    .doc-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .doc-item {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color .15s;
+    }
+
+    .doc-item:hover { border-color: var(--brdh); }
+
+    .doc-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--bld);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .doc-info { flex: 1; }
+    .doc-name { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 2px; }
+    .doc-meta { font-size: 11px; color: var(--t3); }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--brd);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 12px;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--blue);
+      background: var(--bls);
+    }
+
+    .upload-zone-icon { font-size: 32px; margin-bottom: 10px; }
+    .upload-zone p { font-size: 13px; color: var(--t2); line-height: 1.6; }
+    .upload-zone strong { color: var(--blb); }
+
+    /* SAVE BAR */
+    .save-bar {
+      position: sticky;
+      bottom: 0;
+      background: rgba(7,12,24,.97);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--brd);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .save-bar p { font-size: 13px; color: var(--t2); }
+
+    @media (max-width: 900px) {
+      .profile-layout { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .pref-grid { grid-template-columns: 1fr; }
+      .profile-sidebar { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/profil" class="emp-nav-a active">Mon Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/interview">🎤 Entretien</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="profile-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="profile-sidebar">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="avatar-wrap">
+        <div class="avatar">T</div>
+        <div class="avatar-edit" title="Modifier la photo">✏️</div>
+      </div>
+      <div class="profile-name">Thomas Renard</div>
+      <div class="profile-title">Développeur Full Stack · Paris</div>
+
+      <div class="profile-completion">
+        <div class="pc-label">
+          <span>Profil complété</span>
+          <span class="pc-pct">72%</span>
+        </div>
+        <div class="pc-track">
+          <div class="pc-fill" id="completionBar"></div>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="pstat">
+          <div class="pstat-num">24</div>
+          <div class="pstat-label">Candidatures</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num">8</div>
+          <div class="pstat-label">Entretiens</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num">5</div>
+          <div class="pstat-label">CV générés</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num">94</div>
+          <div class="pstat-label">Score ATS max</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Nav -->
+    <div class="section-card" style="padding:8px">
+      <div class="profile-nav">
+        <button class="pnav-item active" onclick="showSection('infos', this)">
+          <span class="pnav-icon">👤</span> Informations personnelles
+        </button>
+        <button class="pnav-item" onclick="showSection('experience', this)">
+          <span class="pnav-icon">💼</span> Expériences
+        </button>
+        <button class="pnav-item" onclick="showSection('formation', this)">
+          <span class="pnav-icon">🎓</span> Formation
+        </button>
+        <button class="pnav-item" onclick="showSection('competences', this)">
+          <span class="pnav-icon">⚡</span> Compétences
+        </button>
+        <button class="pnav-item" onclick="showSection('preferences', this)">
+          <span class="pnav-icon">🎯</span> Préférences de recherche
+        </button>
+        <button class="pnav-item" onclick="showSection('documents', this)">
+          <span class="pnav-icon">📄</span> Mes documents
+        </button>
+        <div class="emp-divider" style="margin:4px 0"></div>
+        <button class="pnav-item" onclick="showSection('securite', this)">
+          <span class="pnav-icon">🔒</span> Sécurité & Compte
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="profile-main" id="profileMain">
+
+    <!-- ── SECTION: INFOS ──────────────────── -->
+    <div class="section-card" id="sec-infos">
+      <div class="sc-header">
+        <div class="sc-title">👤 Informations personnelles</div>
+        <span class="badge badge-blue">Profil public</span>
+      </div>
+      <div class="sc-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="emp-label">Prénom</label>
+            <input type="text" class="emp-input" value="Thomas" placeholder="Votre prénom"/>
+          </div>
+          <div class="form-group">
+            <label class="emp-label">Nom</label>
+            <input type="text" class="emp-input" value="Renard" placeholder="Votre nom"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="emp-label">Email</label>
+            <input type="email" class="emp-input" value="thomas.renard@gmail.com" placeholder="email@exemple.fr"/>
+          </div>
+          <div class="form-group">
+            <label class="emp-label">Téléphone</label>
+            <input type="tel" class="emp-input" value="+33 6 12 34 56 78" placeholder="+33 6 ..."/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="emp-label">Titre professionnel</label>
+            <input type="text" class="emp-input" value="Développeur Full Stack" placeholder="ex. Chef de projet Marketing"/>
+          </div>
+          <div class="form-group">
+            <label class="emp-label">Ville</label>
+            <input type="text" class="emp-input" value="Paris, Île-de-France" placeholder="Paris, Lyon..."/>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="emp-label">Résumé professionnel</label>
+          <textarea class="emp-input" rows="4" placeholder="Décrivez votre parcours en quelques phrases...">Développeur Full Stack passionné avec 3 ans d'expérience en React et Node.js. J'ai travaillé sur des projets à fort trafic et je cherche à rejoindre une équipe innovante en CDI sur Paris ou en remote.</textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="emp-label">LinkedIn</label>
+            <input type="url" class="emp-input" value="https://linkedin.com/in/thomas-renard" placeholder="https://linkedin.com/in/..."/>
+          </div>
+          <div class="form-group">
+            <label class="emp-label">Portfolio / Site web</label>
+            <input type="url" class="emp-input" value="https://thomasrenard.dev" placeholder="https://..."/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: EXPERIENCE ────────────── -->
+    <div class="section-card" id="sec-experience" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">💼 Expériences professionnelles</div>
+        <button class="btn btn-primary btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
+      </div>
+      <div class="sc-body">
+        <div class="exp-list">
+          <div class="exp-item">
+            <div class="exp-logo">🏢</div>
+            <div class="exp-info">
+              <div class="exp-title">Développeur Full Stack React / Node.js</div>
+              <div class="exp-company">Startup SaaS · CDI · Paris (Hybride)</div>
+              <div class="exp-period">Mar 2022 — Présent · 2 ans 3 mois</div>
+              <div class="exp-desc">Développement d'une plateforme SaaS de gestion RH. Architecture React + Node.js + PostgreSQL. 30 000 utilisateurs actifs, 99.9% uptime.</div>
+            </div>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Modifier">✏️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-logo">🌍</div>
+            <div class="exp-info">
+              <div class="exp-title">Développeur Frontend React (Stage)</div>
+              <div class="exp-company">Agence Web · Stage · Lyon</div>
+              <div class="exp-period">Juil 2021 — Mar 2022 · 8 mois</div>
+              <div class="exp-desc">Intégration d'interfaces React à partir de maquettes Figma. Mise en place de tests unitaires Jest.</div>
+            </div>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Modifier">✏️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: FORMATION ─────────────── -->
+    <div class="section-card" id="sec-formation" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">🎓 Formation</div>
+        <button class="btn btn-primary btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
+      </div>
+      <div class="sc-body">
+        <div class="exp-list">
+          <div class="exp-item">
+            <div class="exp-logo">🎓</div>
+            <div class="exp-info">
+              <div class="exp-title">Master Informatique — Génie Logiciel</div>
+              <div class="exp-company">Université Lyon 1</div>
+              <div class="exp-period">2019 — 2021 · Mention Bien</div>
+            </div>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Modifier">✏️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-logo">📚</div>
+            <div class="exp-info">
+              <div class="exp-title">Licence Mathématiques & Informatique</div>
+              <div class="exp-company">Université Lyon 1</div>
+              <div class="exp-period">2016 — 2019</div>
+            </div>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Modifier">✏️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: COMPÉTENCES ───────────── -->
+    <div class="section-card" id="sec-competences" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">⚡ Compétences</div>
+      </div>
+      <div class="sc-body">
+        <label class="emp-label" style="margin-bottom:10px">Compétences techniques</label>
+        <div class="skills-wrap" id="skillsWrap">
+          <span class="skill-tag"><span class="skill-level-dot level-expert"></span>React<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-expert"></span>TypeScript<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Node.js<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>PostgreSQL<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Docker<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>GraphQL<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>AWS<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>Git<span class="remove" onclick="removeSkill(this)">✕</span></span>
+        </div>
+        <div class="skill-input-row">
+          <input type="text" class="emp-input" id="skillInput" placeholder="Ajouter une compétence..." style="flex:1"/>
+          <button class="btn btn-secondary" onclick="addSkill()">Ajouter</button>
+        </div>
+
+        <div style="margin-top:24px">
+          <label class="emp-label" style="margin-bottom:10px">Langues</label>
+          <div class="skills-wrap">
+            <span class="skill-tag"><span class="skill-level-dot level-expert"></span>Français (natif)<span class="remove" onclick="removeSkill(this)">✕</span></span>
+            <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Anglais (C1)<span class="remove" onclick="removeSkill(this)">✕</span></span>
+            <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>Espagnol (B2)<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;padding:14px;background:var(--s3);border-radius:12px;display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:20px">💡</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px">Niveau de compétence</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.6">
+              <span style="color:var(--gnb)">●</span> Expert &nbsp;
+              <span style="color:var(--blb)">●</span> Avancé &nbsp;
+              <span style="color:var(--ylb)">●</span> Intermédiaire &nbsp;
+              <span style="color:var(--t3)">●</span> Débutant
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: PRÉFÉRENCES ───────────── -->
+    <div class="section-card" id="sec-preferences" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">🎯 Préférences de recherche</div>
+      </div>
+      <div class="sc-body">
+        <div class="pref-grid">
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Type de contrat</div>
+              <div class="pref-value">CDI · CDD</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Salaire souhaité</div>
+              <div class="pref-value">45 000 — 60 000 €</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Localisation</div>
+              <div class="pref-value">Paris · Remote</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Secteur</div>
+              <div class="pref-value">Tech · SaaS · FinTech</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Disponibilité</div>
+              <div class="pref-value">Dans 1 mois</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+          <div class="pref-item">
+            <div>
+              <div class="pref-label">Niveau d'expérience</div>
+              <div class="pref-value">Junior · Confirmé</div>
+            </div>
+            <button class="icon-btn">✏️</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--s3);border-radius:12px;border:1px solid var(--brd)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Alertes email nouvelles offres</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Recevez les offres correspondant à vos critères</div>
+            </div>
+            <div class="emp-toggle on" id="alertToggle" onclick="this.classList.toggle('on')">
+              <div class="emp-toggle-knob"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--s3);border-radius:12px;border:1px solid var(--brd)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--t1)">Profil visible aux recruteurs</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Les recruteurs peuvent vous contacter directement</div>
+            </div>
+            <div class="emp-toggle" id="visibleToggle" onclick="this.classList.toggle('on')">
+              <div class="emp-toggle-knob"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: DOCUMENTS ─────────────── -->
+    <div class="section-card" id="sec-documents" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">📄 Mes documents</div>
+      </div>
+      <div class="sc-body">
+        <div class="doc-list">
+          <div class="doc-item">
+            <div class="doc-icon">📄</div>
+            <div class="doc-info">
+              <div class="doc-name">CV_Thomas_Renard_Dev_2024.pdf</div>
+              <div class="doc-meta">PDF · 245 Ko · Mis à jour le 15 jan. 2024</div>
+            </div>
+            <span class="badge badge-green" style="margin-right:4px">Score ATS: 94</span>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Télécharger">⬇️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon">✉️</div>
+            <div class="doc-info">
+              <div class="doc-name">Lettre_BNP_Dev_React.pdf</div>
+              <div class="doc-meta">PDF · 118 Ko · Créé le 10 jan. 2024</div>
+            </div>
+            <div class="exp-actions">
+              <button class="icon-btn" title="Télécharger">⬇️</button>
+              <button class="icon-btn" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone" onclick="empToast('Fonctionnalité d\'upload disponible en version Pro','info')">
+          <div class="upload-zone-icon">📂</div>
+          <p><strong>Glissez-déposez vos fichiers ici</strong><br/>ou cliquez pour parcourir · PDF, DOCX · Max 5 Mo</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: SÉCURITÉ ──────────────── -->
+    <div class="section-card" id="sec-securite" style="display:none">
+      <div class="sc-header">
+        <div class="sc-title">🔒 Sécurité & Compte</div>
+      </div>
+      <div class="sc-body">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="form-group">
+            <label class="emp-label">Mot de passe actuel</label>
+            <input type="password" class="emp-input" placeholder="••••••••"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="emp-label">Nouveau mot de passe</label>
+              <input type="password" class="emp-input" placeholder="••••••••"/>
+            </div>
+            <div class="form-group">
+              <label class="emp-label">Confirmer le mot de passe</label>
+              <input type="password" class="emp-input" placeholder="••••••••"/>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="align-self:flex-start" onclick="empToast('Mot de passe mis à jour','success')">Mettre à jour</button>
+
+          <div class="emp-divider" style="margin:8px 0"></div>
+
+          <div style="background:var(--rnd);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--rnb);margin-bottom:8px">⚠️ Zone de danger</div>
+            <p style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6">La suppression de votre compte est irréversible. Toutes vos données, candidatures et documents seront effacés définitivement.</p>
+            <button class="btn" style="background:rgba(239,68,68,.15);color:var(--rnb);border:1px solid rgba(239,68,68,.2)" onclick="empToast('Contactez contact@emploia.fr pour supprimer votre compte','error')">Supprimer mon compte</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <p>💾 Des modifications non sauvegardées sont en attente.</p>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-ghost btn-sm" onclick="empToast('Modifications annulées','info')">Annuler</button>
+    <button class="btn btn-primary btn-sm" onclick="empToast('Profil sauvegardé avec succès !','success')">Sauvegarder les modifications</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+  <a href="/profil" class="emp-bottom-nav-item active"><span class="bn-icon">👤</span>Profil</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  // Section switching
+  function showSection(id, btn) {
+    document.querySelectorAll('[id^="sec-"]').forEach(s => s.style.display = 'none');
+    document.getElementById('sec-' + id).style.display = 'block';
+    document.querySelectorAll('.pnav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Skills
+  function removeSkill(el) {
+    el.closest('.skill-tag').remove();
+  }
+
+  function addSkill() {
+    const input = document.getElementById('skillInput');
+    const val = input.value.trim();
+    if (!val) return;
+    const tag = document.createElement('span');
+    tag.className = 'skill-tag';
+    tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${val}<span class="remove" onclick="removeSkill(this)">✕</span>`;
+    document.getElementById('skillsWrap').appendChild(tag);
+    input.value = '';
+    empToast('Compétence ajoutée', 'success');
+  }
+
+  document.getElementById('skillInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addSkill();
+  });
+
+  // Animate completion bar
+  setTimeout(() => {
+    document.getElementById('completionBar').style.width = '72%';
+  }, 400);
+</script>
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Mentions légales — Emploia</title>
+  <meta name="description" content="Mentions légales, politique de confidentialité et conditions générales d'utilisation d'Emploia."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .legal-layout {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .legal-nav {
+      position: sticky;
+      top: 80px;
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .legal-nav-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 12px 12px;
+    }
+
+    .legal-nav a {
+      display: block;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--t2);
+      text-decoration: none;
+      transition: all .15s;
+    }
+
+    .legal-nav a:hover { background: var(--s3); color: var(--t1); }
+    .legal-nav a.active { background: var(--bld); color: var(--blb); font-weight: 700; }
+
+    .legal-content { display: flex; flex-direction: column; gap: 8px; }
+
+    .legal-section {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .legal-section.active { display: block; }
+
+    .legal-header {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .legal-header h1 {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -.6px;
+      margin-bottom: 6px;
+    }
+
+    .legal-header p {
+      font-size: 12px;
+      color: var(--t3);
+    }
+
+    .legal-body {
+      padding: 28px;
+    }
+
+    .legal-body h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: -.4px;
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .legal-body h2:first-child { margin-top: 0; }
+
+    .legal-body h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t2);
+      margin: 16px 0 8px;
+    }
+
+    .legal-body p {
+      font-size: 13.5px;
+      color: var(--t2);
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+
+    .legal-body ul {
+      padding-left: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .legal-body ul li {
+      font-size: 13.5px;
+      color: var(--t2);
+      line-height: 1.7;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .legal-body ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--blb);
+      font-weight: 700;
+    }
+
+    .legal-body a {
+      color: var(--blb);
+      text-decoration: none;
+    }
+
+    .legal-body a:hover { text-decoration: underline; }
+
+    .legal-info-box {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .legal-info-box p { margin: 0; font-size: 13px; }
+
+    .legal-highlight {
+      background: var(--bld);
+      border: 1px solid rgba(59,130,246,.15);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 16px 0;
+    }
+
+    .legal-highlight p {
+      margin: 0;
+      color: var(--blb);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .legal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    .legal-table th {
+      background: var(--s3);
+      color: var(--t2);
+      font-weight: 700;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .legal-table td {
+      padding: 10px 14px;
+      color: var(--t2);
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .legal-table tr:last-child td { border-bottom: none; }
+    .legal-table tr:nth-child(even) { background: rgba(255,255,255,.015); }
+
+    @media (max-width: 700px) {
+      .legal-layout { grid-template-columns: 1fr; }
+      .legal-nav { position: relative; top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="#" class="emp-nav-a active">Légal</a>
+      <a href="/app" class="emp-nav-cta">Essai gratuit →</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="legal-layout">
+
+  <!-- SIDEBAR NAV -->
+  <aside class="legal-nav">
+    <div class="legal-nav-title">Pages légales</div>
+    <a href="#" class="active" onclick="showLegal('mentions',this);return false">📋 Mentions légales</a>
+    <a href="#" onclick="showLegal('privacy',this);return false">🔒 Politique de confidentialité</a>
+    <a href="#" onclick="showLegal('cgu',this);return false">📄 CGU</a>
+    <a href="#" onclick="showLegal('cookies',this);return false">🍪 Politique cookies</a>
+  </aside>
+
+  <main class="legal-content">
+
+    <!-- ── MENTIONS LÉGALES ───────────────── -->
+    <div class="legal-section active" id="sec-mentions">
+      <div class="legal-header">
+        <h1>Mentions légales</h1>
+        <p>Dernière mise à jour : 1er janvier 2024</p>
+      </div>
+      <div class="legal-body">
+        <h2>Éditeur du site</h2>
+        <div class="legal-info-box">
+          <p><strong style="color:var(--t1)">Emploia SAS</strong><br/>
+          Capital social : 1 000 €<br/>
+          Siège social : [Adresse à compléter], Paris, France<br/>
+          SIRET : [Numéro SIRET à compléter]<br/>
+          RCS Paris : [Numéro RCS à compléter]<br/>
+          Email : <a href="mailto:contact@emploia.fr">contact@emploia.fr</a></p>
+        </div>
+
+        <h2>Directeur de la publication</h2>
+        <p>Le directeur de la publication est le représentant légal de la société Emploia SAS.</p>
+
+        <h2>Hébergement</h2>
+        <div class="legal-info-box">
+          <p><strong style="color:var(--t1)">Vercel Inc.</strong><br/>
+          340 Pine Street, Suite 701, San Francisco, CA 94104, USA<br/>
+          <a href="https://vercel.com" target="_blank">vercel.com</a></p>
+        </div>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>L'ensemble du contenu de ce site (textes, images, graphismes, logo, sons, logiciels, etc.) est la propriété exclusive d'Emploia SAS ou de ses partenaires. Toute reproduction, distribution, modification ou utilisation de ce contenu, même partielle, est strictement interdite sans autorisation écrite préalable.</p>
+
+        <h2>Intelligence Artificielle</h2>
+        <p>Emploia utilise l'API Claude d'Anthropic pour les fonctionnalités de génération de contenu. Les résultats générés par l'IA sont fournis à titre indicatif et ne constituent pas des conseils professionnels. Emploia n'est pas responsable des décisions prises sur la base des contenus générés.</p>
+
+        <h2>Limitation de responsabilité</h2>
+        <p>Emploia s'efforce de maintenir le service disponible 24h/24 et 7j/7, mais ne peut garantir une disponibilité continue. Emploia ne saurait être tenu responsable des dommages résultant de l'utilisation ou de l'impossibilité d'utiliser le service.</p>
+
+        <h2>Contact</h2>
+        <p>Pour toute question relative aux présentes mentions légales, vous pouvez nous contacter à : <a href="mailto:contact@emploia.fr">contact@emploia.fr</a></p>
+      </div>
+    </div>
+
+    <!-- ── POLITIQUE DE CONFIDENTIALITÉ ────── -->
+    <div class="legal-section" id="sec-privacy">
+      <div class="legal-header">
+        <h1>Politique de confidentialité</h1>
+        <p>Dernière mise à jour : 1er janvier 2024 · Conforme RGPD</p>
+      </div>
+      <div class="legal-body">
+        <div class="legal-highlight">
+          <p>ℹ️ Emploia respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement du service et ne vendons jamais vos données à des tiers.</p>
+        </div>
+
+        <h2>1. Responsable du traitement</h2>
+        <p>Emploia SAS est responsable du traitement de vos données personnelles. Pour toute question relative à la protection de vos données, contactez-nous à : <a href="mailto:privacy@emploia.fr">privacy@emploia.fr</a></p>
+
+        <h2>2. Données collectées</h2>
+        <h3>Données d'inscription</h3>
+        <ul>
+          <li>Nom et prénom</li>
+          <li>Adresse email</li>
+          <li>Mot de passe (hashé, jamais stocké en clair)</li>
+        </ul>
+
+        <h3>Données de profil (optionnelles)</h3>
+        <ul>
+          <li>Informations professionnelles (expériences, formations, compétences)</li>
+          <li>Préférences de recherche d'emploi</li>
+          <li>Documents (CV, lettres de motivation)</li>
+        </ul>
+
+        <h3>Données d'utilisation</h3>
+        <ul>
+          <li>Logs de connexion (date, heure, adresse IP)</li>
+          <li>Historique des générations IA (si plan Pro)</li>
+          <li>Candidatures suivies dans le dashboard</li>
+        </ul>
+
+        <h2>3. Finalités du traitement</h2>
+        <table class="legal-table">
+          <tr><th>Finalité</th><th>Base légale</th><th>Durée</th></tr>
+          <tr><td>Création et gestion du compte</td><td>Exécution du contrat</td><td>Durée du compte + 3 ans</td></tr>
+          <tr><td>Génération de CV et lettres</td><td>Exécution du contrat</td><td>Durée du compte</td></tr>
+          <tr><td>Gestion des paiements</td><td>Obligation légale</td><td>10 ans (comptabilité)</td></tr>
+          <tr><td>Amélioration du service</td><td>Intérêt légitime</td><td>12 mois</td></tr>
+          <tr><td>Newsletter (si consentement)</td><td>Consentement</td><td>Jusqu'au désabonnement</td></tr>
+        </table>
+
+        <h2>4. Partage des données</h2>
+        <p>Vos données peuvent être partagées avec :</p>
+        <ul>
+          <li><strong style="color:var(--t1)">Anthropic</strong> — API Claude pour la génération de contenu (données anonymisées)</li>
+          <li><strong style="color:var(--t1)">Stripe</strong> — Traitement sécurisé des paiements</li>
+          <li><strong style="color:var(--t1)">Vercel</strong> — Hébergement de l'application</li>
+          <li><strong style="color:var(--t1)">Plausible</strong> — Analytics anonymes (si consentement cookies)</li>
+        </ul>
+        <p>Nous ne vendons jamais vos données à des tiers à des fins commerciales.</p>
+
+        <h2>5. Vos droits</h2>
+        <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+        <ul>
+          <li><strong style="color:var(--t1)">Droit d'accès</strong> — Obtenir une copie de vos données</li>
+          <li><strong style="color:var(--t1)">Droit de rectification</strong> — Corriger vos données inexactes</li>
+          <li><strong style="color:var(--t1)">Droit à l'effacement</strong> — Supprimer votre compte et vos données</li>
+          <li><strong style="color:var(--t1)">Droit à la portabilité</strong> — Exporter vos données (format JSON ou CSV)</li>
+          <li><strong style="color:var(--t1)">Droit d'opposition</strong> — Vous opposer à certains traitements</li>
+        </ul>
+        <p>Pour exercer vos droits, écrivez à : <a href="mailto:privacy@emploia.fr">privacy@emploia.fr</a>. Vous pouvez également introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank">CNIL</a>.</p>
+
+        <h2>6. Sécurité</h2>
+        <p>Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données : chiffrement HTTPS, mots de passe hashés (bcrypt), accès restreint aux données, audits réguliers.</p>
+      </div>
+    </div>
+
+    <!-- ── CGU ────────────────────────────── -->
+    <div class="legal-section" id="sec-cgu">
+      <div class="legal-header">
+        <h1>Conditions Générales d'Utilisation</h1>
+        <p>Dernière mise à jour : 1er janvier 2024</p>
+      </div>
+      <div class="legal-body">
+        <h2>Article 1 — Objet</h2>
+        <p>Les présentes Conditions Générales d'Utilisation (CGU) régissent l'utilisation du service Emploia, accessible sur emploia.fr, proposé par Emploia SAS.</p>
+
+        <h2>Article 2 — Acceptation</h2>
+        <p>L'utilisation du service implique l'acceptation pleine et entière des présentes CGU. Si vous n'acceptez pas ces conditions, vous ne devez pas utiliser le service.</p>
+
+        <h2>Article 3 — Description du service</h2>
+        <p>Emploia est une plateforme de recherche d'emploi propulsée par l'IA qui propose :</p>
+        <ul>
+          <li>La génération de CVs ATS-optimisés</li>
+          <li>La génération de lettres de motivation personnalisées</li>
+          <li>L'analyse de score ATS</li>
+          <li>Un simulateur d'entretien IA</li>
+          <li>Une recherche d'offres d'emploi en France</li>
+          <li>Un tableau de bord de suivi des candidatures</li>
+        </ul>
+
+        <h2>Article 4 — Compte utilisateur</h2>
+        <p>Pour accéder aux fonctionnalités complètes, vous devez créer un compte. Vous êtes responsable de la confidentialité de vos identifiants. Toute utilisation frauduleuse doit être signalée immédiatement à <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>.</p>
+
+        <h2>Article 5 — Plans tarifaires</h2>
+        <h3>Plan Gratuit</h3>
+        <p>Inclut 5 générations IA, sans carte bancaire requise, pour une durée illimitée.</p>
+
+        <h3>Plan Pro (9€/mois)</h3>
+        <p>Générations illimitées, accès à toutes les fonctionnalités. Engagement mensuel, résiliable à tout moment. L'essai gratuit de 7 jours n'est pas débité si annulé avant expiration.</p>
+
+        <h3>Plan Intensif (19€/mois)</h3>
+        <p>Inclut tout le plan Pro + coaching 1:1 mensuel. Mêmes conditions de résiliation.</p>
+
+        <h2>Article 6 — Paiement et résiliation</h2>
+        <p>Les paiements sont traités par Stripe (PCI DSS certifié). Vous pouvez résilier à tout moment depuis votre espace compte. La résiliation prend effet à la fin de la période en cours, sans remboursement partiel.</p>
+
+        <h2>Article 7 — Contenu généré par l'IA</h2>
+        <div class="legal-highlight">
+          <p>⚠️ Les contenus générés par l'IA (CVs, lettres, analyses) sont fournis à titre indicatif. Emploia ne garantit pas l'obtention d'un emploi. Vous êtes responsable de vérifier et personnaliser les contenus avant envoi.</p>
+        </div>
+
+        <h2>Article 8 — Propriété des contenus</h2>
+        <p>Vous conservez la propriété de toutes les données et documents que vous soumettez. En utilisant le service, vous accordez à Emploia une licence limitée pour traiter ces données dans le seul but de fournir le service.</p>
+
+        <h2>Article 9 — Comportement interdit</h2>
+        <ul>
+          <li>Utiliser le service à des fins illégales ou frauduleuses</li>
+          <li>Tenter de contourner les limitations du plan gratuit</li>
+          <li>Revendre ou redistribuer l'accès au service</li>
+          <li>Soumettre des contenus offensants, discriminatoires ou illégaux</li>
+        </ul>
+
+        <h2>Article 10 — Modification des CGU</h2>
+        <p>Emploia se réserve le droit de modifier ces CGU à tout moment. Les utilisateurs seront informés par email au moins 30 jours avant toute modification substantielle.</p>
+
+        <h2>Article 11 — Droit applicable</h2>
+        <p>Les présentes CGU sont soumises au droit français. En cas de litige, les tribunaux compétents de Paris seront seuls compétents, sauf disposition légale contraire.</p>
+
+        <h2>Article 12 — Contact</h2>
+        <p>Pour toute question : <a href="mailto:contact@emploia.fr">contact@emploia.fr</a></p>
+      </div>
+    </div>
+
+    <!-- ── COOKIES ─────────────────────────── -->
+    <div class="legal-section" id="sec-cookies">
+      <div class="legal-header">
+        <h1>Politique de cookies</h1>
+        <p>Dernière mise à jour : 1er janvier 2024</p>
+      </div>
+      <div class="legal-body">
+        <h2>Qu'est-ce qu'un cookie ?</h2>
+        <p>Un cookie est un petit fichier texte déposé sur votre appareil lors de la visite d'un site web. Il permet au site de mémoriser vos préférences et d'améliorer votre expérience.</p>
+
+        <h2>Cookies utilisés par Emploia</h2>
+        <table class="legal-table">
+          <tr><th>Cookie</th><th>Type</th><th>Durée</th><th>Finalité</th></tr>
+          <tr><td>emploia_session</td><td>Essentiel</td><td>Session</td><td>Authentification utilisateur</td></tr>
+          <tr><td>emploia_cookie_v1</td><td>Essentiel</td><td>1 an</td><td>Mémorisation du consentement cookies</td></tr>
+          <tr><td>emploia_saved_jobs</td><td>Fonctionnel</td><td>Local</td><td>Offres sauvegardées (localStorage)</td></tr>
+          <tr><td>_plausible</td><td>Analytique</td><td>1 an</td><td>Statistiques anonymes (si consentement)</td></tr>
+        </table>
+
+        <h2>Cookies tiers</h2>
+        <ul>
+          <li><strong style="color:var(--t1)">Stripe</strong> — Nécessaires au traitement sécurisé des paiements</li>
+          <li><strong style="color:var(--t1)">Plausible Analytics</strong> — Statistiques anonymes (aucun suivi inter-sites, RGPD-friendly)</li>
+        </ul>
+
+        <h2>Gérer vos préférences</h2>
+        <p>Vous pouvez à tout moment modifier vos préférences de cookies en cliquant sur le bouton ci-dessous ou en effaçant les cookies de votre navigateur.</p>
+        <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="localStorage.removeItem('emploia_cookie_v1');empToast('Préférences réinitialisées — rechargez la page','info')">Modifier mes préférences</button>
+          <button class="btn btn-ghost btn-sm" onclick="localStorage.setItem('emploia_cookie_v1','declined');empToast('Cookies analytiques refusés','info')">Refuser les cookies analytiques</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="emp-footer">
+  <div style="max-width:860px;margin:0 auto;padding-top:24px;border-top:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <p style="font-size:12px;color:var(--t3)">© <span id="yr"></span> Emploia. Tous droits réservés.</p>
+    <div style="display:flex;gap:16px">
+      <a href="#" onclick="showLegal('mentions',document.querySelector('.legal-nav a'));return false" style="font-size:12px;color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Mentions légales</a>
+      <a href="#" onclick="showLegal('privacy',null);return false" style="font-size:12px;color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Confidentialité</a>
+      <a href="#" onclick="showLegal('cgu',null);return false" style="font-size:12px;color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">CGU</a>
+    </div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  function showLegal(id, btn) {
+    document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('active');
+    document.querySelectorAll('.legal-nav a').forEach(a => a.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Handle URL hash
+  const hash = window.location.hash.replace('#', '');
+  if (['mentions', 'privacy', 'cgu', 'cookies'].includes(hash)) {
+    const btn = document.querySelector(`.legal-nav a[onclick*="${hash}"]`);
+    showLegal(hash, btn);
+  }
+</script>
+</body>
+</html>

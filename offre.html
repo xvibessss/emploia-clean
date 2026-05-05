@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Développeur Full Stack React — BNP Paribas | Emploia</title>
+  <meta name="description" content="CDI · Paris 9e · 45 000–55 000€/an. Postulez avec un CV ATS-optimisé généré en 30 secondes par Emploia."/>
+  <link rel="canonical" href="https://emploia.fr/offre/developpeur-full-stack-bnp-paribas"/>
+  <link rel="manifest" href="manifest.json"/>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"JobPosting","title":"Développeur Full Stack React","hiringOrganization":{"@type":"Organization","name":"BNP Paribas"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":"Paris","addressRegion":"Île-de-France","addressCountry":"FR"}},"employmentType":"FULL_TIME","baseSalary":{"@type":"MonetaryAmount","currency":"EUR","value":{"@type":"QuantitativeValue","minValue":45000,"maxValue":55000,"unitText":"YEAR"}},"datePosted":"2024-01-15","description":"Nous recherchons un développeur Full Stack React/Node.js pour rejoindre notre équipe Digital Banking."}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .job-detail-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 100px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── MAIN CONTENT ───────────────────────── */
+    .job-main { display: flex; flex-direction: column; gap: 20px; }
+
+    /* JOB HEADER */
+    .job-header {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    .jh-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .jh-logo {
+      width: 64px; height: 64px;
+      border-radius: 14px;
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .jh-info { flex: 1; }
+
+    .jh-company {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blb);
+      margin-bottom: 6px;
+    }
+
+    .jh-title {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -.8px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .jh-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .jh-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--brd);
+      flex-wrap: wrap;
+    }
+
+    .match-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--grad-primary);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99,102,241,.3);
+    }
+
+    /* SCORE MINI */
+    .score-mini-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .sm-box {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .sm-num {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+
+    .sm-lbl { font-size: 10px; color: var(--t3); margin-top: 3px; }
+
+    /* CONTENT SECTIONS */
+    .content-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .cc-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--brd);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t1);
+    }
+
+    .cc-body { padding: 24px; }
+
+    .job-desc-text {
+      font-size: 14px;
+      color: var(--t2);
+      line-height: 1.85;
+    }
+
+    .job-desc-text h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--t1);
+      margin: 20px 0 10px;
+    }
+
+    .job-desc-text ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0;
+    }
+
+    .job-desc-text li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13.5px;
+    }
+
+    .job-desc-text li::before {
+      content: '→';
+      color: var(--blb);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* KEYWORDS */
+    .keywords-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .kw-tag {
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      color: var(--t2);
+      transition: all .15s;
+    }
+
+    .kw-tag.match { background: var(--bld); border-color: rgba(59,130,246,.2); color: var(--blb); }
+    .kw-tag.missing { background: var(--rnd); border-color: rgba(239,68,68,.15); color: var(--rnb); }
+
+    /* SIMILAR JOBS */
+    .similar-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--brd);
+      cursor: pointer;
+      transition: all .15s;
+      text-decoration: none;
+    }
+
+    .similar-card:last-child { border-bottom: none; padding-bottom: 0; }
+    .similar-card:first-child { padding-top: 0; }
+
+    .similar-card:hover .sc-title-text { color: var(--blb); }
+
+    .sc-logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .sc-title-text { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 3px; transition: color .15s; }
+    .sc-meta { font-size: 11px; color: var(--t3); }
+
+    /* ── SIDEBAR ────────────────────────────── */
+    .job-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
+
+    .apply-card {
+      background: var(--s2);
+      border: 1px solid var(--brdh);
+      border-radius: 18px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .apply-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad-primary);
+    }
+
+    .apply-price {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--gnb);
+      margin-bottom: 4px;
+      letter-spacing: -.5px;
+    }
+
+    .apply-type { font-size: 12px; color: var(--t3); margin-bottom: 20px; }
+
+    .apply-meta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+    .apply-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--t2);
+    }
+
+    .apply-meta-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .ats-alert {
+      background: rgba(99,102,241,.08);
+      border: 1px solid rgba(99,102,241,.18);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .ats-alert-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--inb);
+      margin-bottom: 4px;
+    }
+
+    .ats-alert p {
+      font-size: 11px;
+      color: var(--t3);
+      line-height: 1.6;
+    }
+
+    .company-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .company-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .company-logo-sm {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .company-name { font-size: 15px; font-weight: 800; color: var(--t1); margin-bottom: 2px; }
+    .company-sector { font-size: 11px; color: var(--t3); }
+
+    .company-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .cs-item {
+      background: var(--s3);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .cs-num { font-size: 16px; font-weight: 800; color: var(--blb); }
+    .cs-lbl { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+    /* MOBILE APPLY BAR */
+    .mobile-apply-bar {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      left: 0; right: 0;
+      z-index: 200;
+      background: rgba(7,12,24,.97);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--brd);
+      padding: 12px 16px;
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .job-detail-layout { grid-template-columns: 1fr; }
+      .job-sidebar { display: none; }
+      .mobile-apply-bar { display: flex; }
+      .score-mini-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a active">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/app" class="emp-nav-cta">Essai gratuit →</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<!-- BREADCRUMB -->
+<div style="max-width:1100px;margin:0 auto;padding:16px 24px 0;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3)">
+  <a href="/" style="color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Accueil</a>
+  <span>›</span>
+  <a href="/jobs" style="color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Offres</a>
+  <span>›</span>
+  <span style="color:var(--t2)">Développeur Full Stack React</span>
+</div>
+
+<div class="job-detail-layout">
+
+  <!-- MAIN -->
+  <main class="job-main">
+
+    <!-- JOB HEADER -->
+    <div class="job-header">
+      <div class="jh-top">
+        <div class="jh-logo">🏦</div>
+        <div class="jh-info">
+          <div class="jh-company">BNP Paribas</div>
+          <h1 class="jh-title">Développeur Full Stack React / Node.js</h1>
+          <div class="jh-badges">
+            <span class="badge badge-blue">💼 CDI</span>
+            <span class="badge badge-gray">📍 Paris 9e</span>
+            <span class="badge badge-green">🏠 Hybride (3j/semaine)</span>
+            <span class="badge badge-yellow">💰 45 000 — 55 000 €</span>
+            <span class="badge badge-red">🔥 Nouveau</span>
+          </div>
+        </div>
+        <div class="match-badge">✨ 92% match</div>
+      </div>
+
+      <!-- ATS SCORE MINI -->
+      <div style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:4px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Analyse IA de compatibilité avec votre profil</div>
+        <div class="score-mini-row">
+          <div class="sm-box">
+            <div class="sm-num" style="color:var(--gnb)">92%</div>
+            <div class="sm-lbl">Match global</div>
+          </div>
+          <div class="sm-box">
+            <div class="sm-num" style="color:var(--blb)">8/10</div>
+            <div class="sm-lbl">Compétences</div>
+          </div>
+          <div class="sm-box">
+            <div class="sm-num" style="color:var(--ylb)">3 ans</div>
+            <div class="sm-lbl">Expérience</div>
+          </div>
+          <div class="sm-box">
+            <div class="sm-num" style="color:#c084fc">94</div>
+            <div class="sm-lbl">Score ATS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="jh-actions">
+        <button class="btn btn-primary btn-lg" onclick="genCV()">✨ Générer mon CV pour ce poste</button>
+        <a href="#" class="btn btn-secondary btn-lg" onclick="empToast('Redirection vers le site recruteur...','info');return false">Postuler directement →</a>
+        <button class="btn btn-ghost" onclick="saveJob(this)" id="saveBtn" style="padding:12px 16px">☆ Sauvegarder</button>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="content-card">
+      <div class="cc-header">📋 Description du poste</div>
+      <div class="cc-body">
+        <div class="job-desc-text">
+          <p>BNP Paribas Digital Banking recherche un <strong>Développeur Full Stack React / Node.js</strong> expérimenté pour rejoindre notre équipe produit en pleine croissance. Vous travaillerez sur des applications financières innovantes utilisées par des millions d'utilisateurs.</p>
+
+          <h3>Vos missions</h3>
+          <ul>
+            <li>Développer et maintenir des applications web React performantes et scalables</li>
+            <li>Concevoir des APIs REST et GraphQL avec Node.js / Express</li>
+            <li>Collaborer avec les équipes Design, Produit et DevOps dans un cadre Agile</li>
+            <li>Participer aux revues de code et garantir la qualité via les tests unitaires (Jest, Cypress)</li>
+            <li>Optimiser les performances et l'accessibilité des interfaces</li>
+            <li>Contribuer à l'architecture technique et aux choix technologiques</li>
+          </ul>
+
+          <h3>Profil recherché</h3>
+          <ul>
+            <li>3+ ans d'expérience en développement Full Stack</li>
+            <li>Maîtrise de React (hooks, context, Redux) et TypeScript</li>
+            <li>Bonne connaissance de Node.js et des bases de données relationnelles (PostgreSQL)</li>
+            <li>Expérience avec les pratiques CI/CD (GitHub Actions, Docker)</li>
+            <li>Sensibilité pour la performance et la sécurité des applications</li>
+            <li>Bon niveau d'anglais professionnel</li>
+          </ul>
+
+          <h3>Ce que nous offrons</h3>
+          <ul>
+            <li>Salaire : 45 000 — 55 000 € selon expérience + participation + intéressement</li>
+            <li>Télétravail hybride : 3 jours/semaine à distance</li>
+            <li>Tickets restaurant, mutuelle, CE avantageux</li>
+            <li>Plan formation annuel de 5 000€ + accès Udemy Business</li>
+            <li>Équipe internationale de 12 développeurs, culture bienveillante</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEYWORDS ATS -->
+    <div class="content-card">
+      <div class="cc-header">🎯 Mots-clés ATS détectés</div>
+      <div class="cc-body">
+        <p style="font-size:12px;color:var(--t3);margin-bottom:16px;line-height:1.6">Les mots-clés <span style="color:var(--blb);font-weight:700">en bleu</span> sont déjà dans votre profil. Les <span style="color:var(--rnb);font-weight:700">en rouge</span> sont à ajouter pour maximiser votre score ATS.</p>
+        <div class="keywords-wrap">
+          <span class="kw-tag match">React</span>
+          <span class="kw-tag match">TypeScript</span>
+          <span class="kw-tag match">Node.js</span>
+          <span class="kw-tag match">PostgreSQL</span>
+          <span class="kw-tag match">REST API</span>
+          <span class="kw-tag match">Agile</span>
+          <span class="kw-tag match">CI/CD</span>
+          <span class="kw-tag">GraphQL</span>
+          <span class="kw-tag missing">Cypress</span>
+          <span class="kw-tag missing">GitHub Actions</span>
+          <span class="kw-tag">Docker</span>
+          <span class="kw-tag missing">Redux</span>
+          <span class="kw-tag">Jest</span>
+          <span class="kw-tag match">Git</span>
+          <span class="kw-tag missing">Performance</span>
+          <span class="kw-tag">Accessibilité</span>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="genCV()">✨ Générer le CV optimisé avec tous ces mots-clés</button>
+      </div>
+    </div>
+
+    <!-- SIMILAR JOBS -->
+    <div class="content-card">
+      <div class="cc-header">🔗 Offres similaires</div>
+      <div class="cc-body" style="padding:16px 24px">
+        <a href="/offre/dev-react-doctolib" class="similar-card">
+          <div class="sc-logo">🏥</div>
+          <div style="flex:1">
+            <div class="sc-title-text">Développeur Frontend React</div>
+            <div class="sc-meta">Doctolib · Paris 9e · CDI · 42–50k€</div>
+          </div>
+          <span class="badge badge-green">89% match</span>
+        </a>
+        <a href="/offre/dev-fullstack-alan" class="similar-card">
+          <div class="sc-logo">🌊</div>
+          <div style="flex:1">
+            <div class="sc-title-text">Développeur Full Stack (React/Python)</div>
+            <div class="sc-meta">Alan · Paris 8e · CDI · 48–60k€</div>
+          </div>
+          <span class="badge badge-blue">85% match</span>
+        </a>
+        <a href="/offre/dev-react-remote" class="similar-card">
+          <div class="sc-logo">🏠</div>
+          <div style="flex:1">
+            <div class="sc-title-text">Lead Developer React (Full Remote)</div>
+            <div class="sc-meta">Startup SaaS · Remote · CDI · 55–70k€</div>
+          </div>
+          <span class="badge badge-indigo">82% match</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="job-sidebar">
+
+    <!-- APPLY CARD -->
+    <div class="apply-card">
+      <div class="apply-price">45 000 — 55 000 €</div>
+      <div class="apply-type">Par an · CDI · Paris 9e</div>
+
+      <div class="apply-meta">
+        <div class="apply-meta-item">
+          <div class="apply-meta-icon">📍</div>
+          <span>Paris 9e · Île-de-France</span>
+        </div>
+        <div class="apply-meta-item">
+          <div class="apply-meta-icon">🏠</div>
+          <span>Hybride · 3 jours remote/semaine</span>
+        </div>
+        <div class="apply-meta-item">
+          <div class="apply-meta-icon">📅</div>
+          <span>Publié il y a 2 jours</span>
+        </div>
+        <div class="apply-meta-item">
+          <div class="apply-meta-icon">👥</div>
+          <span>~47 candidats ont postulé</span>
+        </div>
+        <div class="apply-meta-item">
+          <div class="apply-meta-icon">⏱️</div>
+          <span>Processus : 3–4 semaines</span>
+        </div>
+      </div>
+
+      <div class="ats-alert">
+        <div class="ats-alert-title">✨ Conseil Emploia</div>
+        <p>Votre profil correspond à <strong>92%</strong> des critères. Générez un CV personnalisé pour maximiser vos chances.</p>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;margin-bottom:10px;font-size:14px;padding:14px" onclick="genCV()">✨ Générer mon CV ATS — 30s</button>
+      <a href="#" class="btn btn-ghost" style="width:100%;font-size:13px" onclick="empToast('Redirection...','info');return false">Postuler directement</a>
+    </div>
+
+    <!-- COMPANY CARD -->
+    <div class="company-card">
+      <div class="company-card-header">
+        <div class="company-logo-sm">🏦</div>
+        <div>
+          <div class="company-name">BNP Paribas</div>
+          <div class="company-sector">Finance · Banque · Tech</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--t3);line-height:1.65">1er groupe bancaire européen, présent dans 65 pays. Transformation digitale en cours avec une forte culture tech.</p>
+      <div class="company-stats">
+        <div class="cs-item">
+          <div class="cs-num">190k</div>
+          <div class="cs-lbl">Employés</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num">65</div>
+          <div class="cs-lbl">Pays</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num">4.2⭐</div>
+          <div class="cs-lbl">Glassdoor</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num">12</div>
+          <div class="cs-lbl">Postes ouverts</div>
+        </div>
+      </div>
+      <a href="/jobs?q=BNP+Paribas" class="btn btn-ghost btn-sm" style="width:100%;margin-top:14px">Voir toutes les offres →</a>
+    </div>
+
+    <!-- SHARE -->
+    <div style="background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Partager cette offre</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="navigator.clipboard.writeText(window.location.href);empToast('Lien copié !','success')" class="btn btn-ghost btn-sm" style="flex:1">🔗 Copier le lien</button>
+        <button onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(window.location.href),'_blank')" class="btn btn-ghost btn-sm">in</button>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- MOBILE APPLY BAR -->
+<div class="mobile-apply-bar">
+  <button class="btn btn-primary" style="flex:1" onclick="genCV()">✨ Générer mon CV</button>
+  <button class="btn btn-secondary" onclick="empToast('Redirection...','info')">Postuler →</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  function genCV() {
+    sessionStorage.setItem('emp_prefill', JSON.stringify({
+      title: 'Développeur Full Stack React / Node.js',
+      company: 'BNP Paribas',
+      desc: 'Développement applications React / Node.js. Maîtrise React TypeScript Node.js PostgreSQL REST API Agile CI/CD.'
+    }));
+    empToast('Génération du CV en cours...', 'success');
+    setTimeout(() => window.location.href = '/app', 1000);
+  }
+
+  let isSaved = false;
+  function saveJob(btn) {
+    isSaved = !isSaved;
+    btn.textContent = isSaved ? '⭐ Sauvegardé' : '☆ Sauvegarder';
+    btn.style.color = isSaved ? 'var(--ylb)' : '';
+    empToast(isSaved ? 'Offre sauvegardée !' : 'Offre retirée des favoris', isSaved ? 'success' : 'info');
+  }
+</script>
+</body>
+</html>

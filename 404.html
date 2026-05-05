@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Page introuvable — Emploia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .error-page {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .error-glow {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .error-content {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+    }
+
+    .error-code {
+      font-size: clamp(80px, 15vw, 160px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -8px;
+      background: linear-gradient(135deg, var(--blb) 0%, var(--inb) 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      animation: fadeUp .5s ease both;
+    }
+
+    .error-title {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: -.6px;
+      margin-bottom: 14px;
+      animation: fadeUp .5s .1s ease both;
+    }
+
+    .error-sub {
+      font-size: 15px;
+      color: var(--t2);
+      line-height: 1.75;
+      margin-bottom: 36px;
+      animation: fadeUp .5s .15s ease both;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+      animation: fadeUp .5s .2s ease both;
+    }
+
+    .error-search {
+      animation: fadeUp .5s .25s ease both;
+      max-width: 440px;
+      margin: 0 auto 48px;
+    }
+
+    .error-search-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .error-suggestions {
+      animation: fadeUp .5s .3s ease both;
+    }
+
+    .error-suggestions-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .error-links {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .error-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      color: var(--t2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+    }
+
+    .error-link:hover {
+      border-color: var(--brdh);
+      color: var(--t1);
+      transform: translateY(-2px);
+    }
+
+    .error-illustration {
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: fadeUp .4s ease both;
+      display: block;
+    }
+
+    /* Floating particles */
+    .particle {
+      position: absolute;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(99,102,241,.4);
+      pointer-events: none;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/app" class="emp-nav-cta">Commencer →</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<!-- ERROR PAGE -->
+<div class="error-page">
+  <div class="error-glow"></div>
+
+  <!-- Floating particles -->
+  <div id="particles"></div>
+
+  <div class="error-content">
+    <span class="error-illustration">🔍</span>
+    <div class="error-code">404</div>
+    <h1 class="error-title">Cette page est introuvable</h1>
+    <p class="error-sub">La page que vous cherchez n'existe pas ou a été déplacée. Pas d'inquiétude — votre prochaine opportunité professionnelle, elle, existe bien !</p>
+
+    <div class="error-actions">
+      <a href="/" class="btn btn-primary btn-lg">🏠 Retour à l'accueil</a>
+      <a href="/jobs" class="btn btn-ghost btn-lg">📋 Voir les offres</a>
+    </div>
+
+    <!-- Search -->
+    <div class="error-search">
+      <p style="font-size:13px;color:var(--t3);margin-bottom:12px">Ou cherchez directement une offre :</p>
+      <div class="error-search-row">
+        <input type="text" class="emp-input" id="errSearch" placeholder="Développeur, Marketing, RH..." style="flex:1"/>
+        <button class="btn btn-primary" onclick="errSearch()">Chercher</button>
+      </div>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="error-suggestions">
+      <div class="error-suggestions-title">Pages populaires</div>
+      <div class="error-links">
+        <a href="/app" class="error-link">✨ Générer un CV</a>
+        <a href="/jobs" class="error-link">📋 Offres d'emploi</a>
+        <a href="/interview" class="error-link">🎤 Simuler un entretien</a>
+        <a href="/dashboard" class="error-link">📊 Mon dashboard</a>
+        <a href="/blog" class="error-link">📝 Blog & Guides</a>
+        <a href="/referral" class="error-link">🎁 Parrainage</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  function errSearch() {
+    const q = document.getElementById('errSearch').value.trim();
+    if (q) window.location.href = '/jobs?q=' + encodeURIComponent(q);
+  }
+
+  document.getElementById('errSearch').addEventListener('keydown', e => {
+    if (e.key === 'Enter') errSearch();
+  });
+
+  // Generate floating particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      width: ${2 + Math.random() * 4}px;
+      height: ${2 + Math.random() * 4}px;
+      opacity: ${0.2 + Math.random() * 0.4};
+      animation-duration: ${6 + Math.random() * 8}s;
+      animation-delay: ${-Math.random() * 8}s;
+      background: ${['rgba(99,102,241,.4)','rgba(59,130,246,.4)','rgba(16,185,129,.3)'][Math.floor(Math.random()*3)]};
+    `;
+    container.appendChild(p);
+  }
+</script>
+</body>
+</html>
