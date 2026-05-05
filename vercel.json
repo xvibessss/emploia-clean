@@ -5,16 +5,19 @@
   "outputDirectory": ".",
   "installCommand": "echo ok",
   "functions": {
-    "api/generate.js": {
+    "api/generate/cv.js": {
       "maxDuration": 45
+    },
+    "api/generate/cover-letter.js": {
+      "maxDuration": 45
+    },
+    "api/generate/ats-score.js": {
+      "maxDuration": 30
     },
     "api/chat.js": {
       "maxDuration": 25
     },
     "api/jobs.js": {
-      "maxDuration": 20
-    },
-    "api/jobs-search.js": {
       "maxDuration": 20
     },
     "api/stripe-checkout.js": {
@@ -34,9 +37,6 @@
     },
     "api/health.js": {
       "maxDuration": 5
-    },
-    "api/stripe-webhook.js": {
-      "maxDuration": 10
     },
     "api/sitemap.js": {
       "maxDuration": 5
