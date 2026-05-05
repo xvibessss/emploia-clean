@@ -40,17 +40,17 @@ async function fetchJSearch(q, type, location, page) {
   if (!key) return [];
   try {
     const typeMap = { stage:'INTERN', alternance:'INTERN', cdd:'CONTRACTOR', cdi:'FULLTIME', freelance:'CONTRACTOR' };
+    const locStr = location || 'Paris France';
     const query = [
-      q || 'emploi',
+      q || 'emploi CDI',
       type === 'stage' ? 'stage internship' : type === 'alternance' ? 'alternance' : '',
-      location || 'France'
-    ].filter(Boolean).join(' ');
+    ].filter(Boolean).join(' ') + ' ' + locStr;
     const params = new URLSearchParams({
       query,
       num_pages: '1',
       page: String(page + 1),
       country: 'fr',
-      date_posted: 'week',
+      date_posted: 'month',
       ...(typeMap[type] ? { employment_type: typeMap[type] } : {}),
     });
     const res = await withTimeout(
@@ -111,7 +111,13 @@ async function fetchFrenchMarket(q, type, location, page) {
     );
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.data || []).map(j => ({
+    const DOM_TOM = ['martinique', 'guadeloupe', 'guyane', 'réunion', 'reunion', 'mayotte', 'lamentin', 'cayenne', 'saint-denis - 97'];
+    return (data.data || [])
+      .filter(j => {
+        const loc = (j.location || '').toLowerCase();
+        return !DOM_TOM.some(d => loc.includes(d));
+      })
+      .map(j => ({
       id: 'fm_' + j.job_id,
       title: j.title,
       company: j.company || 'Confidentiel',
