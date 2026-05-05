@@ -317,14 +317,17 @@ function prioritizeByCountry(jobs) {
 }
 
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
-export default async function handler(req) {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
+export default async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    return res.status(204).end();
+  }
 
-  const url      = new URL(req.url);
-  const q        = url.searchParams.get('q') || '';
-  const type     = (url.searchParams.get('type') || '').toLowerCase();
-  const location = url.searchParams.get('location') || '';
-  const page     = Math.max(0, parseInt(url.searchParams.get('page') || '0'));
+  const q        = req.query?.q || '';
+  const type     = (req.query?.type || '').toLowerCase();
+  const location = req.query?.location || '';
+  const page     = Math.max(0, parseInt(req.query?.page || '0'));
 
   try {
     const [ftRes, adzRes, jsRes, rmRes, abRes, tmRes, ajdbRes] = await Promise.allSettled([
@@ -359,14 +362,14 @@ export default async function handler(req) {
         'The Muse': tmRes.status === 'fulfilled' && (tmRes.value?.length ?? 0) > 0,
         'Active Jobs DB': ajdbRes.status === 'fulfilled' && (ajdbRes.value?.length ?? 0) > 0,
       };
-      return new Response(JSON.stringify({
+      return res.status(200).setHeader('Content-Type','application/json').setHeader('Access-Control-Allow-Origin','*').send({
         jobs: final,
         total: final.length,
         page,
         demo: false,
         sources: activeSources,
         sourcesStatus,
-      }), { status: 200, headers: H });
+      });
     }
   } catch {}
 
