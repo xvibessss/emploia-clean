@@ -141,8 +141,14 @@ async function fetchInternships(q, type, location) {
   const key = process.env.RAPIDAPI_KEY;
   if (!key) return [];
   try {
+    const params = new URLSearchParams({
+      location_filter: location || 'France',
+      limit: '15',
+      description_type: 'text',
+    });
+    if (q) params.set('title_filter', q);
     const res = await withTimeout(
-      fetch('https://internships-api.p.rapidapi.com/active-jb-7d', {
+      fetch(`https://internships-api.p.rapidapi.com/active-jb-7d?${params}`, {
         headers: {
           'x-rapidapi-host': 'internships-api.p.rapidapi.com',
           'x-rapidapi-key': key,
@@ -152,33 +158,34 @@ async function fetchInternships(q, type, location) {
     if (!res.ok) return [];
     const data = await res.json();
     const jobs = Array.isArray(data) ? data : (data.data || []);
-    const loc = (location || '').toLowerCase();
     return jobs
       .filter(j => {
         const countries = (j.countries_derived || []).map(c => c.toLowerCase());
-        const isEU = countries.some(c => ['france','fr','belgium','switzerland','luxembourg','europe'].includes(c));
-        const isRemote = j.remote_derived === true || j.location_type === 'REMOTE';
-        const matchQ = !q || (j.title||'').toLowerCase().includes(q.toLowerCase()) ||
-                       (j.organization||'').toLowerCase().includes(q.toLowerCase());
-        const matchLoc = !loc || (j.locations_derived||[]).some(l => l.toLowerCase().includes(loc));
-        return (isEU || isRemote) && matchQ && (!loc || matchLoc || isRemote);
+        const isFR = countries.some(c => ['france','fr'].includes(c));
+        const isRemote = j.remote_derived === true;
+        return isFR || isRemote;
       })
-      .slice(0, 8)
-      .map(j => ({
-        id: 'int_' + j.id,
-        title: j.title,
-        company: j.organization || 'Confidentiel',
-        location: j.remote_derived ? 'Remote' : ((j.locations_derived || [])[0] || 'Europe'),
-        type: j.employment_type?.includes('INTERN') ? 'Stage' : 'Alternance',
-        salary: j.salary_raw || null,
-        description: (j.linkedin_org_slogan || j.linkedin_org_description || '').slice(0, 300),
-        url: j.url || j.external_apply_url || '',
-        date: j.date_posted || new Date().toISOString(),
-        remote: j.remote_derived || false,
-        source: 'LinkedIn Internships',
-        logo: j.organization_logo || null,
-        country: 'FR',
-      }));
+      .slice(0, 10)
+      .map(j => {
+        const loc = (j.locations_derived || j.cities_derived || [])[0] || 'France';
+        const empType = (j.employment_type || '').toUpperCase();
+        const isAlternance = j.title?.toLowerCase().includes('alternance') || j.title?.toLowerCase().includes('apprenti');
+        return {
+          id: 'int_' + j.id,
+          title: j.title,
+          company: j.organization || 'Confidentiel',
+          location: j.remote_derived ? 'Remote · France' : loc,
+          type: isAlternance ? 'Alternance' : empType.includes('INTERN') ? 'Stage' : 'Stage',
+          salary: j.salary_raw || null,
+          description: (j.linkedin_org_slogan || j.linkedin_org_description || '').slice(0, 300),
+          url: j.url || j.external_apply_url || '',
+          date: j.date_posted || new Date().toISOString(),
+          remote: j.remote_derived || false,
+          source: 'LinkedIn Internships',
+          logo: j.organization_logo || null,
+          country: 'FR',
+        };
+      });
   } catch { return []; }
 }
 
