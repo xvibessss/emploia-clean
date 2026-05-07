@@ -812,7 +812,7 @@
 <script src="shared.js"></script>
 <script>
   let currentType = 'tous', currentPage = 0;
-  const saved = new Set(JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'));
+  const saved = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'); } catch { return []; } })());
 
   function setType(btn) {
     document.querySelectorAll('.type-chip').forEach(b => b.classList.remove('active'));
@@ -823,10 +823,6 @@
   }
 
   function doSearch() { currentPage = 0; loadJobs(); }
-
-  function esc(s) {
-    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  }
 
   function hashScore(str) {
     let h = 5381;

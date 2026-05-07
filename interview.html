@@ -6,7 +6,15 @@
   <title>Entretien IA — Préparez votre entretien d'embauche · Emploia</title>
   <meta name="description" content="Simulez votre entretien d'embauche avec une IA. Questions personnalisées selon votre poste, feedback en temps réel."/>
   <link rel="canonical" href="https://emploia.fr/interview"/>
+  <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
+  <meta property="og:title" content="Entretien IA — Simulateur d'entretien · Emploia"/>
+  <meta property="og:description" content="Simulez votre entretien d'embauche avec une IA. Questions personnalisées, feedback en temps réel."/>
+  <meta property="og:image" content="https://emploia.fr/opengraph.jpg"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/interview"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://emploia.fr/opengraph.jpg"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     body { background: var(--bg3); height: 100vh; overflow: hidden; }
@@ -503,9 +511,9 @@
 </div>
 
 <div class="iv-mobile-tabs">
-  <button class="iv-mt" onclick="showMobile('sidebar')">⚙️ Config</button>
-  <button class="iv-mt active" onclick="showMobile('chat')">💬 Chat</button>
-  <button class="iv-mt" onclick="showMobile('coach')">🎯 Coach</button>
+  <button class="iv-mt" onclick="showMobile(this,'sidebar')">⚙️ Config</button>
+  <button class="iv-mt active" onclick="showMobile(this,'chat')">💬 Chat</button>
+  <button class="iv-mt" onclick="showMobile(this,'coach')">🎯 Coach</button>
 </div>
 
 <div class="iv-page" id="ivPage">
@@ -537,22 +545,22 @@
 
     <h3 style="margin-top:8px">📋 Templates rapides</h3>
     <div class="templates-list">
-      <button class="tpl-card" onclick="loadTpl('rh')">
+      <button class="tpl-card" onclick="loadTpl(this,'rh')">
         <span class="tpl-card-emoji">👥</span>Entretien RH classique
       </button>
-      <button class="tpl-card" onclick="loadTpl('tech')">
+      <button class="tpl-card" onclick="loadTpl(this,'tech')">
         <span class="tpl-card-emoji">💻</span>Entretien technique
       </button>
-      <button class="tpl-card" onclick="loadTpl('compo')">
+      <button class="tpl-card" onclick="loadTpl(this,'compo')">
         <span class="tpl-card-emoji">🧠</span>Comportemental (STAR)
       </button>
-      <button class="tpl-card" onclick="loadTpl('manager')">
+      <button class="tpl-card" onclick="loadTpl(this,'manager')">
         <span class="tpl-card-emoji">👔</span>Avec le manager
       </button>
-      <button class="tpl-card" onclick="loadTpl('case')">
+      <button class="tpl-card" onclick="loadTpl(this,'case')">
         <span class="tpl-card-emoji">📊</span>Étude de cas
       </button>
-      <button class="tpl-card" onclick="loadTpl('salary')">
+      <button class="tpl-card" onclick="loadTpl(this,'salary')">
         <span class="tpl-card-emoji">💰</span>Négociation salariale
       </button>
     </div>
@@ -653,9 +661,9 @@
     level = btn.dataset.lvl;
   }
 
-  function showMobile(tab) {
+  function showMobile(btn, tab) {
     document.querySelectorAll('.iv-mt').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    btn.classList.add('active');
     const page = document.getElementById('ivPage');
     page.classList.remove('show-sidebar', 'show-coach');
     if (tab === 'sidebar') page.classList.add('show-sidebar');
@@ -668,11 +676,7 @@
     document.getElementById('ivSendBtn').disabled = !t.value.trim();
   }
 
-  function countWords() {
-    const txt = document.getElementById('ivInput').value;
-    const w = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-    // Live word count for current input
-  }
+  function countWords() {}
 
   function pushMsg(role, text, ts) {
     messages.push({ role, text, ts: ts || Date.now() });
@@ -683,12 +687,23 @@
     const time = new Date(ts || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     const div = document.createElement('div');
     div.className = 'iv-msg ' + role;
-    div.innerHTML = `
-      <div class="iv-msg-avatar">${role === 'bot' ? '🤖' : '🧑'}</div>
-      <div>
-        <div class="iv-msg-bubble">${text.replace(/\n/g,'<br>')}</div>
-        <div class="iv-msg-time" style="${role==='user'?'text-align:right':''}">${time}</div>
-      </div>`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'iv-msg-avatar';
+    avatar.textContent = role === 'bot' ? '🤖' : '🧑';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'iv-msg-bubble';
+    bubble.innerHTML = esc(text).replace(/\n/g, '<br>');
+
+    const ts = document.createElement('div');
+    ts.className = 'iv-msg-time';
+    if (role === 'user') ts.style.textAlign = 'right';
+    ts.textContent = time;
+
+    const wrapper = document.createElement('div');
+    wrapper.append(bubble, ts);
+    div.append(avatar, wrapper);
     document.getElementById('ivMessages').appendChild(div);
     document.getElementById('ivMessages').scrollTop = document.getElementById('ivMessages').scrollHeight;
   }
@@ -738,9 +753,9 @@
     startInterview();
   }
 
-  function loadTpl(tpl) {
+  function loadTpl(btn, tpl) {
     document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
-    event.target.closest('.tpl-card').classList.add('active');
+    btn.classList.add('active');
     const prompts = {
       rh: 'Entretien RH classique',
       tech: 'Entretien technique avec questions de code',
@@ -807,7 +822,12 @@
     }
     const item = document.createElement('div');
     item.className = 'feedback-item';
-    item.innerHTML = `<span class="feedback-emoji">${emoji}</span><div>${text}</div>`;
+    const emojiEl = document.createElement('span');
+    emojiEl.className = 'feedback-emoji';
+    emojiEl.textContent = emoji;
+    const textEl = document.createElement('div');
+    textEl.textContent = text;
+    item.append(emojiEl, textEl);
     list.insertBefore(item, list.firstChild);
     if (list.children.length > 6) list.lastChild.remove();
   }

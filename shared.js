@@ -2,6 +2,16 @@
    EMPLOIA — Shared JavaScript utilities
 ═══════════════════════════════════════════════════ */
 
+// HTML escaping — used by all pages to prevent XSS
+function esc(s) {
+  return (s == null ? '' : String(s))
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ── SCROLL PROGRESS ──────────────────────────────────
 (function() {
   const bar = document.getElementById('emp-scroll-prog');

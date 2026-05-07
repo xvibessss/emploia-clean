@@ -6,7 +6,15 @@
   <title>Générateur IA — Créez votre CV ATS en 30s · Emploia</title>
   <meta name="description" content="Générez en 30 secondes un CV optimisé ATS, une lettre de motivation percutante, ou un score ATS détaillé avec l'IA Emploia."/>
   <link rel="canonical" href="https://emploia.fr/app"/>
+  <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
+  <meta property="og:title" content="Générateur IA — CV ATS en 30s · Emploia"/>
+  <meta property="og:description" content="Générez en 30 secondes un CV optimisé ATS, une lettre de motivation percutante, ou un score ATS détaillé."/>
+  <meta property="og:image" content="https://emploia.fr/opengraph.jpg"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/app"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://emploia.fr/opengraph.jpg"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     body { background: var(--bg3); }
@@ -765,8 +773,10 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
           </div>
         </div>`;
     } else {
-      const text = typeof result === 'string' ? result : (result.result || result.text || JSON.stringify(result));
-      document.getElementById('resultArea').innerHTML = `<div class="result-content">${text}</div>`;
+      const rawText = typeof result === 'string' ? result : (result.result || result.text || JSON.stringify(result));
+      const resultArea = document.getElementById('resultArea');
+      resultArea.innerHTML = '<div class="result-content"></div>';
+      resultArea.querySelector('.result-content').textContent = rawText;
     }
   }
 

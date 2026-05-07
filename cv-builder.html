@@ -6,7 +6,17 @@
   <title>CV Builder — Créez votre CV professionnel · Emploia</title>
   <meta name="description" content="Créez et téléchargez un CV professionnel en quelques minutes. Preview en temps réel, 4 templates ATS-optimisés, export PDF gratuit."/>
   <link rel="canonical" href="https://emploia.fr/cv-builder"/>
+  <link rel="manifest" href="manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
+  <meta property="og:title" content="CV Builder — Créez votre CV professionnel · Emploia"/>
+  <meta property="og:description" content="Créez et téléchargez un CV professionnel en quelques minutes. Preview en temps réel, templates ATS-optimisés."/>
+  <meta property="og:image" content="https://emploia.fr/opengraph.jpg"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/cv-builder"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://emploia.fr/opengraph.jpg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     body { background: var(--bg3); overflow-x: hidden; }
@@ -803,8 +813,6 @@
       computeATS();
     }, 400);
   }
-
-  function esc(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function renderCV() {
     const paper = document.getElementById('cvPaper');
