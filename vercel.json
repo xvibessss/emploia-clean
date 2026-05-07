@@ -47,6 +47,18 @@
     "api/auth/logout.js": {
       "maxDuration": 5
     },
+    "api/auth/google.js": {
+      "maxDuration": 10
+    },
+    "api/auth/google/callback.js": {
+      "maxDuration": 15
+    },
+    "api/auth/forgot-password.js": {
+      "maxDuration": 15
+    },
+    "api/auth/reset-password.js": {
+      "maxDuration": 15
+    },
     "api/health.js": {
       "maxDuration": 5
     },
@@ -114,6 +126,14 @@
     {
       "source": "/legal",
       "destination": "/legal.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
+    },
+    {
+      "source": "/api/auth/google/callback",
+      "destination": "/api/auth/google/callback"
     },
     {
       "source": "/api/webhook/stripe",
