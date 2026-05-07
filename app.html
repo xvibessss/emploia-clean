@@ -689,22 +689,34 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
 
       const body = mode === 'ats' ? { jobOffer: job, cvText } : { jobOffer: job, profile };
 
-      // Demo response if API unavailable
-      let result;
-      try {
-        const res = await fetch(endpoints[mode], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        result = data.result || data;
-      } catch(e) {
-        // Fallback demo
-        await new Promise(r => setTimeout(r, 1500));
-        result = mode === 'ats' ? demoAtsResult() : demoTextResult();
+      const res = await fetch(endpoints[mode], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body)
+      });
+
+      if (res.status === 401) {
+        clearInterval(window._loadIntv);
+        document.getElementById('resultArea').innerHTML = '';
+        empShowAuth('login');
+        return;
       }
 
+      if (res.status === 402) {
+        clearInterval(window._loadIntv);
+        document.getElementById('resultArea').innerHTML = '';
+        showUpgradeModal();
+        return;
+      }
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Erreur de génération');
+      }
+
+      const data = await res.json();
+      const result = data.result || data;
       showResult(result);
     } catch (e) {
       showError(e.message || 'Erreur de génération');
@@ -791,6 +803,34 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       </div>`;
   }
 
+  function showUpgradeModal() {
+    let modal = document.getElementById('upgradeModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'upgradeModal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:800;background:rgba(4,8,15,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
+      modal.innerHTML = `
+        <div style="background:var(--s1);border:1px solid var(--brdh);border-radius:20px;padding:36px 32px;max-width:440px;width:100%;position:relative;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+          <button onclick="document.getElementById('upgradeModal').remove()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px">✕</button>
+          <div style="font-size:40px;margin-bottom:12px">🚀</div>
+          <h2 style="font-size:22px;font-weight:900;letter-spacing:-.6px;margin-bottom:8px">Vos 5 générations sont épuisées</h2>
+          <p style="color:var(--t2);font-size:14px;line-height:1.65;margin-bottom:24px">Vous avez utilisé vos <strong>5 générations gratuites</strong>. Passez Pro pour des générations illimitées — et décrochez votre entretien plus vite.</p>
+          <div style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;text-align:left">
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Générations illimitées (CV, lettre, score ATS)</div>
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Coaching entretien IA illimité</div>
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Optimisation LinkedIn</div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--gnb);background:var(--gnd);border-radius:8px;padding:8px 14px;display:inline-block;margin-bottom:16px">🎁 7 jours gratuits — 0€ débité aujourd'hui</div><br>
+          <a href="/#pricing" style="display:inline-block;width:100%;padding:15px;border-radius:11px;background:var(--grad-primary);color:#fff;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(99,102,241,.35);letter-spacing:-.2px">Démarrer l'essai gratuit Pro →</a>
+          <div style="margin-top:12px;font-size:12px;color:var(--t3)">9€/mois · Annulation en 1 clic · Sans engagement</div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    } else {
+      modal.style.display = 'flex';
+    }
+  }
+
   function resetResult() {
     document.getElementById('resultArea').innerHTML = `
       <div class="result-empty">
@@ -857,10 +897,17 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     if (!el) return;
     if (user) {
       const used = user.generationsUsed || 0;
-      const limit = user.plan === 'pro' ? '∞' : '5';
-      el.closest('.usage-pill').innerHTML = user.plan === 'pro'
-        ? `⭐ Plan Pro · générations illimitées`
-        : `✨ <span><strong>${used}</strong> / ${limit} générations gratuites</span><a href="#pricing" class="upgrade-link">Passer Pro</a>`;
+      const limit = 5;
+      const remaining = limit - used;
+      if (user.plan === 'pro') {
+        el.closest('.usage-pill').innerHTML = `⭐ Plan Pro · générations illimitées`;
+      } else if (remaining <= 0) {
+        el.closest('.usage-pill').innerHTML = `<span style="color:var(--rnb)">⛔ Limite atteinte</span> · <a href="/#pricing" class="upgrade-link">Passer Pro →</a>`;
+      } else if (remaining <= 2) {
+        el.closest('.usage-pill').innerHTML = `⚠️ <span style="color:var(--ylb)"><strong>${remaining}</strong> génération${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}</span> · <a href="/#pricing" class="upgrade-link">Passer Pro</a>`;
+      } else {
+        el.closest('.usage-pill').innerHTML = `✨ <span><strong>${used}</strong> / ${limit} générations gratuites</span><a href="/#pricing" class="upgrade-link">Passer Pro</a>`;
+      }
     }
   }
   window.addEventListener('empAuthChange', e => syncUsagePill(e.detail.user));
