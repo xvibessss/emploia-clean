@@ -68,6 +68,30 @@
   --grad-text: linear-gradient(135deg, var(--blb) 0%, var(--inb) 50%, #c084fc 100%);
 }
 
+body.light {
+  --bg:  #f8fafc;
+  --bg2: #f1f5f9;
+  --bg3: #e9eef6;
+  --s1:  #f1f5f9;
+  --s2:  #e9eef6;
+  --s3:  #dde4ef;
+  --s4:  #cdd5e0;
+  --brd:  rgba(0,0,0,.09);
+  --brdh: rgba(0,0,0,.16);
+  --brd2: rgba(0,0,0,.05);
+  --t1: #0f172a;
+  --t2: #475569;
+  --t3: #94a3b8;
+  --t4: #c8d4e3;
+  --bld:  rgba(59,130,246,.1);
+  --bls:  rgba(59,130,246,.05);
+  --ind2: rgba(99,102,241,.08);
+  --gnd:  rgba(16,185,129,.08);
+  --yld:  rgba(245,158,11,.08);
+  --rnd:  rgba(239,68,68,.06);
+  --vid:  rgba(139,92,246,.08);
+}
+
 html { scroll-behavior: smooth; }
 
 body {

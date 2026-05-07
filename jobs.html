@@ -847,7 +847,27 @@
 
   function doSearch() { currentPage = 0; loadJobs(); }
 
-  const scoreCache = {};
+  const SCORE_CACHE_KEY = 'emploia_scores_v1';
+  const SCORE_TTL = 86400000; // 24h
+
+  function loadScoreCache() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(SCORE_CACHE_KEY) || '{}');
+      const now = Date.now();
+      const fresh = {};
+      for (const [k, v] of Object.entries(raw)) {
+        if (v.ts && now - v.ts < SCORE_TTL) fresh[k] = v;
+      }
+      return fresh;
+    } catch { return {}; }
+  }
+
+  const scoreCache = loadScoreCache();
+
+  function persistScore(jobId, data) {
+    scoreCache[jobId] = { ...data, ts: Date.now() };
+    try { localStorage.setItem(SCORE_CACHE_KEY, JSON.stringify(scoreCache)); } catch {}
+  }
 
   async function analyzeScore(jobId, jobTitle, jobDescription, pillEl) {
     if (scoreCache[jobId]) { showScore(pillEl, scoreCache[jobId]); return; }
@@ -862,7 +882,7 @@
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      scoreCache[jobId] = data;
+      persistScore(jobId, data);
       showScore(pillEl, data);
     } catch {
       pillEl.textContent = '✨ Score';

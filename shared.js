@@ -431,11 +431,10 @@ window.empSubmitRegister = async function(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Erreur d'inscription");
-    empCloseModal('empAuthModal');
     window.empUser = data.user;
     empUpdateNav(data.user);
-    empToast('Compte créé ! Bienvenue ' + data.user.name.split(' ')[0] + ' 🎉', 'success');
     window.dispatchEvent(new CustomEvent('empAuthChange', { detail: { user: data.user } }));
+    window.location.href = '/onboarding';
   } catch (err) {
     errEl.textContent = err.message; errEl.style.display = 'block';
   } finally {
@@ -498,6 +497,8 @@ window.empUpdateNav = function(user) {
         <div class="emp-user-sep"></div>
         <div class="emp-user-plan">Plan : <strong>${user.plan === 'pro' ? '⭐ Pro' : 'Gratuit'}</strong></div>
         <div class="emp-user-sep"></div>
+        <button class="emp-user-theme" onclick="empToggleTheme()" id="empThemeBtn">${document.body.classList.contains('light') ? '🌙 Mode sombre' : '☀️ Mode clair'}</button>
+        <div class="emp-user-sep"></div>
         <button class="emp-user-logout" onclick="empLogout()">Déconnexion</button>
       </div>
     </div>`;
@@ -510,6 +511,17 @@ window.empUpdateNav = function(user) {
 window.empToggleUserMenu = function() {
   document.getElementById('empUserDropdown')?.classList.toggle('open');
 };
+
+window.empToggleTheme = function() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('empTheme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('empThemeBtn');
+  if (btn) btn.textContent = isLight ? '🌙 Mode sombre' : '☀️ Mode clair';
+};
+
+(function empInitTheme() {
+  if (localStorage.getItem('empTheme') === 'light') document.body.classList.add('light');
+})();
 
 async function empAuthInit() {
   // Handle OAuth redirect errors

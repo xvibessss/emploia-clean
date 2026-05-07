@@ -85,6 +85,44 @@ export default async function handler(req) {
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
 
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    const firstName = name.split(' ')[0];
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Emploia <noreply@emploia.fr>',
+        to: [email],
+        subject: `Bienvenue sur Emploia, ${firstName} ! 🎉`,
+        html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+<div style="max-width:520px;margin:40px auto;padding:0 20px">
+  <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px">
+      <div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div>
+    </div>
+    <div style="padding:32px">
+      <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Bienvenue, ${firstName} ! 🎉</h1>
+      <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez accès à votre copilote de candidature IA — le premier 100% français.</p>
+      <p style="color:#475569;line-height:1.6;margin:0 0 28px">Avec Emploia, générez des CV et lettres de motivation optimisés ATS, analysez votre score de compatibilité sur chaque offre, et entraînez-vous aux entretiens avec l'IA.</p>
+      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">Commencer ma recherche →</a>
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e2e8f0">
+        <p style="color:#64748b;font-size:13px;margin:0 0 12px;font-weight:600">Ce que vous pouvez faire :</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">✨</span><span style="color:#475569;font-size:13px"><strong>Générer</strong> — CV et lettre de motivation IA en 30 secondes</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard</strong> — Suivre toutes vos candidatures en kanban</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Entretien</strong> — Préparez-vous avec le coaching IA</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p>
+</div>
+</body></html>`,
+      }),
+    }).catch(() => {});
+  }
+
   const token = await signToken(id);
   const safeUser = { id, name, email, plan: "free" };
 

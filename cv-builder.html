@@ -807,10 +807,27 @@
   function saveCV() {
     document.getElementById('saveStatus').textContent = 'Saving...';
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
+    saveTimer = setTimeout(async () => {
       localStorage.setItem('emploia_cv', JSON.stringify(cv));
       document.getElementById('saveStatus').textContent = 'Sauvegardé';
       computeATS();
+      if (window.empUser) {
+        try {
+          await fetch('/api/profile', {
+            method: 'PUT', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firstName: cv.name?.split(' ')[0] || '',
+              lastName: cv.name?.split(' ').slice(1).join(' ') || '',
+              title: cv.role || '',
+              phone: cv.phone || '',
+              location: cv.city || '',
+              linkedin: cv.linkedin || '',
+              summary: cv.summary || '',
+            }),
+          });
+        } catch {}
+      }
     }, 400);
   }
 
@@ -999,10 +1016,35 @@
     setTimeout(() => window.print(), 600);
   }
 
+  async function loadFromProfile(user) {
+    const isDefault = cv.name === 'Marie Dupont';
+    if (!isDefault) return;
+    try {
+      const res = await fetch('/api/profile', { credentials: 'same-origin' });
+      if (!res.ok) return;
+      const p = await res.json();
+      const name = [p.firstName, p.lastName].filter(Boolean).join(' ') || user.name || '';
+      if (name) cv.name = name;
+      if (p.title) cv.role = p.title;
+      if (p.phone) cv.phone = p.phone;
+      if (p.location) cv.city = p.location;
+      if (p.linkedin) cv.linkedin = p.linkedin;
+      if (p.summary) cv.summary = p.summary;
+      if (p.skills?.length) cv.skills = p.skills.map(s => typeof s === 'string' ? { name: s, level: 80 } : s);
+      if (p.experience?.length) cv.exp = p.experience;
+      if (p.education?.length) cv.edu = p.education;
+      loadFields();
+      renderCV();
+    } catch {}
+  }
+
   // INIT
   loadFields();
   renderCV();
   computeATS();
+
+  window.addEventListener('empAuthChange', e => { if (e.detail?.user) loadFromProfile(e.detail.user); });
+  if (window.empUser) loadFromProfile(window.empUser);
 
   // Set template button active
   document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
