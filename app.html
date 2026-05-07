@@ -878,6 +878,45 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       empToast('Offre pré-remplie depuis la liste', 'success');
     } catch(e) {}
   }
+
+  // Post-Stripe success banner + plan poll
+  const urlP = new URLSearchParams(window.location.search);
+  if (urlP.get('success') === '1') {
+    history.replaceState(null, '', '/app');
+    if (!document.querySelector('style[data-emp-anim]')) {
+      const s = document.createElement('style');
+      s.dataset.empAnim = '1';
+      s.textContent = '@keyframes fadeDown{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+      document.head.appendChild(s);
+    }
+    const showProBanner = () => {
+      const banner = document.createElement('div');
+      banner.id = 'proBanner';
+      banner.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:1000;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:14px 28px;border-radius:14px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(16,185,129,.4);display:flex;align-items:center;gap:12px;max-width:92vw;animation:fadeDown .4s ease';
+      banner.innerHTML = `<span style="font-size:22px">🎉</span><div><div>Bienvenue dans le Plan Pro !</div><div style="font-weight:400;font-size:12px;opacity:.9;margin-top:2px">Générations illimitées activées — profitez de vos 7 jours d'essai.</div></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;margin-left:8px;opacity:.7">✕</button>`;
+      document.body.appendChild(banner);
+      setTimeout(() => banner?.remove(), 10000);
+    };
+    // Poll /api/auth/me until plan=pro (webhook may take a few seconds)
+    let polls = 0;
+    const pollPlan = setInterval(async () => {
+      polls++;
+      if (polls > 5) { clearInterval(pollPlan); showProBanner(); return; }
+      try {
+        const r = await fetch('/api/auth/me', { credentials: 'same-origin' });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.user?.plan === 'pro') {
+            clearInterval(pollPlan);
+            window.empUser = d.user;
+            empUpdateNav?.(d.user);
+            syncUsagePill(d.user);
+            showProBanner();
+          }
+        }
+      } catch {}
+    }, 2000);
+  }
 </script>
 </body>
 </html>

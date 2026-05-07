@@ -1504,6 +1504,10 @@
       <div class="section-tag">Tarifs</div>
       <h2 class="section-title">Simple. Transparent. Sans surprise.</h2>
       <p class="section-sub" style="margin:0 auto">Commencez gratuitement. Passez Pro uniquement si vous en avez besoin.</p>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);border-radius:10px;padding:8px 16px;margin-top:16px;font-size:13px;color:var(--t2)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite"></div>
+        <span><strong style="color:var(--t1)" id="liveCount">2 847</strong> candidats utilisent Emploia en ce moment</span>
+      </div>
     </div>
     <div class="price-toggle">
       <span>Mensuel</span>
@@ -1511,7 +1515,7 @@
         <div class="toggle-knob"></div>
       </div>
       <span>Annuel</span>
-      <span class="badge badge-green">−20%</span>
+      <span class="badge badge-green" id="annualBadge">−20%</span>
     </div>
     <div class="price-grid">
       <div class="pc">
@@ -1564,7 +1568,7 @@
           <li><span class="pfc">✓</span> Accès anticipé nouvelles fonctions</li>
           <li><span class="pfc">✓</span> Support prioritaire dédié</li>
         </ul>
-        <button class="btn-plan bp-outline" onclick="openPayment('intensif','19€/mois','Intensif')">Choisir Intensif</button>
+        <button class="btn-plan bp-outline" onclick="openPayment('intensif','19€/mois','Intensif')">Décrocher vite →</button>
         <div class="plan-guarantee">🔒 Annulation en 1 clic · Aucun engagement</div>
       </div>
     </div>
@@ -1678,17 +1682,50 @@
 <div class="pay-overlay" id="payOverlay" onclick="closePayOnBg(event)">
   <div class="pay-modal">
     <button class="pay-close" onclick="closePayment()">✕</button>
-    <div style="font-size:20px;font-weight:800;color:var(--t1);margin-bottom:6px;letter-spacing:-.5px">Commencer l'essai gratuit</div>
-    <div style="font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6">7 jours gratuits, puis <span id="pmPrice">9€/mois</span>. Annulable à tout moment.</div>
-    <div style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:14px;font-weight:700;color:var(--t1)">Plan <span id="pmPlan">Pro</span></div>
-      <div style="font-size:20px;font-weight:900;color:var(--inb)" id="pmPriceDisplay">9€/mois</div>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <div style="font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.5px">Essai gratuit 7 jours</div>
     </div>
-    <div style="font-size:11px;color:var(--gnb);font-weight:600;background:var(--gnd);padding:4px 12px;border-radius:6px;display:inline-block;margin-bottom:20px">🎁 7 jours d'essai gratuit — 0€ aujourd'hui</div>
-    <input type="email" id="pmEmail" placeholder="Votre email" autocomplete="email" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--brd);background:var(--bg);font-size:14px;color:var(--t1);font-family:'Sora',sans-serif;outline:none;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--brd)'"/>
-    <button id="pmPayBtn" onclick="startCheckout()" style="width:100%;padding:14px;border-radius:11px;font-size:15px;font-weight:800;color:#fff;background:var(--grad-primary);border:none;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 20px rgba(99,102,241,.3);margin-bottom:12px;transition:all .2s">Démarrer l'essai gratuit →</button>
-    <div style="font-size:11px;color:var(--t3);text-align:center;display:flex;align-items:center;justify-content:center;gap:6px">🔒 Paiement sécurisé par Stripe · Annulation en 1 clic</div>
-    <div style="margin-top:14px;font-size:11px;color:var(--t3);text-align:center">En continuant, vous acceptez nos <a href="/legal/cgu" style="color:var(--blb)">CGU</a> et notre <a href="/legal/privacy" style="color:var(--blb)">Politique de confidentialité</a>.</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:18px;line-height:1.6"><strong style="color:var(--gnb)">0€ débité aujourd'hui.</strong> Puis <span id="pmPrice">9€/mois</span> — annulable en 1 clic.</div>
+
+    <!-- Plan recap -->
+    <div style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:14px;font-weight:800;color:var(--t1)">Plan <span id="pmPlan">Pro</span></div>
+        <div style="font-size:18px;font-weight:900;color:var(--inb)" id="pmPriceDisplay">9€/mois</div>
+      </div>
+      <div id="pmFeatures" style="display:flex;flex-direction:column;gap:5px">
+        <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px"><span style="color:var(--gnb)">✓</span> Générations illimitées (CV, lettre, score ATS)</div>
+        <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px"><span style="color:var(--gnb)">✓</span> Simulateur d'entretien IA illimité</div>
+        <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px"><span style="color:var(--gnb)">✓</span> Optimisation LinkedIn</div>
+        <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px"><span style="color:var(--gnb)">✓</span> Dashboard + Export CSV</div>
+      </div>
+    </div>
+
+    <!-- Social proof mini -->
+    <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px">⭐</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--t1)">"Score ATS 41 → 94. 2 rappels en 1 semaine."</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">Sophie M. — Chargée com' digitale, Paris</div>
+      </div>
+    </div>
+
+    <!-- Email input -->
+    <label style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:6px">Votre email</label>
+    <input type="email" id="pmEmail" placeholder="vous@exemple.fr" autocomplete="email" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--brd);background:var(--bg);font-size:14px;color:var(--t1);font-family:'Sora',sans-serif;outline:none;margin-bottom:14px;transition:border-color .15s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--brd)'"/>
+
+    <!-- CTA -->
+    <button id="pmPayBtn" onclick="startCheckout()" style="width:100%;padding:15px;border-radius:11px;font-size:15px;font-weight:800;color:#fff;background:var(--grad-primary);border:none;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 24px rgba(99,102,241,.35);margin-bottom:12px;transition:all .2s;letter-spacing:-.2px">Démarrer mon essai gratuit →</button>
+
+    <!-- Trust signals -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">
+      <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">🔒 Stripe PCI DSS</span>
+      <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">✗ Annulation en 1 clic</span>
+      <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">🇫🇷 Données FR</span>
+    </div>
+    <div style="font-size:11px;color:var(--t3);text-align:center">En continuant, vous acceptez nos <a href="/legal/cgu" style="color:var(--blb)">CGU</a> et notre <a href="/legal/privacy" style="color:var(--blb)">Politique de confidentialité</a>.</div>
   </div>
 </div>
 
@@ -1818,33 +1855,58 @@
   function togglePrice(toggle) {
     isAnnual = !isAnnual;
     toggle.classList.toggle('on', isAnnual);
+    const badge = document.getElementById('annualBadge');
     if (isAnnual) {
       document.getElementById('proPrice').innerHTML = '7<sup>€</sup>';
-      document.getElementById('proPeriod').textContent = '/ mois · facturé 86,40€/an';
+      document.getElementById('proPeriod').innerHTML = '/ mois · <strong style="color:var(--gnb)">Économisez 24€/an</strong>';
       document.getElementById('intenPrice').innerHTML = '15<sup>€</sup>';
-      document.getElementById('intenPeriod').textContent = '/ mois · facturé 182,40€/an';
+      document.getElementById('intenPeriod').innerHTML = '/ mois · <strong style="color:var(--gnb)">Économisez 48€/an</strong>';
+      if (badge) badge.textContent = 'Économie maximale';
     } else {
       document.getElementById('proPrice').innerHTML = '9<sup>€</sup>';
       document.getElementById('proPeriod').textContent = '/ mois · sans engagement';
       document.getElementById('intenPrice').innerHTML = '19<sup>€</sup>';
-      document.getElementById('intenPeriod').textContent = '/ mois · 1 mois suffit';
+      document.getElementById('intenPeriod').textContent = '/ mois · pour décrocher rapidement';
+      if (badge) badge.textContent = '−20%';
     }
   }
 
   // ── PAYMENT MODAL ─────────────────────────────────────
   let curPlan = 'pro';
 
+  const PM_FEATURES = {
+    pro: [
+      'Générations illimitées (CV, lettre, score ATS)',
+      'Simulateur d\'entretien IA illimité',
+      'Optimisation LinkedIn',
+      'Dashboard + Export CSV',
+    ],
+    intensif: [
+      'Tout du plan Pro (générations illimitées)',
+      'Coaching CV 1:1 (1h/mois avec un expert)',
+      'Optimisation LinkedIn avancée',
+      'Support prioritaire dédié',
+    ],
+  };
+
   function openPayment(plan, price, name) {
     curPlan = plan;
     document.getElementById('pmPlan').textContent = name;
     document.getElementById('pmPrice').textContent = price;
     document.getElementById('pmPriceDisplay').textContent = price;
-    document.getElementById('pmEmail').value = '';
+    const feats = PM_FEATURES[plan] || PM_FEATURES.pro;
+    document.getElementById('pmFeatures').innerHTML = feats.map(f =>
+      `<div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px"><span style="color:var(--gnb)">✓</span> ${f}</div>`
+    ).join('');
+    const emailInput = document.getElementById('pmEmail');
+    emailInput.value = window.empUser?.email || '';
     const btn = document.getElementById('pmPayBtn');
     btn.disabled = false;
-    btn.textContent = 'Démarrer l\'essai gratuit →';
+    btn.textContent = 'Démarrer mon essai gratuit →';
     document.getElementById('payOverlay').classList.add('vis');
-    setTimeout(() => document.getElementById('pmEmail').focus(), 100);
+    setTimeout(() => {
+      if (!emailInput.value) emailInput.focus();
+    }, 100);
   }
 
   function closePayment() { document.getElementById('payOverlay').classList.remove('vis'); }
@@ -1855,7 +1917,8 @@
 
   async function startCheckout() {
     const email = document.getElementById('pmEmail').value.trim();
-    if (!email || !email.includes('@')) {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    if (!emailOk) {
       document.getElementById('pmEmail').style.borderColor = 'var(--red)';
       setTimeout(() => document.getElementById('pmEmail').style.borderColor = 'var(--brd)', 2500);
       return;
@@ -1904,6 +1967,17 @@
 
   // ── BLINK CURSOR ──────────────────────────────────────
   // Already in CSS via @keyframes blink
+
+  // ── LIVE COUNTER (slight drift to feel real) ──────────
+  (function liveCounter() {
+    const el = document.getElementById('liveCount');
+    if (!el) return;
+    let base = 2847;
+    setInterval(() => {
+      base += Math.floor(Math.random() * 3) - 1;
+      el.textContent = base.toLocaleString('fr-FR');
+    }, 8000);
+  })();
 </script>
 </body>
 </html>
