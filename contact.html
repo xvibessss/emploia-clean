@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contact — Emploia</title>
+<meta name="description" content="Contactez l'équipe Emploia. Support, partenariats, presse — nous répondons sous 24h."/>
+<link rel="canonical" href="https://emploia.fr/contact"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#6366f1"/>
+<meta property="og:title" content="Contact — Emploia"/>
+<meta property="og:description" content="Contactez l'équipe Emploia. Nous répondons sous 24h."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://emploia.fr/contact"/>
+<meta property="og:image" content="https://emploia.fr/opengraph.jpg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="shared.css"/>
+<style>
+.contact-page { max-width: 860px; margin: 0 auto; padding: 60px 24px 100px; }
+.contact-header { text-align: center; margin-bottom: 48px; }
+.contact-header h1 { font-size: clamp(28px,4vw,44px); font-weight: 900; letter-spacing:-1.2px; margin-bottom: 12px; }
+.contact-header p { font-size: 15px; color: var(--t2); }
+
+.contact-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+
+.contact-form-card { background: var(--s2); border: 1px solid var(--brd); border-radius: 20px; padding: 32px; }
+.contact-form-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 24px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px; }
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1.5px solid var(--brd); background: var(--s3);
+  font-size: 13px; color: var(--t1); font-family: 'Sora', sans-serif;
+  outline: none; transition: border-color .15s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+  border-color: var(--blue); background: var(--s4);
+}
+.form-group textarea { resize: vertical; min-height: 120px; line-height: 1.65; }
+.form-group select option { background: var(--s2); }
+
+.contact-submit { width: 100%; padding: 14px; border-radius: 11px; background: var(--grad-primary); color: #fff; font-weight: 800; font-size: 15px; border: none; cursor: pointer; font-family: 'Sora', sans-serif; transition: opacity .2s; }
+.contact-submit:hover { opacity: .9; }
+.contact-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+.contact-info { display: flex; flex-direction: column; gap: 14px; }
+.info-card { background: var(--s2); border: 1px solid var(--brd); border-radius: 16px; padding: 22px; }
+.info-card h3 { font-size: 13px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.info-card p, .info-card a { font-size: 13px; color: var(--t2); line-height: 1.65; text-decoration: none; }
+.info-card a { color: var(--blb); }
+.info-card a:hover { text-decoration: underline; }
+
+.faq-teaser { background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.07)); border: 1px solid rgba(99,102,241,.2); border-radius: 16px; padding: 22px; }
+
+#successMsg { display: none; text-align: center; padding: 24px; }
+#successMsg .suc-icon { font-size: 48px; margin-bottom: 12px; }
+#successMsg h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+#successMsg p { font-size: 13px; color: var(--t2); }
+
+@media (max-width: 720px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<nav class="emp-nav">
+  <a href="/" class="emp-logo">
+    <div class="emp-logo-mark">E</div>
+    Emploia
+  </a>
+  <div class="emp-nav-links">
+    <a href="/jobs" class="emp-nav-a">Offres</a>
+    <a href="/app" class="emp-nav-a">Générer CV</a>
+    <a href="/about" class="emp-nav-a">À propos</a>
+    <a href="/contact" class="emp-nav-a active">Contact</a>
+    <div id="empNavAuth"><button class="emp-nav-login" onclick="empShowAuth('login')">Se connecter</button></div>
+  </div>
+  <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/about">👋 À propos</a>
+  <a href="/contact">💬 Contact</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="contact-page">
+  <div class="contact-header">
+    <div class="section-tag" style="display:inline-block;margin-bottom:16px">Support</div>
+    <h1>On est là pour vous aider</h1>
+    <p>Une question, un problème, une suggestion ? L'équipe Emploia répond sous <strong>24h ouvrées</strong>.</p>
+  </div>
+
+  <div class="contact-grid">
+    <!-- Formulaire -->
+    <div class="contact-form-card">
+      <h2>✉️ Envoyer un message</h2>
+      <div id="contactForm">
+        <div class="form-group">
+          <label>Sujet</label>
+          <select id="cSubject">
+            <option value="support">🛠️ Support technique</option>
+            <option value="billing">💳 Facturation / abonnement</option>
+            <option value="feature">💡 Suggestion de fonctionnalité</option>
+            <option value="partnership">🤝 Partenariat / presse</option>
+            <option value="rgpd">🔒 RGPD / données personnelles</option>
+            <option value="other">❓ Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Votre nom</label>
+          <input type="text" id="cName" placeholder="Marie Dupont" autocomplete="name"/>
+        </div>
+        <div class="form-group">
+          <label>Votre email</label>
+          <input type="email" id="cEmail" placeholder="vous@exemple.fr" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="cMessage" placeholder="Décrivez votre demande en détail..."></textarea>
+        </div>
+        <div id="cError" style="color:var(--rnb);font-size:12px;margin-bottom:12px;display:none"></div>
+        <button class="contact-submit" id="cSubmit" onclick="submitContact()">Envoyer le message →</button>
+        <p style="font-size:11px;color:var(--t3);text-align:center;margin-top:12px">Réponse garantie sous 24h ouvrées</p>
+      </div>
+      <div id="successMsg">
+        <div class="suc-icon">✅</div>
+        <h3>Message envoyé !</h3>
+        <p>Merci de nous avoir contactés. L'équipe Emploia vous répondra sous 24h ouvrées à l'adresse indiquée.</p>
+        <a href="/" class="btn btn-ghost btn-sm" style="margin-top:16px;display:inline-block">Retour à l'accueil</a>
+      </div>
+    </div>
+
+    <!-- Infos contact -->
+    <div class="contact-info">
+      <div class="info-card">
+        <h3>📧 Email direct</h3>
+        <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>
+        <p style="margin-top:6px">Pour les demandes urgentes ou professionnelles.</p>
+      </div>
+      <div class="info-card">
+        <h3>⏱️ Horaires de support</h3>
+        <p>Lundi — Vendredi<br/>9h — 18h (heure de Paris)</p>
+        <p style="margin-top:6px">Les messages reçus le week-end sont traités le lundi matin.</p>
+      </div>
+      <div class="info-card">
+        <h3>🤝 Partenariats & presse</h3>
+        <p>Vous êtes une école, un cabinet de recrutement ou un média ? On adore collaborer.</p>
+        <a href="mailto:contact@emploia.fr?subject=Partenariat Emploia" style="margin-top:8px;display:inline-block">Écrire à l'équipe →</a>
+      </div>
+      <div class="faq-teaser info-card">
+        <h3>❓ FAQ</h3>
+        <p style="margin-bottom:12px">Avant d'envoyer un message, jetez un œil à notre FAQ — votre réponse est peut-être déjà là.</p>
+        <a href="/#faq" class="btn btn-ghost btn-sm" style="display:inline-block">Voir la FAQ →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/blog" class="emp-bottom-nav-item"><span class="bn-icon">📝</span>Blog</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  // Pre-fill if logged in
+  window.addEventListener('empAuthChange', e => {
+    const u = e.detail?.user;
+    if (u) {
+      if (u.name) document.getElementById('cName').value = u.name;
+      if (u.email) document.getElementById('cEmail').value = u.email;
+    }
+  });
+  if (window.empUser) {
+    if (window.empUser.name) document.getElementById('cName').value = window.empUser.name;
+    if (window.empUser.email) document.getElementById('cEmail').value = window.empUser.email;
+  }
+
+  async function submitContact() {
+    const name = document.getElementById('cName').value.trim();
+    const email = document.getElementById('cEmail').value.trim();
+    const subject = document.getElementById('cSubject').value;
+    const message = document.getElementById('cMessage').value.trim();
+    const errEl = document.getElementById('cError');
+    errEl.style.display = 'none';
+
+    if (!name || name.length < 2) { errEl.textContent = 'Veuillez entrer votre nom.'; errEl.style.display = 'block'; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { errEl.textContent = 'Email invalide.'; errEl.style.display = 'block'; return; }
+    if (!message || message.length < 10) { errEl.textContent = 'Message trop court (10 caractères minimum).'; errEl.style.display = 'block'; return; }
+
+    const btn = document.getElementById('cSubmit');
+    btn.disabled = true; btn.textContent = 'Envoi en cours…';
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message })
+      });
+      if (res.ok) {
+        document.getElementById('contactForm').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      } else {
+        const d = await res.json().catch(() => ({}));
+        errEl.textContent = d.error || 'Erreur lors de l\'envoi. Écrivez directement à contact@emploia.fr';
+        errEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Envoyer le message →';
+      }
+    } catch {
+      errEl.textContent = 'Erreur réseau. Écrivez directement à contact@emploia.fr';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Envoyer le message →';
+    }
+  }
+</script>
+</body>
+</html>

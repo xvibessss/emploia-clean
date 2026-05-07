@@ -67,6 +67,9 @@
     },
     "api/sitemap.js": {
       "maxDuration": 5
+    },
+    "api/contact.js": {
+      "maxDuration": 15
     }
   },
   "rewrites": [
@@ -133,6 +136,30 @@
     {
       "source": "/reset-password",
       "destination": "/reset-password.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/legal/mentions",
+      "destination": "/legal.html"
+    },
+    {
+      "source": "/legal/privacy",
+      "destination": "/legal.html"
+    },
+    {
+      "source": "/legal/cgu",
+      "destination": "/legal.html"
+    },
+    {
+      "source": "/legal/cookies",
+      "destination": "/legal.html"
     },
     {
       "source": "/api/auth/google/callback",

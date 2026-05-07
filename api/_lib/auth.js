@@ -2,7 +2,7 @@
 // Uses Web Crypto API — 100% Edge Runtime compatible
 
 export const COOKIE_NAME = "__Host-emploia-token";
-export const FREE_LIMIT = 5;
+export const FREE_LIMIT = 3;
 
 // No fallback — fail loudly if secret not set
 function getJwtSecret() {

@@ -1653,9 +1653,9 @@
     <div class="emp-footer-col">
       <h4>Ressources</h4>
       <a href="/blog">Blog & Guides</a>
-      <a href="#features">Fonctionnalités</a>
       <a href="#faq">FAQ</a>
-      <a href="/onboarding">Démarrer</a>
+      <a href="/about">À propos</a>
+      <a href="/contact">Contact</a>
       <a href="/referral">Parrainage 🎁</a>
     </div>
     <div class="emp-footer-col">
@@ -1850,7 +1850,14 @@
   }
 
   // ── PRICING TOGGLE ────────────────────────────────────
-  let isAnnual = false;
+  let isAnnual = true;
+  // Default to annual — apply immediately
+  document.getElementById('priceToggle')?.classList.add('on');
+  document.getElementById('proPrice').innerHTML = '7<sup>€</sup>';
+  document.getElementById('proPeriod').innerHTML = '/ mois · <strong style="color:var(--gnb)">Économisez 24€/an</strong>';
+  document.getElementById('intenPrice').innerHTML = '15<sup>€</sup>';
+  document.getElementById('intenPeriod').innerHTML = '/ mois · <strong style="color:var(--gnb)">Économisez 48€/an</strong>';
+  document.getElementById('annualBadge').textContent = 'Économie maximale';
 
   function togglePrice(toggle) {
     isAnnual = !isAnnual;

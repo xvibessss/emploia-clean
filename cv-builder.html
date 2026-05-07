@@ -862,6 +862,7 @@
             ${cv.edu?.length ? `<div class="cv-modern-section"><div class="cv-h3">Formation</div>${cv.edu.map(e=>`<div class="cv-exp"><div class="cv-exp-head"><div><div class="cv-exp-title">${esc(e.title)}</div><div class="cv-exp-co">${esc(e.school)}</div></div><div class="cv-exp-date">${esc(e.date)}</div></div>${e.desc?`<div class="cv-exp-desc">${esc(e.desc)}</div>`:''}</div>`).join('')}</div>` : ''}
           </div>
         </div>
+        ${!window.empUser || window.empUser.plan !== 'pro' ? `<div style="border-top:1px solid #e8ecf0;padding:6px 14px;font-size:9px;color:#aaa;text-align:right;font-family:sans-serif">Créé avec <a href="https://emploia.fr" style="color:#6366f1;text-decoration:none">Emploia.fr</a></div>` : ''}
       </div>`;
   }
 
@@ -884,6 +885,7 @@
           ${cv.skills?.length ? `<div><div class="cv-h3">Compétences</div>${cv.skills.map(s=>`<div style="font-size:11.5px;margin-bottom:4px">• ${esc(s.name)}</div>`).join('')}</div>` : ''}
           ${cv.lang?.length ? `<div><div class="cv-h3">Langues</div>${cv.lang.map(l=>`<div style="font-size:11.5px;margin-bottom:4px">• ${esc(l.name)} — <em>${esc(l.level)}</em></div>`).join('')}</div>` : ''}
         </div>
+        ${!window.empUser || window.empUser.plan !== 'pro' ? `<div style="border-top:1px solid #e8ecf0;padding:6px 14px;font-size:9px;color:#aaa;text-align:right;font-family:sans-serif">Créé avec <a href="https://emploia.fr" style="color:#6366f1;text-decoration:none">Emploia.fr</a></div>` : ''}
       </div>`;
   }
 
@@ -907,6 +909,7 @@
           ${cv.skills?.length ? `<div><div class="cv-h3">COMPÉTENCES</div><div style="font-size:11.5px;line-height:1.9;color:#444">${cv.skills.map(s=>esc(s.name)).join(' · ')}</div></div>` : ''}
           ${cv.lang?.length ? `<div><div class="cv-h3">LANGUES</div>${cv.lang.map(l=>`<div style="font-size:11.5px;line-height:1.7;color:#444">${esc(l.name)} <span style="color:#999">— ${esc(l.level)}</span></div>`).join('')}</div>` : ''}
         </div>
+        ${!window.empUser || window.empUser.plan !== 'pro' ? `<div style="border-top:1px solid #e8ecf0;padding:6px 14px;font-size:9px;color:#aaa;text-align:right;font-family:sans-serif">Créé avec <a href="https://emploia.fr" style="color:#6366f1;text-decoration:none">Emploia.fr</a></div>` : ''}
       </div>`;
   }
 
