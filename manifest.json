@@ -9,7 +9,7 @@
   "lang": "fr",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/public/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ],
   "screenshots": [],
   "categories": ["productivity", "business"],

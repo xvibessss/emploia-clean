@@ -3,6 +3,7 @@ Allow: /
 Disallow: /api/
 Disallow: /dashboard
 Disallow: /onboarding
+Disallow: /profil
+Disallow: /app
 
 Sitemap: https://emploia.fr/sitemap.xml
-# updated: 1777586320

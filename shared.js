@@ -66,11 +66,21 @@ function empToast(msg, type = 'success') {
 
   const toast = document.createElement('div');
   toast.className = 'emp-toast';
-  toast.innerHTML = `
-    <span style="color:${colors[type]};font-size:16px;flex-shrink:0">${icons[type]}</span>
-    <span style="flex:1;line-height:1.4">${msg}</span>
-    <span onclick="this.closest('.emp-toast').remove()" style="cursor:pointer;color:var(--t3);font-size:13px">✕</span>
-  `;
+
+  const iconEl = document.createElement('span');
+  iconEl.style.cssText = `color:${colors[type]};font-size:16px;flex-shrink:0`;
+  iconEl.textContent = icons[type];
+
+  const msgEl = document.createElement('span');
+  msgEl.style.cssText = 'flex:1;line-height:1.4';
+  msgEl.textContent = msg;
+
+  const closeEl = document.createElement('span');
+  closeEl.style.cssText = 'cursor:pointer;color:var(--t3);font-size:13px';
+  closeEl.textContent = '✕';
+  closeEl.addEventListener('click', () => toast.remove());
+
+  toast.append(iconEl, msgEl, closeEl);
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.transition = 'all .3s';
@@ -179,12 +189,3 @@ document.querySelectorAll('.emp-modal-backdrop').forEach(m => {
   });
 });
 
-// ── PAGE TRANSITION ───────────────────────────────────
-document.querySelectorAll('a[href]').forEach(a => {
-  const href = a.getAttribute('href');
-  if (href && !href.startsWith('#') && !href.startsWith('http') && !href.startsWith('mailto')) {
-    a.addEventListener('click', e => {
-      // Let browser handle normally for now
-    });
-  }
-});
