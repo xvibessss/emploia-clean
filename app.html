@@ -851,6 +851,22 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   // Init
   updateLen();
 
+  // Sync usage pill with real auth state
+  function syncUsagePill(user) {
+    const el = document.getElementById('usageCount');
+    if (!el) return;
+    if (user) {
+      const used = user.generationsUsed || 0;
+      const limit = user.plan === 'pro' ? '∞' : '5';
+      el.closest('.usage-pill').innerHTML = user.plan === 'pro'
+        ? `⭐ Plan Pro · générations illimitées`
+        : `✨ <span><strong>${used}</strong> / ${limit} générations gratuites</span><a href="#pricing" class="upgrade-link">Passer Pro</a>`;
+    }
+  }
+  window.addEventListener('empAuthChange', e => syncUsagePill(e.detail.user));
+  // Delay to let empAuthInit finish
+  setTimeout(() => syncUsagePill(window.empUser), 800);
+
   // Pre-fill from sessionStorage if coming from /jobs
   const prefill = sessionStorage.getItem('emp_prefill');
   if (prefill) {

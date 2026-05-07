@@ -59,6 +59,9 @@
     "api/auth/reset-password.js": {
       "maxDuration": 15
     },
+    "api/profile.js": {
+      "maxDuration": 15
+    },
     "api/health.js": {
       "maxDuration": 5
     },

@@ -1064,8 +1064,8 @@
         btn.classList.add('tracked');
         empToast('Ajouté au dashboard !', 'success');
       } else if (res.status === 401) {
-        empToast('Connectez-vous pour suivre les offres', 'error');
         btn.disabled = false;
+        empShowAuth('login');
       } else {
         empToast('Erreur', 'error');
         btn.disabled = false;

@@ -843,7 +843,7 @@
   <p>💾 Des modifications non sauvegardées sont en attente.</p>
   <div style="display:flex;gap:10px">
     <button class="btn btn-ghost btn-sm" onclick="empToast('Modifications annulées','info')">Annuler</button>
-    <button class="btn btn-primary btn-sm" onclick="empToast('Profil sauvegardé avec succès !','success')">Sauvegarder les modifications</button>
+    <button class="btn btn-primary btn-sm" id="saveProfileBtn" onclick="saveProfile()">Sauvegarder les modifications</button>
   </div>
 </div>
 
@@ -959,6 +959,65 @@
     ].filter(Boolean).join('\n');
     localStorage.setItem('emploia_profile_text', profileText);
   }
+
+  function collectProfile() {
+    const skills = [...document.querySelectorAll('.skill-tag')].map(t => t.firstChild.textContent.trim()).filter(Boolean);
+    return {
+      firstName: document.getElementById('prfFirstName')?.value.trim() || '',
+      lastName:  document.getElementById('prfLastName')?.value.trim() || '',
+      title:     document.getElementById('prfTitle')?.value.trim() || '',
+      location:  document.getElementById('prfLocation')?.value.trim() || '',
+      phone:     document.getElementById('prfPhone')?.value.trim() || '',
+      summary:   document.getElementById('prfSummary')?.value.trim() || '',
+      linkedin:  document.getElementById('prfLinkedin')?.value.trim() || '',
+      portfolio: document.getElementById('prfPortfolio')?.value.trim() || '',
+      skills,
+    };
+  }
+
+  async function saveProfile() {
+    const btn = document.getElementById('saveProfileBtn');
+    btn.disabled = true; btn.textContent = 'Sauvegarde…';
+    const data = collectProfile();
+    // Always save to localStorage for AI match score
+    localStorage.setItem('emploia_profile_text', [data.title, data.summary, data.skills?.join(', ')].filter(Boolean).join('\n'));
+    // Save to KV if logged in
+    if (window.empUser) {
+      try {
+        const res = await fetch('/api/profile', {
+          method: 'PUT', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          empToast('Profil sauvegardé dans votre compte ✓', 'success');
+        } else {
+          empToast('Profil sauvegardé localement (erreur serveur)', 'info');
+        }
+      } catch {
+        empToast('Profil sauvegardé localement', 'info');
+      }
+    } else {
+      empToast('Profil sauvegardé localement — connectez-vous pour le synchroniser', 'success');
+    }
+    btn.disabled = false; btn.textContent = 'Sauvegarder les modifications';
+  }
+
+  // Load profile from KV if logged in
+  async function loadProfileFromServer() {
+    if (!window.empUser) return;
+    try {
+      const res = await fetch('/api/profile', { credentials: 'same-origin' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.firstName) return;
+      fillProfileFromCV(data); // reuse same filler
+      empToast('Profil chargé depuis votre compte', 'info');
+    } catch {}
+  }
+
+  window.addEventListener('empAuthChange', e => { if (e.detail.user) loadProfileFromServer(); });
+  setTimeout(loadProfileFromServer, 900);
 </script>
 </body>
 </html>
