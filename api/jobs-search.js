@@ -117,9 +117,9 @@ export default async function handler(req) {
   ]);
 
   const jobs = [
-    ...(apecJobs.value || []),
-    ...(helloWorkJobs.value || []),
-    ...(wldJobs.value || []),
+    ...(apecJobs.status === 'fulfilled' ? apecJobs.value : []),
+    ...(helloWorkJobs.status === 'fulfilled' ? helloWorkJobs.value : []),
+    ...(wldJobs.status === 'fulfilled' ? wldJobs.value : []),
   ];
 
   return new Response(JSON.stringify({ jobs, total: jobs.length }), { status: 200, headers: H });

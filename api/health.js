@@ -12,7 +12,7 @@ export default async function handler(req) {
     stripe: !!process.env.STRIPE_SECRET_KEY,
     jwt: !!process.env.JWT_SECRET,
     upstash: !!(process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL),
-    jsearch: !!process.env.JSEARCH_API_KEY,
+    jsearch: !!process.env.RAPIDAPI_KEY,
     franceTravail: !!process.env.FRANCE_TRAVAIL_CLIENT_ID,
     adzuna: !!process.env.ADZUNA_APP_ID,
   };

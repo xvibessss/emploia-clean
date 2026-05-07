@@ -3,6 +3,13 @@ import { kvGet, kvSet } from './_lib/auth.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return result === 0;
+}
+
 async function verifyStripeSignature(payload, header, secret) {
   if (!secret || !header) return false;
   const parts = header.split(',');
@@ -13,7 +20,7 @@ async function verifyStripeSignature(payload, header, secret) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const computed = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload));
   const computedHex = Array.from(new Uint8Array(computed)).map(b => b.toString(16).padStart(2, '0')).join('');
-  return computedHex === sig;
+  return timingSafeEqual(computedHex, sig);
 }
 
 export default async function handler(req) {
@@ -38,16 +45,21 @@ export default async function handler(req) {
         const email = session.customer_email || session.customer_details?.email;
         const plan = session.metadata?.plan || 'pro';
         if (email) {
-          const user = await kvGet(`user:${email.toLowerCase()}`);
+          const normalizedEmail = email.toLowerCase();
+          const user = await kvGet(`user:${normalizedEmail}`);
           if (user) {
-            await kvSet(`user:${email.toLowerCase()}`, {
-              ...user,
-              plan,
-              stripeCustomerId: session.customer,
-              subscriptionId: session.subscription,
-              planActivatedAt: new Date().toISOString(),
-              generationsUsed: 0, // Reset on plan upgrade
-            });
+            await Promise.all([
+              kvSet(`user:${normalizedEmail}`, {
+                ...user,
+                plan,
+                stripeCustomerId: session.customer,
+                subscriptionId: session.subscription,
+                planActivatedAt: new Date().toISOString(),
+                generationsUsed: 0,
+              }),
+              // Store customerId → email mapping for subscription cancellation
+              kvSet(`stripe:${session.customer}`, normalizedEmail),
+            ]);
           }
         }
         break;
@@ -55,7 +67,6 @@ export default async function handler(req) {
       case 'customer.subscription.deleted': {
         const sub = event.data.object;
         const customerId = sub.customer;
-        // Find user by stripe customer ID
         const email = await kvGet(`stripe:${customerId}`);
         if (email) {
           const user = await kvGet(`user:${email}`);
@@ -64,12 +75,12 @@ export default async function handler(req) {
         break;
       }
       case 'invoice.payment_failed': {
-        // Could send email notification here
         break;
       }
     }
     return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 });
+    console.error('Stripe webhook error:', err);
+    return new Response(JSON.stringify({ error: 'Webhook processing failed' }), { status: 500 });
   }
 }
