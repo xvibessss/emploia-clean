@@ -277,7 +277,7 @@
     /* ── KANBAN ─────────────────────────────── */
     .kanban-board {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -309,10 +309,39 @@
     }
 
     .kc-dot { width: 7px; height: 7px; border-radius: 50%; }
-    .dot-applied { background: var(--blue); }
+    .dot-wishlist  { background: #a78bfa; }
+    .dot-applied   { background: var(--blue); }
     .dot-interview { background: var(--ylw); }
-    .dot-offer { background: var(--grn); }
-    .dot-rejected { background: var(--red); }
+    .dot-offer     { background: var(--grn); }
+    .dot-rejected  { background: var(--red); }
+
+    /* Application modal */
+    .app-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .app-modal-overlay.open { display: flex; }
+    .app-modal {
+      background: var(--bg);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .app-modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 20px; letter-spacing: -.4px; }
+    .app-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .app-modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .app-modal-field label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; }
+    .app-modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
     .kc-count {
       font-size: 11px;
@@ -616,6 +645,10 @@
     .ub-text { font-size: 12px; color: var(--t2); line-height: 1.5; }
     .ub-text strong { color: var(--t1); }
 
+    @media (max-width: 1400px) {
+      .kanban-board { grid-template-columns: repeat(3, 1fr); }
+    }
+
     @media (max-width: 1100px) {
       .dash-grid { grid-template-columns: 1fr; }
       .generate-panel { display: none; }
@@ -775,11 +808,12 @@
       <!-- TOOLBAR -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
         <div class="dash-tabs">
-          <button class="dash-tab active" onclick="setDashTab('all',this)">Toutes <span class="tab-count">24</span></button>
-          <button class="dash-tab" onclick="setDashTab('applied',this)">Envoyées <span class="tab-count">14</span></button>
-          <button class="dash-tab" onclick="setDashTab('interview',this)">Entretiens <span class="tab-count">7</span></button>
-          <button class="dash-tab" onclick="setDashTab('offer',this)">Offres <span class="tab-count">2</span></button>
-          <button class="dash-tab" onclick="setDashTab('rejected',this)">Refus <span class="tab-count">1</span></button>
+          <button class="dash-tab active" data-tab="all" onclick="setDashTab('all',this)">Toutes <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="wishlist" onclick="setDashTab('wishlist',this)">À postuler <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="applied" onclick="setDashTab('applied',this)">Envoyées <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="interview" onclick="setDashTab('interview',this)">Entretiens <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="offer" onclick="setDashTab('offer',this)">Offres <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="rejected" onclick="setDashTab('rejected',this)">Refus <span class="tab-count">0</span></button>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
           <div class="view-toggle">
@@ -787,187 +821,53 @@
             <button class="vt-btn" id="vtList" onclick="setView('list')">≡ Liste</button>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV</button>
-          <button class="btn btn-primary btn-sm" onclick="empToast('Ajout de candidature','info')">+ Ajouter</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
         </div>
       </div>
 
       <!-- KANBAN VIEW -->
       <div id="kanbanView">
         <div class="kanban-board">
-          <!-- ENVOYÉE -->
-          <div class="kanban-col">
+          <div class="kanban-col" data-status="wishlist" ondragover="event.preventDefault()" ondrop="dropCard(event,'wishlist')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-wishlist"></div>À postuler</div>
+              <span class="kc-count" id="kc-wishlist">0</span>
+            </div>
+            <div class="kc-body" id="kb-wishlist"></div>
+          </div>
+          <div class="kanban-col" data-status="applied" ondragover="event.preventDefault()" ondrop="dropCard(event,'applied')">
             <div class="kc-header">
               <div class="kc-title"><div class="kc-dot dot-applied"></div>Envoyée</div>
-              <span class="kc-count">5</span>
+              <span class="kc-count" id="kc-applied">0</span>
             </div>
-            <div class="kc-body">
-              <div class="kanban-card" onclick="empToast('Ouverture détail candidature','info')">
-                <div class="kcard-company">BNP Paribas</div>
-                <div class="kcard-title">Dev Full Stack React</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date">Il y a 2j</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn" title="Relancer">📧</button>
-                    <button class="kcard-btn" title="Déplacer">→</button>
-                  </div>
-                </div>
-              </div>
-              <div class="kanban-card">
-                <div class="kcard-company">Doctolib</div>
-                <div class="kcard-title">Alternance Business Dev</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date">Il y a 5j</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">📧</button>
-                    <button class="kcard-btn">→</button>
-                  </div>
-                </div>
-              </div>
-              <div class="kanban-card">
-                <div class="kcard-company">L'Oréal</div>
-                <div class="kcard-title">Stage Marketing Digital</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date">Il y a 1sem</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">📧</button>
-                    <button class="kcard-btn">→</button>
-                  </div>
-                </div>
-              </div>
-              <button class="kc-add" onclick="empToast('Ajout d\'une candidature','info')">+ Ajouter</button>
-            </div>
+            <div class="kc-body" id="kb-applied"></div>
           </div>
-
-          <!-- ENTRETIEN -->
-          <div class="kanban-col">
+          <div class="kanban-col" data-status="interview" ondragover="event.preventDefault()" ondrop="dropCard(event,'interview')">
             <div class="kc-header">
               <div class="kc-title"><div class="kc-dot dot-interview"></div>Entretien</div>
-              <span class="kc-count">3</span>
+              <span class="kc-count" id="kc-interview">0</span>
             </div>
-            <div class="kc-body">
-              <div class="kanban-card" style="border-color:rgba(245,158,11,.2)">
-                <div class="kcard-company">Capgemini</div>
-                <div class="kcard-title">Dev Backend Python</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date" style="color:var(--ylb);font-weight:700">🗓 Demain 14h</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">🎤</button>
-                    <button class="kcard-btn">→</button>
-                  </div>
-                </div>
-              </div>
-              <div class="kanban-card">
-                <div class="kcard-company">Alan</div>
-                <div class="kcard-title">Ingénieur Full Stack</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date">Vendredi 10h</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">🎤</button>
-                    <button class="kcard-btn">→</button>
-                  </div>
-                </div>
-              </div>
-              <button class="kc-add">+ Ajouter</button>
-            </div>
+            <div class="kc-body" id="kb-interview"></div>
           </div>
-
-          <!-- OFFRE -->
-          <div class="kanban-col">
+          <div class="kanban-col" data-status="offer" ondragover="event.preventDefault()" ondrop="dropCard(event,'offer')">
             <div class="kc-header">
               <div class="kc-title"><div class="kc-dot dot-offer"></div>Offre reçue</div>
-              <span class="kc-count">2</span>
+              <span class="kc-count" id="kc-offer">0</span>
             </div>
-            <div class="kc-body">
-              <div class="kanban-card" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)">
-                <div class="kcard-company" style="color:var(--gnb)">Société Générale ✓</div>
-                <div class="kcard-title">Dev React Senior</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date" style="color:var(--gnb);font-weight:700">48k€/an</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">📝</button>
-                    <button class="kcard-btn">✓</button>
-                  </div>
-                </div>
-              </div>
-              <button class="kc-add">+ Ajouter</button>
-            </div>
+            <div class="kc-body" id="kb-offer"></div>
           </div>
-
-          <!-- REFUS -->
-          <div class="kanban-col">
+          <div class="kanban-col" data-status="rejected" ondragover="event.preventDefault()" ondrop="dropCard(event,'rejected')">
             <div class="kc-header">
               <div class="kc-title"><div class="kc-dot dot-rejected"></div>Refus</div>
-              <span class="kc-count">1</span>
+              <span class="kc-count" id="kc-rejected">0</span>
             </div>
-            <div class="kc-body">
-              <div class="kanban-card" style="opacity:.6">
-                <div class="kcard-company">Orange</div>
-                <div class="kcard-title">Dev Mobile React Native</div>
-                <div class="kcard-footer">
-                  <span class="kcard-date">Il y a 3sem</span>
-                  <div class="kcard-actions">
-                    <button class="kcard-btn">🗑</button>
-                  </div>
-                </div>
-              </div>
-              <button class="kc-add">+ Ajouter</button>
-            </div>
+            <div class="kc-body" id="kb-rejected"></div>
           </div>
         </div>
       </div>
 
       <!-- LIST VIEW -->
-      <div class="list-view" id="listView">
-        <div class="list-item">
-          <div class="li-logo">🏦</div>
-          <div class="li-info">
-            <div class="li-title">Développeur Full Stack React</div>
-            <div class="li-company">BNP Paribas</div>
-            <div class="li-meta">
-              <div class="li-meta-item">📍 Paris 9e</div>
-              <div class="li-meta-item">💰 45–55k€</div>
-              <div class="li-meta-item">📅 Il y a 2 jours</div>
-            </div>
-          </div>
-          <span class="badge badge-blue">Envoyée</span>
-          <div class="li-actions">
-            <button class="btn btn-ghost btn-sm" onclick="empToast('Relance envoyée','success')">📧 Relancer</button>
-            <button class="btn btn-primary btn-sm">Voir →</button>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-logo">🏥</div>
-          <div class="li-info">
-            <div class="li-title">Développeur Backend Python</div>
-            <div class="li-company">Capgemini</div>
-            <div class="li-meta">
-              <div class="li-meta-item">📍 Paris 8e</div>
-              <div class="li-meta-item">💰 42–50k€</div>
-              <div class="li-meta-item" style="color:var(--ylb)">🗓 Entretien demain 14h</div>
-            </div>
-          </div>
-          <span class="badge badge-yellow">Entretien</span>
-          <div class="li-actions">
-            <a href="/interview" class="btn btn-ghost btn-sm">🎤 S'entraîner</a>
-            <button class="btn btn-primary btn-sm">Voir →</button>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-logo">🌊</div>
-          <div class="li-info">
-            <div class="li-title">Développeur React Senior</div>
-            <div class="li-company">Société Générale</div>
-            <div class="li-meta">
-              <div class="li-meta-item">📍 Paris La Défense</div>
-              <div class="li-meta-item" style="color:var(--gnb)">💰 Offre 48k€/an reçue</div>
-            </div>
-          </div>
-          <span class="badge badge-green">Offre reçue</span>
-          <div class="li-actions">
-            <button class="btn btn-primary btn-sm" onclick="empToast('Félicitations ! Analysez l\'offre','success')">Analyser →</button>
-          </div>
-        </div>
-      </div>
+      <div class="list-view" id="listView"></div>
 
       <!-- UPGRADE -->
       <div class="upgrade-banner" style="margin-top:16px">
@@ -1077,6 +977,55 @@
   </div>
 </div>
 
+<!-- APPLICATION MODAL -->
+<div class="app-modal-overlay" id="appModal" onclick="if(event.target===this)closeModal()">
+  <div class="app-modal">
+    <h3 id="modalTitle">Nouvelle candidature</h3>
+    <div class="app-modal-row">
+      <div class="app-modal-field">
+        <label>Poste</label>
+        <input type="text" class="emp-input" id="appJobTitle" placeholder="Développeur Frontend"/>
+      </div>
+      <div class="app-modal-field">
+        <label>Entreprise</label>
+        <input type="text" class="emp-input" id="appCompany" placeholder="Nom de l'entreprise"/>
+      </div>
+    </div>
+    <div class="app-modal-row">
+      <div class="app-modal-field">
+        <label>Lieu</label>
+        <input type="text" class="emp-input" id="appLocation" placeholder="Paris, Remote..."/>
+      </div>
+      <div class="app-modal-field">
+        <label>Salaire</label>
+        <input type="text" class="emp-input" id="appSalary" placeholder="45–55k€"/>
+      </div>
+    </div>
+    <div class="app-modal-field">
+      <label>Lien de l'offre</label>
+      <input type="url" class="emp-input" id="appUrl" placeholder="https://..."/>
+    </div>
+    <div class="app-modal-field">
+      <label>Statut</label>
+      <select class="emp-input" id="appStatus">
+        <option value="wishlist">📋 À postuler</option>
+        <option value="applied">📤 Envoyée</option>
+        <option value="interview">🗓 Entretien</option>
+        <option value="offer">🎉 Offre reçue</option>
+        <option value="rejected">❌ Refus</option>
+      </select>
+    </div>
+    <div class="app-modal-field">
+      <label>Notes</label>
+      <textarea class="emp-input" id="appNotes" rows="3" placeholder="Contacts, infos, suivi..."></textarea>
+    </div>
+    <div class="app-modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary btn-sm" id="saveAppBtn" onclick="saveApplication()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="emp-bottom-nav">
   <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
@@ -1089,36 +1038,273 @@
 <script src="shared.js"></script>
 <script>
   // Greeting
-  const h = new Date().getHours();
-  document.getElementById('greetingText').textContent = h < 12 ? 'Bonjour' : h < 18 ? 'Bon après-midi' : 'Bonsoir';
-  document.getElementById('greetingEmoji').textContent = h < 12 ? '☀️' : h < 18 ? '👋' : '🌙';
+  const hr = new Date().getHours();
+  document.getElementById('greetingText').textContent = hr < 12 ? 'Bonjour' : hr < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('greetingEmoji').textContent = hr < 12 ? '☀️' : hr < 18 ? '👋' : '🌙';
 
-  // View toggle
-  function setView(v) {
-    const kanban = document.getElementById('kanbanView');
-    const list = document.getElementById('listView');
-    const kb = document.getElementById('vtKanban');
-    const lv = document.getElementById('vtList');
-    if (v === 'kanban') {
-      kanban.style.display = 'block';
-      list.classList.remove('active');
-      kb.classList.add('active');
-      lv.classList.remove('active');
-    } else {
-      kanban.style.display = 'none';
-      list.classList.add('active');
-      kb.classList.remove('active');
-      lv.classList.add('active');
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let allApps = [];
+  let activeTab = 'all';
+  let editingId = null;
+  let draggedId = null;
+
+  const COLS = [
+    { status: 'wishlist',  label: 'À postuler',  dotClass: 'dot-wishlist'  },
+    { status: 'applied',   label: 'Envoyée',      dotClass: 'dot-applied'   },
+    { status: 'interview', label: 'Entretien',    dotClass: 'dot-interview' },
+    { status: 'offer',     label: 'Offre reçue',  dotClass: 'dot-offer'     },
+    { status: 'rejected',  label: 'Refus',        dotClass: 'dot-rejected'  },
+  ];
+  const STATUS_LABEL  = Object.fromEntries(COLS.map(c => [c.status, c.label]));
+  const STATUS_BADGE  = { wishlist:'badge-purple', applied:'badge-blue', interview:'badge-yellow', offer:'badge-green', rejected:'badge-gray' };
+
+  // ── DATA LOADING ───────────────────────────────────────────────────────────
+  async function loadApplications() {
+    try {
+      const res = await fetch('/api/applications', { credentials: 'include' });
+      if (res.status === 401) { allApps = []; }
+      else if (res.ok) { allApps = (await res.json()).applications || []; }
+      else { throw new Error(); }
+    } catch { empToast('Erreur de chargement des candidatures', 'error'); allApps = []; }
+    refresh();
+  }
+
+  function filteredApps() {
+    return activeTab === 'all' ? allApps : allApps.filter(a => a.status === activeTab);
+  }
+
+  function refresh() {
+    renderKanban(filteredApps());
+    renderList(filteredApps());
+    updateTabCounts(allApps);
+  }
+
+  // ── KANBAN ─────────────────────────────────────────────────────────────────
+  function renderKanban(apps) {
+    COLS.forEach(col => {
+      const body  = document.getElementById('kb-' + col.status);
+      const count = document.getElementById('kc-' + col.status);
+      const colApps = apps.filter(a => a.status === col.status);
+      if (count) count.textContent = colApps.length;
+      if (!body) return;
+      body.innerHTML = colApps.map(renderCard).join('');
+      const addBtn = document.createElement('button');
+      addBtn.className = 'kc-add';
+      addBtn.textContent = '+ Ajouter';
+      addBtn.onclick = () => openAddModal(col.status);
+      body.appendChild(addBtn);
+    });
+  }
+
+  function renderCard(app) {
+    const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt)) / 86400000);
+    const dateStr = daysAgo === 0 ? "Aujourd'hui" : daysAgo === 1 ? "Hier" : `Il y a ${daysAgo}j`;
+    const extra = app.status === 'offer'     ? ' style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)"'
+                : app.status === 'interview'  ? ' style="border-color:rgba(245,158,11,.2)"'
+                : app.status === 'rejected'   ? ' style="opacity:.65"' : '';
+    return `<div class="kanban-card"${extra} draggable="true"
+      ondragstart="dragCard(event,'${esc(app.id)}')"
+      onclick="openDetailModal('${esc(app.id)}')">
+      <div class="kcard-company">${esc(app.company || '—')}</div>
+      <div class="kcard-title">${esc(app.jobTitle || 'Candidature')}</div>
+      ${app.salary ? `<div style="font-size:10px;color:var(--gnb);margin:2px 0 4px">💰 ${esc(app.salary)}</div>` : ''}
+      <div class="kcard-footer">
+        <span class="kcard-date">${dateStr}</span>
+        <div class="kcard-actions">
+          <button class="kcard-btn" title="Modifier" onclick="event.stopPropagation();openDetailModal('${esc(app.id)}')">✏️</button>
+          <button class="kcard-btn" title="Supprimer" onclick="event.stopPropagation();deleteApp('${esc(app.id)}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── LIST ───────────────────────────────────────────────────────────────────
+  function renderList(apps) {
+    const el = document.getElementById('listView');
+    if (!apps.length) {
+      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--t3);font-size:14px">
+        Aucune candidature.<br><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openAddModal()">+ Ajouter ma première candidature</button></div>`;
+      return;
+    }
+    el.innerHTML = apps.map(app => {
+      const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt)) / 86400000);
+      const dateStr = daysAgo === 0 ? "Aujourd'hui" : daysAgo === 1 ? "Hier" : `Il y a ${daysAgo}j`;
+      return `<div class="list-item">
+        <div class="li-logo">🏢</div>
+        <div class="li-info">
+          <div class="li-title">${esc(app.jobTitle || 'Candidature')}</div>
+          <div class="li-company">${esc(app.company || '—')}</div>
+          <div class="li-meta">
+            ${app.location ? `<div class="li-meta-item">📍 ${esc(app.location)}</div>` : ''}
+            ${app.salary   ? `<div class="li-meta-item">💰 ${esc(app.salary)}</div>`   : ''}
+            <div class="li-meta-item">📅 ${dateStr}</div>
+          </div>
+        </div>
+        <span class="badge ${STATUS_BADGE[app.status] || 'badge-gray'}">${STATUS_LABEL[app.status] || app.status}</span>
+        <div class="li-actions">
+          ${app.url ? `<a href="${esc(app.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir l'offre →</a>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="openDetailModal('${esc(app.id)}')">Modifier</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── TABS & COUNTS ──────────────────────────────────────────────────────────
+  function updateTabCounts(apps) {
+    const counts = { all: apps.length };
+    COLS.forEach(c => counts[c.status] = 0);
+    apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+    document.querySelectorAll('.dash-tab').forEach(btn => {
+      const tab = btn.dataset.tab;
+      if (tab !== undefined && counts[tab] !== undefined) {
+        const el = btn.querySelector('.tab-count');
+        if (el) el.textContent = counts[tab];
+      }
+    });
+  }
+
+  function setDashTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    refresh();
+  }
+
+  // ── DRAG & DROP ────────────────────────────────────────────────────────────
+  function dragCard(e, id) {
+    draggedId = id;
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function dropCard(e, status) {
+    e.preventDefault();
+    if (!draggedId) return;
+    moveApp(draggedId, status);
+    draggedId = null;
+  }
+  async function moveApp(id, newStatus) {
+    const app = allApps.find(a => a.id === id);
+    if (!app || app.status === newStatus) return;
+    app.status = newStatus;
+    app.updatedAt = Date.now();
+    refresh();
+    try {
+      await fetch(`/api/applications?id=${encodeURIComponent(id)}`, {
+        method: 'PATCH', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      empToast(`Déplacé vers "${STATUS_LABEL[newStatus]}"`, 'success');
+    } catch {
+      empToast('Erreur lors du déplacement', 'error');
+      loadApplications();
     }
   }
 
-  // Tab
-  function setDashTab(tab, btn) {
-    document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  // ── MODAL ──────────────────────────────────────────────────────────────────
+  function openAddModal(defaultStatus = 'wishlist') {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Nouvelle candidature';
+    document.getElementById('appJobTitle').value = '';
+    document.getElementById('appCompany').value  = '';
+    document.getElementById('appUrl').value      = '';
+    document.getElementById('appLocation').value = '';
+    document.getElementById('appSalary').value   = '';
+    document.getElementById('appStatus').value   = defaultStatus;
+    document.getElementById('appNotes').value    = '';
+    document.getElementById('appModal').classList.add('open');
+    document.getElementById('appJobTitle').focus();
+  }
+  function openDetailModal(id) {
+    const app = allApps.find(a => a.id === id);
+    if (!app) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Modifier la candidature';
+    document.getElementById('appJobTitle').value = app.jobTitle || '';
+    document.getElementById('appCompany').value  = app.company  || '';
+    document.getElementById('appUrl').value      = app.url      || '';
+    document.getElementById('appLocation').value = app.location || '';
+    document.getElementById('appSalary').value   = app.salary   || '';
+    document.getElementById('appStatus').value   = app.status   || 'wishlist';
+    document.getElementById('appNotes').value    = app.notes    || '';
+    document.getElementById('appModal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('appModal').classList.remove('open');
+    editingId = null;
   }
 
-  // Gen tabs
+  async function saveApplication() {
+    const data = {
+      jobTitle: document.getElementById('appJobTitle').value.trim(),
+      company:  document.getElementById('appCompany').value.trim(),
+      url:      document.getElementById('appUrl').value.trim(),
+      location: document.getElementById('appLocation').value.trim(),
+      salary:   document.getElementById('appSalary').value.trim(),
+      status:   document.getElementById('appStatus').value,
+      notes:    document.getElementById('appNotes').value.trim(),
+    };
+    if (!data.jobTitle && !data.company) { empToast('Remplissez le poste ou l\'entreprise', 'error'); return; }
+    const btn = document.getElementById('saveAppBtn');
+    btn.disabled = true; btn.textContent = 'Enregistrement...';
+    try {
+      if (editingId) {
+        const res = await fetch(`/api/applications?id=${encodeURIComponent(editingId)}`, {
+          method: 'PATCH', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (res.ok) {
+          const idx = allApps.findIndex(a => a.id === editingId);
+          if (idx !== -1) allApps[idx] = result.application;
+          empToast('Candidature mise à jour', 'success');
+        } else { empToast(result.error || 'Erreur', 'error'); }
+      } else {
+        const res = await fetch('/api/applications', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (res.ok) {
+          allApps.unshift(result.application);
+          empToast('Candidature ajoutée !', 'success');
+        } else if (res.status === 401) {
+          empToast('Connectez-vous pour sauvegarder vos candidatures', 'error');
+        } else { empToast(result.error || 'Erreur', 'error'); }
+      }
+      closeModal();
+      refresh();
+    } catch { empToast('Erreur réseau', 'error'); }
+    btn.disabled = false; btn.textContent = 'Enregistrer';
+  }
+
+  async function deleteApp(id) {
+    if (!confirm('Supprimer cette candidature ?')) return;
+    try {
+      await fetch(`/api/applications?id=${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'include' });
+      allApps = allApps.filter(a => a.id !== id);
+      refresh();
+      empToast('Candidature supprimée', 'info');
+    } catch { empToast('Erreur', 'error'); }
+  }
+
+  // ── VIEW TOGGLE ────────────────────────────────────────────────────────────
+  function setView(v) {
+    const kanban = document.getElementById('kanbanView');
+    const list   = document.getElementById('listView');
+    const kb = document.getElementById('vtKanban');
+    const lv = document.getElementById('vtList');
+    if (v === 'kanban') {
+      kanban.style.display = 'block'; list.classList.remove('active');
+      kb.classList.add('active'); lv.classList.remove('active');
+    } else {
+      kanban.style.display = 'none'; list.classList.add('active');
+      kb.classList.remove('active'); lv.classList.add('active');
+    }
+  }
+
+  // ── GENERATE ───────────────────────────────────────────────────────────────
   let curGenTab = 'cv';
   function setGenTab(btn, tab) {
     document.querySelectorAll('.gen-tab').forEach(b => b.classList.remove('active'));
@@ -1127,58 +1313,53 @@
     document.getElementById('genResult').className = 'gen-result';
     document.getElementById('genResult').innerHTML = '<div style="color:var(--t3);font-size:12px"><div style="font-size:32px;margin-bottom:10px">✨</div>Remplissez les champs et cliquez sur Générer</div>';
   }
-
-  // Generate
   async function handleGen() {
-    const offer = document.getElementById('genOffer').value.trim();
+    const offer   = document.getElementById('genOffer').value.trim();
     const profile = document.getElementById('genProfile').value.trim();
     if (!offer || !profile) { empToast('Veuillez remplir tous les champs', 'error'); return; }
-
-    const btn = document.getElementById('genBtn');
+    const btn    = document.getElementById('genBtn');
     const result = document.getElementById('genResult');
-    btn.disabled = true;
-    btn.textContent = '⏳ Génération en cours...';
+    btn.disabled = true; btn.textContent = '⏳ Génération en cours...';
     result.className = 'gen-result';
     result.innerHTML = '<div class="spin"></div>';
-
     try {
       const endpoints = { cv: '/api/generate/cv', lettre: '/api/generate/cover-letter', ats: '/api/generate/ats-score' };
       const body = curGenTab === 'ats' ? { jobOffer: offer, cvText: profile } : { jobOffer: offer, profile };
-      const res = await fetch(endpoints[curGenTab], {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: body })
-      });
+      const res  = await fetch(endpoints[curGenTab], { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: body }) });
       const data = await res.json();
       if (data.result) {
         result.className = 'gen-result has-content';
         result.textContent = data.result;
         empToast('Génération réussie !', 'success');
       } else throw new Error(data.error || 'Erreur');
-    } catch(e) {
+    } catch {
       result.innerHTML = '<div style="color:var(--rnb);font-size:12px">⚠️ Erreur de génération. Réessayez.</div>';
       empToast('Erreur lors de la génération', 'error');
     }
-    btn.disabled = false;
-    btn.textContent = '✨ Générer avec l\'IA';
+    btn.disabled = false; btn.textContent = '✨ Générer avec l\'IA';
   }
 
-  // Export CSV
+  // ── CSV EXPORT ─────────────────────────────────────────────────────────────
   function exportCSV() {
-    const data = [
-      ['Poste', 'Entreprise', 'Statut', 'Date'],
-      ['Dev Full Stack React', 'BNP Paribas', 'Envoyée', '2024-01-13'],
-      ['Dev Backend Python', 'Capgemini', 'Entretien', '2024-01-10'],
-      ['Dev React Senior', 'Société Générale', 'Offre reçue', '2024-01-05'],
-    ];
-    const csv = data.map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    if (!allApps.length) { empToast('Aucune candidature à exporter', 'info'); return; }
+    const rows = [['Poste','Entreprise','Statut','Lieu','Salaire','URL','Date']];
+    allApps.forEach(a => rows.push([
+      a.jobTitle||'', a.company||'', STATUS_LABEL[a.status]||a.status,
+      a.location||'', a.salary||'', a.url||'',
+      new Date(a.createdAt).toLocaleDateString('fr-FR'),
+    ]));
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'candidatures-emploia.csv';
-    a.click();
+    a.href = URL.createObjectURL(blob); a.download = 'candidatures-emploia.csv'; a.click();
     empToast('Export CSV téléchargé', 'success');
   }
+
+  // ── KEYBOARD ───────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── INIT ───────────────────────────────────────────────────────────────────
+  loadApplications();
 </script>
 </body>
 </html>

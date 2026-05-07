@@ -504,6 +504,28 @@
     .btn-save-job:hover { background: var(--s3); color: var(--ylb); }
     .btn-save-job.saved { color: var(--ylb); border-color: rgba(245,158,11,.3); }
 
+    .btn-track {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a78bfa;
+      background: rgba(167,139,250,.1);
+      border: 1.5px solid rgba(167,139,250,.3);
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .btn-track:hover { background: rgba(167,139,250,.2); border-color: #a78bfa; }
+    .btn-track.tracked { color: var(--gnb); background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.3); }
+
+    .match-pill {
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .match-pill:hover { opacity: .85; }
+
     /* SKELETON */
     .skel-job {
       background: var(--s2);
@@ -812,7 +834,8 @@
 <script src="shared.js"></script>
 <script>
   let currentType = 'tous', currentPage = 0;
-  const saved = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'); } catch { return []; } })());
+  const saved   = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs')   || '[]'); } catch { return []; } })());
+  const tracked = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]'); } catch { return []; } })());
 
   function setType(btn) {
     document.querySelectorAll('.type-chip').forEach(b => b.classList.remove('active'));
@@ -824,10 +847,38 @@
 
   function doSearch() { currentPage = 0; loadJobs(); }
 
-  function hashScore(str) {
-    let h = 5381;
-    for (let i = 0; i < str.length; i++) h = ((h<<5)+h)+str.charCodeAt(i);
-    return 82 + (Math.abs(h) % 15);
+  const scoreCache = {};
+
+  async function analyzeScore(jobId, jobTitle, jobDescription, pillEl) {
+    if (scoreCache[jobId]) { showScore(pillEl, scoreCache[jobId]); return; }
+    pillEl.textContent = '⏳';
+    pillEl.style.pointerEvents = 'none';
+    try {
+      const userProfile = localStorage.getItem('emploia_profile_text') || '';
+      const res = await fetch('/api/match-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobTitle, jobDescription: jobDescription.slice(0, 800), userProfile }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      scoreCache[jobId] = data;
+      showScore(pillEl, data);
+    } catch {
+      pillEl.textContent = '✨ Score';
+      pillEl.style.pointerEvents = '';
+    }
+  }
+
+  function showScore(pillEl, data) {
+    pillEl.textContent = `✨ ${data.score}%`;
+    pillEl.style.pointerEvents = '';
+    pillEl.title = [
+      data.verdict,
+      data.pros?.length ? '✅ ' + data.pros.join(' · ') : '',
+      data.cons?.length ? '⚠️ ' + data.cons.join(' · ') : '',
+      data.tip ? '💡 ' + data.tip : '',
+    ].filter(Boolean).join('\n');
   }
 
   function typeClass(type) {
@@ -843,7 +894,7 @@
     const dateStr = daysSince === 0 ? "Aujourd'hui" : daysSince === 1 ? "Hier" : `Il y a ${daysSince}j`;
     const isNew = daysSince < 3;
     const isSaved = saved.has(job.id);
-    const score = hashScore(job.id || job.title || '');
+    const isTracked = tracked.has(job.id);
     const sourceStyle = {
       'France Travail': 'color:var(--blb);background:var(--bld)',
       'APEC': 'color:#a78bfa;background:rgba(167,139,250,.1)',
@@ -861,7 +912,7 @@
               <div class="jc-company">${esc(job.company)}</div>
             </div>
           </div>
-          <span class="match-pill">✨ ${score}%</span>
+          <span class="match-pill" id="pill-${esc(job.id)}" title="Cliquer pour analyser la compatibilité IA" onclick="analyzeScore('${esc(job.id)}','${esc(job.title)}','${esc((job.description||'').slice(0,400))}',this)">✨ Score IA</span>
         </div>
         <div class="jc-badges">
           <span class="badge ${typeClass(job.type)}">${typeEmoji(job.type)} ${esc(job.type)}</span>
@@ -878,6 +929,7 @@
           </div>
           <div class="jc-actions">
             <button class="btn-gen-cv" onclick="genCV('${esc(job.title)}','${esc(job.company)}','${esc((job.description||'').slice(0,200))}')">✨ CV en 30s</button>
+            <button class="btn-track${isTracked?' tracked':''}" id="track-${esc(job.id)}" onclick="trackJob('${esc(job.id)}','${esc(job.title)}','${esc(job.company)}','${esc(job.url||'')}','${esc(job.location||'')}',this)">${isTracked?'✅ Suivi':'📋 Suivre'}</button>
             <button class="btn-apply" onclick="window.open('${esc(job.url||'#')}','_blank')">Postuler →</button>
             <button class="btn-save-job${isSaved?' saved':''}" id="save-${esc(job.id)}" onclick="toggleSave('${esc(job.id)}',this)">${isSaved?'⭐':'☆'}</button>
           </div>
@@ -990,6 +1042,38 @@
       empToast('Offre sauvegardée !', 'success');
     }
     localStorage.setItem('emploia_saved_jobs', JSON.stringify([...saved]));
+  }
+
+  async function trackJob(id, jobTitle, company, url, location, btn) {
+    if (tracked.has(id)) {
+      empToast('Déjà dans votre dashboard', 'info');
+      return;
+    }
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/applications', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobTitle, company, url, location, status: 'wishlist' }),
+      });
+      if (res.ok) {
+        tracked.add(id);
+        localStorage.setItem('emploia_tracked_jobs', JSON.stringify([...tracked]));
+        btn.textContent = '✅ Suivi';
+        btn.classList.add('tracked');
+        empToast('Ajouté au dashboard !', 'success');
+      } else if (res.status === 401) {
+        empToast('Connectez-vous pour suivre les offres', 'error');
+        btn.disabled = false;
+      } else {
+        empToast('Erreur', 'error');
+        btn.disabled = false;
+      }
+    } catch {
+      empToast('Erreur réseau', 'error');
+      btn.disabled = false;
+    }
   }
 
   function resetFilters() {

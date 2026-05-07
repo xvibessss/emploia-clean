@@ -514,51 +514,55 @@
     <div class="section-card" id="sec-infos">
       <div class="sc-header">
         <div class="sc-title">👤 Informations personnelles</div>
-        <span class="badge badge-blue">Profil public</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-blue">Profil public</span>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('cvFileInput').click()" title="Importer un CV PDF">📄 Importer CV</button>
+          <input type="file" id="cvFileInput" accept="application/pdf" style="display:none" onchange="importCV(this)"/>
+        </div>
       </div>
       <div class="sc-body">
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Prénom</label>
-            <input type="text" class="emp-input" value="Thomas" placeholder="Votre prénom"/>
+            <input type="text" class="emp-input" id="prfFirstName" value="Thomas" placeholder="Votre prénom"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Nom</label>
-            <input type="text" class="emp-input" value="Renard" placeholder="Votre nom"/>
+            <input type="text" class="emp-input" id="prfLastName" value="Renard" placeholder="Votre nom"/>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Email</label>
-            <input type="email" class="emp-input" value="thomas.renard@gmail.com" placeholder="email@exemple.fr"/>
+            <input type="email" class="emp-input" id="prfEmail" value="thomas.renard@gmail.com" placeholder="email@exemple.fr"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Téléphone</label>
-            <input type="tel" class="emp-input" value="+33 6 12 34 56 78" placeholder="+33 6 ..."/>
+            <input type="tel" class="emp-input" id="prfPhone" value="+33 6 12 34 56 78" placeholder="+33 6 ..."/>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Titre professionnel</label>
-            <input type="text" class="emp-input" value="Développeur Full Stack" placeholder="ex. Chef de projet Marketing"/>
+            <input type="text" class="emp-input" id="prfTitle" value="Développeur Full Stack" placeholder="ex. Chef de projet Marketing"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Ville</label>
-            <input type="text" class="emp-input" value="Paris, Île-de-France" placeholder="Paris, Lyon..."/>
+            <input type="text" class="emp-input" id="prfLocation" value="Paris, Île-de-France" placeholder="Paris, Lyon..."/>
           </div>
         </div>
         <div class="form-group" style="margin-bottom:16px">
           <label class="emp-label">Résumé professionnel</label>
-          <textarea class="emp-input" rows="4" placeholder="Décrivez votre parcours en quelques phrases...">Développeur Full Stack passionné avec 3 ans d'expérience en React et Node.js. J'ai travaillé sur des projets à fort trafic et je cherche à rejoindre une équipe innovante en CDI sur Paris ou en remote.</textarea>
+          <textarea class="emp-input" id="prfSummary" rows="4" placeholder="Décrivez votre parcours en quelques phrases...">Développeur Full Stack passionné avec 3 ans d'expérience en React et Node.js. J'ai travaillé sur des projets à fort trafic et je cherche à rejoindre une équipe innovante en CDI sur Paris ou en remote.</textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">LinkedIn</label>
-            <input type="url" class="emp-input" value="https://linkedin.com/in/thomas-renard" placeholder="https://linkedin.com/in/..."/>
+            <input type="url" class="emp-input" id="prfLinkedin" value="https://linkedin.com/in/thomas-renard" placeholder="https://linkedin.com/in/..."/>
           </div>
           <div class="form-group">
             <label class="emp-label">Portfolio / Site web</label>
-            <input type="url" class="emp-input" value="https://thomasrenard.dev" placeholder="https://..."/>
+            <input type="url" class="emp-input" id="prfPortfolio" value="https://thomasrenard.dev" placeholder="https://..."/>
           </div>
         </div>
       </div>
@@ -887,6 +891,74 @@
   setTimeout(() => {
     document.getElementById('completionBar').style.width = '72%';
   }, 400);
+
+  // CV Import
+  async function importCV(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 3_000_000) { empToast('Fichier trop volumineux (max 3 MB)', 'error'); return; }
+    if (file.type !== 'application/pdf') { empToast('Format PDF requis', 'error'); return; }
+
+    empToast('Analyse du CV en cours...', 'info');
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result.split(',')[1];
+      try {
+        const res = await fetch('/api/import-cv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pdfBase64: base64 }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          empToast(err.error || 'Erreur lors de l\'analyse', 'error');
+          return;
+        }
+        const data = await res.json();
+        fillProfileFromCV(data);
+        empToast('CV importé avec succès !', 'success');
+      } catch {
+        empToast('Erreur réseau', 'error');
+      }
+      input.value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function fillProfileFromCV(data) {
+    const set = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val; };
+    set('prfFirstName', data.firstName);
+    set('prfLastName',  data.lastName);
+    set('prfEmail',     data.email);
+    set('prfPhone',     data.phone);
+    set('prfTitle',     data.title);
+    set('prfLocation',  data.location);
+    set('prfSummary',   data.summary);
+    set('prfLinkedin',  data.linkedin);
+    set('prfPortfolio', data.portfolio);
+
+    if (data.skills?.length) {
+      const wrap = document.getElementById('skillsWrap');
+      if (wrap) {
+        wrap.innerHTML = '';
+        data.skills.forEach(skill => {
+          const tag = document.createElement('span');
+          tag.className = 'skill-tag';
+          tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${esc(skill)}<span class="remove" onclick="removeSkill(this)">✕</span>`;
+          wrap.appendChild(tag);
+        });
+      }
+    }
+
+    // Save profile text to localStorage for AI match score
+    const profileText = [
+      data.title, data.summary,
+      data.skills?.join(', '),
+      data.experience?.map(e => `${e.title} chez ${e.company} : ${e.description}`).join(' '),
+    ].filter(Boolean).join('\n');
+    localStorage.setItem('emploia_profile_text', profileText);
+  }
 </script>
 </body>
 </html>

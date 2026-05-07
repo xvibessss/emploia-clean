@@ -654,6 +654,9 @@
   let startTime = null;
   let timerInterval = null;
   let isRecording = false;
+  let isStreaming = false;
+  let currentRole = '';
+  let currentCompany = '';
 
   function setLevel(btn) {
     document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
@@ -673,37 +676,33 @@
   function autoResize(t) {
     t.style.height = 'auto';
     t.style.height = Math.min(t.scrollHeight, 120) + 'px';
-    document.getElementById('ivSendBtn').disabled = !t.value.trim();
+    document.getElementById('ivSendBtn').disabled = !t.value.trim() || isStreaming;
   }
 
   function countWords() {}
 
-  function pushMsg(role, text, ts) {
-    messages.push({ role, text, ts: ts || Date.now() });
+  function pushMsg(role, text) {
+    const ts = Date.now();
+    messages.push({ role, content: text, ts });
     if (messages.length === 1) {
       document.getElementById('ivMessages').innerHTML = '';
     }
-
-    const time = new Date(ts || Date.now()).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const time = new Date(ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     const div = document.createElement('div');
-    div.className = 'iv-msg ' + role;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'iv-msg-avatar';
-    avatar.textContent = role === 'bot' ? '🤖' : '🧑';
-
+    div.className = 'iv-msg ' + (role === 'assistant' ? 'bot' : 'user');
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'iv-msg-avatar';
+    avatarEl.textContent = role === 'assistant' ? '🤖' : '🧑';
     const bubble = document.createElement('div');
     bubble.className = 'iv-msg-bubble';
     bubble.innerHTML = esc(text).replace(/\n/g, '<br>');
-
-    const ts = document.createElement('div');
-    ts.className = 'iv-msg-time';
-    if (role === 'user') ts.style.textAlign = 'right';
-    ts.textContent = time;
-
+    const timeEl = document.createElement('div');
+    timeEl.className = 'iv-msg-time';
+    if (role === 'user') timeEl.style.textAlign = 'right';
+    timeEl.textContent = time;
     const wrapper = document.createElement('div');
-    wrapper.append(bubble, ts);
-    div.append(avatar, wrapper);
+    wrapper.append(bubble, timeEl);
+    div.append(avatarEl, wrapper);
     document.getElementById('ivMessages').appendChild(div);
     document.getElementById('ivMessages').scrollTop = document.getElementById('ivMessages').scrollHeight;
   }
@@ -727,25 +726,114 @@
     document.getElementById('typingIndicator')?.remove();
   }
 
+  async function streamBotResponse() {
+    isStreaming = true;
+    document.getElementById('ivSendBtn').disabled = true;
+    showTyping();
+
+    const apiMessages = messages.map(m => ({ role: m.role, content: m.content }));
+
+    try {
+      const res = await fetch('/api/interview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: apiMessages,
+          role: currentRole || 'un poste',
+          company: currentCompany,
+          level,
+        }),
+      });
+
+      if (!res.ok) {
+        hideTyping();
+        const err = await res.json().catch(() => ({}));
+        empToast(err.error || 'Erreur de connexion', 'error');
+        isStreaming = false;
+        document.getElementById('ivSendBtn').disabled = !document.getElementById('ivInput').value.trim();
+        return;
+      }
+
+      hideTyping();
+
+      // Create streaming bubble
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'iv-msg bot';
+      const avatarEl = document.createElement('div');
+      avatarEl.className = 'iv-msg-avatar';
+      avatarEl.textContent = '🤖';
+      const bubble = document.createElement('div');
+      bubble.className = 'iv-msg-bubble';
+      const timeEl = document.createElement('div');
+      timeEl.className = 'iv-msg-time';
+      const wrapper = document.createElement('div');
+      wrapper.append(bubble, timeEl);
+      msgDiv.append(avatarEl, wrapper);
+      document.getElementById('ivMessages').appendChild(msgDiv);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            if (parsed.chunk) {
+              fullText += parsed.chunk;
+              bubble.innerHTML = esc(fullText).replace(/\n/g, '<br>');
+              document.getElementById('ivMessages').scrollTop = document.getElementById('ivMessages').scrollHeight;
+            }
+          } catch {}
+        }
+      }
+
+      const ts = Date.now();
+      timeEl.textContent = new Date(ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      messages.push({ role: 'assistant', content: fullText, ts });
+      questionCount++;
+      updateStats();
+
+      // Extract italic feedback from response (_text_)
+      const feedbackMatch = fullText.match(/_([^_\n]+)_/);
+      if (feedbackMatch) addFeedback('💬', feedbackMatch[1].trim());
+
+    } catch (err) {
+      hideTyping();
+      console.error(err);
+      empToast('Erreur de connexion', 'error');
+    }
+
+    isStreaming = false;
+    document.getElementById('ivSendBtn').disabled = !document.getElementById('ivInput').value.trim();
+  }
+
   function startInterview() {
-    const role = document.getElementById('cfgRole').value.trim() || 'votre poste';
-    const company = document.getElementById('cfgCompany').value.trim();
+    currentRole = document.getElementById('cfgRole').value.trim() || 'un poste';
+    currentCompany = document.getElementById('cfgCompany').value.trim();
+
+    messages = [];
+    questionCount = 0;
+    totalWords = 0;
+    document.getElementById('ivMessages').innerHTML = '';
+    document.getElementById('feedbackList').innerHTML = '<div class="feedback-item"><span class="feedback-emoji">💡</span><div>Démarrez une session pour recevoir un feedback en temps réel.</div></div>';
 
     if (!startTime) {
       startTime = Date.now();
       timerInterval = setInterval(updateTimer, 1000);
     }
 
-    const greeting = `Parfait ! Démarrons une simulation d'entretien pour le poste de **${role}**${company?' chez **'+company+'**':''}, niveau **${level}**.\n\nVoici ma première question :\n\n💼 *Pourriez-vous vous présenter en 60 secondes et m'expliquer pourquoi ce poste vous intéresse particulièrement ?*`;
-
-    showTyping();
-    setTimeout(() => {
-      hideTyping();
-      pushMsg('bot', greeting);
-      questionCount++;
-      updateStats();
-      addFeedback('💡', 'Conseil : structurez votre réponse en 3 points : qui vous êtes, ce que vous savez faire, pourquoi ce poste.');
-    }, 1100);
+    updateStats();
+    // Hidden trigger message — not shown in UI, starts the conversation
+    messages.push({ role: 'user', content: 'Je suis prêt pour commencer l\'entretien.', ts: Date.now() });
+    streamBotResponse();
   }
 
   function quickStart(prompt) {
@@ -769,9 +857,17 @@
   }
 
   async function sendMsg() {
+    if (isStreaming) return;
     const inp = document.getElementById('ivInput');
     const text = inp.value.trim();
     if (!text) return;
+
+    if (!startTime) {
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 1000);
+      currentRole = document.getElementById('cfgRole').value.trim() || 'un poste';
+      currentCompany = document.getElementById('cfgCompany').value.trim();
+    }
 
     pushMsg('user', text);
     totalWords += text.split(/\s+/).length;
@@ -779,40 +875,21 @@
     autoResize(inp);
     updateStats();
 
-    showTyping();
-    addFeedback('⏱', 'Réponse de ' + text.split(/\s+/).length + ' mots — ' + (text.length > 200 ? 'bonne longueur' : 'pourrait être étoffée'));
+    addFeedback('⏱', `${text.split(/\s+/).length} mots — ${text.length > 150 ? 'bonne longueur' : 'développez davantage'}`);
 
-    // Simulate AI response
-    setTimeout(() => {
-      hideTyping();
-      const responses = [
-        "Très bonne réponse ! 👏\n\nPour aller plus loin, pourriez-vous me donner un **exemple concret** d'une situation où vous avez dû gérer un conflit dans votre équipe ? Utilisez la méthode STAR si possible.",
-        "Intéressant, j'aime votre approche.\n\nQuestion suivante : *Décrivez-moi un projet dont vous êtes particulièrement fier·e. Quel a été votre rôle et quels résultats avez-vous obtenus ?*",
-        "Bonne réflexion !\n\nMaintenant, parlons technique : *Quels sont les principaux défis techniques que vous avez rencontrés sur votre dernier projet ? Comment les avez-vous surmontés ?*",
-        "Excellent angle !\n\nDernière question pour cette section : *Quelle est votre plus grande zone d'amélioration et que faites-vous concrètement pour progresser ?*"
-      ];
-      pushMsg('bot', responses[questionCount % responses.length]);
-      questionCount++;
-      updateStats();
-
-      const tips = [
-        '✅ Bien : vous avez donné un exemple concret',
-        '💡 Astuce : quantifiez plus vos résultats',
-        '🎯 Pensez à parler des leçons apprises',
-        '⭐ Excellente structure de réponse !'
-      ];
-      addFeedback(tips[questionCount % tips.length].split(' ')[0], tips[questionCount % tips.length].substring(2));
-    }, 1300);
+    await streamBotResponse();
   }
 
   function askQ(q) {
-    pushMsg('bot', `Question : *${q}*\n\nPrenez votre temps pour répondre.`);
-    questionCount++;
-    updateStats();
     if (!startTime) {
       startTime = Date.now();
       timerInterval = setInterval(updateTimer, 1000);
+      currentRole = document.getElementById('cfgRole').value.trim() || 'un poste';
+      currentCompany = document.getElementById('cfgCompany').value.trim();
     }
+    pushMsg('assistant', `**${q}**\n\nPrenez votre temps pour répondre.`);
+    questionCount++;
+    updateStats();
   }
 
   function addFeedback(emoji, text) {
@@ -879,8 +956,9 @@
   }
 
   function exportChat() {
-    if (!messages.length) return empToast('Aucun message à exporter', 'info');
-    const txt = messages.map(m => `[${new Date(m.ts).toLocaleString('fr-FR')}] ${m.role === 'bot' ? '🤖 Coach' : '🧑 Vous'}\n${m.text}\n`).join('\n---\n\n');
+    const visible = messages.filter(m => m.role !== 'user' || messages.indexOf(m) > 0);
+    if (!visible.length) return empToast('Aucun message à exporter', 'info');
+    const txt = visible.map(m => `[${new Date(m.ts).toLocaleString('fr-FR')}] ${m.role === 'assistant' ? '🤖 Coach' : '🧑 Vous'}\n${m.content}\n`).join('\n---\n\n');
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -895,6 +973,9 @@
     questionCount = 0;
     totalWords = 0;
     startTime = null;
+    isStreaming = false;
+    currentRole = '';
+    currentCompany = '';
     clearInterval(timerInterval);
     document.getElementById('statQ').textContent = '0';
     document.getElementById('statT').textContent = '00:00';
