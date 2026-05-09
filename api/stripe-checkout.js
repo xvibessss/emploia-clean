@@ -3,8 +3,10 @@ import { checkRateLimit, getAllowedOrigin, validateEmail } from './_lib/auth.js'
 
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
 const PRICE_IDS = {
-  pro: process.env.STRIPE_PRICE_PRO || 'price_pro_monthly',
-  intensif: process.env.STRIPE_PRICE_INTENSIF || 'price_intensif_monthly',
+  pro:             process.env.STRIPE_PRICE_PRO             || 'price_pro_monthly',
+  intensif:        process.env.STRIPE_PRICE_INTENSIF        || 'price_intensif_monthly',
+  pro_annual:      process.env.STRIPE_PRICE_PRO_ANNUAL      || null,
+  intensif_annual: process.env.STRIPE_PRICE_INTENSIF_ANNUAL || null,
 };
 
 // Headers set dynamically based on origin
@@ -44,7 +46,9 @@ export default async function handler(req) {
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
 
   const { plan, email } = body;
-  if (!plan || !PRICE_IDS[plan]) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
+  if (!plan || !(plan in PRICE_IDS)) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
+  const priceId = PRICE_IDS[plan];
+  if (!priceId) return new Response(JSON.stringify({ error: 'Plan annuel non configuré' }), { status: 400, headers });
   if (email && !validateEmail(email)) return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers });
 
   try {
@@ -56,10 +60,10 @@ export default async function handler(req) {
       },
       body: new URLSearchParams({
         mode: 'subscription',
-        'line_items[0][price]': PRICE_IDS[plan],
+        'line_items[0][price]': priceId,
         'line_items[0][quantity]': '1',
-        success_url: 'https://emploia.fr/app?success=1',
-        cancel_url: 'https://emploia.fr/#pricing',
+        success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/app?success=1`,
+        cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/#pricing`,
         ...(email ? { customer_email: email } : {}),
         'metadata[plan]': plan,
         locale: 'fr',

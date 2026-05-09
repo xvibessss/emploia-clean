@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin } from './_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout } from './_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -49,15 +49,15 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backtick :
 Règles : score entre 50 et 97. verdict parmi : "Excellent match", "Bon profil", "Profil partiel", "Profil éloigné".`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 300,
         messages: [{ role: 'user', content: prompt }],
       }),
-    });
+    }), 20000);
 
     if (!res.ok) return new Response(JSON.stringify({ error: 'Erreur API' }), { status: 502, headers: H });
 

@@ -75,7 +75,7 @@ export default async function handler(req) {
     name,
     email,
     passwordHash,
-    passwordSalt: salt, // unique per user
+    passwordSalt: salt,
     generationsUsed: 0,
     plan: "free",
     createdAt: new Date().toISOString(),
@@ -85,11 +85,24 @@ export default async function handler(req) {
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
 
+  // Track referral signup if a ref code was provided
+  const refCode = typeof body.ref === 'string' ? body.ref.trim().toUpperCase() : null;
+  if (refCode && /^[A-Z0-9]{8}$/.test(refCode)) {
+    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+    fetch(`${base}/api/referral`, {
+      method: 'POST',
+      signal: AbortSignal.timeout(5000),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: refCode, newUserEmail: email }),
+    }).catch(() => {});
+  }
+
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
     const firstName = name.split(' ')[0];
     fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'Emploia <noreply@emploia.fr>',

@@ -18,25 +18,63 @@ export default async function handler(req) {
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+
   if (req.method === 'GET') {
+    const rl = await checkRateLimit(`ip:${ip}`, 'profile-get', 120, 60);
+    if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
     const profile = await kvGet(`profile:${user.email}`) || {};
     return new Response(JSON.stringify(profile), { status: 200, headers: H });
   }
 
   if (req.method === 'PUT') {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const rl = await checkRateLimit(`ip:${ip}`, 'profile', 30, 3600);
+    const rl = await checkRateLimit(`ip:${ip}`, 'profile-put', 30, 3600);
     if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
 
+    const bodyText = await req.text();
+    if (bodyText.length > 50000) return new Response(JSON.stringify({ error: 'Profil trop volumineux' }), { status: 413, headers: H });
     let body;
-    try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
-    // Only allow known fields
-    const allowed = ['firstName','lastName','title','location','phone','summary','linkedin','portfolio','skills','experience','education','languages','profileText'];
+    const str = (v, max) => typeof v === 'string' ? v.slice(0, max) : undefined;
     const profile = {};
-    for (const k of allowed) if (body[k] !== undefined) profile[k] = body[k];
-    profile.updatedAt = new Date().toISOString();
 
+    // Scalar string fields
+    const scalarFields = { firstName: 100, lastName: 100, title: 200, location: 200, phone: 30, summary: 3000, profileText: 5000 };
+    for (const [k, max] of Object.entries(scalarFields)) {
+      if (body[k] !== undefined) { const v = str(body[k], max); if (v !== undefined) profile[k] = v; }
+    }
+    // URL fields — only allow http(s)://
+    for (const k of ['linkedin', 'portfolio']) {
+      if (body[k] !== undefined) {
+        const v = str(body[k], 300);
+        if (v === '' || v === undefined) { profile[k] = ''; continue; }
+        if (/^https?:\/\//i.test(v)) profile[k] = v;
+        // else silently drop malicious values (javascript:, data:, etc.)
+      }
+    }
+
+    // Array fields — sanitize each entry
+    if (Array.isArray(body.skills)) {
+      profile.skills = body.skills.slice(0, 50).map(s => typeof s === 'string' ? s.slice(0, 100) : (typeof s === 'object' && s ? { name: String(s.name||'').slice(0,100), level: Math.min(100, Math.max(0, parseInt(s.level)||0)) } : null)).filter(Boolean);
+    }
+    if (Array.isArray(body.experience)) {
+      profile.experience = body.experience.slice(0, 20).map(e => typeof e === 'object' && e ? {
+        title: String(e.title||'').slice(0,200), company: String(e.company||'').slice(0,200),
+        date: String(e.date||'').slice(0,100), desc: String(e.desc||'').slice(0,2000),
+      } : null).filter(Boolean);
+    }
+    if (Array.isArray(body.education)) {
+      profile.education = body.education.slice(0, 10).map(e => typeof e === 'object' && e ? {
+        title: String(e.title||'').slice(0,200), school: String(e.school||'').slice(0,200),
+        date: String(e.date||'').slice(0,100), desc: String(e.desc||'').slice(0,1000),
+      } : null).filter(Boolean);
+    }
+    if (Array.isArray(body.languages)) {
+      profile.languages = body.languages.slice(0, 10).map(l => typeof l === 'object' && l ? { name: String(l.name||'').slice(0,100), level: String(l.level||'').slice(0,50) } : null).filter(Boolean);
+    }
+
+    profile.updatedAt = new Date().toISOString();
     await kvSet(`profile:${user.email}`, profile);
     return new Response(JSON.stringify({ success: true, profile }), { status: 200, headers: H });
   }

@@ -1,4 +1,5 @@
-// Node.js runtime — process.env supported
+export const config = { runtime: 'edge' };
+import { checkRateLimit, kvGet } from './_lib/auth.js';
 
 const H = {
   'Access-Control-Allow-Origin': '*',
@@ -31,7 +32,9 @@ function isGermanJob(title, desc) {
 }
 
 function withTimeout(p, ms) {
-  return Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms))]);
+  return Promise.race([p, new Promise((_, r) =>
+    setTimeout(() => r(new Error('timeout')), ms)
+  )]);
 }
 
 // ── JSEARCH (Indeed + LinkedIn + Glassdoor) ───────────
@@ -296,6 +299,32 @@ async function fetchAdzuna(q, type, location, page) {
   } catch { return []; }
 }
 
+// ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
+async function fetchEmployerJobs(q, type, location) {
+  try {
+    let jobs = await kvGet('employer_jobs') || [];
+    if (!Array.isArray(jobs)) return [];
+    jobs = jobs.filter(j => j.status === 'active');
+    if (type && type !== 'tous') {
+      const m = { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' };
+      if (m[type]) jobs = jobs.filter(j => j.type === m[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    return jobs.slice(0, 5);
+  } catch { return []; }
+}
+
 // ── DEDUPE & SORT ─────────────────────────────────────
 function deduplicate(jobs) {
   const seen = new Set();
@@ -340,45 +369,58 @@ function getMock(q, type, page) {
   return { jobs:items.slice(page*12,page*12+12), total:items.length, page, demo:true, sources:['Emploia'] };
 }
 
-// ── MAIN HANDLER ──────────────────────────────────────
-export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
-    Object.entries(H).forEach(([k,v]) => res.setHeader(k,v));
-    return res.status(204).end();
-  }
+// ── MAIN HANDLER (Edge Runtime) ───────────────────────
+export default async function handler(req) {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
 
-  const q        = (req.query?.q || '').trim();
-  const type     = (req.query?.type || '').toLowerCase();
-  const location = req.query?.location || '';
-  const page     = Math.max(0, parseInt(req.query?.page || '0'));
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'jobs', 60, 60);
+  if (!rl.allowed) return new Response(
+    JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 minute.' }),
+    { status: 429, headers: H }
+  );
+
+  const url = new URL(req.url);
+  const q          = (url.searchParams.get('q')       || '').trim().slice(0, 200);
+  const type       = (url.searchParams.get('type')     || '').toLowerCase().slice(0, 20);
+  const location   = (url.searchParams.get('location') || '').slice(0, 100);
+  const remoteOnly = url.searchParams.get('remote') === 'true';
+  const page       = Math.max(0, Math.min(10, parseInt(url.searchParams.get('page') || '0')));
 
   try {
-    const [jsRes, fmRes, intRes, rmRes, abRes, azRes] = await Promise.allSettled([
+    const [jsRes, fmRes, intRes, rmRes, abRes, azRes, empRes] = await Promise.allSettled([
       fetchJSearch(q, type, location, page),
       fetchFrenchMarket(q, type, location, page),
       fetchInternships(q, type, location),
       fetchRemotive(q, type),
       fetchArbeitnow(q, type, page),
       fetchAdzuna(q, type, location, page),
+      fetchEmployerJobs(q, type, location),
     ]);
 
+    const employerJobs = empRes.status === 'fulfilled' ? empRes.value : [];
     const allJobs = [
-      ...(fmRes.status==='fulfilled' ? fmRes.value : []),
-      ...(jsRes.status==='fulfilled' ? jsRes.value : []),
-      ...(azRes.status==='fulfilled' ? azRes.value : []),
-      ...(intRes.status==='fulfilled' ? intRes.value : []),
-      ...(rmRes.status==='fulfilled' ? rmRes.value : []),
-      ...(abRes.status==='fulfilled' ? abRes.value : []),
+      ...employerJobs,
+      ...(fmRes.status === 'fulfilled' ? fmRes.value : []),
+      ...(jsRes.status === 'fulfilled' ? jsRes.value : []),
+      ...(azRes.status === 'fulfilled' ? azRes.value : []),
+      ...(intRes.status === 'fulfilled' ? intRes.value : []),
+      ...(rmRes.status === 'fulfilled' ? rmRes.value : []),
+      ...(abRes.status === 'fulfilled' ? abRes.value : []),
     ];
 
     if (allJobs.length > 0) {
-      const final = prioritize(deduplicate(allJobs));
-      const sources = [...new Set(final.map(j=>j.source))];
-      Object.entries(H).forEach(([k,v]) => res.setHeader(k,v));
-      return res.status(200).json({ jobs:final, total:final.length, page, demo:false, sources });
+      let final = prioritize(deduplicate(allJobs));
+      if (remoteOnly) final = final.filter(j => j.remote === true);
+      const sources = [...new Set(final.map(j => j.source))];
+      return new Response(
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources }),
+        { status: 200, headers: H }
+      );
     }
   } catch {}
 
-  Object.entries(H).forEach(([k,v]) => res.setHeader(k,v));
-  return res.status(200).json(getMock(q, type, page));
+  const mock = getMock(q, type, page);
+  if (remoteOnly) mock.jobs = mock.jobs.filter(j => j.remote === true);
+  return new Response(JSON.stringify(mock), { status: 200, headers: H });
 }

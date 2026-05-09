@@ -702,22 +702,61 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         empShowAuth('login');
         return;
       }
-
       if (res.status === 402) {
         clearInterval(window._loadIntv);
         document.getElementById('resultArea').innerHTML = '';
         showUpgradeModal();
         return;
       }
-
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error || 'Erreur de génération');
       }
 
-      const data = await res.json();
-      const result = data.result || data;
-      showResult(result);
+      // ATS score returns JSON; CV and cover-letter stream SSE
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('text/event-stream')) {
+        // SSE streaming — display text as it arrives
+        clearInterval(window._loadIntv);
+        const resultArea = document.getElementById('resultArea');
+        resultArea.innerHTML = '<div class="result-content" style="white-space:pre-wrap"></div>';
+        const contentEl = resultArea.querySelector('.result-content');
+        document.getElementById('resultActions').style.display = 'block';
+        document.getElementById('resultActionsBottom').style.display = 'block';
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const parsed = JSON.parse(line.slice(6));
+              if (parsed.error) throw new Error(parsed.error);
+              if (parsed.chunk) {
+                fullText += parsed.chunk;
+                contentEl.textContent = fullText;
+              }
+              if (parsed.done) {
+                lastResult = fullText;
+              }
+            } catch (e) {
+              if (e.message !== 'Unexpected end of JSON input') throw e;
+            }
+          }
+        }
+      } else {
+        const data = await res.json();
+        const result = data.result || data;
+        showResult(result);
+      }
     } catch (e) {
       showError(e.message || 'Erreur de génération');
     } finally {

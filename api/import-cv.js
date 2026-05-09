@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, getAllowedOrigin } from './_lib/auth.js';
+import { checkRateLimit, getAllowedOrigin, withTimeout } from './_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -30,12 +30,16 @@ export default async function handler(req) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
 
+  if (!/^[A-Za-z0-9+/=\r\n]+$/.test(body.pdfBase64)) {
+    return new Response(JSON.stringify({ error: 'Format PDF invalide' }), { status: 400, headers: H });
+  }
+
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
         messages: [{
           role: 'user',
@@ -53,7 +57,7 @@ Règles : ne laisse aucun champ vide si l'info est présente. Max 3 expériences
           ],
         }],
       }),
-    });
+    }), 40000);
 
     if (!res.ok) return new Response(JSON.stringify({ error: 'Erreur analyse PDF' }), { status: 502, headers: H });
 

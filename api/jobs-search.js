@@ -1,11 +1,18 @@
 // Additional search endpoint that aggregates more sources
 // Used for real-time search suggestions and extended results
 export const config = { runtime: 'edge' };
+import { getAllowedOrigin } from './_lib/auth.js';
 
-const H = {
-  'Access-Control-Allow-Origin': '*',
-  'Content-Type': 'application/json',
-};
+const rlMap = new Map();
+function rateLimit(ip, max, windowMs) {
+  const now = Date.now();
+  const entry = rlMap.get(ip) || { count: 0, reset: now + windowMs };
+  if (now > entry.reset) { entry.count = 0; entry.reset = now + windowMs; }
+  entry.count++;
+  rlMap.set(ip, entry);
+  if (rlMap.size > 5000) { const cutoff = now - windowMs; for (const [k, v] of rlMap) if (v.reset < cutoff) rlMap.delete(k); }
+  return entry.count <= max;
+}
 
 // Scrape-free APEC via their public RSS feed
 async function fetchAPECRSS(q, type) {
@@ -104,11 +111,23 @@ async function fetchWeLoveDevs(q, type) {
 }
 
 export default async function handler(req) {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
+  const origin = getAllowedOrigin(req);
+  const H = {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Vary': 'Origin',
+    'Content-Type': 'application/json',
+  };
+
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...H, 'Access-Control-Allow-Methods': 'GET, OPTIONS' } });
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (!rateLimit(ip, 60, 60000)) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+
   const url = new URL(req.url);
-  const q = url.searchParams.get('q') || '';
-  const type = (url.searchParams.get('type') || '').toLowerCase();
-  const location = url.searchParams.get('location') || '';
+  const q = (url.searchParams.get('q') || '').slice(0, 200);
+  const type = (url.searchParams.get('type') || '').toLowerCase().slice(0, 20);
+  const location = (url.searchParams.get('location') || '').slice(0, 100);
 
   const [apecJobs, helloWorkJobs, wldJobs] = await Promise.allSettled([
     fetchAPECRSS(q, type),

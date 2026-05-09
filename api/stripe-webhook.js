@@ -16,6 +16,8 @@ async function verifyStripeSignature(payload, header, secret) {
   const ts = parts.find(p => p.startsWith('t='))?.slice(2);
   const sig = parts.find(p => p.startsWith('v1='))?.slice(3);
   if (!ts || !sig) return false;
+  // Reject webhooks older than 5 minutes to prevent replay attacks.
+  if (Math.abs(Date.now() / 1000 - parseInt(ts, 10)) > 300) return false;
   const signedPayload = `${ts}.${payload}`;
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const computed = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload));
@@ -29,10 +31,11 @@ export default async function handler(req) {
   const body = await req.text();
   const sig = req.headers.get('stripe-signature') || '';
 
-  if (STRIPE_WEBHOOK_SECRET) {
-    const valid = await verifyStripeSignature(body, sig, STRIPE_WEBHOOK_SECRET);
-    if (!valid) return new Response('Invalid signature', { status: 400 });
+  if (!STRIPE_WEBHOOK_SECRET) {
+    return new Response('Webhook secret not configured', { status: 500 });
   }
+  const valid = await verifyStripeSignature(body, sig, STRIPE_WEBHOOK_SECRET);
+  if (!valid) return new Response('Invalid signature', { status: 400 });
 
   let event;
   try { event = JSON.parse(body); }
@@ -71,6 +74,32 @@ export default async function handler(req) {
         if (email) {
           const user = await kvGet(`user:${email}`);
           if (user) await kvSet(`user:${email}`, { ...user, plan: 'free', subscriptionId: null });
+        }
+        break;
+      }
+      case 'customer.subscription.updated': {
+        const sub = event.data.object;
+        const customerId = sub.customer;
+        const email = await kvGet(`stripe:${customerId}`);
+        if (email) {
+          const user = await kvGet(`user:${email}`);
+          if (user) {
+            // Extract plan from price metadata if available
+            const priceId = sub.items?.data?.[0]?.price?.id;
+            const PRICE_TO_PLAN = {
+              [process.env.STRIPE_PRICE_PRO]: 'pro',
+              [process.env.STRIPE_PRICE_INTENSIF]: 'intensif',
+              [process.env.STRIPE_PRICE_PRO_ANNUAL]: 'pro',
+              [process.env.STRIPE_PRICE_INTENSIF_ANNUAL]: 'intensif',
+            };
+            const newPlan = (priceId && PRICE_TO_PLAN[priceId]) || user.plan;
+            await kvSet(`user:${email}`, {
+              ...user,
+              plan: sub.status === 'active' ? newPlan : 'free',
+              subscriptionId: sub.id,
+              subscriptionStatus: sub.status,
+            });
+          }
         }
         break;
       }

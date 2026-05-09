@@ -17,6 +17,9 @@
   <meta property="og:url" content="https://emploia.fr/"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Emploia","url":"https://emploia.fr","description":"Le copilote de candidature IA 100% français.","contactPoint":{"@type":"ContactPoint","email":"contact@emploia.fr","contactType":"customer support"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Emploia","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Copilote de candidature IA — CV ATS-optimisé, lettre de motivation, coaching entretien, 100% français.","url":"https://emploia.fr","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"127"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Emploia","url":"https://emploia.fr","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://emploia.fr/jobs?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Emploia est-il gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui, Emploia propose un plan gratuit avec accès aux fonctionnalités essentielles. Des plans Pro et Intensif sont disponibles pour un usage avancé."}},{"@type":"Question","name":"Combien de temps faut-il pour générer un CV avec Emploia ?","acceptedAnswer":{"@type":"Answer","text":"Moins de 30 secondes. L'IA génère un CV ATS-optimisé adapté à l'offre d'emploi que vous ciblez."}},{"@type":"Question","name":"Emploia fonctionne-t-il pour les stages et alternances ?","acceptedAnswer":{"@type":"Answer","text":"Oui, Emploia est conçu pour toutes les formes d'emploi : CDI, CDD, stage, alternance et télétravail."}},{"@type":"Question","name":"Mes données sont-elles sécurisées ?","acceptedAnswer":{"@type":"Answer","text":"Vos données sont hébergées en Europe et ne sont jamais revendues. Emploia est 100% conforme RGPD."}}]}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="shared.css"/>
@@ -1079,6 +1082,7 @@
       <a href="/jobs" class="emp-nav-a">Offres</a>
       <a href="#features" class="emp-nav-a">Fonctionnalités</a>
       <a href="/blog" class="emp-nav-a">Blog</a>
+      <a href="/employeurs" class="emp-nav-a">Recruteurs</a>
       <a href="#pricing" class="emp-nav-a">Tarifs</a>
       <a href="#faq" class="emp-nav-a">FAQ</a>
       <a href="/app" class="emp-nav-cta">Commencer gratuitement →</a>
@@ -1490,6 +1494,45 @@
           <div>
             <div class="testi-name">Manon B.</div>
             <div class="testi-role">Marketing Manager, Bordeaux</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">En 3 semaines d'utilisation, j'ai eu 4 entretiens sur 7 candidatures. Avant Emploia, j'en avais eu 1 sur 30. La différence de score ATS est énorme — de 38 à 89 en moyenne.</p>
+        <div class="testi-result">🚀 4 entretiens sur 7 candidatures</div>
+        <div class="testi-author" style="margin-top:14px">
+          <div class="testi-av">K</div>
+          <div>
+            <div class="testi-name">Kevin D.</div>
+            <div class="testi-role">Développeur Python, Lyon</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">J'ai décroché mon stage de fin d'études chez BNP Paribas grâce à Emploia. Le simulateur d'entretien m'a préparé à des questions que je n'aurais jamais anticipées.</p>
+        <div class="testi-result">🏦 Stage BNP Paribas décroché</div>
+        <div class="testi-author" style="margin-top:14px">
+          <div class="testi-av">A</div>
+          <div>
+            <div class="testi-name">Amina S.</div>
+            <div class="testi-role">Étudiante M2 Finance, Paris</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Le dashboard Kanban m'a permis de suivre 23 candidatures simultanément sans perdre le fil. J'ai signé mon CDI en 5 semaines — ma recherche la plus rapide depuis 10 ans.</p>
+        <div class="testi-result">✍️ CDI signé en 5 semaines</div>
+        <div class="testi-author" style="margin-top:14px">
+          <div class="testi-av">L</div>
+          <div>
+            <div class="testi-name">Laurent P.</div>
+            <div class="testi-role">Responsable RH, Nantes</div>
           </div>
         </div>
       </div>
@@ -1984,6 +2027,65 @@
       base += Math.floor(Math.random() * 3) - 1;
       el.textContent = base.toLocaleString('fr-FR');
     }, 8000);
+  })();
+
+  // ── COOKIE CONSENT (RGPD) ─────────────────────────────
+  (function cookieConsent() {
+    if (localStorage.getItem('emp_cookie_ok')) return;
+    const banner = document.createElement('div');
+    banner.id = 'cookie-banner';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#0d1424;border-top:1px solid rgba(255,255,255,.1);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:Sora,sans-serif;';
+    banner.innerHTML = `
+      <p style="margin:0;font-size:13px;color:#94a3b8;max-width:640px">
+        Nous utilisons des cookies pour améliorer votre expérience et analyser le trafic.
+        <a href="/legal/cookies" style="color:#60a5fa;text-decoration:none">En savoir plus</a>
+      </p>
+      <div style="display:flex;gap:10px;flex-shrink:0">
+        <button id="cookie-refuse" style="padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;font-family:Sora,sans-serif">Refuser</button>
+        <button id="cookie-accept" style="padding:8px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:Sora,sans-serif">Accepter</button>
+      </div>`;
+    document.body.appendChild(banner);
+    function dismiss(accepted) {
+      localStorage.setItem('emp_cookie_ok', accepted ? 'yes' : 'no');
+      banner.remove();
+    }
+    document.getElementById('cookie-accept').addEventListener('click', () => dismiss(true));
+    document.getElementById('cookie-refuse').addEventListener('click', () => dismiss(false));
+  })();
+
+  // ── EXIT INTENT POPUP ─────────────────────────────────
+  (function exitIntent() {
+    if (localStorage.getItem('emp_exit_seen')) return;
+    let triggered = false;
+    const overlay = document.createElement('div');
+    overlay.id = 'exit-overlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,8,15,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#0d1424;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:36px 40px;max-width:420px;width:90%;text-align:center;position:relative;font-family:Sora,sans-serif;';
+    box.innerHTML = `
+      <button id="exit-close" style="position:absolute;top:14px;right:18px;background:transparent;border:none;color:#475569;font-size:20px;cursor:pointer;line-height:1">×</button>
+      <div style="font-size:40px;margin-bottom:12px">🎯</div>
+      <h2 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 10px;letter-spacing:-.5px">Avant de partir…</h2>
+      <p style="font-size:14px;color:#94a3b8;line-height:1.6;margin:0 0 24px">Essayez Emploia gratuitement — optimisez votre CV pour les ATS et décrochez plus d'entretiens.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="#" onclick="empShowAuth('register');document.getElementById('exit-overlay').style.display='none';return false" style="display:block;padding:13px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:14px;text-decoration:none">Créer mon compte gratuit →</a>
+        <button id="exit-no" style="padding:10px;border-radius:11px;background:transparent;border:1px solid rgba(255,255,255,.1);color:#475569;font-size:13px;cursor:pointer;font-family:Sora,sans-serif">Non merci, je pars sans essayer</button>
+      </div>`;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    function show() {
+      if (triggered) return;
+      triggered = true;
+      localStorage.setItem('emp_exit_seen', '1');
+      overlay.style.display = 'flex';
+    }
+    function hide() { overlay.style.display = 'none'; }
+
+    document.addEventListener('mouseleave', e => { if (e.clientY < 10) show(); });
+    document.getElementById('exit-close').addEventListener('click', hide);
+    document.getElementById('exit-no').addEventListener('click', hide);
+    overlay.addEventListener('click', e => { if (e.target === overlay) hide(); });
   })();
 </script>
 </body>

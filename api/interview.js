@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin } from './_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from './_lib/auth.js';
 
 const LEVEL_LABELS = {
   junior: 'débutant (0-2 ans d\'expérience)',
@@ -55,6 +55,9 @@ export default async function handler(req) {
   });
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H_JSON });
 
+  const user = await getCurrentUser(req);
+  if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H_JSON });
+
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'interview', 60, 3600);
   if (!rl.allowed) return new Response(
@@ -96,7 +99,7 @@ export default async function handler(req) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 512,
         stream: true,
         system: buildSystem(role, company, level),

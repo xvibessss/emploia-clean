@@ -998,8 +998,16 @@
     }
   });
 
-  // Init
+  // Init — require auth
   document.getElementById('ivSendBtn').disabled = true;
+  (async () => {
+    try {
+      const r = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!r.ok) {
+        if (typeof empShowAuth === 'function') empShowAuth('login');
+      }
+    } catch {}
+  })();
 </script>
 </body>
 </html>

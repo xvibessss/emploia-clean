@@ -396,6 +396,7 @@ body::after {
 .badge-red    { background: var(--rnd);  color: var(--rnb); }
 .badge-purple { background: var(--vid);  color: #c4b5fd; }
 .badge-gray   { background: var(--s3);   color: var(--t2); border: 1px solid var(--brd); }
+.badge-direct { background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(59,130,246,.1)); color: #a5b4fc; border: 1px solid rgba(99,102,241,.35); font-weight: 800; }
 
 /* ── BUTTONS ───────────────────────────────── */
 .btn {

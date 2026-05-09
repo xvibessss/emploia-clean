@@ -23,11 +23,10 @@ function getHeaders(req, stream=false) {
     ? { ...base, 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no' }
     : { ...base, 'Content-Type': 'application/json' };
 }
-let H_STREAM = {}, H_JSON = {};
 
 export default async function handler(req) {
-  H_STREAM = getHeaders(req, true);
-  H_JSON = getHeaders(req, false);
+  const H_JSON   = getHeaders(req, false);
+  const H_STREAM = getHeaders(req, true);
   const origin = getAllowedOrigin(req);
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true', 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } });
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H_JSON });
@@ -70,11 +69,11 @@ export default async function handler(req) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
         stream: true,
         system: SYSTEM,
-        messages: messages.slice(-16),
+        messages,
       }),
     });
 

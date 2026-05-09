@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, kvGet, kvSet, getAllowedOrigin } from './_lib/auth.js';
+import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
 
 const STATUSES = ['wishlist', 'applied', 'interview', 'offer', 'rejected'];
 
@@ -21,6 +21,10 @@ export default async function handler(req) {
     headers: { ...H, 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' },
   });
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'applications', 120, 60);
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
@@ -38,12 +42,13 @@ export default async function handler(req) {
     let body;
     try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
+    const rawUrl = String(body.url || '').slice(0, 500);
     const apps = await kvGet(key) || [];
     const app = {
       id: crypto.randomUUID(),
       jobTitle: String(body.jobTitle || '').slice(0, 200),
       company:  String(body.company  || '').slice(0, 200),
-      url:      String(body.url      || '').slice(0, 500),
+      url:      /^https?:\/\//i.test(rawUrl) ? rawUrl : '',
       location: String(body.location || '').slice(0, 200),
       salary:   String(body.salary   || '').slice(0, 100),
       status:   STATUSES.includes(body.status) ? body.status : 'wishlist',
@@ -69,7 +74,7 @@ export default async function handler(req) {
     if (body.notes    !== undefined) apps[idx].notes    = String(body.notes).slice(0, 2000);
     if (body.jobTitle !== undefined) apps[idx].jobTitle = String(body.jobTitle).slice(0, 200);
     if (body.company  !== undefined) apps[idx].company  = String(body.company).slice(0, 200);
-    if (body.url      !== undefined) apps[idx].url      = String(body.url).slice(0, 500);
+    if (body.url      !== undefined) { const u = String(body.url).slice(0,500); apps[idx].url = /^https?:\/\//i.test(u) ? u : ''; }
     if (body.location !== undefined) apps[idx].location = String(body.location).slice(0, 200);
     if (body.salary   !== undefined) apps[idx].salary   = String(body.salary).slice(0, 100);
     apps[idx].updatedAt = Date.now();

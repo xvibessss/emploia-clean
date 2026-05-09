@@ -630,6 +630,18 @@
       gap: 8px;
     }
 
+    /* REFERRAL CARD */
+    .referral-card{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(99,102,241,.06));border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:18px 20px;}
+    .referral-title{font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px;}
+    .referral-sub{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6;}
+    .referral-stats{display:flex;gap:12px;margin-bottom:14px;}
+    .referral-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:10px 12px;text-align:center;}
+    .referral-stat-n{font-size:20px;font-weight:900;color:var(--gnb);}
+    .referral-stat-l{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
+    .referral-link-row{display:flex;gap:8px;align-items:center;}
+    .referral-link-input{flex:1;padding:9px 12px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;color:var(--t2);font-size:11px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .referral-copy-btn{padding:9px 14px;background:linear-gradient(135deg,var(--grn),rgba(16,185,129,.7));color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
     /* UPGRADE BANNER */
     .upgrade-banner {
       background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.08));
@@ -970,6 +982,20 @@
             Vous avez un entretien <strong style="color:var(--ylb)">demain chez Capgemini</strong>. Simulez un entretien technique maintenant pour vous préparer au mieux.
           </div>
           <a href="/interview" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">🎤 Simuler l'entretien →</a>
+        </div>
+      </div>
+
+      <!-- REFERRAL CARD -->
+      <div class="referral-card" id="referralCard" style="display:none">
+        <div class="referral-title">🎁 Parrainez vos amis — gagnez 1 mois Pro</div>
+        <div class="referral-sub">Pour chaque ami qui s'inscrit avec votre lien, vous gagnez tous les deux 1 mois d'accès Pro offert.</div>
+        <div class="referral-stats">
+          <div class="referral-stat"><div class="referral-stat-n" id="refSignups">0</div><div class="referral-stat-l">filleuls</div></div>
+          <div class="referral-stat"><div class="referral-stat-n" id="refMonths">0</div><div class="referral-stat-l">mois gagnés</div></div>
+        </div>
+        <div class="referral-link-row">
+          <input class="referral-link-input" id="refLinkInput" type="text" readonly value="emploia.fr/?ref=..." onclick="this.select()"/>
+          <button class="referral-copy-btn" onclick="copyRefLink()">🔗 Copier</button>
         </div>
       </div>
 
@@ -1389,8 +1415,30 @@
   // ── KEYBOARD ───────────────────────────────────────────────────────────────
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+  // ── REFERRAL ────────────────────────────────────────────────────────────────
+  async function loadReferral() {
+    try {
+      const r = await fetch('/api/referral', { credentials: 'include' });
+      if (!r.ok) return;
+      const d = await r.json();
+      document.getElementById('refLinkInput').value = d.link || '';
+      document.getElementById('refSignups').textContent = d.signups || 0;
+      document.getElementById('refMonths').textContent = d.monthsEarned || 0;
+      document.getElementById('referralCard').style.display = 'block';
+    } catch {}
+  }
+  function copyRefLink() {
+    const val = document.getElementById('refLinkInput').value;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.querySelector('.referral-copy-btn');
+      btn.textContent = '✓ Copié !';
+      setTimeout(() => { btn.textContent = '🔗 Copier'; }, 2000);
+    });
+  }
+
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();
+  loadReferral();
 </script>
 </body>
 </html>

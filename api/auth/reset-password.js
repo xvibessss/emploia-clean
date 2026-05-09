@@ -25,6 +25,9 @@ export default async function handler(req) {
 
   const { token, password } = body;
   if (!token || !password) return new Response(JSON.stringify({ error: 'Token et mot de passe requis' }), { status: 400, headers: H });
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) {
+    return new Response(JSON.stringify({ error: 'Token invalide' }), { status: 400, headers: H });
+  }
   if (password.length < 8) return new Response(JSON.stringify({ error: 'Mot de passe trop court (8 caractères min)' }), { status: 400, headers: H });
   if (password.length > 128) return new Response(JSON.stringify({ error: 'Mot de passe trop long' }), { status: 400, headers: H });
   if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {

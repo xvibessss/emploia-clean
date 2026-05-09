@@ -1,39 +1,46 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, incrementGenerations, FREE_LIMIT, sanitizeString, getAllowedOrigin } from "../_lib/auth.js";
+import { getCurrentUser, incrementGenerations, getGenerationsUsed, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
-  const H = { "Content-Type": "application/json", "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true", "Vary": "Origin" };
+  const H_JSON = { "Content-Type": "application/json", "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true", "Vary": "Origin" };
+  const H_STREAM = { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true", "Vary": "Origin" };
 
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...H, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" } });
-  if (req.method !== "POST") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers: H });
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...H_JSON, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" } });
+  if (req.method !== "POST") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers: H_JSON });
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'generate-cv', 20, 3600);
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de générations. Réessayez dans 1 heure.' }), { status: 429, headers: H_JSON });
 
   const user = await getCurrentUser(req);
-  if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
-
-  if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
-    return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
-  }
+  if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H_JSON });
 
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
+  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H_JSON }); }
 
   const jobOffer = sanitizeString(body.jobOffer, 8000);
   const profile = sanitizeString(body.profile, 8000);
-  if (!jobOffer || !profile) {
-    return new Response(JSON.stringify({ error: "Offre et profil requis" }), { status: 400, headers: H });
+  if (!jobOffer || !profile) return new Response(JSON.stringify({ error: "Offre et profil requis" }), { status: 400, headers: H_JSON });
+
+  if (user.plan === "free") {
+    const freshCount = await getGenerationsUsed(user.email);
+    const used = freshCount !== null ? freshCount : user.generationsUsed;
+    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H_JSON });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return new Response(JSON.stringify({ error: "Service temporairement indisponible" }), { status: 500, headers: H });
+  if (!apiKey) return new Response(JSON.stringify({ error: "Service temporairement indisponible" }), { status: 500, headers: H_JSON });
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
+      signal: AbortSignal.timeout(40000),
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
-        model: "claude-haiku-4-5",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 4096,
+        stream: true,
         messages: [{
           role: "user",
           content: `Tu es un expert en rédaction de CV professionnels en France.
@@ -57,16 +64,50 @@ Format: texte structuré clair avec des tirets et des sections bien délimitées
     });
 
     if (!res.ok) {
-      console.error("CV generation error:", res.status);
-      return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 502, headers: H });
+      const err = await res.text();
+      console.error("CV generation error:", res.status, err.slice(0, 200));
+      return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 502, headers: H_JSON });
     }
 
-    const data = await res.json();
-    const result = data.content?.[0]?.type === "text" ? data.content[0].text : "";
-    await incrementGenerations(user);
-    return new Response(JSON.stringify({ result }), { status: 200, headers: H });
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const encoder = new TextEncoder();
+
+    (async () => {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const parsed = JSON.parse(line.slice(6));
+              if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`));
+              }
+              if (parsed.type === 'message_stop') {
+                await incrementGenerations(user);
+                await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
+              }
+            } catch {}
+          }
+        }
+      } catch (err) {
+        await writer.write(encoder.encode(`data: ${JSON.stringify({ error: 'Erreur de génération' })}\n\n`)).catch(() => {});
+      } finally {
+        await writer.close().catch(() => {});
+      }
+    })();
+
+    return new Response(readable, { status: 200, headers: H_STREAM });
   } catch (err) {
     console.error("CV generation error:", err);
-    return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H });
+    return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H_JSON });
   }
 }

@@ -17,12 +17,16 @@ const UPSTASH_TOKEN = process.env.STORAGE_KV_REST_API_TOKEN || process.env.KV_RE
 
 async function upstash(command) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return { result: null };
-  const res = await fetch(UPSTASH_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify(command),
-  });
-  return res.json();
+  try {
+    const res = await fetch(UPSTASH_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify(command),
+    });
+    return await res.json();
+  } catch {
+    return { result: null };
+  }
 }
 
 export async function kvGet(key) {
@@ -34,6 +38,12 @@ export async function kvGet(key) {
 export async function kvSet(key, value, ttl) {
   if (ttl) await upstash(["SET", key, JSON.stringify(value), "EX", ttl]);
   else await upstash(["SET", key, JSON.stringify(value)]);
+}
+
+export async function kvSetNX(key, value, ttlSeconds) {
+  const cmd = ["SET", key, JSON.stringify(value), "NX", "EX", ttlSeconds];
+  const data = await upstash(cmd);
+  return data?.result === "OK";
 }
 
 export async function kvIncr(key) {
@@ -182,11 +192,28 @@ export async function getCurrentUser(req) {
   const userId = payload.sub || payload.userId; // support old tokens
   const email = await kvGet(`userid:${userId}`);
   if (!email) return null;
-  return kvGet(`user:${email}`);
+  const user = await kvGet(`user:${email}`);
+  if (!user) return null;
+  // Merge the atomic counter (source of truth) into the user object.
+  // Falls back to user.generationsUsed for legacy accounts with no gen: key.
+  const atomicCount = await kvGet(`gen:${email}`);
+  if (typeof atomicCount === 'number') user.generationsUsed = atomicCount;
+  return user;
 }
 
 export async function incrementGenerations(user) {
-  await kvSet(`user:${user.email}`, { ...user, generationsUsed: user.generationsUsed + 1 });
+  // Atomically increment a dedicated counter key to avoid race conditions.
+  // Two simultaneous requests both reading generationsUsed=2 and both
+  // writing 3 would effectively lose one increment. The INCR key is the
+  // authoritative source; getCurrentUser merges it back into the user object.
+  await kvIncr(`gen:${user.email}`);
+}
+
+// Exported so generate endpoints can do a fresh atomic read before
+// deciding to allow or deny the generation.
+export async function getGenerationsUsed(email) {
+  const count = await kvGet(`gen:${email}`);
+  return typeof count === 'number' ? count : null;
 }
 
 // ── INPUT VALIDATION ────────────────────────────────────────────────────────
@@ -197,6 +224,35 @@ export function validateEmail(email) {
 export function sanitizeString(str, maxLen = 10000) {
   if (typeof str !== 'string') return '';
   return str.slice(0, maxLen).trim();
+}
+
+export function htmlEscape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ]);
+}
+
+export async function kvDel(key) {
+  return upstash(["DEL", key]);
+}
+
+export async function kvMget(...keys) {
+  if (!keys.length) return [];
+  const { result } = await upstash(["MGET", ...keys]);
+  return (result || []).map(r => {
+    if (r == null) return null;
+    try { return JSON.parse(r); } catch { return r; }
+  });
 }
 
 // ── ALLOWED ORIGINS ────────────────────────────────────────────────────────

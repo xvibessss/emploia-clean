@@ -34,7 +34,7 @@ export default async function handler(req) {
     const token = crypto.randomUUID();
     await kvSet(`reset:${token}`, { email, createdAt: Date.now() }, 3600);
 
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
     await fetch('https://api.resend.com/emails', {

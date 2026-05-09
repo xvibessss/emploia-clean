@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, incrementGenerations, FREE_LIMIT, sanitizeString, getAllowedOrigin } from "../_lib/auth.js";
+import { getCurrentUser, incrementGenerations, getGenerationsUsed, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -8,12 +8,12 @@ export default async function handler(req) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...H, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type" } });
   if (req.method !== "POST") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers: H });
 
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'generate-ats', 20, 3600);
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de générations. Réessayez dans 1 heure.' }), { status: 429, headers: H });
+
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
-
-  if (user.plan === "free" && user.generationsUsed >= FREE_LIMIT) {
-    return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
-  }
 
   let body;
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
@@ -24,15 +24,21 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: "CV et offre requis" }), { status: 400, headers: H });
   }
 
+  if (user.plan === "free") {
+    const freshCount = await getGenerationsUsed(user.email);
+    const used = freshCount !== null ? freshCount : user.generationsUsed;
+    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: "Service temporairement indisponible" }), { status: 500, headers: H });
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await withTimeout(fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
-        model: "claude-haiku-4-5",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 4096,
         messages: [{
           role: "user",
@@ -63,7 +69,7 @@ Analyse ce CV par rapport à cette offre d'emploi et fournis:
 Sois précis et actionnable dans tes recommandations.`,
         }],
       }),
-    });
+    }), 30000);
 
     if (!res.ok) {
       console.error("ATS score error:", res.status);

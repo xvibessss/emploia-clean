@@ -188,7 +188,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
     <button class="cat-btn" data-cat="salaire" onclick="filterCat(this)">Salaires</button>
   </div>
 
-  <a href="#article-ats-guide" class="featured-card" data-article="ats-guide" onclick="openArticle('ats-guide');return false;">
+  <a href="/blog/cv-ats-2026" class="featured-card" data-article="ats-guide">
     <div>
       <div class="fc-tag green">Guide complet</div>
       <div class="fc-title">Comment optimiser son CV pour passer les filtres ATS en France</div>
@@ -214,11 +214,11 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
     <div class="sidebar">
       <div class="sidebar-card">
         <div class="sidebar-title">Articles populaires</div>
-        <a href="#article-ats-guide" class="sidebar-link" onclick="openArticle('ats-guide');return false;">CV ATS 2026 : le guide complet <strong>#1</strong></a>
-        <a href="#article-star-method" class="sidebar-link" onclick="openArticle('star-method');return false;">Méthode STAR expliquée <strong>#2</strong></a>
-        <a href="#article-salary-2026" class="sidebar-link" onclick="openArticle('salary-2026');return false;">Salaires dev en France 2026 <strong>#3</strong></a>
-        <a href="#article-cover-letter" class="sidebar-link" onclick="openArticle('cover-letter');return false;">Lettre de motivation qui convertit <strong>#4</strong></a>
-        <a href="#article-alternance-guide" class="sidebar-link" onclick="openArticle('alternance-guide');return false;">Trouver une alternance rapidement <strong>#5</strong></a>
+        <a href="/blog/cv-ats-2026" class="sidebar-link">CV ATS 2026 : le guide complet <strong>#1</strong></a>
+        <a href="/blog/methode-star-entretien" class="sidebar-link">Méthode STAR expliquée <strong>#2</strong></a>
+        <a href="/blog/salaires-france-2026" class="sidebar-link">Salaires dev en France 2026 <strong>#3</strong></a>
+        <a href="/blog/lettre-motivation-2026" class="sidebar-link">Lettre de motivation qui convertit <strong>#4</strong></a>
+        <a href="/blog/trouver-alternance-2026" class="sidebar-link">Trouver une alternance rapidement <strong>#5</strong></a>
       </div>
 
       <div class="cta-card">
@@ -249,6 +249,12 @@ const ARTICLES = [
   { id:'ats-keywords', cat:'cv', emoji:'🔍', tag:'cv', title:'Les mots-clés ATS par métier : la liste complète', excerpt:'Développeur, marketing, finance, RH, logistique — les mots-clés exacts à inclure dans votre CV selon votre secteur.', read:'6 min', date:'2 avr. 2026' },
   { id:'salary-negotiation', cat:'salaire', emoji:'🤝', tag:'salaire', title:'Négocier son salaire en France : techniques et timing', excerpt:'Quand négocier, combien demander, comment répondre à "Quelles sont vos prétentions ?" sans se brader.', read:'11 min', date:'30 mar. 2026' },
   { id:'stage-guide', cat:'recherche', emoji:'🎓', tag:'recherche', title:'Trouver un stage en 2026 : toutes les plateformes', excerpt:'Stage.fr, Welcome to the Jungle, Indeed, LinkedIn, candidatures spontanées — la stratégie complète pour trouver un stage rapidement.', read:'8 min', date:'28 mar. 2026' },
+  { id:'cv-sans-experience', cat:'cv', emoji:'🌱', tag:'cv', title:'Faire un CV sans expérience : méthode complète (2026)', excerpt:'Projets personnels, formations, bénévolat, compétences — comment valoriser tout ce qui compte pour convaincre un recruteur sans expérience pro.', read:'9 min', date:'7 avr. 2026' },
+  { id:'questions-entretien-rh', cat:'entretien', emoji:'🤝', tag:'entretien', title:'Les 30 questions d\'entretien RH les plus posées — Avec réponses', excerpt:'"Parlez-moi de vous", "Vos défauts ?", "Pourquoi nous ?" — les meilleures réponses type pour les 30 questions RH les plus fréquentes en France.', read:'15 min', date:'5 avr. 2026' },
+  { id:'relancer-candidature', cat:'recherche', emoji:'📧', tag:'recherche', title:'Relancer une candidature après un entretien : email + timing', excerpt:'Comment relancer un recruteur sans paraître insistant. Timing exact, formulation, 4 exemples d\'emails de relance qui fonctionnent.', read:'6 min', date:'3 avr. 2026' },
+  { id:'negocier-salaire', cat:'salaire', emoji:'💬', tag:'salaire', title:'Négocier son salaire en entretien : guide complet + scripts', excerpt:'Quand parler salaire, combien demander, comment répondre à "Quelles sont vos prétentions ?". 3 scripts de négociation + tableau des fourchettes par métier.', read:'10 min', date:'25 avr. 2026' },
+  { id:'candidature-spontanee', cat:'recherche', emoji:'📨', tag:'recherche', title:'Candidature spontanée : exemple complet + guide 2026', excerpt:'80% des offres ne sont jamais publiées. Comment trouver le bon contact, rédiger le bon email et décrocher un entretien sans offre publiée.', read:'8 min', date:'28 avr. 2026' },
+  { id:'reconversion-professionnelle', cat:'recherche', emoji:'🔄', tag:'recherche', title:'Reconversion professionnelle en 2026 : guide complet + financement', excerpt:'CPF, Pro-A, 6 secteurs qui recrutent — tout pour changer de métier en 2026, avec les formations financées et les démarches étape par étape.', read:'12 min', date:'2 mai 2026' },
 ];
 
 const tagColors = { cv:'tag-cv', entretien:'tag-entretien', recherche:'tag-recherche', salaire:'tag-salaire' };
@@ -258,8 +264,9 @@ let currentCat = 'tous';
 
 function renderArticles() {
   const filtered = currentCat === 'tous' ? ARTICLES : ARTICLES.filter(a => a.cat === currentCat);
+  const slugMap = { 'ats-guide':'cv-ats-2026', 'star-method':'methode-star-entretien', 'salary-2026':'salaires-france-2026', 'cover-letter':'lettre-motivation-2026', 'alternance-guide':'trouver-alternance-2026', 'linkedin-optimization':'optimiser-profil-linkedin', 'cv-sans-experience':'cv-sans-experience', 'questions-entretien-rh':'questions-entretien-rh', 'relancer-candidature':'relancer-candidature', 'negocier-salaire':'negocier-salaire-entretien', 'candidature-spontanee':'candidature-spontanee-exemple', 'reconversion-professionnelle':'reconversion-professionnelle-2026' };
   document.getElementById('articlesGrid').innerHTML = filtered.map(a => `
-    <a class="article-card" href="#article-${a.id}" data-cat="${a.cat}" onclick="openArticle('${a.id}');return false;">
+    <a class="article-card" href="/blog/${slugMap[a.id] || '#article-' + a.id}" data-cat="${a.cat}">
       <div class="ac-img" style="background:var(--s3)">${a.emoji}</div>
       <div class="ac-body">
         <div class="ac-tags"><span class="ac-tag ${tagColors[a.tag]}">${tagLabels[a.tag]}</span></div>
