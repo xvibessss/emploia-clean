@@ -94,6 +94,9 @@
     },
     "api/stripe-portal.js": {
       "maxDuration": 15
+    },
+    "api/saved-jobs.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -208,6 +211,11 @@
     { "source": "/blog/negocier-salaire-entretien", "destination": "/blog/negocier-salaire-entretien.html" },
     { "source": "/blog/candidature-spontanee-exemple", "destination": "/blog/candidature-spontanee-exemple.html" },
     { "source": "/blog/reconversion-professionnelle-2026", "destination": "/blog/reconversion-professionnelle-2026.html" },
+    { "source": "/blog/travailler-en-startup-2026", "destination": "/blog/travailler-en-startup-2026.html" },
+    { "source": "/blog/entretien-en-anglais", "destination": "/blog/entretien-en-anglais.html" },
+    { "source": "/blog/portfolio-developpeur-2026", "destination": "/blog/portfolio-developpeur-2026.html" },
+    { "source": "/blog/negocier-contrat-travail-2026", "destination": "/blog/negocier-contrat-travail-2026.html" },
+    { "source": "/blog/cv-par-competences-2026", "destination": "/blog/cv-par-competences-2026.html" },
     {
       "source": "/emploi/paris",
       "destination": "/emploi/paris.html"
@@ -267,7 +275,17 @@
     {
       "source": "/metier/commercial",
       "destination": "/metier/commercial.html"
-    }
+    },
+    { "source": "/metier/chef-projet", "destination": "/metier/chef-projet.html" },
+    { "source": "/metier/product-manager", "destination": "/metier/product-manager.html" },
+    { "source": "/metier/devops", "destination": "/metier/devops.html" },
+    { "source": "/metier/comptable", "destination": "/metier/comptable.html" },
+    { "source": "/metier/juridique", "destination": "/metier/juridique.html" },
+    { "source": "/emploi/strasbourg", "destination": "/emploi/strasbourg.html" },
+    { "source": "/emploi/nice", "destination": "/emploi/nice.html" },
+    { "source": "/emploi/rennes", "destination": "/emploi/rennes.html" },
+    { "source": "/emploi/montpellier", "destination": "/emploi/montpellier.html" },
+    { "source": "/emploi/grenoble", "destination": "/emploi/grenoble.html" }
   ],
   "headers": [
     {

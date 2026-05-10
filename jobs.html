@@ -844,6 +844,7 @@
 <script>
   let currentType = 'tous', currentPage = 0;
   const saved   = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs')   || '[]'); } catch { return []; } })());
+  let allJobs = [];
   const tracked = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]'); } catch { return []; } })());
 
   function setType(btn) {
@@ -1034,6 +1035,7 @@
         return;
       }
 
+      allJobs = data.jobs;
       document.getElementById('jobsList').innerHTML = data.jobs.map(renderJob).join('');
       renderPagination(data.jobs.length, total);
 
@@ -1072,19 +1074,29 @@
     setTimeout(() => window.location.href = '/app', 800);
   }
 
-  function toggleSave(id, btn) {
+  async function toggleSave(id, btn) {
     if (saved.has(id)) {
       saved.delete(id);
       btn.textContent = '☆';
       btn.classList.remove('saved');
+      localStorage.setItem('emploia_saved_jobs', JSON.stringify([...saved]));
       empToast('Offre retirée des favoris', 'info');
+      fetch('/api/saved-jobs?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'include' }).catch(() => {});
     } else {
       saved.add(id);
       btn.textContent = '⭐';
       btn.classList.add('saved');
+      localStorage.setItem('emploia_saved_jobs', JSON.stringify([...saved]));
       empToast('Offre sauvegardée !', 'success');
+      // Find job data from current results to sync to API
+      const job = allJobs?.find(j => String(j.id) === String(id)) || { id };
+      fetch('/api/saved-jobs', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: String(id), title: job.title || id, company: job.company || '', location: job.location || '', type: job.type || '', salary: job.salary || null, url: job.url || null, source: job.source || '' }),
+      }).catch(() => {});
     }
-    localStorage.setItem('emploia_saved_jobs', JSON.stringify([...saved]));
   }
 
   async function trackJob(id, jobTitle, company, url, location, btn) {

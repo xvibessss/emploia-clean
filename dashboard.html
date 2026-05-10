@@ -886,6 +886,19 @@
         <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, des alertes email et l'export CSV complet.</div>
         <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
       </div>
+
+      <!-- SAVED JOBS -->
+      <div id="savedJobsSection" style="margin-top:16px;display:none">
+        <div style="background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">⭐ Offres sauvegardées <span id="savedCount" style="background:var(--s3);color:var(--t3);font-size:10px;padding:2px 8px;border-radius:100px">0</span></div>
+            <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Parcourir les offres →</a>
+          </div>
+          <div id="savedJobsList" style="padding:12px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto">
+            <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px">Aucune offre sauvegardée.<br><a href="/jobs" style="color:var(--inb)">Parcourir les offres</a></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- RIGHT: GENERATE + ACTIVITY -->
@@ -1436,9 +1449,47 @@
     });
   }
 
+  // ── SAVED JOBS ─────────────────────────────────────────────────────────────
+  async function loadSavedJobs() {
+    try {
+      const r = await fetch('/api/saved-jobs', { credentials: 'include' });
+      if (!r.ok) return;
+      const { saved } = await r.json();
+      if (!saved || !saved.length) {
+        document.getElementById('savedJobsSection').style.display = 'block';
+        return;
+      }
+      document.getElementById('savedJobsSection').style.display = 'block';
+      document.getElementById('savedCount').textContent = saved.length;
+      document.getElementById('savedJobsList').innerHTML = saved.map(j => `
+        <div style="background:var(--s3);border:1px solid var(--brd);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.title}</div>
+            <div style="font-size:11px;color:var(--t3)">${j.company || ''}${j.location ? ' · ' + j.location : ''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            ${j.url ? `<a href="${j.url}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Voir</a>` : ''}
+            <button onclick="unsaveJobDash('${j.id}',this.closest('div[style]'))" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--rnb)">✕</button>
+          </div>
+        </div>`).join('');
+    } catch {}
+  }
+
+  async function unsaveJobDash(id, el) {
+    try {
+      await fetch('/api/saved-jobs?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'include' });
+      el.remove();
+      const list = document.getElementById('savedJobsList');
+      const count = list.children.length;
+      document.getElementById('savedCount').textContent = count;
+      if (!count) list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--t3);font-size:13px">Aucune offre sauvegardée.<br><a href="/jobs" style="color:var(--inb)">Parcourir les offres</a></div>';
+    } catch {}
+  }
+
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();
   loadReferral();
+  loadSavedJobs();
 </script>
 </body>
 </html>

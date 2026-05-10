@@ -39,7 +39,22 @@ export default function handler(req, res) {
     { loc: `${base}/metier/design`,      changefreq: 'daily',   priority: '0.85', lastmod: today },
     { loc: `${base}/metier/finance`,     changefreq: 'daily',   priority: '0.85', lastmod: today },
     { loc: `${base}/metier/rh`,          changefreq: 'daily',   priority: '0.85', lastmod: today },
-    { loc: `${base}/metier/commercial`,  changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/commercial`,      changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/chef-projet`,     changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/product-manager`, changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/devops`,          changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/comptable`,       changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/juridique`,       changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/strasbourg`,      changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/nice`,            changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/rennes`,          changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/montpellier`,     changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/grenoble`,        changefreq: 'daily',   priority: '0.85', lastmod: today },
+    { loc: `${base}/blog/travailler-en-startup-2026`,    changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-12' },
+    { loc: `${base}/blog/entretien-en-anglais`,          changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-10' },
+    { loc: `${base}/blog/portfolio-developpeur-2026`,    changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-08' },
+    { loc: `${base}/blog/negocier-contrat-travail-2026`, changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-06' },
+    { loc: `${base}/blog/cv-par-competences-2026`,       changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-04' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
