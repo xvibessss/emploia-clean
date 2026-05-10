@@ -451,11 +451,12 @@
       <div class="profile-completion">
         <div class="pc-label">
           <span>Profil complété</span>
-          <span class="pc-pct">72%</span>
+          <span class="pc-pct" id="completionPct">—%</span>
         </div>
         <div class="pc-track">
-          <div class="pc-fill" id="completionBar"></div>
+          <div class="pc-fill" id="completionBar" style="width:0%"></div>
         </div>
+        <div id="completionTip" style="font-size:11px;color:var(--t3);margin-top:8px;min-height:14px"></div>
       </div>
 
       <div class="profile-stats">
@@ -887,10 +888,41 @@
     if (e.key === 'Enter') addSkill();
   });
 
-  // Animate completion bar
-  setTimeout(() => {
-    document.getElementById('completionBar').style.width = '72%';
-  }, 400);
+  // Dynamic completion bar
+  function calculateCompletion() {
+    const checks = [
+      { id: 'prfFirstName', weight: 8, label: 'prénom' },
+      { id: 'prfLastName',  weight: 8, label: 'nom' },
+      { id: 'prfTitle',     weight: 15, label: 'titre de poste' },
+      { id: 'prfLocation',  weight: 8, label: 'localisation' },
+      { id: 'prfPhone',     weight: 6, label: 'téléphone' },
+      { id: 'prfSummary',   weight: 20, label: 'résumé professionnel' },
+      { id: 'prfLinkedin',  weight: 8, label: 'profil LinkedIn' },
+      { id: 'prfPortfolio', weight: 5, label: 'portfolio' },
+    ];
+    let score = 0;
+    const missing = [];
+    for (const c of checks) {
+      const el = document.getElementById(c.id);
+      if (el && el.value.trim().length > 1) score += c.weight;
+      else missing.push(c.label);
+    }
+    const skillCount = document.querySelectorAll('.skill-tag').length;
+    if (skillCount >= 3) score += 22;
+    else if (skillCount >= 1) score += 10;
+    else missing.push('compétences (min. 3)');
+
+    score = Math.min(score, 100);
+    document.getElementById('completionBar').style.width = score + '%';
+    document.getElementById('completionPct').textContent = score + '%';
+    const tip = document.getElementById('completionTip');
+    if (score === 100) tip.textContent = '✅ Profil complet !';
+    else if (missing.length > 0) tip.textContent = `À compléter : ${missing.slice(0, 2).join(', ')}`;
+    else tip.textContent = '';
+    return score;
+  }
+
+  setTimeout(calculateCompletion, 500);
 
   // CV Import
   async function importCV(input) {
@@ -1012,12 +1044,18 @@
       const data = await res.json();
       if (!data || !data.firstName) return;
       fillProfileFromCV(data); // reuse same filler
+      setTimeout(calculateCompletion, 200);
       empToast('Profil chargé depuis votre compte', 'info');
     } catch {}
   }
 
   window.addEventListener('empAuthChange', e => { if (e.detail.user) loadProfileFromServer(); });
   setTimeout(loadProfileFromServer, 900);
+
+  // Recalculate completion on any field change
+  document.querySelectorAll('#prfFirstName,#prfLastName,#prfTitle,#prfLocation,#prfPhone,#prfSummary,#prfLinkedin,#prfPortfolio').forEach(el => {
+    el.addEventListener('input', () => setTimeout(calculateCompletion, 100));
+  });
 </script>
 </body>
 </html>

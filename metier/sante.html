@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Emploi Santé / Médical en France — CDI, Alternance — Emploia</title>
+  <meta name="description" content="Offres d'emploi dans la santé en France — infirmier, aide-soignant, médecin, pharmacien, technicien de laboratoire. CDI, CDD, intérim."/>
+  <link rel="canonical" href="https://emploia.fr/metier/sante"/>
+  <link rel="manifest" href="/manifest.json"/><meta name="theme-color" content="#6366f1"/>
+  <meta property="og:title" content="Emploi Santé / Médical en France — Emploia"/>
+  <meta property="og:description" content="Offres d'emploi dans la santé en France — infirmier, aide-soignant, médecin, pharmacien, technicien de laboratoire. CDI, CDD, intérim."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .seo-layout{max-width:1200px;margin:0 auto;padding:100px 24px 80px}
+    .seo-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--ind2);border:1px solid rgba(99,102,241,.2);color:var(--inb);font-size:12px;font-weight:700;padding:6px 14px;border-radius:100px;margin-bottom:20px}
+    .seo-hero h1{font-size:clamp(28px,4.5vw,52px);font-weight:900;line-height:1.1;letter-spacing:-2px;margin-bottom:16px}
+    .seo-hero p{font-size:15px;color:var(--t2);max-width:560px;line-height:1.7;margin-bottom:28px}
+    .seo-search-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+    .seo-search-input{flex:1;min-width:200px;background:var(--s2);border:1px solid var(--brd);border-radius:var(--r);padding:12px 16px;color:var(--t1);font-size:14px}
+    .seo-search-input:focus{outline:none;border-color:var(--ind)}
+    .seo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+    .job-card{background:var(--s2);border:1px solid var(--brd);border-radius:20px;padding:22px;transition:all .15s;display:flex;flex-direction:column}
+    .job-card:hover{border-color:var(--brdh);transform:translateY(-2px)}
+    .job-card-top{display:flex;gap:12px;margin-bottom:12px}
+    .job-logo{width:42px;height:42px;border-radius:10px;background:var(--s4);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+    .job-logo img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+    .job-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px}
+    .job-company{font-size:12px;color:var(--t2)}
+    .job-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+    .job-tag{padding:3px 10px;border-radius:100px;font-size:11px;background:var(--s3);border:1px solid var(--brd);color:var(--t3)}
+    .job-tag.type{background:var(--ind2);border-color:rgba(99,102,241,.2);color:var(--inb)}
+    .job-card-footer{display:flex;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--brd2)}
+    .job-card-footer .btn{flex:1;font-size:12px;padding:8px 10px;justify-content:center}
+    .seo-cta{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(59,130,246,.08));border:1px solid rgba(99,102,241,.2);border-radius:24px;padding:48px 40px;text-align:center;margin-top:60px}
+    .seo-cta h2{font-size:26px;font-weight:800;margin-bottom:12px}
+    .seo-cta p{font-size:14px;color:var(--t2);margin-bottom:24px}
+    .seo-info{margin-top:60px}.seo-info h2{font-size:22px;font-weight:700;margin-bottom:20px}
+    .seo-info p{font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:12px}
+    .seo-related{margin-top:48px}.seo-related h2{font-size:18px;font-weight:700;margin-bottom:16px}
+    .seo-related-links{display:flex;gap:8px;flex-wrap:wrap}
+    .seo-related-links a{background:var(--s2);border:1px solid var(--brd);border-radius:100px;padding:6px 16px;font-size:13px;color:var(--t2);text-decoration:none;transition:all .15s}
+    .seo-related-links a:hover{border-color:var(--ind);color:var(--inb);background:var(--ind2)}
+    .skills-cloud{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+    .rech-meta{font-size:13px;color:var(--t3);margin-bottom:20px}
+    .loading-state{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--t3);gap:12px;grid-column:1/-1}
+  </style>
+</head>
+<body>
+<nav class="emp-nav"><div class="emp-nav-inner">
+  <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
+  <div class="emp-nav-links">
+    <a href="/jobs" class="emp-nav-a">Offres</a><a href="/app" class="emp-nav-a">Générer CV</a>
+    <a href="/interview" class="emp-nav-a">Entretien</a><a href="/dashboard" class="emp-nav-a">Dashboard</a>
+    <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</div></nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a><a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a><a href="/dashboard">📊 Dashboard</a>
+  <div class="mn-div"></div><a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+<div class="seo-layout page-enter">
+  <div class="seo-hero" style="margin-bottom:32px">
+    <div class="seo-eyebrow">🏥 Offres d'emploi</div>
+    <h1>Offres <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Santé / Médical</span> en France</h1>
+    <p>Offres d'emploi dans la santé en France — infirmier, aide-soignant, médecin, pharmacien, technicien de laboratoire. CDI, CDD, intérim.</p>
+    <div class="seo-search-row">
+      <input class="seo-search-input" id="queryInput" placeholder="Affiner..." onkeydown="if(event.key==='Enter')refineSearch()"/>
+      <button class="btn btn-primary" onclick="refineSearch()">Rechercher</button>
+    </div>
+  </div>
+  <div class="skills-cloud"><span class="job-tag">IDE</span><span class="job-tag">Soins infirmiers</span><span class="job-tag">Dossier patient</span><span class="job-tag">DPI</span><span class="job-tag">AFGSU</span><span class="job-tag">Bloc opératoire</span><span class="job-tag">Urgences</span><span class="job-tag">HAD</span></div>
+  <div class="rech-meta"><span id="jobCount">Chargement...</span></div>
+  <div id="jobGrid" class="seo-grid">
+    <div class="loading-state"><div class="spin"></div><span>Chargement des offres...</span></div>
+  </div>
+  <div class="seo-cta"><h2>✨ Générez votre CV en 30 secondes</h2><p>Notre IA adapte votre CV à chaque offre — mots-clés ATS, format optimisé, lettre de motivation incluse.</p><a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a></div>
+  <div class="seo-info">
+    <h2>Emploi <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Santé / Médical</span> — Guide</h2>
+    <p>Le secteur de la santé est l'un des plus recruteurs en France avec des dizaines de milliers de postes non pourvus chaque année, notamment en soins infirmiers, aide à domicile et médecine spécialisée. La pénurie de soignants crée des opportunités permanentes, y compris en intérim bien rémunéré.</p><p>Les profils les plus recherchés : infirmiers diplômés d'État (IDE), aides-soignants (AS), médecins généralistes et spécialistes, kinésithérapeutes, préparateurs en pharmacie, techniciens de laboratoire. Les salaires varient considérablement selon le statut (public/privé) et la spécialité.</p>
+  </div>
+  <div class="seo-related"><h2>Autres métiers</h2><div class="seo-related-links"><a href="/metier/rh">RH</a><a href="/metier/commercial">Commercial</a><a href="/metier/juridique">Juridique</a><a href="/metier/comptable">Comptable</a></div></div>
+  <div class="seo-related" style="margin-top:24px"><h2>Par ville</h2><div class="seo-related-links"><a href="/emploi/paris">Paris</a><a href="/emploi/lyon">Lyon</a><a href="/emploi/marseille">Marseille</a><a href="/emploi/bordeaux">Bordeaux</a></div></div>
+</div>
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+<script src="/shared.js"></script>
+<script>
+  const DEFAULT_QUERY="infirmier santé médical";
+  function esc(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function renderJob(j){
+    const card=document.createElement('div');card.className='job-card reveal';
+    const t={full_time:'CDI',part_time:'Temps partiel',contract:'CDD',internship:'Stage',apprenticeship:'Alternance',temporary:'Intérim',freelance:'Freelance'};
+    const type=t[j.job_type]||j.type||'';
+    const enc=encodeURIComponent((j.title||'')+(j.company_name||j.company?' chez '+(j.company_name||j.company):''));
+    const logo=j.company_logo?`<img src="${esc(j.company_logo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🏢'">`:'🏢';
+    card.innerHTML=`<div class="job-card-top"><div class="job-logo">${logo}</div><div><div class="job-title">${esc(j.title||'Poste')}</div><div class="job-company">${esc(j.company_name||j.company||'')}</div></div></div>
+    <div class="job-tags">${type?`<span class="job-tag type">${esc(type)}</span>`:''}${j.remote?'<span class="job-tag">🌐 Remote</span>':''}</div>
+    <div class="job-card-footer"><a href="/app?offre=${enc}" class="btn btn-primary">✨ Générer CV</a>${j.url?`<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
+    return card;
+  }
+  function refineSearch(){window.location.href='/recherche?q='+encodeURIComponent(document.getElementById('queryInput').value.trim()||DEFAULT_QUERY);}
+  async function loadJobs(){
+    const g=document.getElementById('jobGrid');
+    try{
+      const r=await fetch('/api/jobs-search?q='+encodeURIComponent(DEFAULT_QUERY)+'&limit=18');
+      const d=await r.json();const jobs=d.jobs||d.results||[];
+      g.innerHTML='';
+      if(!jobs.length){g.innerHTML='<div class="loading-state">Aucune offre — <a href="/jobs" style="color:var(--blb);margin-left:6px">voir toutes les offres</a></div>';document.getElementById('jobCount').textContent='Aucune offre';return;}
+      jobs.forEach(j=>g.appendChild(renderJob(j)));
+      document.getElementById('jobCount').textContent=(d.total||jobs.length).toLocaleString('fr-FR')+' offres trouvées';
+      document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+    }catch{g.innerHTML='<div class="loading-state"><a href="/jobs" style="color:var(--blb)">Voir toutes les offres</a></div>';}
+  }
+  loadJobs();
+</script></body></html>

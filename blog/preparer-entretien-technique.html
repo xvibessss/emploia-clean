@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Comment préparer un entretien technique (dev, data, DevOps) en 2026 — Emploia Blog</title>
+  <meta name="description" content="Algorithmes, system design, live coding, pair programming : comment préparer un entretien technique en 2026. Ressources, méthode et pièges à éviter."/>
+  <link rel="canonical" href="https://emploia.fr/blog/preparer-entretien-technique"/>
+  <meta property="og:title" content="Comment préparer un entretien technique (dev, data, DevOps) en 2026"/>
+  <meta property="og:description" content="Algorithmes, system design, live coding, pair programming : méthode complète pour préparer un entretien technique."/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://emploia.fr/blog/preparer-entretien-technique"/>
+  <meta property="og:image" content="https://emploia.fr/opengraph.jpg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Comment préparer un entretien technique (dev, data, DevOps) en 2026","description":"Algorithmes, system design, live coding, pair programming : méthode complète pour préparer un entretien technique.","url":"https://emploia.fr/blog/preparer-entretien-technique","datePublished":"20 mai 2026","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .blog-layout { max-width: 760px; margin: 0 auto; padding: 100px 24px 80px; }
+    .blog-category { display: inline-flex; align-items: center; gap: 8px; background: var(--ind2); border: 1px solid rgba(99,102,241,.2); color: var(--inb); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: .5px; }
+    .blog-title { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; letter-spacing: -1.5px; margin-bottom: 20px; color: var(--t1); }
+    .blog-meta { display: flex; gap: 16px; align-items: center; font-size: 13px; color: var(--t3); margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--brd); flex-wrap: wrap; }
+    .blog-body { font-size: 16px; line-height: 1.8; color: var(--t2); }
+    .blog-body h2 { font-size: 22px; font-weight: 800; color: var(--t1); margin: 40px 0 16px; letter-spacing: -.5px; }
+    .blog-body h3 { font-size: 17px; font-weight: 700; color: var(--t1); margin: 28px 0 12px; }
+    .blog-body p { margin-bottom: 18px; }
+    .blog-body ul, .blog-body ol { padding-left: 24px; margin-bottom: 18px; }
+    .blog-body li { margin-bottom: 8px; }
+    .blog-body strong { color: var(--t1); font-weight: 700; }
+    .blog-body code { background: var(--s3); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+    .tip-box { background: rgba(99,102,241,.06); border-left: 3px solid var(--inb); border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 24px 0; }
+    .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
+    .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
+    .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
+    .blog-back:hover { color: var(--t1); }
+  </style>
+</head>
+<body>
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/blog" class="emp-nav-a">Blog</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/blog">📝 Blog</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="blog-layout page-enter">
+  <a href="/blog" class="blog-back">← Retour au blog</a>
+  <div class="blog-category">entretien</div>
+  <h1 class="blog-title">Comment préparer un entretien technique (dev, data, DevOps) en 2026</h1>
+  <div class="blog-meta">
+    <span>📅 20 mai 2026</span>
+    <span>⏱ 11 min de lecture</span>
+    <span>✍️ Équipe Emploia</span>
+  </div>
+  <div class="blog-body">
+
+    <p>L'entretien technique reste l'étape la plus redoutée dans le recrutement tech. En 2026, les formats ont évolué : moins de puzzles algorithmiques purs, plus de system design, pair programming et revues de code réelles. Voici la méthode complète pour vous préparer efficacement.</p>
+
+    <h2>Comprendre les différents formats en 2026</h2>
+
+    <h3>Le live coding (45–90 min)</h3>
+    <p>Toujours très répandu. Vous codez sur un outil partagé (CoderPad, HackerRank) pendant que l'interviewer observe. L'objectif n'est pas d'avoir la solution parfaite immédiatement, mais de montrer votre raisonnement. <strong>Parlez à voix haute</strong> pendant que vous codez.</p>
+
+    <h3>Le system design (60–90 min)</h3>
+    <p>Pour les profils senior (3+ ans). On vous demande de concevoir un système distribué : "Designez Twitter", "Comment feriez-vous tenir 1 million de connexions simultanées ?". Évalue votre compréhension des trade-offs architecturaux.</p>
+
+    <h3>La revue de code (30–60 min)</h3>
+    <p>On vous donne un bout de code existant à analyser : bugs, problèmes de performance, lisibilité, sécurité. Très courant en 2026 car plus proche de la réalité du travail quotidien.</p>
+
+    <h3>Le take-home project (3–7 jours)</h3>
+    <p>Un mini-projet à rendre chez soi. Avantage : moins de stress. Inconvénient : demande du temps. Soignez la qualité du code, les tests, la documentation du README et le déploiement (Vercel, Railway).</p>
+
+    <h2>Préparer les algorithmes et structures de données</h2>
+
+    <p>Même si les FAANG-style interviews sont moins fréquents en France, les bases restent testées. Concentrez-vous sur :</p>
+    <ul>
+      <li><strong>Structures de données</strong> : tableaux, hash maps, listes chaînées, arbres, graphes, piles, files</li>
+      <li><strong>Algorithmes clés</strong> : tri (quicksort, mergesort), recherche binaire, BFS/DFS, sliding window</li>
+      <li><strong>Complexité</strong> : savoir expliquer O(n), O(log n), O(n²) — et pourquoi ça compte</li>
+    </ul>
+
+    <div class="tip-box">
+      <strong>Ressources recommandées</strong> : LeetCode (cibler les "Easy" et "Medium" français), Exercism.io pour pratiquer en français, AlgoExpert pour les explications vidéo.
+    </div>
+
+    <h2>Préparer le system design</h2>
+
+    <h3>Le framework SNAKE</h3>
+    <ol>
+      <li><strong>S</strong>cénario — clarifier les exigences fonctionnelles et non-fonctionnelles</li>
+      <li><strong>N</strong>écessités — estimer le volume : utilisateurs, requêtes/s, stockage</li>
+      <li><strong>A</strong>rchitecture — proposer les briques : API, DB, cache, message queue</li>
+      <li><strong>K</strong>ey components — détailler les composants critiques</li>
+      <li><strong>E</strong>valuation — discuter les trade-offs et les points de défaillance</li>
+    </ol>
+
+    <h3>Concepts à maîtriser</h3>
+    <ul>
+      <li>Load balancing, CDN, reverse proxy</li>
+      <li>SQL vs NoSQL — quand utiliser quoi</li>
+      <li>Sharding, réplication, consistency vs availability (CAP theorem)</li>
+      <li>Message queues (Kafka, RabbitMQ)</li>
+      <li>Caching (Redis, Memcached) et stratégies d'invalidation</li>
+      <li>Microservices vs monolithe — les vrais trade-offs</li>
+    </ul>
+
+    <h2>Préparer les questions comportementales tech</h2>
+    <p>Même en entretien technique, vous aurez des questions comme : "Parlez d'un incident de production que vous avez géré", "Un désaccord technique avec un collègue — comment ça s'est passé ?"</p>
+    <p>Utilisez la méthode STAR (Situation, Tâche, Action, Résultat) avec des exemples précis. Préparez 4–5 anecdotes réelles couvrant : réussite technique, gestion d'erreur, collaboration, décision sous incertitude.</p>
+
+    <h2>Le jour J : les bonnes pratiques</h2>
+    <ul>
+      <li><strong>Clarifiez avant de coder</strong> : posez 2–3 questions pour comprendre les contraintes ("Peut-il y avoir des doublons ?", "Quelle taille max pour les inputs ?")</li>
+      <li><strong>Pensez à voix haute</strong> : l'interviewer veut voir votre raisonnement, pas juste la solution</li>
+      <li><strong>Commencez par une solution brute</strong>, puis optimisez — ne bloquez pas sur la solution parfaite</li>
+      <li><strong>Testez votre code</strong> avec des exemples, incluant les edge cases</li>
+      <li><strong>Si vous êtes bloqué</strong>, dites-le : "Je vois deux approches, la première est… la deuxième est…"</li>
+    </ul>
+
+    <h2>Ressources spécifiques par profil</h2>
+    <h3>Développeur backend/fullstack</h3>
+    <p>LeetCode (150 problèmes minimum), Designing Data-Intensive Applications (livre), System Design Primer (GitHub). Pratiquez aussi les questions sur votre stack : REST vs GraphQL, gestion des transactions, indexation SQL.</p>
+
+    <h3>Data scientist / Data engineer</h3>
+    <p>SQL avancé (window functions, CTEs), statistiques (p-value, régression, A/B testing), Python pandas/numpy. Pour le data engineering : Spark, Airflow, architecture lambda/kappa.</p>
+
+    <h3>DevOps / SRE</h3>
+    <p>Kubernetes, Docker, CI/CD (GitHub Actions, GitLab CI), observabilité (Prometheus, Grafana, ELK). Questions sur les SLO/SLA/SLI et la gestion des incidents en production.</p>
+
+  </div>
+  <div class="blog-cta">
+    <h3>✨ Préparez votre entretien avec Emploia</h3>
+    <p>Simulez des entretiens techniques avec notre IA, adaptez votre CV à chaque poste et suivez vos candidatures depuis votre dashboard.</p>
+    <a href="/interview" class="btn btn-primary btn-lg">Simuler un entretien →</a>
+  </div>
+</div>
+
+<script src="/shared.js"></script>
+</body>
+</html>

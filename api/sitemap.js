@@ -55,6 +55,22 @@ export default function handler(req, res) {
     { loc: `${base}/blog/portfolio-developpeur-2026`,    changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-08' },
     { loc: `${base}/blog/negocier-contrat-travail-2026`, changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-06' },
     { loc: `${base}/blog/cv-par-competences-2026`,       changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-04' },
+    { loc: `${base}/emploi/aix-en-provence`,  changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/rouen`,            changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/nancy`,            changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/dijon`,            changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/emploi/clermont-ferrand`, changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/ingenieur`,        changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/logistique`,       changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/communication`,    changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/sante`,            changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/metier/btp`,              changefreq: 'daily', priority: '0.85', lastmod: today },
+    { loc: `${base}/blog/teletravail-negocier-2026`,        changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-14' },
+    { loc: `${base}/blog/secteurs-qui-recrutent-2026`,      changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-16' },
+    { loc: `${base}/blog/ia-et-emploi-2026`,                changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-18' },
+    { loc: `${base}/blog/preparer-entretien-technique`,     changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-20' },
+    { loc: `${base}/blog/email-candidature-parfait`,        changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-22' },
+    { loc: `${base}/blog/reseaux-sociaux-recherche-emploi`, changefreq: 'monthly', priority: '0.8', lastmod: '2026-05-24' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -97,6 +97,9 @@
     },
     "api/saved-jobs.js": {
       "maxDuration": 10
+    },
+    "api/alerts.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -285,7 +288,23 @@
     { "source": "/emploi/nice", "destination": "/emploi/nice.html" },
     { "source": "/emploi/rennes", "destination": "/emploi/rennes.html" },
     { "source": "/emploi/montpellier", "destination": "/emploi/montpellier.html" },
-    { "source": "/emploi/grenoble", "destination": "/emploi/grenoble.html" }
+    { "source": "/emploi/grenoble", "destination": "/emploi/grenoble.html" },
+    { "source": "/emploi/aix-en-provence", "destination": "/emploi/aix-en-provence.html" },
+    { "source": "/emploi/rouen", "destination": "/emploi/rouen.html" },
+    { "source": "/emploi/nancy", "destination": "/emploi/nancy.html" },
+    { "source": "/emploi/dijon", "destination": "/emploi/dijon.html" },
+    { "source": "/emploi/clermont-ferrand", "destination": "/emploi/clermont-ferrand.html" },
+    { "source": "/metier/ingenieur", "destination": "/metier/ingenieur.html" },
+    { "source": "/metier/logistique", "destination": "/metier/logistique.html" },
+    { "source": "/metier/communication", "destination": "/metier/communication.html" },
+    { "source": "/metier/sante", "destination": "/metier/sante.html" },
+    { "source": "/metier/btp", "destination": "/metier/btp.html" },
+    { "source": "/blog/teletravail-negocier-2026", "destination": "/blog/teletravail-negocier-2026.html" },
+    { "source": "/blog/secteurs-qui-recrutent-2026", "destination": "/blog/secteurs-qui-recrutent-2026.html" },
+    { "source": "/blog/ia-et-emploi-2026", "destination": "/blog/ia-et-emploi-2026.html" },
+    { "source": "/blog/preparer-entretien-technique", "destination": "/blog/preparer-entretien-technique.html" },
+    { "source": "/blog/email-candidature-parfait", "destination": "/blog/email-candidature-parfait.html" },
+    { "source": "/blog/reseaux-sociaux-recherche-emploi", "destination": "/blog/reseaux-sociaux-recherche-emploi.html" }
   ],
   "headers": [
     {
