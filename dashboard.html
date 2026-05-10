@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — Emploia</title>
+  <meta name="description" content="Gérez toutes vos candidatures, générez des CVs ATS-optimisés et suivez vos entretiens depuis votre dashboard Emploia."/>
+  <link rel="canonical" href="https://emploia.fr/dashboard"/>
+  <meta name="robots" content="noindex"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    body { background: var(--bg3); }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    .dash-layout {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 24px 100px;
+    }
+
+    /* ── WELCOME BANNER ─────────────────────── */
+    .welcome-banner {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad-primary);
+    }
+
+    .wb-glow {
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(99,102,241,.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .wb-left { position: relative; z-index: 1; }
+
+    .wb-greeting {
+      font-size: 13px;
+      color: var(--t3);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wb-name {
+      font-size: clamp(20px, 2.5vw, 26px);
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -.6px;
+      margin-bottom: 10px;
+    }
+
+    .wb-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .wb-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--t3);
+    }
+
+    .wb-stat strong { color: var(--t2); font-weight: 700; }
+
+    .wb-right {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── ONBOARDING PROGRESS ────────────────── */
+    .onboarding-card {
+      background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(99,102,241,.06));
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+
+    .ob-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ob-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ob-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .ob-step {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+
+    .ob-step:hover { border-color: var(--brdh); background: rgba(255,255,255,.07); }
+    .ob-step.done { border-color: rgba(16,185,129,.25); background: rgba(16,185,129,.06); }
+
+    .ob-step-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      background: var(--s3);
+    }
+
+    .ob-step.done .ob-step-icon { background: var(--gnd); }
+
+    .ob-step-text { flex: 1; }
+    .ob-step-label { font-size: 12px; font-weight: 700; color: var(--t2); }
+    .ob-step.done .ob-step-label { color: var(--gnb); }
+    .ob-step-sub { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+    .ob-check { font-size: 14px; color: var(--gnb); }
+
+    /* ── STATS ROW ──────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all .2s;
+      cursor: default;
+    }
+
+    .stat-card:hover { border-color: var(--brdh); transform: translateY(-1px); }
+
+    .sc-icon {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .sc-value {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--t1);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .sc-label { font-size: 11px; color: var(--t3); }
+
+    .sc-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .sc-delta.up { color: var(--gnb); }
+    .sc-delta.down { color: var(--rnb); }
+
+    /* ── MAIN GRID ──────────────────────────── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── TABS ───────────────────────────────── */
+    .dash-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .dash-tab {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+
+    .dash-tab:hover { color: var(--t2); background: rgba(255,255,255,.04); }
+
+    .dash-tab.active {
+      background: var(--grad-primary);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99,102,241,.3);
+    }
+
+    .tab-count {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 100px;
+      background: rgba(255,255,255,.2);
+    }
+
+    .dash-tab:not(.active) .tab-count {
+      background: var(--s3);
+      color: var(--t3);
+    }
+
+    /* ── KANBAN ─────────────────────────────── */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kanban-col {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .kc-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kc-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .kc-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .dot-wishlist  { background: #a78bfa; }
+    .dot-applied   { background: var(--blue); }
+    .dot-interview { background: var(--ylw); }
+    .dot-offer     { background: var(--grn); }
+    .dot-rejected  { background: var(--red); }
+
+    /* Application modal */
+    .app-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .app-modal-overlay.open { display: flex; }
+    .app-modal {
+      background: var(--bg);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .app-modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 20px; letter-spacing: -.4px; }
+    .app-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .app-modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .app-modal-field label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; }
+    .app-modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+    .kc-count {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--t3);
+      background: var(--s3);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .kc-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+
+    .kanban-card {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .kanban-card:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+
+    .kcard-company { font-size: 10px; font-weight: 700; color: var(--t3); margin-bottom: 4px; }
+    .kcard-title { font-size: 12px; font-weight: 700; color: var(--t1); margin-bottom: 8px; line-height: 1.3; }
+    .kcard-footer { display: flex; align-items: center; justify-content: space-between; }
+    .kcard-date { font-size: 10px; color: var(--t3); }
+    .kcard-actions { display: flex; gap: 4px; }
+
+    .kcard-btn {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: none;
+      background: var(--s4);
+      cursor: pointer;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+
+    .kcard-btn:hover { background: var(--bld); }
+
+    .kc-add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t3);
+      cursor: pointer;
+      border: 1px dashed var(--brd);
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .kc-add:hover { border-color: var(--blue); color: var(--blb); background: var(--bls); }
+
+    /* ── LIST VIEW ──────────────────────────── */
+    .list-view { display: none; flex-direction: column; gap: 10px; }
+
+    .list-view.active { display: flex; }
+
+    .list-item {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all .2s;
+      cursor: pointer;
+    }
+
+    .list-item:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+
+    .li-logo {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .li-info { flex: 1; }
+    .li-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+    .li-company { font-size: 12px; color: var(--t2); margin-bottom: 6px; }
+    .li-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .li-meta-item { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 4px; }
+
+    .li-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* ── GENERATE PANEL (RIGHT) ─────────────── */
+    .generate-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    .gen-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .gen-card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gen-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .gen-card-body { padding: 16px 18px; }
+
+    .gen-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+      background: var(--s3);
+      border-radius: 10px;
+      padding: 4px;
+    }
+
+    .gen-tab {
+      flex: 1;
+      padding: 7px 6px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+      text-align: center;
+    }
+
+    .gen-tab.active {
+      background: var(--grad-primary);
+      color: #fff;
+    }
+
+    .gen-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1.5px solid var(--brd);
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--t1);
+      font-family: 'Sora', sans-serif;
+      outline: none;
+      resize: none;
+      line-height: 1.65;
+      transition: border-color .15s;
+      margin-bottom: 10px;
+    }
+
+    .gen-textarea:focus { border-color: var(--blue); }
+    .gen-textarea::placeholder { color: var(--t3); }
+
+    /* RESULT AREA */
+    .gen-result {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 120px;
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .gen-result.has-content {
+      align-items: flex-start;
+      text-align: left;
+      color: var(--t1);
+      white-space: pre-wrap;
+    }
+
+    /* USAGE BAR */
+    .usage-bar {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .usage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .usage-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; }
+    .usage-count { font-size: 12px; font-weight: 700; color: var(--blb); }
+
+    /* RECENT ACTIVITY */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--brd);
+    }
+
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .activity-item:first-child { padding-top: 0; }
+
+    .activity-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .activity-text { flex: 1; }
+    .activity-title { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.4; }
+    .activity-title strong { color: var(--t1); }
+    .activity-time { font-size: 10px; color: var(--t3); margin-top: 3px; }
+
+    /* VIEW TOGGLE */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--s3);
+      border-radius: 9px;
+      padding: 3px;
+    }
+
+    .vt-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: 'Sora', sans-serif;
+      transition: all .15s;
+    }
+
+    .vt-btn.active { background: var(--s2); color: var(--t1); }
+
+    /* SKELETON CARDS */
+    .skel-card-dash {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* REFERRAL CARD */
+    .referral-card{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(99,102,241,.06));border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:18px 20px;}
+    .referral-title{font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px;}
+    .referral-sub{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6;}
+    .referral-stats{display:flex;gap:12px;margin-bottom:14px;}
+    .referral-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:10px 12px;text-align:center;}
+    .referral-stat-n{font-size:20px;font-weight:900;color:var(--gnb);}
+    .referral-stat-l{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
+    .referral-link-row{display:flex;gap:8px;align-items:center;}
+    .referral-link-input{flex:1;padding:9px 12px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;color:var(--t2);font-size:11px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .referral-copy-btn{padding:9px 14px;background:linear-gradient(135deg,var(--grn),rgba(16,185,129,.7));color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+
+    /* UPGRADE BANNER */
+    .upgrade-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.08));
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ub-text { font-size: 12px; color: var(--t2); line-height: 1.5; }
+    .ub-text strong { color: var(--t1); }
+
+    @media (max-width: 1400px) {
+      .kanban-board { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .generate-panel { display: none; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .kanban-board { grid-template-columns: repeat(2, 1fr); }
+      .ob-steps { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .kanban-board { grid-template-columns: 1fr; }
+      .ob-steps { grid-template-columns: 1fr; }
+      .welcome-banner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/dashboard" class="emp-nav-a active">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="dash-layout page-enter">
+
+  <!-- WELCOME BANNER -->
+  <div class="welcome-banner">
+    <div class="wb-glow"></div>
+    <div class="wb-left">
+      <div class="wb-greeting">
+        <span id="greetingEmoji">👋</span>
+        <span id="greetingText">Bonjour</span>
+      </div>
+      <div class="wb-name">Thomas Renard</div>
+      <div class="wb-stats">
+        <div class="wb-stat"><span>📋</span> <strong>24</strong> candidatures</div>
+        <div class="wb-stat"><span>🎯</span> <strong>8</strong> entretiens</div>
+        <div class="wb-stat"><span>✨</span> <strong>3</strong> générations restantes</div>
+        <div class="wb-stat"><span>⭐</span> Plan <strong>Gratuit</strong></div>
+      </div>
+    </div>
+    <div class="wb-right">
+      <a href="/jobs" class="btn btn-ghost btn-sm">📋 Chercher une offre</a>
+      <a href="/app" class="btn btn-primary btn-sm">✨ Générer un CV</a>
+    </div>
+  </div>
+
+  <!-- ONBOARDING STEPS -->
+  <div class="onboarding-card" id="onboardingCard">
+    <div class="ob-header">
+      <div class="ob-title">🚀 Complétez votre profil pour de meilleures recommandations
+        <span class="badge badge-blue">72% complété</span>
+      </div>
+      <button onclick="document.getElementById('onboardingCard').style.display='none'" style="background:transparent;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:4px">✕</button>
+    </div>
+    <div class="ob-steps">
+      <a href="/app" class="ob-step done">
+        <div class="ob-step-icon">✨</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Premier CV généré</div>
+          <div class="ob-step-sub">Complété</div>
+        </div>
+        <span class="ob-check">✓</span>
+      </a>
+      <a href="/profil" class="ob-step done">
+        <div class="ob-step-icon">👤</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Profil créé</div>
+          <div class="ob-step-sub">Complété</div>
+        </div>
+        <span class="ob-check">✓</span>
+      </a>
+      <a href="/jobs" class="ob-step">
+        <div class="ob-step-icon">📋</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Première candidature</div>
+          <div class="ob-step-sub">Postulez à une offre</div>
+        </div>
+      </a>
+      <a href="/interview" class="ob-step">
+        <div class="ob-step-icon">🎤</div>
+        <div class="ob-step-text">
+          <div class="ob-step-label">Simuler un entretien</div>
+          <div class="ob-step-sub">Préparez-vous</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--bld)">📤</div>
+      <div class="sc-value">24</div>
+      <div class="sc-label">Candidatures envoyées</div>
+      <div class="sc-delta up">↑ +3 cette semaine</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--yld)">🎤</div>
+      <div class="sc-value">8</div>
+      <div class="sc-label">Entretiens obtenus</div>
+      <div class="sc-delta up">↑ Taux 33%</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--gnd)">🏆</div>
+      <div class="sc-value">2</div>
+      <div class="sc-label">Offres reçues</div>
+      <div class="sc-delta up">↑ En cours</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:var(--ind2)">📄</div>
+      <div class="sc-value">94</div>
+      <div class="sc-label">Meilleur score ATS</div>
+      <div class="sc-delta up">↑ +53 pts vs avant</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:rgba(139,92,246,.1)">⏳</div>
+      <div class="sc-value">5</div>
+      <div class="sc-label">En attente de réponse</div>
+      <div class="sc-delta down">↓ 3 relances à faire</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dash-grid">
+
+    <!-- LEFT: KANBAN / LIST -->
+    <div>
+      <!-- TOOLBAR -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="dash-tabs">
+          <button class="dash-tab active" data-tab="all" onclick="setDashTab('all',this)">Toutes <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="wishlist" onclick="setDashTab('wishlist',this)">À postuler <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="applied" onclick="setDashTab('applied',this)">Envoyées <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="interview" onclick="setDashTab('interview',this)">Entretiens <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="offer" onclick="setDashTab('offer',this)">Offres <span class="tab-count">0</span></button>
+          <button class="dash-tab" data-tab="rejected" onclick="setDashTab('rejected',this)">Refus <span class="tab-count">0</span></button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="view-toggle">
+            <button class="vt-btn active" id="vtKanban" onclick="setView('kanban')">⊞ Kanban</button>
+            <button class="vt-btn" id="vtList" onclick="setView('list')">≡ Liste</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <!-- KANBAN VIEW -->
+      <div id="kanbanView">
+        <div class="kanban-board">
+          <div class="kanban-col" data-status="wishlist" ondragover="event.preventDefault()" ondrop="dropCard(event,'wishlist')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-wishlist"></div>À postuler</div>
+              <span class="kc-count" id="kc-wishlist">0</span>
+            </div>
+            <div class="kc-body" id="kb-wishlist"></div>
+          </div>
+          <div class="kanban-col" data-status="applied" ondragover="event.preventDefault()" ondrop="dropCard(event,'applied')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-applied"></div>Envoyée</div>
+              <span class="kc-count" id="kc-applied">0</span>
+            </div>
+            <div class="kc-body" id="kb-applied"></div>
+          </div>
+          <div class="kanban-col" data-status="interview" ondragover="event.preventDefault()" ondrop="dropCard(event,'interview')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-interview"></div>Entretien</div>
+              <span class="kc-count" id="kc-interview">0</span>
+            </div>
+            <div class="kc-body" id="kb-interview"></div>
+          </div>
+          <div class="kanban-col" data-status="offer" ondragover="event.preventDefault()" ondrop="dropCard(event,'offer')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-offer"></div>Offre reçue</div>
+              <span class="kc-count" id="kc-offer">0</span>
+            </div>
+            <div class="kc-body" id="kb-offer"></div>
+          </div>
+          <div class="kanban-col" data-status="rejected" ondragover="event.preventDefault()" ondrop="dropCard(event,'rejected')">
+            <div class="kc-header">
+              <div class="kc-title"><div class="kc-dot dot-rejected"></div>Refus</div>
+              <span class="kc-count" id="kc-rejected">0</span>
+            </div>
+            <div class="kc-body" id="kb-rejected"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div class="list-view" id="listView"></div>
+
+      <!-- UPGRADE -->
+      <div class="upgrade-banner" style="margin-top:16px">
+        <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, des alertes email et l'export CSV complet.</div>
+        <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: GENERATE + ACTIVITY -->
+    <div class="generate-panel">
+
+      <!-- GENERATE CARD -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">✨ Générer</div>
+          <span class="badge badge-blue">3 crédits restants</span>
+        </div>
+        <div class="gen-card-body">
+          <div class="gen-tabs">
+            <button class="gen-tab active" onclick="setGenTab(this,'cv')">📄 CV</button>
+            <button class="gen-tab" onclick="setGenTab(this,'lettre')">✉️ Lettre</button>
+            <button class="gen-tab" onclick="setGenTab(this,'ats')">🎯 ATS</button>
+          </div>
+
+          <textarea class="gen-textarea" id="genOffer" rows="4" placeholder="Collez l'offre d'emploi ici..."></textarea>
+          <textarea class="gen-textarea" id="genProfile" rows="3" placeholder="Votre profil / expériences..."></textarea>
+
+          <div class="gen-result" id="genResult">
+            <div style="color:var(--t3);font-size:12px">
+              <div style="font-size:32px;margin-bottom:10px">✨</div>
+              Remplissez les champs et cliquez sur Générer
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="genBtn" style="width:100%" onclick="handleGen()">
+            ✨ Générer avec l'IA
+          </button>
+
+          <div style="margin-top:10px">
+            <div class="usage-bar">
+              <div class="usage-header">
+                <div class="usage-label">Crédits utilisés</div>
+                <div class="usage-count">2 / 5</div>
+              </div>
+              <div class="emp-progress-track">
+                <div class="emp-progress-fill" style="width:40%"></div>
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--t3)">3 générations restantes · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY CARD -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">⚡ Activité récente</div>
+        </div>
+        <div class="gen-card-body" style="padding-top:4px">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-text">
+                <div class="activity-title">CV généré pour <strong>BNP Paribas</strong> (Score ATS: 94)</div>
+                <div class="activity-time">Il y a 2 heures</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🎤</div>
+              <div class="activity-text">
+                <div class="activity-title">Entretien simulé — <strong>Développeur Backend</strong></div>
+                <div class="activity-time">Hier à 16h30</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">✉️</div>
+              <div class="activity-text">
+                <div class="activity-title">Lettre générée pour <strong>Capgemini</strong></div>
+                <div class="activity-time">Il y a 2 jours</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">⭐</div>
+              <div class="activity-text">
+                <div class="activity-title">Offre sauvegardée — <strong>Alan (Full Stack)</strong></div>
+                <div class="activity-time">Il y a 3 jours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div class="gen-card">
+        <div class="gen-card-header">
+          <div class="gen-card-title">💡 Conseil du jour</div>
+        </div>
+        <div class="gen-card-body">
+          <div style="font-size:13px;color:var(--t2);line-height:1.7">
+            Vous avez un entretien <strong style="color:var(--ylb)">demain chez Capgemini</strong>. Simulez un entretien technique maintenant pour vous préparer au mieux.
+          </div>
+          <a href="/interview" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">🎤 Simuler l'entretien →</a>
+        </div>
+      </div>
+
+      <!-- REFERRAL CARD -->
+      <div class="referral-card" id="referralCard" style="display:none">
+        <div class="referral-title">🎁 Parrainez vos amis — gagnez 1 mois Pro</div>
+        <div class="referral-sub">Pour chaque ami qui s'inscrit avec votre lien, vous gagnez tous les deux 1 mois d'accès Pro offert.</div>
+        <div class="referral-stats">
+          <div class="referral-stat"><div class="referral-stat-n" id="refSignups">0</div><div class="referral-stat-l">filleuls</div></div>
+          <div class="referral-stat"><div class="referral-stat-n" id="refMonths">0</div><div class="referral-stat-l">mois gagnés</div></div>
+        </div>
+        <div class="referral-link-row">
+          <input class="referral-link-input" id="refLinkInput" type="text" readonly value="emploia.fr/?ref=..." onclick="this.select()"/>
+          <button class="referral-copy-btn" onclick="copyRefLink()">🔗 Copier</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- APPLICATION MODAL -->
+<div class="app-modal-overlay" id="appModal" onclick="if(event.target===this)closeModal()">
+  <div class="app-modal">
+    <h3 id="modalTitle">Nouvelle candidature</h3>
+    <div class="app-modal-row">
+      <div class="app-modal-field">
+        <label>Poste</label>
+        <input type="text" class="emp-input" id="appJobTitle" placeholder="Développeur Frontend"/>
+      </div>
+      <div class="app-modal-field">
+        <label>Entreprise</label>
+        <input type="text" class="emp-input" id="appCompany" placeholder="Nom de l'entreprise"/>
+      </div>
+    </div>
+    <div class="app-modal-row">
+      <div class="app-modal-field">
+        <label>Lieu</label>
+        <input type="text" class="emp-input" id="appLocation" placeholder="Paris, Remote..."/>
+      </div>
+      <div class="app-modal-field">
+        <label>Salaire</label>
+        <input type="text" class="emp-input" id="appSalary" placeholder="45–55k€"/>
+      </div>
+    </div>
+    <div class="app-modal-field">
+      <label>Lien de l'offre</label>
+      <input type="url" class="emp-input" id="appUrl" placeholder="https://..."/>
+    </div>
+    <div class="app-modal-field">
+      <label>Statut</label>
+      <select class="emp-input" id="appStatus">
+        <option value="wishlist">📋 À postuler</option>
+        <option value="applied">📤 Envoyée</option>
+        <option value="interview">🗓 Entretien</option>
+        <option value="offer">🎉 Offre reçue</option>
+        <option value="rejected">❌ Refus</option>
+      </select>
+    </div>
+    <div class="app-modal-field">
+      <label>Notes</label>
+      <textarea class="emp-input" id="appNotes" rows="3" placeholder="Contacts, infos, suivi..."></textarea>
+    </div>
+    <div class="app-modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary btn-sm" id="saveAppBtn" onclick="saveApplication()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item active"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  // Greeting
+  const hr = new Date().getHours();
+  document.getElementById('greetingText').textContent = hr < 12 ? 'Bonjour' : hr < 18 ? 'Bon après-midi' : 'Bonsoir';
+  document.getElementById('greetingEmoji').textContent = hr < 12 ? '☀️' : hr < 18 ? '👋' : '🌙';
+
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let allApps = [];
+  let activeTab = 'all';
+  let editingId = null;
+  let draggedId = null;
+
+  const COLS = [
+    { status: 'wishlist',  label: 'À postuler',  dotClass: 'dot-wishlist'  },
+    { status: 'applied',   label: 'Envoyée',      dotClass: 'dot-applied'   },
+    { status: 'interview', label: 'Entretien',    dotClass: 'dot-interview' },
+    { status: 'offer',     label: 'Offre reçue',  dotClass: 'dot-offer'     },
+    { status: 'rejected',  label: 'Refus',        dotClass: 'dot-rejected'  },
+  ];
+  const STATUS_LABEL  = Object.fromEntries(COLS.map(c => [c.status, c.label]));
+  const STATUS_BADGE  = { wishlist:'badge-purple', applied:'badge-blue', interview:'badge-yellow', offer:'badge-green', rejected:'badge-gray' };
+
+  // ── DATA LOADING ───────────────────────────────────────────────────────────
+  async function loadApplications() {
+    try {
+      const res = await fetch('/api/applications', { credentials: 'include' });
+      if (res.status === 401) {
+        allApps = [];
+        showAuthBanner();
+      } else if (res.ok) {
+        allApps = (await res.json()).applications || [];
+        hideAuthBanner();
+      } else { throw new Error(); }
+    } catch { empToast('Erreur de chargement des candidatures', 'error'); allApps = []; }
+    refresh();
+  }
+
+  function showAuthBanner() {
+    let b = document.getElementById('dashAuthBanner');
+    if (b) return;
+    b = document.createElement('div');
+    b.id = 'dashAuthBanner';
+    b.style.cssText = 'background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap';
+    b.innerHTML = `
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px">📊 Connectez-vous pour suivre vos candidatures</div>
+        <div style="font-size:13px;color:var(--t2)">Sauvegardez votre Kanban, suivez vos offres et exportez en CSV — gratuitement.</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-shrink:0">
+        <button onclick="empShowAuth('register')" style="padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;color:#fff;background:var(--grad-primary);border:none;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 4px 14px rgba(99,102,241,.35)">S'inscrire gratuitement</button>
+        <button onclick="empShowAuth('login')" style="padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:var(--t1);background:var(--s2);border:1.5px solid var(--brd);cursor:pointer;font-family:'Sora',sans-serif">Se connecter</button>
+      </div>`;
+    const kanbanEl = document.querySelector('.kb-board') || document.querySelector('.dash-main');
+    if (kanbanEl) kanbanEl.parentNode.insertBefore(b, kanbanEl);
+    else document.querySelector('.app-container')?.prepend(b);
+    window.addEventListener('empAuthChange', e => {
+      if (e.detail.user) { hideAuthBanner(); loadApplications(); }
+    }, { once: true });
+  }
+
+  function hideAuthBanner() {
+    document.getElementById('dashAuthBanner')?.remove();
+  }
+
+  function filteredApps() {
+    return activeTab === 'all' ? allApps : allApps.filter(a => a.status === activeTab);
+  }
+
+  function refresh() {
+    renderKanban(filteredApps());
+    renderList(filteredApps());
+    updateTabCounts(allApps);
+  }
+
+  // ── KANBAN ─────────────────────────────────────────────────────────────────
+  function renderKanban(apps) {
+    COLS.forEach(col => {
+      const body  = document.getElementById('kb-' + col.status);
+      const count = document.getElementById('kc-' + col.status);
+      const colApps = apps.filter(a => a.status === col.status);
+      if (count) count.textContent = colApps.length;
+      if (!body) return;
+      body.innerHTML = colApps.map(renderCard).join('');
+      const addBtn = document.createElement('button');
+      addBtn.className = 'kc-add';
+      addBtn.textContent = '+ Ajouter';
+      addBtn.onclick = () => openAddModal(col.status);
+      body.appendChild(addBtn);
+    });
+  }
+
+  function renderCard(app) {
+    const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt)) / 86400000);
+    const dateStr = daysAgo === 0 ? "Aujourd'hui" : daysAgo === 1 ? "Hier" : `Il y a ${daysAgo}j`;
+    const extra = app.status === 'offer'     ? ' style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)"'
+                : app.status === 'interview'  ? ' style="border-color:rgba(245,158,11,.2)"'
+                : app.status === 'rejected'   ? ' style="opacity:.65"' : '';
+    return `<div class="kanban-card"${extra} draggable="true"
+      ondragstart="dragCard(event,'${esc(app.id)}')"
+      onclick="openDetailModal('${esc(app.id)}')">
+      <div class="kcard-company">${esc(app.company || '—')}</div>
+      <div class="kcard-title">${esc(app.jobTitle || 'Candidature')}</div>
+      ${app.salary ? `<div style="font-size:10px;color:var(--gnb);margin:2px 0 4px">💰 ${esc(app.salary)}</div>` : ''}
+      <div class="kcard-footer">
+        <span class="kcard-date">${dateStr}</span>
+        <div class="kcard-actions">
+          <button class="kcard-btn" title="Modifier" onclick="event.stopPropagation();openDetailModal('${esc(app.id)}')">✏️</button>
+          <button class="kcard-btn" title="Supprimer" onclick="event.stopPropagation();deleteApp('${esc(app.id)}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── LIST ───────────────────────────────────────────────────────────────────
+  function renderList(apps) {
+    const el = document.getElementById('listView');
+    if (!apps.length) {
+      el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--t3);font-size:14px">
+        Aucune candidature.<br><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="openAddModal()">+ Ajouter ma première candidature</button></div>`;
+      return;
+    }
+    el.innerHTML = apps.map(app => {
+      const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt)) / 86400000);
+      const dateStr = daysAgo === 0 ? "Aujourd'hui" : daysAgo === 1 ? "Hier" : `Il y a ${daysAgo}j`;
+      return `<div class="list-item">
+        <div class="li-logo">🏢</div>
+        <div class="li-info">
+          <div class="li-title">${esc(app.jobTitle || 'Candidature')}</div>
+          <div class="li-company">${esc(app.company || '—')}</div>
+          <div class="li-meta">
+            ${app.location ? `<div class="li-meta-item">📍 ${esc(app.location)}</div>` : ''}
+            ${app.salary   ? `<div class="li-meta-item">💰 ${esc(app.salary)}</div>`   : ''}
+            <div class="li-meta-item">📅 ${dateStr}</div>
+          </div>
+        </div>
+        <span class="badge ${STATUS_BADGE[app.status] || 'badge-gray'}">${STATUS_LABEL[app.status] || app.status}</span>
+        <div class="li-actions">
+          ${app.url ? `<a href="${esc(app.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir l'offre →</a>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="openDetailModal('${esc(app.id)}')">Modifier</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── TABS & COUNTS ──────────────────────────────────────────────────────────
+  function updateTabCounts(apps) {
+    const counts = { all: apps.length };
+    COLS.forEach(c => counts[c.status] = 0);
+    apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+    document.querySelectorAll('.dash-tab').forEach(btn => {
+      const tab = btn.dataset.tab;
+      if (tab !== undefined && counts[tab] !== undefined) {
+        const el = btn.querySelector('.tab-count');
+        if (el) el.textContent = counts[tab];
+      }
+    });
+  }
+
+  function setDashTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    refresh();
+  }
+
+  // ── DRAG & DROP ────────────────────────────────────────────────────────────
+  function dragCard(e, id) {
+    draggedId = id;
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function dropCard(e, status) {
+    e.preventDefault();
+    if (!draggedId) return;
+    moveApp(draggedId, status);
+    draggedId = null;
+  }
+  async function moveApp(id, newStatus) {
+    const app = allApps.find(a => a.id === id);
+    if (!app || app.status === newStatus) return;
+    app.status = newStatus;
+    app.updatedAt = Date.now();
+    refresh();
+    try {
+      await fetch(`/api/applications?id=${encodeURIComponent(id)}`, {
+        method: 'PATCH', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      empToast(`Déplacé vers "${STATUS_LABEL[newStatus]}"`, 'success');
+    } catch {
+      empToast('Erreur lors du déplacement', 'error');
+      loadApplications();
+    }
+  }
+
+  // ── MODAL ──────────────────────────────────────────────────────────────────
+  function openAddModal(defaultStatus = 'wishlist') {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Nouvelle candidature';
+    document.getElementById('appJobTitle').value = '';
+    document.getElementById('appCompany').value  = '';
+    document.getElementById('appUrl').value      = '';
+    document.getElementById('appLocation').value = '';
+    document.getElementById('appSalary').value   = '';
+    document.getElementById('appStatus').value   = defaultStatus;
+    document.getElementById('appNotes').value    = '';
+    document.getElementById('appModal').classList.add('open');
+    document.getElementById('appJobTitle').focus();
+  }
+  function openDetailModal(id) {
+    const app = allApps.find(a => a.id === id);
+    if (!app) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Modifier la candidature';
+    document.getElementById('appJobTitle').value = app.jobTitle || '';
+    document.getElementById('appCompany').value  = app.company  || '';
+    document.getElementById('appUrl').value      = app.url      || '';
+    document.getElementById('appLocation').value = app.location || '';
+    document.getElementById('appSalary').value   = app.salary   || '';
+    document.getElementById('appStatus').value   = app.status   || 'wishlist';
+    document.getElementById('appNotes').value    = app.notes    || '';
+    document.getElementById('appModal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('appModal').classList.remove('open');
+    editingId = null;
+  }
+
+  async function saveApplication() {
+    const data = {
+      jobTitle: document.getElementById('appJobTitle').value.trim(),
+      company:  document.getElementById('appCompany').value.trim(),
+      url:      document.getElementById('appUrl').value.trim(),
+      location: document.getElementById('appLocation').value.trim(),
+      salary:   document.getElementById('appSalary').value.trim(),
+      status:   document.getElementById('appStatus').value,
+      notes:    document.getElementById('appNotes').value.trim(),
+    };
+    if (!data.jobTitle && !data.company) { empToast('Remplissez le poste ou l\'entreprise', 'error'); return; }
+    const btn = document.getElementById('saveAppBtn');
+    btn.disabled = true; btn.textContent = 'Enregistrement...';
+    try {
+      if (editingId) {
+        const res = await fetch(`/api/applications?id=${encodeURIComponent(editingId)}`, {
+          method: 'PATCH', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (res.ok) {
+          const idx = allApps.findIndex(a => a.id === editingId);
+          if (idx !== -1) allApps[idx] = result.application;
+          empToast('Candidature mise à jour', 'success');
+        } else { empToast(result.error || 'Erreur', 'error'); }
+      } else {
+        const res = await fetch('/api/applications', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (res.ok) {
+          allApps.unshift(result.application);
+          empToast('Candidature ajoutée !', 'success');
+        } else if (res.status === 401) {
+          empShowAuth('login');
+        } else { empToast(result.error || 'Erreur', 'error'); }
+      }
+      closeModal();
+      refresh();
+    } catch { empToast('Erreur réseau', 'error'); }
+    btn.disabled = false; btn.textContent = 'Enregistrer';
+  }
+
+  async function deleteApp(id) {
+    if (!confirm('Supprimer cette candidature ?')) return;
+    try {
+      await fetch(`/api/applications?id=${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'include' });
+      allApps = allApps.filter(a => a.id !== id);
+      refresh();
+      empToast('Candidature supprimée', 'info');
+    } catch { empToast('Erreur', 'error'); }
+  }
+
+  // ── VIEW TOGGLE ────────────────────────────────────────────────────────────
+  function setView(v) {
+    const kanban = document.getElementById('kanbanView');
+    const list   = document.getElementById('listView');
+    const kb = document.getElementById('vtKanban');
+    const lv = document.getElementById('vtList');
+    if (v === 'kanban') {
+      kanban.style.display = 'block'; list.classList.remove('active');
+      kb.classList.add('active'); lv.classList.remove('active');
+    } else {
+      kanban.style.display = 'none'; list.classList.add('active');
+      kb.classList.remove('active'); lv.classList.add('active');
+    }
+  }
+
+  // ── GENERATE ───────────────────────────────────────────────────────────────
+  let curGenTab = 'cv';
+  function setGenTab(btn, tab) {
+    document.querySelectorAll('.gen-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    curGenTab = tab;
+    document.getElementById('genResult').className = 'gen-result';
+    document.getElementById('genResult').innerHTML = '<div style="color:var(--t3);font-size:12px"><div style="font-size:32px;margin-bottom:10px">✨</div>Remplissez les champs et cliquez sur Générer</div>';
+  }
+  async function handleGen() {
+    const offer   = document.getElementById('genOffer').value.trim();
+    const profile = document.getElementById('genProfile').value.trim();
+    if (!offer || !profile) { empToast('Veuillez remplir tous les champs', 'error'); return; }
+    const btn    = document.getElementById('genBtn');
+    const result = document.getElementById('genResult');
+    btn.disabled = true; btn.textContent = '⏳ Génération en cours...';
+    result.className = 'gen-result';
+    result.innerHTML = '<div class="spin"></div>';
+    try {
+      const endpoints = { cv: '/api/generate/cv', lettre: '/api/generate/cover-letter', ats: '/api/generate/ats-score' };
+      const body = curGenTab === 'ats' ? { jobOffer: offer, cvText: profile } : { jobOffer: offer, profile };
+      const res  = await fetch(endpoints[curGenTab], { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: body }) });
+      const data = await res.json();
+      if (data.result) {
+        result.className = 'gen-result has-content';
+        result.textContent = data.result;
+        empToast('Génération réussie !', 'success');
+      } else throw new Error(data.error || 'Erreur');
+    } catch {
+      result.innerHTML = '<div style="color:var(--rnb);font-size:12px">⚠️ Erreur de génération. Réessayez.</div>';
+      empToast('Erreur lors de la génération', 'error');
+    }
+    btn.disabled = false; btn.textContent = '✨ Générer avec l\'IA';
+  }
+
+  // ── CSV EXPORT ─────────────────────────────────────────────────────────────
+  function exportCSV() {
+    if (!allApps.length) { empToast('Aucune candidature à exporter', 'info'); return; }
+    const rows = [['Poste','Entreprise','Statut','Lieu','Salaire','URL','Date']];
+    allApps.forEach(a => rows.push([
+      a.jobTitle||'', a.company||'', STATUS_LABEL[a.status]||a.status,
+      a.location||'', a.salary||'', a.url||'',
+      new Date(a.createdAt).toLocaleDateString('fr-FR'),
+    ]));
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'candidatures-emploia.csv'; a.click();
+    empToast('Export CSV téléchargé', 'success');
+  }
+
+  // ── KEYBOARD ───────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── REFERRAL ────────────────────────────────────────────────────────────────
+  async function loadReferral() {
+    try {
+      const r = await fetch('/api/referral', { credentials: 'include' });
+      if (!r.ok) return;
+      const d = await r.json();
+      document.getElementById('refLinkInput').value = d.link || '';
+      document.getElementById('refSignups').textContent = d.signups || 0;
+      document.getElementById('refMonths').textContent = d.monthsEarned || 0;
+      document.getElementById('referralCard').style.display = 'block';
+    } catch {}
+  }
+  function copyRefLink() {
+    const val = document.getElementById('refLinkInput').value;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.querySelector('.referral-copy-btn');
+      btn.textContent = '✓ Copié !';
+      setTimeout(() => { btn.textContent = '🔗 Copier'; }, 2000);
+    });
+  }
+
+  // ── INIT ───────────────────────────────────────────────────────────────────
+  loadApplications();
+  loadReferral();
+</script>
+</body>
+</html>

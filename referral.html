@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Parrainage — Gagnez des mois gratuits avec Emploia</title>
+  <meta name="description" content="Parrainez vos amis sur Emploia et gagnez 1 mois gratuit par filleul. Programme de parrainage 100% transparent."/>
+  <link rel="canonical" href="https://emploia.fr/referral"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .ref-layout {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+    }
+    .ref-hero {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .ref-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.2);
+      color: var(--gnb);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .ref-hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+    }
+    .ref-hero p {
+      font-size: 16px;
+      color: var(--t2);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .ref-how {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 48px 0;
+    }
+    @media (max-width: 600px) { .ref-how { grid-template-columns: 1fr; } }
+    .ref-step {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .ref-step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--ind2);
+      border: 1px solid rgba(99,102,241,.2);
+      color: var(--inb);
+      font-size: 18px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .ref-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .ref-step p { font-size: 13px; color: var(--t2); line-height: 1.6; margin: 0; }
+    .ref-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+    .ref-card-title {
+      font-size: 18px; font-weight: 700; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ref-link-row {
+      display: flex; gap: 10px; align-items: center;
+    }
+    .ref-link-input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r);
+      padding: 12px 16px;
+      color: var(--t1);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .ref-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .ref-stat-box {
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r2);
+      padding: 20px;
+      text-align: center;
+    }
+    .ref-stat-num {
+      font-size: 36px; font-weight: 900;
+      background: var(--grad-text);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ref-stat-label { font-size: 12px; color: var(--t3); margin-top: 4px; }
+    .ref-login-prompt {
+      text-align: center;
+      padding: 60px 24px;
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+    }
+    .ref-login-prompt h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+    .ref-login-prompt p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
+    .ref-faq { margin-top: 48px; }
+    .ref-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+    .ref-faq-item {
+      border-bottom: 1px solid var(--brd);
+      padding: 16px 0;
+    }
+    .ref-faq-q {
+      font-size: 15px; font-weight: 600; color: var(--t1);
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .ref-faq-a {
+      font-size: 13px; color: var(--t2); line-height: 1.7;
+      margin-top: 12px; display: none;
+    }
+    .ref-faq-item.open .ref-faq-a { display: block; }
+    .ref-faq-item.open .ref-faq-icon { transform: rotate(45deg); }
+    .ref-faq-icon { transition: transform .2s; font-size: 20px; color: var(--t3); }
+  </style>
+</head>
+<body>
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="ref-layout page-enter">
+  <div class="ref-hero">
+    <div class="ref-hero-badge">🎁 Programme de parrainage</div>
+    <h1>Parrainez, <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">gagnez</span></h1>
+    <p>Pour chaque ami qui s'inscrit via votre lien, vous gagnez <strong style="color:var(--gnb)">1 mois gratuit</strong> sur votre abonnement Emploia.</p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="ref-how">
+    <div class="ref-step">
+      <div class="ref-step-num">1</div>
+      <h3>Copiez votre lien</h3>
+      <p>Votre lien unique est généré automatiquement. Partagez-le où vous voulez.</p>
+    </div>
+    <div class="ref-step">
+      <div class="ref-step-num">2</div>
+      <h3>Vos amis s'inscrivent</h3>
+      <p>Ils créent un compte Emploia via votre lien. C'est gratuit et sans engagement.</p>
+    </div>
+    <div class="ref-step">
+      <div class="ref-step-num">3</div>
+      <h3>Vous gagnez un mois</h3>
+      <p>Dès leur inscription, 1 mois gratuit est crédité sur votre abonnement Pro ou Intensif.</p>
+    </div>
+  </div>
+
+  <!-- USER SECTION (logged in) -->
+  <div id="refLoggedIn" style="display:none">
+    <div class="ref-card">
+      <div class="ref-card-title">🔗 Votre lien de parrainage</div>
+      <div class="ref-link-row">
+        <input class="ref-link-input" id="refLink" readonly value="https://emploia.fr/?ref=..."/>
+        <button class="btn btn-primary" onclick="copyLink()">Copier</button>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <a id="shareWA" href="#" target="_blank" class="btn btn-ghost btn-sm">💬 WhatsApp</a>
+        <a id="shareLI" href="#" target="_blank" class="btn btn-ghost btn-sm">in LinkedIn</a>
+        <a id="shareEmail" href="#" class="btn btn-ghost btn-sm">📧 Email</a>
+      </div>
+      <div class="ref-stats">
+        <div class="ref-stat-box">
+          <div class="ref-stat-num" id="refSignups">0</div>
+          <div class="ref-stat-label">Filleuls inscrits</div>
+        </div>
+        <div class="ref-stat-box">
+          <div class="ref-stat-num" id="refMonths">0</div>
+          <div class="ref-stat-label">Mois gagnés</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT LOGGED IN -->
+  <div id="refNotLogged">
+    <div class="ref-login-prompt">
+      <div style="font-size:48px;margin-bottom:16px">🎁</div>
+      <h2>Connectez-vous pour parrainer</h2>
+      <p>Créez un compte ou connectez-vous pour obtenir votre lien de parrainage unique.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/app" class="btn btn-primary">Créer un compte gratuit</a>
+        <a href="/app" class="btn btn-ghost">Se connecter</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="ref-faq">
+    <h2>Questions fréquentes</h2>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Combien de parrainages puis-je faire ? <span class="ref-faq-icon">+</span></div>
+      <div class="ref-faq-a">Il n'y a pas de limite ! Vous pouvez parrainer autant d'amis que vous le souhaitez et cumuler les mois gratuits.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Quand est crédité le mois gratuit ? <span class="ref-faq-icon">+</span></div>
+      <div class="ref-faq-a">Le mois gratuit est crédité immédiatement après l'inscription de votre filleul. Il sera appliqué lors de votre prochain renouvellement.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Mon filleul a-t-il besoin de s'abonner ? <span class="ref-faq-icon">+</span></div>
+      <div class="ref-faq-a">Non ! Il suffit qu'il crée un compte gratuit via votre lien. Vous gagnez un mois dès son inscription.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Les mois gratuits expirent-ils ? <span class="ref-faq-icon">+</span></div>
+      <div class="ref-faq-a">Non, les mois gratuits gagnés sont cumulables et n'expirent pas tant que vous avez un abonnement actif.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Je suis sur le plan gratuit, puis-je parrainer ? <span class="ref-faq-icon">+</span></div>
+      <div class="ref-faq-a">Oui ! Les mois gratuits seront crédités et appliqués si vous souscrivez un abonnement payant. Ils ne se perdent pas.</div>
+    </div>
+  </div>
+</div>
+
+<footer class="emp-footer">
+  <div class="emp-footer-grid">
+    <div class="emp-footer-col">
+      <a href="/" class="emp-logo" style="margin-bottom:12px;display:inline-flex">
+        <div class="emp-logo-mark">E</div>
+        Emploia
+      </a>
+      <p style="font-size:12px;color:var(--t3);line-height:1.6">Le copilote de candidature 100% français.</p>
+    </div>
+    <div class="emp-footer-col">
+      <h4>Produit</h4>
+      <a href="/jobs">Offres d'emploi</a>
+      <a href="/app">Générateur IA</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div class="emp-footer-col">
+      <h4>Légal</h4>
+      <a href="/legal/mentions">Mentions légales</a>
+      <a href="/legal/privacy">Confidentialité</a>
+      <a href="/legal/cgu">CGU</a>
+    </div>
+  </div>
+  <div class="emp-footer-bottom">
+    <p>© <span id="yr"></span> Emploia. Tous droits réservés.</p>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  function faqToggle(item) {
+    item.classList.toggle('open');
+  }
+
+  async function loadReferral() {
+    try {
+      const r = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!d.user) return;
+
+      document.getElementById('refNotLogged').style.display = 'none';
+      document.getElementById('refLoggedIn').style.display = 'block';
+
+      const refR = await fetch('/api/referral', { credentials: 'include' });
+      if (!refR.ok) return;
+      const ref = await refR.json();
+
+      const link = ref.link || `https://emploia.fr/?ref=${ref.code}`;
+      document.getElementById('refLink').value = link;
+      document.getElementById('refSignups').textContent = ref.signups || 0;
+      document.getElementById('refMonths').textContent = ref.monthsEarned || 0;
+
+      const msg = encodeURIComponent(`Essaie Emploia — le copilote IA pour décrocher des entretiens 🚀 : ${link}`);
+      document.getElementById('shareWA').href = `https://wa.me/?text=${msg}`;
+      document.getElementById('shareLI').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`;
+      document.getElementById('shareEmail').href = `mailto:?subject=Je%20te%20recommande%20Emploia&body=${msg}`;
+    } catch {}
+  }
+
+  function copyLink() {
+    const val = document.getElementById('refLink').value;
+    navigator.clipboard.writeText(val).then(() => {
+      empToast('Lien copié !', 'success');
+    });
+  }
+
+  // Check URL ref param (when landing via a referral link)
+  const urlRef = new URLSearchParams(window.location.search).get('ref');
+  if (urlRef) {
+    sessionStorage.setItem('emploia_ref', urlRef);
+  }
+
+  loadReferral();
+</script>
+</body>
+</html>

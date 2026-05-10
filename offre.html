@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Offre d'emploi — Emploia</title>
+  <meta name="description" content="Consultez cette offre et générez votre CV ATS-optimisé en 30 secondes avec Emploia."/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .offre-layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .offre-layout { grid-template-columns: 1fr; } }
+    .offre-main {}
+    .offre-sidebar {}
+    .offre-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--t3); font-size: 13px; text-decoration: none;
+      margin-bottom: 24px;
+      transition: color .15s;
+    }
+    .offre-back:hover { color: var(--t2); }
+    .offre-header {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .offre-company-row {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+    }
+    .offre-logo {
+      width: 52px; height: 52px;
+      border-radius: var(--r);
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: var(--t2);
+      flex-shrink: 0;
+    }
+    .offre-company-name { font-size: 14px; color: var(--t2); }
+    .offre-title { font-size: 26px; font-weight: 800; margin-bottom: 16px; color: var(--t1); }
+    .offre-tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .offre-tag {
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      border-radius: 100px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--t2);
+    }
+    .offre-tag.type { background: var(--ind2); border-color: rgba(99,102,241,.2); color: var(--inb); }
+    .offre-section {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .offre-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .offre-section p, .offre-section li {
+      font-size: 14px; color: var(--t2); line-height: 1.8;
+    }
+    .offre-section ul { margin: 0 0 0 20px; }
+    .offre-section li { margin-bottom: 6px; }
+    .sticky-sidebar {
+      position: sticky; top: 100px;
+    }
+    .gen-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .gen-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .gen-card p { font-size: 13px; color: var(--t2); margin-bottom: 20px; line-height: 1.6; }
+    .gen-card .btn { width: 100%; justify-content: center; margin-bottom: 8px; }
+    .offre-meta {
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r2);
+      padding: 16px;
+    }
+    .offre-meta-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--brd2);
+      font-size: 13px;
+    }
+    .offre-meta-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .offre-meta-label { color: var(--t3); }
+    .offre-meta-val { color: var(--t1); font-weight: 500; }
+    .loading-state {
+      display: flex; align-items: center; justify-content: center;
+      padding: 80px 24px; color: var(--t3); gap: 12px;
+    }
+    .offre-score-bar { height: 6px; border-radius: 3px; background: var(--s3); margin-top: 8px; overflow: hidden; }
+    .offre-score-fill { height: 100%; border-radius: 3px; background: var(--grad-primary); transition: width .6s ease; }
+  </style>
+</head>
+<body>
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div id="loadingState" class="loading-state">
+  <div class="spin"></div>
+  <span>Chargement de l'offre...</span>
+</div>
+
+<div class="offre-layout page-enter" id="offreLayout" style="display:none">
+  <div class="offre-main">
+    <a href="/jobs" class="offre-back">← Retour aux offres</a>
+
+    <div class="offre-header">
+      <div class="offre-company-row">
+        <div class="offre-logo" id="offreLogo">🏢</div>
+        <div>
+          <div class="offre-company-name" id="offreCompany">—</div>
+          <div style="font-size:12px;color:var(--t3)" id="offreLocation">—</div>
+        </div>
+      </div>
+      <div class="offre-title" id="offreTitle">Chargement...</div>
+      <div class="offre-tags" id="offreTags"></div>
+    </div>
+
+    <div class="offre-section" id="offreDescSection">
+      <h2>Description du poste</h2>
+      <div id="offreDesc" style="font-size:14px;color:var(--t2);line-height:1.8">Chargement...</div>
+    </div>
+  </div>
+
+  <div class="offre-sidebar">
+    <div class="sticky-sidebar">
+      <div class="gen-card">
+        <h3>✨ Générer votre candidature</h3>
+        <p>Obtenez un CV et une lettre de motivation ATS-optimisés pour ce poste en 30 secondes.</p>
+        <a href="/app" class="btn btn-primary" id="genCvBtn">Générer mon CV →</a>
+        <a href="/app" class="btn btn-ghost" id="genLetterBtn">Générer ma lettre</a>
+      </div>
+
+      <div class="offre-meta">
+        <div class="offre-meta-row">
+          <span class="offre-meta-label">Entreprise</span>
+          <span class="offre-meta-val" id="metaCompany">—</span>
+        </div>
+        <div class="offre-meta-row">
+          <span class="offre-meta-label">Lieu</span>
+          <span class="offre-meta-val" id="metaLocation">—</span>
+        </div>
+        <div class="offre-meta-row">
+          <span class="offre-meta-label">Type</span>
+          <span class="offre-meta-val" id="metaType">—</span>
+        </div>
+        <div class="offre-meta-row">
+          <span class="offre-meta-label">Salaire</span>
+          <span class="offre-meta-val" id="metaSalary">Non précisé</span>
+        </div>
+        <div class="offre-meta-row">
+          <span class="offre-meta-label">Publié</span>
+          <span class="offre-meta-val" id="metaDate">—</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <a href="#" id="offreApplyBtn" target="_blank" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:0">
+          Postuler sur le site →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="errorState" style="display:none;text-align:center;padding:80px 24px">
+  <div style="font-size:48px;margin-bottom:16px">🔍</div>
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Offre introuvable</h2>
+  <p style="font-size:14px;color:var(--t2);margin-bottom:24px">Cette offre n'existe plus ou a expiré.</p>
+  <a href="/jobs" class="btn btn-primary">Voir toutes les offres →</a>
+</div>
+
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="/shared.js"></script>
+<script>
+  const JOB_TYPES = { full_time: 'CDI', part_time: 'Temps partiel', contract: 'CDD', internship: 'Stage', apprenticeship: 'Alternance', temporary: 'Intérim', freelance: 'Freelance' };
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const date = new Date(d);
+    if (isNaN(date)) return '—';
+    const diff = Math.floor((Date.now() - date) / 86400000);
+    if (diff === 0) return "Aujourd'hui";
+    if (diff === 1) return "Hier";
+    if (diff < 7) return `Il y a ${diff} jours`;
+    if (diff < 30) return `Il y a ${Math.floor(diff/7)} sem.`;
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  }
+
+  function formatSalary(min, max, currency) {
+    if (!min && !max) return 'Non précisé';
+    const fmt = (v) => new Intl.NumberFormat('fr-FR').format(Math.round(v));
+    const cur = currency === 'EUR' ? '€' : (currency || '€');
+    if (min && max) return `${fmt(min)}–${fmt(max)} ${cur}/an`;
+    if (min) return `À partir de ${fmt(min)} ${cur}/an`;
+    return `Jusqu'à ${fmt(max)} ${cur}/an`;
+  }
+
+  function renderOffer(job) {
+    document.title = `${job.title || 'Offre'} — ${job.company_name || ''} — Emploia`;
+
+    document.getElementById('offreLogo').textContent = job.company_logo ? '' : '🏢';
+    if (job.company_logo) {
+      const img = document.createElement('img');
+      img.src = job.company_logo;
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px';
+      img.onerror = () => { img.parentElement.textContent = '🏢'; };
+      document.getElementById('offreLogo').appendChild(img);
+    }
+
+    document.getElementById('offreCompany').textContent = job.company_name || 'Entreprise';
+    document.getElementById('offreLocation').textContent = job.location || '';
+    document.getElementById('offreTitle').textContent = job.title || 'Offre d\'emploi';
+
+    const tags = document.getElementById('offreTags');
+    const addTag = (text, cls = '') => {
+      const t = document.createElement('span');
+      t.className = `offre-tag ${cls}`;
+      t.textContent = text;
+      tags.appendChild(t);
+    };
+    if (job.job_type) addTag(JOB_TYPES[job.job_type] || job.job_type, 'type');
+    if (job.location) addTag('📍 ' + job.location);
+    if (job.remote) addTag('🌐 Remote');
+    if (job.salary_min || job.salary_max) addTag('💰 ' + formatSalary(job.salary_min, job.salary_max, job.salary_currency));
+    if (job.experience_level) addTag('🎓 ' + job.experience_level);
+
+    const desc = job.description || 'Aucune description disponible pour cette offre.';
+    const descEl = document.getElementById('offreDesc');
+    // Simple text → HTML: preserve line breaks and basic structure
+    descEl.innerHTML = desc
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\n\n+/g, '</p><p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:8px">')
+      .replace(/\n/g, '<br/>');
+    descEl.innerHTML = '<p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:8px">' + descEl.innerHTML + '</p>';
+
+    document.getElementById('metaCompany').textContent = job.company_name || '—';
+    document.getElementById('metaLocation').textContent = job.location || '—';
+    document.getElementById('metaType').textContent = JOB_TYPES[job.job_type] || job.job_type || '—';
+    document.getElementById('metaSalary').textContent = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
+    document.getElementById('metaDate').textContent = formatDate(job.created_at || job.date_posted);
+
+    if (job.url) {
+      document.getElementById('offreApplyBtn').href = job.url;
+    }
+
+    // Pre-fill app page links with job title
+    const encoded = encodeURIComponent(job.title + (job.company_name ? ' chez ' + job.company_name : ''));
+    document.getElementById('genCvBtn').href = `/app?offre=${encoded}`;
+    document.getElementById('genLetterBtn').href = `/app?offre=${encoded}`;
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('offreLayout').style.display = 'grid';
+  }
+
+  async function loadOffer() {
+    // Extract job ID from URL path: /offre/:id
+    const pathParts = window.location.pathname.split('/');
+    const jobId = pathParts[pathParts.length - 1];
+
+    if (!jobId) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      return;
+    }
+
+    // Check sessionStorage cache (jobs page may have stored the job data)
+    const cached = sessionStorage.getItem(`job_${jobId}`);
+    if (cached) {
+      try {
+        renderOffer(JSON.parse(cached));
+        return;
+      } catch {}
+    }
+
+    try {
+      const r = await fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`);
+      if (!r.ok) throw new Error('not found');
+      const data = await r.json();
+      const job = data.job || (Array.isArray(data.jobs) ? data.jobs.find(j => String(j.id) === String(jobId)) : null);
+      if (!job) throw new Error('not found');
+      renderOffer(job);
+    } catch {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+    }
+  }
+
+  loadOffer();
+</script>
+</body>
+</html>
