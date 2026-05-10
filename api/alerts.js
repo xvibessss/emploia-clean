@@ -7,7 +7,7 @@ import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit } from '
 // DELETE → remove alert
 
 export default async function handler(req) {
-  const origin = getAllowedOrigin(req.headers.get('origin'));
+  const origin = getAllowedOrigin(req);
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: {
@@ -19,7 +19,8 @@ export default async function handler(req) {
   }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-  if (!await checkRateLimit(`rl:alerts:${ip}`, 30, 60)) {
+  const rl = await checkRateLimit(`ip:${ip}`, 'alerts', 30, 60);
+  if (!rl.allowed) {
     return new Response(JSON.stringify({ error: 'Rate limit' }), {
       status: 429, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
     });
