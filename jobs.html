@@ -630,6 +630,48 @@
       .search-row { flex-wrap: wrap; }
       .search-loc { width: 100%; }
     }
+
+    /* ── SMART APPLY DRAWER ─────────────────────────── */
+    .apply-drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 900; cursor: pointer; }
+    .apply-drawer-overlay.open { display: block; }
+    .apply-drawer {
+      position: fixed; top: 0; right: -540px; height: 100%;
+      width: min(540px, 100vw); background: var(--bg);
+      border-left: 1px solid var(--brd); z-index: 901;
+      display: flex; flex-direction: column;
+      transition: right .32s cubic-bezier(.4,0,.2,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,.25);
+    }
+    .apply-drawer.open { right: 0; }
+    .apply-drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .apply-tab {
+      flex: 1; padding: 7px 4px; border-radius: 7px; font-size: 11px;
+      font-weight: 700; border: none; background: transparent;
+      color: var(--t3); cursor: pointer; font-family: 'Sora', sans-serif; transition: all .15s;
+    }
+    .apply-tab.active { background: var(--grad-primary); color: #fff; }
+
+    /* ── CO-PILOT ───────────────────────────────────── */
+    .copilot-fab {
+      position: fixed; bottom: 80px; right: 20px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--grad-primary); border: none; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(99,102,241,.5); font-size: 20px;
+      z-index: 800; display: flex; align-items: center; justify-content: center;
+      transition: transform .2s;
+    }
+    .copilot-fab:hover { transform: scale(1.1); }
+    .copilot-panel {
+      position: fixed; bottom: 144px; right: 20px;
+      width: 320px; height: 440px; background: var(--bg);
+      border: 1px solid var(--brd); border-radius: 16px;
+      z-index: 800; box-shadow: 0 8px 40px rgba(0,0,0,.4);
+      flex-direction: column; overflow: hidden; display: none;
+    }
+    .copilot-panel.open { display: flex; }
+    .cop-msg { border-radius: 10px; padding: 9px 12px; font-size: 12px; line-height: 1.65; max-width: 88%; }
+    .cop-msg.user { background: var(--grad-primary); color: #fff; align-self: flex-end; }
+    .cop-msg.assistant { background: var(--s2); color: var(--t2); align-self: flex-start; border: 1px solid var(--brd); }
   </style>
 </head>
 <body>
@@ -831,6 +873,110 @@
   </div>
 </div>
 
+<!-- APPLY DRAWER OVERLAY -->
+<div id="applyOverlay" class="apply-drawer-overlay" onclick="closeApplyDrawer()"></div>
+
+<!-- SMART APPLY DRAWER -->
+<div id="applyDrawer" class="apply-drawer">
+  <div style="padding:18px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0">
+    <div style="flex:1;min-width:0">
+      <div id="drawerCompany" style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <div id="drawerTitle" style="font-size:16px;font-weight:800;color:var(--t1);line-height:1.3;letter-spacing:-.3px"></div>
+    </div>
+    <button onclick="closeApplyDrawer()" style="background:var(--s3);border:none;cursor:pointer;color:var(--t2);font-size:15px;padding:6px 10px;border-radius:8px;flex-shrink:0;margin-top:2px">✕</button>
+  </div>
+  <div style="padding:12px 24px;border-bottom:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0">
+    <a id="drawerJobLink" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="flex:1;text-align:center">🔗 Voir l'offre sur le site →</a>
+    <button id="drawerTrackBtn" onclick="addToTrackerDrawer()" class="btn btn-ghost btn-sm">📋 Dashboard</button>
+  </div>
+  <div style="padding:12px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px;flex-shrink:0">
+    <span id="drawerScorePill" style="font-size:12px;font-weight:800;padding:5px 14px;border-radius:100px;background:var(--grad-primary);color:#fff;white-space:nowrap;cursor:default">✨ Score IA</span>
+    <span id="drawerScoreVerdict" style="font-size:12px;color:var(--t3)"></span>
+  </div>
+  <div class="apply-drawer-body">
+    <div id="drawerGenSection">
+      <div style="text-align:center;padding:28px 0">
+        <div style="font-size:48px;margin-bottom:14px">🤖</div>
+        <div style="font-size:15px;font-weight:800;color:var(--t1);margin-bottom:8px;letter-spacing:-.3px">Pack candidature IA</div>
+        <div style="font-size:12.5px;color:var(--t2);margin-bottom:24px;line-height:1.75;max-width:340px;margin-left:auto;margin-right:auto">
+          Lettre de motivation personnalisée, bullets CV adaptés, questions d'entretien probables — tout généré pour <em>cette offre précise</em> en 10 secondes.
+        </div>
+        <button class="btn btn-primary" id="drawerGenBtn" onclick="generateSmartApply()" style="width:100%;padding:13px;font-size:14px">✨ Générer mon pack candidature</button>
+        <div style="margin-top:10px;font-size:11px;color:var(--t3)">
+          Complétez votre <a href="/profil" style="color:var(--inb)">profil</a> pour un résultat personnalisé
+        </div>
+      </div>
+    </div>
+    <div id="drawerResults" style="display:none">
+      <div style="display:flex;gap:4px;background:var(--s3);border-radius:10px;padding:4px;margin-bottom:16px">
+        <button class="apply-tab active" data-tab="letter" onclick="setApplyTab('letter',this)">✉️ Lettre</button>
+        <button class="apply-tab" data-tab="cv" onclick="setApplyTab('cv',this)">📄 Bullets CV</button>
+        <button class="apply-tab" data-tab="interview" onclick="setApplyTab('interview',this)">🎤 Entretien</button>
+      </div>
+      <!-- Letter -->
+      <div id="applyTabLetter">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px">Lettre de motivation</div>
+          <button onclick="copyApplyText('coverLetter')" class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 10px">📋 Copier</button>
+        </div>
+        <div id="drawerLetter" style="background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:12.5px;color:var(--t2);line-height:1.8;white-space:pre-wrap;max-height:360px;overflow-y:auto"></div>
+        <div style="margin-top:14px">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">⚡ Pitch 30 secondes</div>
+          <div id="drawerPitch" style="background:var(--bls);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--blb);line-height:1.7;font-style:italic"></div>
+        </div>
+      </div>
+      <!-- CV Bullets -->
+      <div id="applyTabCv" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px">Bullets à ajouter à votre CV</div>
+          <button onclick="copyApplyText('cvBullets')" class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 10px">📋 Copier tout</button>
+        </div>
+        <div id="drawerBullets" style="display:flex;flex-direction:column;gap:8px"></div>
+        <div style="margin-top:16px">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Compétences à mettre en avant</div>
+          <div id="drawerSkills" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+      </div>
+      <!-- Interview -->
+      <div id="applyTabInterview" style="display:none">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">Questions probables + réponses modèles</div>
+        <div id="drawerQuestions" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--brd);display:flex;gap:8px">
+        <a id="drawerApplyLink" href="#" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="flex:1;text-align:center">Postuler maintenant →</a>
+        <button onclick="generateSmartApply()" class="btn btn-ghost btn-sm">🔄 Regénérer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CO-PILOT FAB -->
+<button class="copilot-fab" onclick="toggleCopilot()" title="Orion — Co-pilot IA">💬</button>
+
+<!-- CO-PILOT PANEL -->
+<div id="copilotPanel" class="copilot-panel">
+  <div style="padding:12px 16px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-size:13px;font-weight:800;color:var(--t1);display:flex;align-items:center;gap:8px">
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--grn)"></div>
+      Orion — Co-pilot IA
+    </div>
+    <button onclick="toggleCopilot()" style="background:transparent;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:2px 6px">✕</button>
+  </div>
+  <div id="copilotMessages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px">
+    <div class="cop-msg assistant">
+      <strong style="color:var(--t1)">Salut ! Je suis Orion 👋</strong><br>
+      Je connais le marché de l'emploi français. Demande-moi d'analyser une offre, de rédiger ta lettre, ou de te préparer à un entretien.
+    </div>
+  </div>
+  <div style="padding:10px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0">
+    <input type="text" id="copilotInput" placeholder="Pose ta question..."
+      style="flex:1;padding:9px 12px;border-radius:9px;border:1.5px solid var(--brd);background:var(--s2);font-size:12px;color:var(--t1);font-family:'Sora',sans-serif;outline:none;transition:border-color .15s"
+      onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--brd)'"
+      onkeydown="if(event.key==='Enter')sendCopilotMessage()"/>
+    <button onclick="sendCopilotMessage()" style="padding:9px 14px;border-radius:9px;background:var(--grad-primary);border:none;cursor:pointer;color:#fff;font-size:14px;font-weight:700;font-family:'Sora',sans-serif">→</button>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="emp-bottom-nav">
   <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
@@ -972,7 +1118,7 @@
           <div class="jc-actions">
             <button class="btn-gen-cv" onclick="genCV('${esc(job.title)}','${esc(job.company)}','${esc((job.description||'').slice(0,200))}')">✨ CV en 30s</button>
             <button class="btn-track${isTracked?' tracked':''}" id="track-${esc(job.id)}" onclick="trackJob('${esc(job.id)}','${esc(job.title)}','${esc(job.company)}','${esc(job.url||'')}','${esc(job.location||'')}',this)">${isTracked?'✅ Suivi':'📋 Suivre'}</button>
-            <button class="btn-apply" onclick="window.open('${esc(job.url||'#')}','_blank')">Postuler →</button>
+            <button class="btn-apply" onclick="openApplyDrawer('${esc(job.id)}')">Postuler →</button>
             <button class="btn-save-job${isSaved?' saved':''}" id="save-${esc(job.id)}" onclick="toggleSave('${esc(job.id)}',this)">${isSaved?'⭐':'☆'}</button>
           </div>
         </div>
@@ -1171,7 +1317,231 @@
       e.preventDefault();
       document.getElementById('searchInput')?.focus();
     }
+    if (e.key === 'Escape') closeApplyDrawer();
   });
+
+  // ── SMART APPLY DRAWER ──────────────────────────────────────────────────────
+  let currentDrawerJob = null;
+  let applyData = null;
+  let copilotContextAdded = false;
+
+  function openApplyDrawer(jobId) {
+    const job = allJobs.find(j => String(j.id) === String(jobId));
+    if (!job) { window.open(job?.url || '#', '_blank'); return; }
+    currentDrawerJob = job;
+    applyData = null;
+    copilotContextAdded = false;
+
+    document.getElementById('drawerTitle').textContent = job.title;
+    document.getElementById('drawerCompany').textContent = [job.company, job.location].filter(Boolean).join(' · ');
+    const link = document.getElementById('drawerJobLink');
+    link.href = job.url || '#';
+    link.style.opacity = job.url ? '' : '.4';
+    document.getElementById('drawerApplyLink').href = job.url || '#';
+
+    const trackBtn = document.getElementById('drawerTrackBtn');
+    const isTracked = tracked.has(String(jobId));
+    trackBtn.textContent = isTracked ? '✅ Suivi' : '📋 Dashboard';
+    if (isTracked) trackBtn.classList.add('tracked'); else trackBtn.classList.remove('tracked');
+
+    document.getElementById('drawerGenSection').style.display = 'block';
+    document.getElementById('drawerResults').style.display = 'none';
+    const btn = document.getElementById('drawerGenBtn');
+    btn.disabled = false;
+    btn.textContent = '✨ Générer mon pack candidature';
+
+    const pillEl = document.getElementById('drawerScorePill');
+    const verdictEl = document.getElementById('drawerScoreVerdict');
+    const cached = scoreCache[String(job.id)];
+    if (cached) {
+      pillEl.textContent = `✨ ${cached.score}%`;
+      verdictEl.textContent = cached.verdict || '';
+    } else {
+      pillEl.textContent = '⏳ Analyse...';
+      verdictEl.textContent = '';
+      analyzeScore(String(job.id), job.title, (job.description || '').slice(0, 800), pillEl).then(() => {
+        const c = scoreCache[String(job.id)];
+        if (c) verdictEl.textContent = c.verdict || '';
+      });
+    }
+
+    document.getElementById('applyDrawer').classList.add('open');
+    document.getElementById('applyOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeApplyDrawer() {
+    document.getElementById('applyDrawer').classList.remove('open');
+    document.getElementById('applyOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  async function generateSmartApply() {
+    if (!currentDrawerJob) return;
+    const btn = document.getElementById('drawerGenBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Génération en cours...';
+
+    const userProfile = localStorage.getItem('emploia_profile_text') || '';
+
+    try {
+      const res = await fetch('/api/smart-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: currentDrawerJob.title,
+          company: currentDrawerJob.company || '',
+          jobDescription: (currentDrawerJob.description || '').slice(0, 4000),
+          userProfile,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Erreur');
+      }
+      applyData = await res.json();
+      renderApplyResults(applyData);
+      document.getElementById('drawerGenSection').style.display = 'none';
+      document.getElementById('drawerResults').style.display = 'block';
+      empToast('Pack candidature généré !', 'success');
+    } catch (e) {
+      empToast(e.message || 'Erreur de génération. Réessayez.', 'error');
+      btn.disabled = false;
+      btn.textContent = '✨ Générer mon pack candidature';
+    }
+  }
+
+  function renderApplyResults(data) {
+    document.getElementById('drawerLetter').textContent = data.coverLetter || '';
+    document.getElementById('drawerPitch').textContent = data.pitch || '';
+
+    document.getElementById('drawerBullets').innerHTML = (data.cvBullets || []).map(b => `
+      <div style="display:flex;align-items:flex-start;gap:8px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:10px 12px">
+        <span style="color:var(--blue);font-size:15px;flex-shrink:0;line-height:1.4">▸</span>
+        <div style="font-size:12.5px;color:var(--t2);line-height:1.6">${esc(b)}</div>
+      </div>`).join('');
+
+    document.getElementById('drawerSkills').innerHTML = (data.skills || []).map(s => `
+      <span class="badge badge-blue">${esc(s)}</span>`).join('');
+
+    document.getElementById('drawerQuestions').innerHTML = (data.questions || []).map((q, i) => `
+      <div style="background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:8px;line-height:1.4">${i + 1}. ${esc(q.q)}</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.65">${esc(q.a)}</div>
+      </div>`).join('');
+
+    setApplyTab('letter', document.querySelector('.apply-tab[data-tab="letter"]'));
+  }
+
+  function setApplyTab(tab, btn) {
+    document.querySelectorAll('.apply-tab').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--t3)';
+    });
+    btn.classList.add('active');
+    btn.style.background = '';
+    btn.style.color = '';
+    document.getElementById('applyTabLetter').style.display   = tab === 'letter'    ? 'block' : 'none';
+    document.getElementById('applyTabCv').style.display       = tab === 'cv'        ? 'block' : 'none';
+    document.getElementById('applyTabInterview').style.display = tab === 'interview' ? 'block' : 'none';
+  }
+
+  function copyApplyText(type) {
+    if (!applyData) return;
+    const texts = {
+      coverLetter: applyData.coverLetter || '',
+      cvBullets:   (applyData.cvBullets || []).map(b => '▸ ' + b).join('\n'),
+      questions:   (applyData.questions || []).map(q => `Q: ${q.q}\nR: ${q.a}`).join('\n\n'),
+    };
+    const text = texts[type] || '';
+    if (!text) return;
+    navigator.clipboard.writeText(text)
+      .then(() => empToast('Copié !', 'success'))
+      .catch(() => empToast('Erreur de copie', 'error'));
+  }
+
+  async function addToTrackerDrawer() {
+    if (!currentDrawerJob) return;
+    const id = String(currentDrawerJob.id);
+    await trackJob(id, currentDrawerJob.title, currentDrawerJob.company || '', currentDrawerJob.url || '', currentDrawerJob.location || '', document.getElementById('drawerTrackBtn'));
+  }
+
+  // ── CO-PILOT ────────────────────────────────────────────────────────────────
+  let copilotHistory = [];
+  let copilotOpen = false;
+
+  function toggleCopilot() {
+    copilotOpen = !copilotOpen;
+    document.getElementById('copilotPanel').classList.toggle('open', copilotOpen);
+    if (copilotOpen) document.getElementById('copilotInput').focus();
+  }
+
+  function appendCopilotMsg(role, text) {
+    const msgs = document.getElementById('copilotMessages');
+    const el = document.createElement('div');
+    el.className = `cop-msg ${role}`;
+    el.textContent = text;
+    msgs.appendChild(el);
+    msgs.scrollTop = msgs.scrollHeight;
+    return el;
+  }
+
+  async function sendCopilotMessage() {
+    const input = document.getElementById('copilotInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    input.disabled = true;
+
+    let userMsg = msg;
+    if (!copilotContextAdded && currentDrawerJob) {
+      userMsg = `[Offre en cours d'analyse: "${currentDrawerJob.title}" chez ${currentDrawerJob.company || 'entreprise inconnue'}${currentDrawerJob.location ? ' (' + currentDrawerJob.location + ')' : ''}]\n\n${msg}`;
+      copilotContextAdded = true;
+    }
+
+    copilotHistory.push({ role: 'user', content: userMsg });
+    appendCopilotMsg('user', msg);
+    const assistantEl = appendCopilotMsg('assistant', '...');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: copilotHistory }),
+      });
+      if (!res.ok) throw new Error();
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullText = '';
+      assistantEl.textContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const d = JSON.parse(line.slice(6));
+            if (d.chunk) { fullText += d.chunk; assistantEl.textContent = fullText; }
+          } catch {}
+        }
+        document.getElementById('copilotMessages').scrollTop = document.getElementById('copilotMessages').scrollHeight;
+      }
+
+      copilotHistory.push({ role: 'assistant', content: fullText });
+    } catch {
+      assistantEl.textContent = '⚠️ Erreur. Réessaie.';
+    }
+
+    input.disabled = false;
+    input.focus();
+  }
 </script>
 </body>
 </html>

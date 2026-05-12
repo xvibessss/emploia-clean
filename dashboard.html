@@ -722,12 +722,12 @@
         <span id="greetingEmoji">👋</span>
         <span id="greetingText">Bonjour</span>
       </div>
-      <div class="wb-name">Thomas Renard</div>
+      <div class="wb-name" id="wbName">Chargement...</div>
       <div class="wb-stats">
-        <div class="wb-stat"><span>📋</span> <strong>24</strong> candidatures</div>
-        <div class="wb-stat"><span>🎯</span> <strong>8</strong> entretiens</div>
-        <div class="wb-stat"><span>✨</span> <strong>3</strong> générations restantes</div>
-        <div class="wb-stat"><span>⭐</span> Plan <strong>Gratuit</strong></div>
+        <div class="wb-stat"><span>📋</span> <strong id="wbTotal">0</strong> candidatures</div>
+        <div class="wb-stat"><span>🎯</span> <strong id="wbInterviews">0</strong> entretiens</div>
+        <div class="wb-stat"><span>✨</span> <strong id="wbCredits">—</strong> générations restantes</div>
+        <div class="wb-stat"><span>⭐</span> Plan <strong id="wbPlan">—</strong></div>
       </div>
     </div>
     <div class="wb-right">
@@ -782,33 +782,33 @@
   <div class="stats-row">
     <div class="stat-card">
       <div class="sc-icon" style="background:var(--bld)">📤</div>
-      <div class="sc-value">24</div>
+      <div class="sc-value" id="statTotal">—</div>
       <div class="sc-label">Candidatures envoyées</div>
-      <div class="sc-delta up">↑ +3 cette semaine</div>
+      <div class="sc-delta" id="statTotalDelta">—</div>
     </div>
     <div class="stat-card">
       <div class="sc-icon" style="background:var(--yld)">🎤</div>
-      <div class="sc-value">8</div>
+      <div class="sc-value" id="statInterviews">—</div>
       <div class="sc-label">Entretiens obtenus</div>
-      <div class="sc-delta up">↑ Taux 33%</div>
+      <div class="sc-delta" id="statInterviewsDelta">—</div>
     </div>
     <div class="stat-card">
       <div class="sc-icon" style="background:var(--gnd)">🏆</div>
-      <div class="sc-value">2</div>
+      <div class="sc-value" id="statOffers">—</div>
       <div class="sc-label">Offres reçues</div>
-      <div class="sc-delta up">↑ En cours</div>
+      <div class="sc-delta up" id="statOffersDelta">—</div>
     </div>
     <div class="stat-card">
       <div class="sc-icon" style="background:var(--ind2)">📄</div>
-      <div class="sc-value">94</div>
-      <div class="sc-label">Meilleur score ATS</div>
-      <div class="sc-delta up">↑ +53 pts vs avant</div>
+      <div class="sc-value" id="statWishlist">—</div>
+      <div class="sc-label">À postuler (wishlist)</div>
+      <div class="sc-delta" id="statWishlistDelta">—</div>
     </div>
     <div class="stat-card">
       <div class="sc-icon" style="background:rgba(139,92,246,.1)">⏳</div>
-      <div class="sc-value">5</div>
+      <div class="sc-value" id="statPending">—</div>
       <div class="sc-label">En attente de réponse</div>
-      <div class="sc-delta down">↓ 3 relances à faire</div>
+      <div class="sc-delta" id="statPendingDelta">—</div>
     </div>
   </div>
 
@@ -990,11 +990,11 @@
         <div class="gen-card-header">
           <div class="gen-card-title">💡 Conseil du jour</div>
         </div>
-        <div class="gen-card-body">
+        <div class="gen-card-body" id="conseilBody">
           <div style="font-size:13px;color:var(--t2);line-height:1.7">
-            Vous avez un entretien <strong style="color:var(--ylb)">demain chez Capgemini</strong>. Simulez un entretien technique maintenant pour vous préparer au mieux.
+            Commencez par <strong>trouver des offres</strong> qui vous correspondent, puis générez votre CV ATS-optimisé en 30 secondes.
           </div>
-          <a href="/interview" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">🎤 Simuler l'entretien →</a>
+          <a href="/jobs" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">📋 Chercher des offres →</a>
         </div>
       </div>
 
@@ -1147,6 +1147,7 @@
     renderKanban(filteredApps());
     renderList(filteredApps());
     updateTabCounts(allApps);
+    updateStatsUI(allApps);
   }
 
   // ── KANBAN ─────────────────────────────────────────────────────────────────
@@ -1486,10 +1487,92 @@
     } catch {}
   }
 
+  // ── DYNAMIC STATS ──────────────────────────────────────────────────────────
+  function updateStatsUI(apps) {
+    const total = apps.length;
+    const interviews = apps.filter(a => a.status === 'interview').length;
+    const interviewsAndOffers = apps.filter(a => a.status === 'interview' || a.status === 'offer').length;
+    const offers = apps.filter(a => a.status === 'offer').length;
+    const wishlist = apps.filter(a => a.status === 'wishlist').length;
+    const pending = apps.filter(a => a.status === 'applied').length;
+    const thisWeek = apps.filter(a => Date.now() - (a.createdAt || 0) < 7 * 86400000).length;
+    const interviewRate = total > 0 ? Math.round((interviewsAndOffers / total) * 100) : 0;
+    const overdue = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000).length;
+
+    const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const cls = (id, c) => { const el = document.getElementById(id); if (el) el.className = 'sc-delta ' + c; };
+
+    s('statTotal', total || '0');
+    s('statInterviews', interviewsAndOffers || '0');
+    s('statOffers', offers || '0');
+    s('statWishlist', wishlist || '0');
+    s('statPending', pending || '0');
+    s('wbTotal', total);
+    s('wbInterviews', interviewsAndOffers);
+
+    if (thisWeek > 0) { cls('statTotalDelta', 'up'); s('statTotalDelta', `↑ +${thisWeek} cette semaine`); }
+    else { cls('statTotalDelta', ''); s('statTotalDelta', 'Aucune cette semaine'); }
+
+    if (interviewRate > 0) { cls('statInterviewsDelta', 'up'); s('statInterviewsDelta', `↑ Taux ${interviewRate}%`); }
+    else { cls('statInterviewsDelta', ''); s('statInterviewsDelta', total ? 'Continuez à postuler' : '—'); }
+
+    cls('statOffersDelta', offers > 0 ? 'up' : '');
+    s('statOffersDelta', offers > 0 ? '🎉 Félicitations !' : (total ? 'En cours...' : '—'));
+
+    cls('statWishlistDelta', wishlist > 0 ? 'up' : '');
+    s('statWishlistDelta', wishlist > 0 ? '→ Générez votre CV' : '—');
+
+    if (overdue > 0) { cls('statPendingDelta', 'down'); s('statPendingDelta', `↓ ${overdue} relance${overdue > 1 ? 's' : ''} à faire`); }
+    else if (pending > 0) { cls('statPendingDelta', 'up'); s('statPendingDelta', '✓ À jour'); }
+    else { cls('statPendingDelta', ''); s('statPendingDelta', '—'); }
+
+    updateConseilDuJour(apps);
+  }
+
+  function updateConseilDuJour(apps) {
+    const el = document.getElementById('conseilBody');
+    if (!el) return;
+    const interviewApps = apps.filter(a => a.status === 'interview');
+    const overdueApps = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000);
+    const wishlistApps = apps.filter(a => a.status === 'wishlist');
+
+    if (interviewApps.length > 0) {
+      const co = interviewApps[0]?.company ? ` dont <strong style="color:var(--t1)">${esc(interviewApps[0].company)}</strong>` : '';
+      el.innerHTML = `<div style="font-size:13px;color:var(--t2);line-height:1.7">Vous avez <strong style="color:var(--ylb)">${interviewApps.length} entretien${interviewApps.length > 1 ? 's' : ''} en cours</strong>${co}. Préparez-vous avec le simulateur IA.</div><a href="/interview" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">🎤 Simuler l'entretien →</a>`;
+    } else if (overdueApps.length > 0) {
+      el.innerHTML = `<div style="font-size:13px;color:var(--t2);line-height:1.7"><strong style="color:var(--rnb)">${overdueApps.length} candidature${overdueApps.length > 1 ? 's' : ''} sans réponse depuis +14 jours.</strong> C'est le bon moment pour relancer les recruteurs.</div><a href="/blog/relancer-candidature" class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%">📧 Guide relance →</a>`;
+    } else if (wishlistApps.length > 0) {
+      el.innerHTML = `<div style="font-size:13px;color:var(--t2);line-height:1.7">Vous avez <strong style="color:var(--blb)">${wishlistApps.length} offre${wishlistApps.length > 1 ? 's' : ''}</strong> en wishlist. Générez votre CV ATS pour postuler rapidement.</div><a href="/app" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">✨ Générer mon CV →</a>`;
+    } else if (!apps.length) {
+      el.innerHTML = `<div style="font-size:13px;color:var(--t2);line-height:1.7">Commencez par <strong>trouver des offres</strong> qui vous correspondent, puis générez votre CV ATS-optimisé en 30 secondes.</div><a href="/jobs" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">📋 Chercher des offres →</a>`;
+    } else {
+      el.innerHTML = `<div style="font-size:13px;color:var(--t2);line-height:1.7">Continuez sur votre lancée ! Consultez les nouvelles offres et gardez votre pipeline actif.</div><a href="/jobs" class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%">📋 Voir les offres →</a>`;
+    }
+  }
+
+  async function loadCurrentUser() {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) return;
+      const user = await res.json();
+      if (user.name) {
+        const firstName = user.name.split(' ')[0];
+        document.getElementById('wbName').textContent = firstName || user.name;
+      }
+      const plan = user.plan || 'free';
+      const planLabel = plan === 'free' ? 'Gratuit' : plan === 'pro' ? 'Pro' : plan === 'intensif' ? 'Intensif' : plan;
+      document.getElementById('wbPlan').textContent = planLabel;
+      const FREE_LIMIT = 3;
+      const credits = plan === 'free' ? Math.max(0, FREE_LIMIT - (user.generationsUsed || 0)) : '∞';
+      document.getElementById('wbCredits').textContent = credits;
+    } catch {}
+  }
+
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();
   loadReferral();
   loadSavedJobs();
+  loadCurrentUser();
 </script>
 </body>
 </html>
