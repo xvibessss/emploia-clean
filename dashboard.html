@@ -887,6 +887,26 @@
         <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
       </div>
 
+      <!-- JOBS POUR VOUS -->
+      <div id="jobsForYouSection" style="margin-top:16px;display:none">
+        <div style="background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">
+              ⭐ Offres pour vous
+              <span style="background:var(--bld);color:var(--blb);font-size:9px;padding:2px 7px;border-radius:100px;font-weight:800">IA</span>
+            </div>
+            <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Voir toutes les offres →</a>
+          </div>
+          <div id="jobsForYouList" style="padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="text-align:center;padding:16px;color:var(--t3);font-size:12px">Chargement...</div>
+          </div>
+          <div style="padding:12px 18px;border-top:1px solid var(--brd);display:flex;gap:8px">
+            <a href="/alerts" class="btn btn-ghost btn-sm" style="font-size:11px">🔔 Créer une alerte →</a>
+            <a href="/jobs" class="btn btn-primary btn-sm" style="font-size:11px">Voir toutes les offres →</a>
+          </div>
+        </div>
+      </div>
+
       <!-- SAVED JOBS -->
       <div id="savedJobsSection" style="margin-top:16px;display:none">
         <div style="background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden">
@@ -1053,6 +1073,16 @@
         <option value="offer">🎉 Offre reçue</option>
         <option value="rejected">❌ Refus</option>
       </select>
+    </div>
+    <div class="app-modal-row">
+      <div class="app-modal-field">
+        <label>Date entretien</label>
+        <input type="date" class="emp-input" id="appInterviewDate"/>
+      </div>
+      <div class="app-modal-field">
+        <label>Contact RH</label>
+        <input type="text" class="emp-input" id="appContact" placeholder="Prénom Nom — email"/>
+      </div>
     </div>
     <div class="app-modal-field">
       <label>Notes</label>
@@ -1275,13 +1305,15 @@
   function openAddModal(defaultStatus = 'wishlist') {
     editingId = null;
     document.getElementById('modalTitle').textContent = 'Nouvelle candidature';
-    document.getElementById('appJobTitle').value = '';
-    document.getElementById('appCompany').value  = '';
-    document.getElementById('appUrl').value      = '';
-    document.getElementById('appLocation').value = '';
-    document.getElementById('appSalary').value   = '';
-    document.getElementById('appStatus').value   = defaultStatus;
-    document.getElementById('appNotes').value    = '';
+    document.getElementById('appJobTitle').value    = '';
+    document.getElementById('appCompany').value     = '';
+    document.getElementById('appUrl').value         = '';
+    document.getElementById('appLocation').value    = '';
+    document.getElementById('appSalary').value      = '';
+    document.getElementById('appStatus').value      = defaultStatus;
+    document.getElementById('appNotes').value       = '';
+    document.getElementById('appInterviewDate').value = '';
+    document.getElementById('appContact').value     = '';
     document.getElementById('appModal').classList.add('open');
     document.getElementById('appJobTitle').focus();
   }
@@ -1289,14 +1321,16 @@
     const app = allApps.find(a => a.id === id);
     if (!app) return;
     editingId = id;
-    document.getElementById('modalTitle').textContent = 'Modifier la candidature';
-    document.getElementById('appJobTitle').value = app.jobTitle || '';
-    document.getElementById('appCompany').value  = app.company  || '';
-    document.getElementById('appUrl').value      = app.url      || '';
-    document.getElementById('appLocation').value = app.location || '';
-    document.getElementById('appSalary').value   = app.salary   || '';
-    document.getElementById('appStatus').value   = app.status   || 'wishlist';
-    document.getElementById('appNotes').value    = app.notes    || '';
+    document.getElementById('modalTitle').textContent   = 'Modifier la candidature';
+    document.getElementById('appJobTitle').value         = app.jobTitle || '';
+    document.getElementById('appCompany').value          = app.company  || '';
+    document.getElementById('appUrl').value              = app.url      || '';
+    document.getElementById('appLocation').value         = app.location || '';
+    document.getElementById('appSalary').value           = app.salary   || '';
+    document.getElementById('appStatus').value           = app.status   || 'wishlist';
+    document.getElementById('appNotes').value            = app.notes    || '';
+    document.getElementById('appInterviewDate').value    = app.interviewDate || '';
+    document.getElementById('appContact').value          = app.contact  || '';
     document.getElementById('appModal').classList.add('open');
   }
   function closeModal() {
@@ -1306,13 +1340,15 @@
 
   async function saveApplication() {
     const data = {
-      jobTitle: document.getElementById('appJobTitle').value.trim(),
-      company:  document.getElementById('appCompany').value.trim(),
-      url:      document.getElementById('appUrl').value.trim(),
-      location: document.getElementById('appLocation').value.trim(),
-      salary:   document.getElementById('appSalary').value.trim(),
-      status:   document.getElementById('appStatus').value,
-      notes:    document.getElementById('appNotes').value.trim(),
+      jobTitle:      document.getElementById('appJobTitle').value.trim(),
+      company:       document.getElementById('appCompany').value.trim(),
+      url:           document.getElementById('appUrl').value.trim(),
+      location:      document.getElementById('appLocation').value.trim(),
+      salary:        document.getElementById('appSalary').value.trim(),
+      status:        document.getElementById('appStatus').value,
+      notes:         document.getElementById('appNotes').value.trim(),
+      interviewDate: document.getElementById('appInterviewDate').value || null,
+      contact:       document.getElementById('appContact').value.trim(),
     };
     if (!data.jobTitle && !data.company) { empToast('Remplissez le poste ou l\'entreprise', 'error'); return; }
     const btn = document.getElementById('saveAppBtn');
@@ -1568,11 +1604,59 @@
     } catch {}
   }
 
+  // ── JOBS POUR VOUS ─────────────────────────────────────────────────────────
+  async function loadJobsForYou() {
+    const profileText = localStorage.getItem('emploia_profile_text') || '';
+    if (!profileText) return;
+
+    const query = profileText.split(/[\n,;·•]+/).find(l => l.trim().length > 3)?.trim().slice(0, 60) || '';
+    if (!query) return;
+
+    document.getElementById('jobsForYouSection').style.display = 'block';
+
+    try {
+      const res = await fetch(`/api/jobs?q=${encodeURIComponent(query)}&page=0`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const jobs = (data.jobs || []).slice(0, 4);
+      if (!jobs.length) return;
+
+      document.getElementById('jobsForYouList').innerHTML = jobs.map(j => {
+        const daysSince = Math.floor((Date.now() - new Date(j.date)) / 86400000);
+        const dateStr = daysSince === 0 ? "Aujourd'hui" : daysSince === 1 ? "Hier" : `Il y a ${daysSince}j`;
+        return `<div style="background:var(--s3);border:1px solid var(--brd);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;transition:border-color .15s" onmouseenter="this.style.borderColor='var(--brdh)'" onmouseleave="this.style.borderColor='var(--brd)'">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(j.title)}</div>
+            <div style="font-size:11px;color:var(--t3)">${esc(j.company)}${j.location ? ' · ' + esc(j.location) : ''} · ${dateStr}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            ${j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="font-size:11px;padding:5px 10px">Voir →</a>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    } catch {}
+  }
+
+  // ── KANBAN CARD + interview date highlight ──────────────────────────────────
+  // Patch renderCard to show interview date if present
+  const _origRenderCard = renderCard;
+  window.renderCard = function(app) {
+    const html = _origRenderCard(app);
+    if (!app.interviewDate) return html;
+    const d = new Date(app.interviewDate);
+    const now = new Date();
+    const diff = Math.ceil((d - now) / 86400000);
+    const label = diff === 0 ? 'Entretien aujourd\'hui !' : diff === 1 ? 'Entretien demain' : diff > 0 ? `Entretien dans ${diff}j` : null;
+    if (!label) return html;
+    return html.replace('</div>', `<div style="font-size:10px;color:var(--ylb);font-weight:700;margin-top:4px">🗓 ${label}</div></div>`);
+  };
+
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();
   loadReferral();
   loadSavedJobs();
   loadCurrentUser();
+  loadJobsForYou();
 </script>
 </body>
 </html>

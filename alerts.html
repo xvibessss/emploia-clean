@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Alertes emploi — Emploia</title>
+  <meta name="description" content="Configurez vos alertes emploi et recevez les meilleures offres par email chaque jour."/>
+  <link rel="canonical" href="https://emploia.fr/alerts"/>
+  <meta name="robots" content="noindex"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    body { background: var(--bg3); }
+
+    .alerts-layout {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 32px 24px 100px;
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 32px 24px 28px;
+      position: relative;
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 50% 0%, rgba(99,102,241,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .page-hero h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 900;
+      letter-spacing: -1.2px;
+      margin-bottom: 8px;
+    }
+
+    .page-hero p {
+      font-size: 14px;
+      color: var(--t2);
+      line-height: 1.65;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* CREATE FORM */
+    .create-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .create-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad-primary);
+    }
+
+    .create-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .create-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--t1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .create-body { padding: 20px 24px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .6px; }
+
+    /* ALERTS LIST */
+    .alerts-section {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .alerts-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .alerts-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert-card {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--brd);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: background .15s;
+    }
+
+    .alert-card:last-child { border-bottom: none; }
+    .alert-card:hover { background: rgba(255,255,255,.02); }
+
+    .alert-info { flex: 1; min-width: 0; }
+
+    .alert-keywords {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .alert-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .alert-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* HOW IT WORKS */
+    .hiw-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .hiw-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .hiw-icon { font-size: 28px; margin-bottom: 10px; }
+    .hiw-title { font-size: 12px; font-weight: 800; color: var(--t1); margin-bottom: 4px; }
+    .hiw-desc { font-size: 11px; color: var(--t3); line-height: 1.55; }
+
+    /* UPGRADE */
+    .upgrade-card {
+      background: linear-gradient(135deg, rgba(99,102,241,.09), rgba(59,130,246,.06));
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .uc-text { font-size: 13px; color: var(--t2); line-height: 1.55; }
+    .uc-text strong { color: var(--t1); }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .hiw-grid { grid-template-columns: 1fr; }
+      .upgrade-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<!-- NAV -->
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien IA</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:var(--ind2);border:1px solid rgba(99,102,241,.2);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;color:var(--inb);margin-bottom:16px">
+    <div class="animate-pulse-dot"></div>
+    Alertes actives · Emploia
+  </div>
+  <h1>Ne manquez aucune <span class="text-grad">opportunité</span></h1>
+  <p>Configurez vos alertes et recevez les meilleures offres directement par email — chaque jour ou chaque semaine.</p>
+</div>
+
+<div class="alerts-layout page-enter">
+
+  <!-- CREATE FORM -->
+  <div class="create-card">
+    <div class="create-header">
+      <div class="create-title">🔔 Nouvelle alerte</div>
+      <span id="alertCountBadge" class="badge badge-gray">0 / 10 alertes</span>
+    </div>
+    <div class="create-body">
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">Mots-clés *</div>
+          <input type="text" class="emp-input" id="alertKeywords" placeholder="React Developer, Product Manager..." onkeydown="if(event.key==='Enter')createAlert()"/>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Lieu (optionnel)</div>
+          <input type="text" class="emp-input" id="alertLocation" placeholder="Paris, Remote, Lyon..."/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">Type de contrat</div>
+          <select class="emp-input" id="alertType">
+            <option value="all">Tous types</option>
+            <option value="cdi">💼 CDI</option>
+            <option value="cdd">📋 CDD</option>
+            <option value="stage">🎓 Stage</option>
+            <option value="alternance">🔄 Alternance</option>
+            <option value="freelance">⚡ Freelance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Fréquence</div>
+          <select class="emp-input" id="alertFrequency">
+            <option value="daily">📧 Quotidienne (chaque matin)</option>
+            <option value="weekly">📬 Hebdomadaire (chaque lundi)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="createAlertBtn" onclick="createAlert()" style="width:100%;padding:12px">
+        🔔 Créer cette alerte
+      </button>
+    </div>
+  </div>
+
+  <!-- ALERTS LIST -->
+  <div class="alerts-section">
+    <div class="alerts-header">
+      <div class="alerts-title">🔔 Mes alertes <span id="alertsCount" style="background:var(--s3);color:var(--t3);font-size:10px;padding:2px 8px;border-radius:100px;font-weight:800">0</span></div>
+      <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Parcourir les offres →</a>
+    </div>
+    <div id="alertsList">
+      <div style="text-align:center;padding:48px 24px;color:var(--t3)">
+        <div style="font-size:40px;margin-bottom:12px">🔔</div>
+        <div style="font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px">Aucune alerte configurée</div>
+        <div style="font-size:12px">Créez votre première alerte pour ne plus rater d'opportunité.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="hiw-grid">
+    <div class="hiw-card">
+      <div class="hiw-icon">🎯</div>
+      <div class="hiw-title">Définissez vos critères</div>
+      <div class="hiw-desc">Mots-clés, lieu, type de contrat — soyez précis pour des résultats pertinents.</div>
+    </div>
+    <div class="hiw-card">
+      <div class="hiw-icon">📧</div>
+      <div class="hiw-title">Recevez par email</div>
+      <div class="hiw-desc">Chaque matin (ou chaque lundi), les nouvelles offres correspondant à vos alertes arrivent dans votre boîte.</div>
+    </div>
+    <div class="hiw-card">
+      <div class="hiw-icon">✨</div>
+      <div class="hiw-title">Postulez en 30s</div>
+      <div class="hiw-desc">Cliquez sur une offre, générez votre CV ATS-optimisé et postulez immédiatement.</div>
+    </div>
+  </div>
+
+  <!-- UPGRADE CARD -->
+  <div class="upgrade-card">
+    <div class="uc-text">
+      <strong>Plan Pro — Alertes illimitées</strong><br>
+      Le plan gratuit permet jusqu'à 10 alertes. Passez Pro pour des alertes illimitées avec matching IA avancé et résumé hebdomadaire personnalisé.
+    </div>
+    <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  let allAlerts = [];
+
+  const TYPE_LABELS = { all: 'Tous types', cdi: 'CDI', cdd: 'CDD', stage: 'Stage', alternance: 'Alternance', freelance: 'Freelance' };
+  const TYPE_BADGES = { all: 'badge-gray', cdi: 'badge-blue', cdd: 'badge-purple', stage: 'badge-green', alternance: 'badge-yellow', freelance: 'badge-red' };
+  const TYPE_EMOJIS = { all: '📋', cdi: '💼', cdd: '📋', stage: '🎓', alternance: '🔄', freelance: '⚡' };
+
+  async function loadAlerts() {
+    try {
+      const res = await fetch('/api/alerts', { credentials: 'include' });
+      if (res.status === 401) { showAuthRequired(); return; }
+      if (res.ok) {
+        const d = await res.json();
+        allAlerts = d.alerts || [];
+        renderAlerts();
+        updateCountBadge();
+      }
+    } catch { empToast('Erreur de chargement', 'error'); }
+  }
+
+  function renderAlerts() {
+    const el = document.getElementById('alertsList');
+    document.getElementById('alertsCount').textContent = allAlerts.length;
+    if (!allAlerts.length) {
+      el.innerHTML = `<div style="text-align:center;padding:48px 24px;color:var(--t3)">
+        <div style="font-size:40px;margin-bottom:12px">🔔</div>
+        <div style="font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px">Aucune alerte configurée</div>
+        <div style="font-size:12px">Créez votre première alerte pour ne plus rater d'opportunité.</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = allAlerts.map(a => {
+      const typeLabel = TYPE_LABELS[a.type] || a.type;
+      const typeEmoji = TYPE_EMOJIS[a.type] || '📋';
+      const typeBadge = TYPE_BADGES[a.type] || 'badge-gray';
+      const freqLabel = a.frequency === 'weekly' ? '📬 Hebdomadaire' : '📧 Quotidienne';
+      const date = a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+      return `
+        <div class="alert-card" id="alert-${esc(a.id)}">
+          <div class="alert-info">
+            <div class="alert-keywords">🔍 ${esc(a.keywords)}</div>
+            <div class="alert-meta">
+              ${a.location ? `<span class="badge badge-gray">📍 ${esc(a.location)}</span>` : ''}
+              <span class="badge ${typeBadge}">${typeEmoji} ${esc(typeLabel)}</span>
+              <span class="badge badge-green">${freqLabel}</span>
+              ${date ? `<span style="font-size:10px;color:var(--t3)">Créée le ${date}</span>` : ''}
+            </div>
+          </div>
+          <div class="alert-actions">
+            <a href="/jobs?q=${encodeURIComponent(a.keywords)}${a.location ? '&location=' + encodeURIComponent(a.location) : ''}${a.type !== 'all' ? '&type=' + encodeURIComponent(a.type) : ''}" class="btn btn-ghost btn-sm" style="font-size:11px">Voir offres →</a>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--rnb)" onclick="deleteAlert('${esc(a.id)}')">🗑</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateCountBadge() {
+    const el = document.getElementById('alertCountBadge');
+    if (el) el.textContent = `${allAlerts.length} / 10 alertes`;
+  }
+
+  async function createAlert() {
+    const keywords  = document.getElementById('alertKeywords').value.trim();
+    const location  = document.getElementById('alertLocation').value.trim();
+    const type      = document.getElementById('alertType').value;
+    const frequency = document.getElementById('alertFrequency').value;
+
+    if (!keywords) { empToast('Entrez au moins un mot-clé', 'error'); document.getElementById('alertKeywords').focus(); return; }
+    if (allAlerts.length >= 10) { empToast('Maximum 10 alertes atteint. Passez Pro pour plus.', 'error'); return; }
+
+    const btn = document.getElementById('createAlertBtn');
+    btn.disabled = true;
+    btn.textContent = 'Création...';
+
+    try {
+      const res = await fetch('/api/alerts', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keywords, location, type, frequency }),
+      });
+      if (res.status === 401) { empShowAuth('login'); btn.disabled = false; btn.textContent = '🔔 Créer cette alerte'; return; }
+      const d = await res.json();
+      if (res.ok) {
+        allAlerts.push(d.alert);
+        renderAlerts();
+        updateCountBadge();
+        document.getElementById('alertKeywords').value = '';
+        document.getElementById('alertLocation').value = '';
+        empToast('Alerte créée ! Vous recevrez vos premiers résultats prochainement.', 'success');
+      } else {
+        empToast(d.error || 'Erreur', 'error');
+      }
+    } catch {
+      empToast('Erreur réseau', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🔔 Créer cette alerte';
+  }
+
+  async function deleteAlert(id) {
+    if (!confirm('Supprimer cette alerte ?')) return;
+    try {
+      const res = await fetch('/api/alerts?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        allAlerts = allAlerts.filter(a => a.id !== id);
+        renderAlerts();
+        updateCountBadge();
+        empToast('Alerte supprimée', 'info');
+      }
+    } catch { empToast('Erreur', 'error'); }
+  }
+
+  function showAuthRequired() {
+    const el = document.getElementById('alertsList');
+    el.innerHTML = `<div style="text-align:center;padding:40px 24px">
+      <div style="font-size:40px;margin-bottom:12px">🔐</div>
+      <div style="font-size:15px;font-weight:800;color:var(--t1);margin-bottom:8px">Connexion requise</div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:20px">Connectez-vous pour gérer vos alertes emploi.</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onclick="empShowAuth('register')" class="btn btn-primary btn-sm">S'inscrire gratuitement</button>
+        <button onclick="empShowAuth('login')" class="btn btn-ghost btn-sm">Se connecter</button>
+      </div>
+    </div>`;
+    window.addEventListener('empAuthChange', e => { if (e.detail.user) loadAlerts(); }, { once: true });
+  }
+
+  // Pre-fill from jobs page search
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('q')) document.getElementById('alertKeywords').value = p.get('q');
+  if (p.get('location')) document.getElementById('alertLocation').value = p.get('location');
+  if (p.get('type') && p.get('type') !== 'tous') document.getElementById('alertType').value = p.get('type');
+
+  loadAlerts();
+</script>
+</body>
+</html>

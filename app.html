@@ -531,8 +531,14 @@
       </div>
 
       <div class="field-group" id="profileGroup">
-        <label>Votre profil / parcours <span class="label-help" id="profLen">0 caractères</span></label>
-        <textarea id="profileInput" rows="6" placeholder="Vos expériences, compétences, formations, langues..." oninput="updateLen()"></textarea>
+        <label>Votre profil / parcours
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="label-help" id="profLen">0 caractères</span>
+            <button type="button" onclick="saveProfile()" style="background:var(--gnd);border:1px solid rgba(16,185,129,.2);color:var(--gnb);font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;cursor:pointer;font-family:'Sora',sans-serif" id="saveProfileBtn">💾 Sauvegarder</button>
+          </div>
+        </label>
+        <textarea id="profileInput" rows="6" placeholder="Vos expériences, compétences, formations, langues..." oninput="updateLen(); scheduleProfileSave()"></textarea>
+        <div id="profileSavedBadge" style="display:none;font-size:10px;color:var(--gnb);margin-top:4px">✓ Profil sauvegardé — pré-rempli automatiquement à la prochaine visite</div>
       </div>
 
       <div class="field-group" id="cvGroup" style="display:none">
@@ -927,8 +933,39 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     };
   }
 
+  // ── PROFILE SAVE / RESTORE ──────────────────────────────────────────────────
+  let profileSaveTimer = null;
+
+  function scheduleProfileSave() {
+    clearTimeout(profileSaveTimer);
+    profileSaveTimer = setTimeout(saveProfile, 2000);
+  }
+
+  function saveProfile() {
+    const profile = document.getElementById('profileInput').value.trim();
+    if (!profile) return;
+    localStorage.setItem('emploia_profile_text', profile);
+    document.getElementById('profileSavedBadge').style.display = 'block';
+    fetch('/api/profile', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileText: profile }),
+    }).catch(() => {});
+  }
+
+  function restoreProfile() {
+    const saved = localStorage.getItem('emploia_profile_text');
+    if (saved && !document.getElementById('profileInput').value) {
+      document.getElementById('profileInput').value = saved;
+      document.getElementById('profileSavedBadge').style.display = 'block';
+      updateLen();
+    }
+  }
+
   // Init
   updateLen();
+  restoreProfile();
 
   // Sync usage pill with real auth state
   function syncUsagePill(user) {

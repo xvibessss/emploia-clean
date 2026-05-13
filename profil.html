@@ -511,6 +511,30 @@
   <!-- MAIN -->
   <main class="profile-main" id="profileMain">
 
+    <!-- ── SECTION: IMPORT RAPIDE ───────────── -->
+    <div style="background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(99,102,241,.06));border:1px solid rgba(10,102,194,.2);border-radius:16px;padding:18px 22px;margin-bottom:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:8px">
+            <span style="background:#0a66c2;color:#fff;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">in</span>
+            Importer depuis LinkedIn
+          </div>
+          <div style="font-size:12px;color:var(--t2)">Collez votre texte de profil LinkedIn pour pré-remplir automatiquement votre profil Emploia.</div>
+        </div>
+        <button onclick="toggleLinkedInImport()" id="liToggleBtn" class="btn btn-ghost btn-sm">Ouvrir →</button>
+      </div>
+      <div id="liImportPanel" style="display:none;margin-top:16px">
+        <div style="background:var(--bls);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11.5px;color:var(--blb);line-height:1.7">
+          <strong>Comment faire :</strong> Sur LinkedIn → votre profil → sélectionnez tout le texte (Ctrl+A) → copiez (Ctrl+C) → collez ici. Ou collez directement vos expériences, compétences, résumé.
+        </div>
+        <textarea id="liText" rows="6" class="emp-input" placeholder="Collez ici votre texte de profil LinkedIn (expériences, compétences, résumé...)..." style="width:100%;resize:vertical;margin-bottom:10px"></textarea>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="importLinkedIn()" id="liImportBtn">✨ Importer dans mon profil</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleLinkedInImport()">Fermer</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ── SECTION: INFOS ──────────────────── -->
     <div class="section-card" id="sec-infos">
       <div class="sc-header">
@@ -1051,6 +1075,50 @@
 
   window.addEventListener('empAuthChange', e => { if (e.detail.user) loadProfileFromServer(); });
   setTimeout(loadProfileFromServer, 900);
+
+  // ── LinkedIn Import ──────────────────────────────────────────────────────
+  function toggleLinkedInImport() {
+    const panel = document.getElementById('liImportPanel');
+    const btn = document.getElementById('liToggleBtn');
+    const open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    btn.textContent = open ? 'Fermer ↑' : 'Ouvrir →';
+  }
+
+  async function importLinkedIn() {
+    const raw = (document.getElementById('liText').value || '').trim();
+    if (!raw) { empToast('Collez d\'abord votre texte LinkedIn', 'error'); return; }
+    const btn = document.getElementById('liImportBtn');
+    btn.disabled = true; btn.textContent = '⏳ Analyse…';
+    try {
+      // Save raw text for AI usage (app.html / smart-apply)
+      localStorage.setItem('emploia_profile_text', raw);
+      // Try to extract structured info with Claude via /api/import-cv
+      const res = await fetch('/api/import-cv', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        fillProfileFromCV(data);
+        setTimeout(calculateCompletion, 200);
+        empToast('Profil LinkedIn importé ✓', 'success');
+        toggleLinkedInImport();
+        document.getElementById('liText').value = '';
+      } else {
+        // Fallback: populate summary textarea with raw text
+        const summaryEl = document.getElementById('prfSummary');
+        if (summaryEl) summaryEl.value = raw.slice(0, 1200);
+        empToast('Texte importé dans le résumé — complétez les autres champs', 'info');
+        setTimeout(calculateCompletion, 200);
+      }
+    } catch {
+      // Silent fallback: at least save to localStorage
+      empToast('Texte sauvegardé pour l\'IA (profil serveur indisponible)', 'info');
+    }
+    btn.disabled = false; btn.textContent = '✨ Importer dans mon profil';
+  }
 
   // Recalculate completion on any field change
   document.querySelectorAll('#prfFirstName,#prfLastName,#prfTitle,#prfLocation,#prfPhone,#prfSummary,#prfLinkedin,#prfPortfolio').forEach(el => {

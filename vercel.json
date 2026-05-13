@@ -100,6 +100,9 @@
     },
     "api/alerts.js": {
       "maxDuration": 10
+    },
+    "api/smart-apply.js": {
+      "maxDuration": 35
     }
   },
   "rewrites": [
@@ -304,7 +307,8 @@
     { "source": "/blog/ia-et-emploi-2026", "destination": "/blog/ia-et-emploi-2026.html" },
     { "source": "/blog/preparer-entretien-technique", "destination": "/blog/preparer-entretien-technique.html" },
     { "source": "/blog/email-candidature-parfait", "destination": "/blog/email-candidature-parfait.html" },
-    { "source": "/blog/reseaux-sociaux-recherche-emploi", "destination": "/blog/reseaux-sociaux-recherche-emploi.html" }
+    { "source": "/blog/reseaux-sociaux-recherche-emploi", "destination": "/blog/reseaux-sociaux-recherche-emploi.html" },
+    { "source": "/alerts", "destination": "/alerts.html" }
   ],
   "headers": [
     {
