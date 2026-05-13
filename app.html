@@ -753,6 +753,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               if (parsed.done) {
                 lastResult = fullText;
                 if (window.plausible) plausible('generation_complete', { props: { type: mode } });
+                setTimeout(showFloatingNudge, 2000);
               }
             } catch (e) {
               if (e.message !== 'Unexpected end of JSON input') throw e;
@@ -851,30 +852,79 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   }
 
   function showUpgradeModal() {
+    if (window.plausible) plausible('upgrade_modal_shown');
     let modal = document.getElementById('upgradeModal');
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'upgradeModal';
-      modal.style.cssText = 'position:fixed;inset:0;z-index:800;background:rgba(4,8,15,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:800;background:rgba(4,8,15,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px';
       modal.innerHTML = `
-        <div style="background:var(--s1);border:1px solid var(--brdh);border-radius:20px;padding:36px 32px;max-width:440px;width:100%;position:relative;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)">
-          <button onclick="document.getElementById('upgradeModal').remove()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px">✕</button>
-          <div style="font-size:40px;margin-bottom:12px">🚀</div>
-          <h2 style="font-size:22px;font-weight:900;letter-spacing:-.6px;margin-bottom:8px">Vos 5 générations sont épuisées</h2>
-          <p style="color:var(--t2);font-size:14px;line-height:1.65;margin-bottom:24px">Vous avez utilisé vos <strong>5 générations gratuites</strong>. Passez Pro pour des générations illimitées — et décrochez votre entretien plus vite.</p>
-          <div style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;text-align:left">
-            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Générations illimitées (CV, lettre, score ATS)</div>
-            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Coaching entretien IA illimité</div>
-            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb)">✓</span> Optimisation LinkedIn</div>
+        <div style="background:var(--s1);border:1px solid var(--brdh);border-radius:24px;padding:32px 28px;max-width:420px;width:100%;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.6)">
+          <button onclick="document.getElementById('upgradeModal').remove()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1">✕</button>
+
+          <!-- Header -->
+          <div style="text-align:center;margin-bottom:20px">
+            <div style="font-size:36px;margin-bottom:10px">🚀</div>
+            <h2 style="font-size:20px;font-weight:900;letter-spacing:-.6px;margin-bottom:6px">Vous avez atteint votre limite</h2>
+            <p style="color:var(--t2);font-size:13px;line-height:1.6">Vos 5 générations gratuites sont utilisées. Passez Pro pour continuer sur votre lancée.</p>
           </div>
-          <div style="font-size:13px;font-weight:700;color:var(--gnb);background:var(--gnd);border-radius:8px;padding:8px 14px;display:inline-block;margin-bottom:16px">🎁 7 jours gratuits — 0€ débité aujourd'hui</div><br>
-          <a href="/#pricing" style="display:inline-block;width:100%;padding:15px;border-radius:11px;background:var(--grad-primary);color:#fff;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 4px 20px rgba(99,102,241,.35);letter-spacing:-.2px">Démarrer l'essai gratuit Pro →</a>
-          <div style="margin-top:12px;font-size:12px;color:var(--t3)">9€/mois · Annulation en 1 clic · Sans engagement</div>
+
+          <!-- Social proof -->
+          <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">S</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--t1)">"Score ATS 41 → 94. 2 rappels en 1 semaine."</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:3px">Sophie M. — Paris · Plan Pro depuis 3 semaines</div>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:18px">
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb);font-size:14px">♾️</span> <strong>Générations illimitées</strong> — CV, lettre, score ATS</div>
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb);font-size:14px">🎤</span> Coaching entretien IA illimité</div>
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb);font-size:14px">🔔</span> Alertes emploi jusqu'à 50 offres/jour</div>
+            <div style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px"><span style="color:var(--gnb);font-size:14px">💼</span> Optimisation LinkedIn + Smart Apply</div>
+          </div>
+
+          <!-- Price + CTA -->
+          <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:8px 14px;margin-bottom:14px;text-align:center;font-size:13px;font-weight:700;color:var(--gnb)">🎁 7 jours gratuits — 0€ débité aujourd'hui</div>
+          <button id="upgradePayBtn" onclick="startUpgradeCheckout()" style="width:100%;padding:15px;border-radius:12px;background:var(--grad-primary);color:#fff;font-weight:800;font-size:15px;border:none;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 6px 24px rgba(99,102,241,.4);letter-spacing:-.2px;transition:all .2s">Démarrer l'essai Pro gratuit →</button>
+          <div style="display:flex;justify-content:center;gap:16px;margin-top:10px">
+            <span style="font-size:11px;color:var(--t3)">🔒 Stripe PCI</span>
+            <span style="font-size:11px;color:var(--t3)">✓ Annulation en 1 clic</span>
+            <span style="font-size:11px;color:var(--t3)">🇫🇷 Données FR</span>
+          </div>
         </div>`;
       document.body.appendChild(modal);
       modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     } else {
       modal.style.display = 'flex';
+    }
+  }
+
+  async function startUpgradeCheckout() {
+    const btn = document.getElementById('upgradePayBtn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = '⏳ Redirection Stripe...';
+    if (window.plausible) plausible('upgrade_checkout_started');
+    try {
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: 'pro', email: window.empUser?.email || '' })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        window.location.href = '/#pricing';
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '⚠️ Erreur — Réessayez';
+      setTimeout(() => { btn.textContent = 'Démarrer l\'essai Pro gratuit →'; }, 3000);
     }
   }
 
@@ -887,6 +937,41 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       </div>`;
     document.getElementById('resultActions').style.display = 'none';
     document.getElementById('resultActionsBottom').style.display = 'none';
+  }
+
+  function showFloatingNudge() {
+    if (document.getElementById('empFloatNudge')) return;
+    const user = window.empUser;
+    if (!user || user.plan !== 'free') return;
+    const used = user.generationsUsed || 0;
+    if (used < 2) return;
+    const dismissed = localStorage.getItem('emp_nudge_dismissed');
+    if (dismissed && Date.now() - Number(dismissed) < 86400000) return;
+    if (!document.querySelector('style[data-nudge-anim]')) {
+      const st = document.createElement('style');
+      st.dataset.nudgeAnim = '1';
+      st.textContent = '@keyframes nudgeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}@keyframes nudgeOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(24px)}}';
+      document.head.appendChild(st);
+    }
+    const remaining = 5 - used;
+    const nudge = document.createElement('div');
+    nudge.id = 'empFloatNudge';
+    nudge.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;width:300px;background:#fff;border:1px solid rgba(99,102,241,.2);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.14);padding:18px 18px 14px;animation:nudgeIn .4s cubic-bezier(.22,1,.36,1);font-family:"Sora",sans-serif';
+    nudge.innerHTML = `
+      <button onclick="(function(){localStorage.setItem('emp_nudge_dismissed',Date.now());const n=document.getElementById('empFloatNudge');if(n){n.style.animation='nudgeOut .3s forwards';setTimeout(()=>n.remove(),300)}})()" style="position:absolute;top:10px;right:12px;background:none;border:none;cursor:pointer;font-size:16px;color:#94a3b8;line-height:1">✕</button>
+      <div style="font-size:18px;margin-bottom:6px">🚀</div>
+      <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:4px">${remaining === 1 ? 'Dernière génération gratuite !' : `Plus que ${remaining} générations gratuites`}</div>
+      <div style="font-size:11px;color:#64748b;line-height:1.5;margin-bottom:12px">Passez Pro pour générer autant de CVs que vous voulez — sans limite, sans attente.</div>
+      <div style="font-size:10px;color:#94a3b8;font-style:italic;margin-bottom:10px">« J'ai décroché 3 entretiens en 2 semaines avec Emploia. » — Sophie R., Paris</div>
+      <button onclick="showUpgradeModal();document.getElementById('empFloatNudge')?.remove();if(window.plausible)plausible('float_nudge_cta_click')" style="width:100%;padding:10px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Sora',sans-serif">Essai Pro gratuit 7j →</button>
+      <div style="text-align:center;font-size:10px;color:#94a3b8;margin-top:6px">0€ aujourd'hui · Annulation en 1 clic</div>
+    `;
+    document.body.appendChild(nudge);
+    if (window.plausible) plausible('float_nudge_shown', { props: { used: String(used) } });
+    setTimeout(() => {
+      const n = document.getElementById('empFloatNudge');
+      if (n) { n.style.animation = 'nudgeOut .3s forwards'; setTimeout(() => n?.remove(), 300); }
+    }, 18000);
   }
 
   function copyResult() {
@@ -1012,14 +1097,36 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       const used = user.generationsUsed || 0;
       const limit = 5;
       const remaining = limit - used;
-      if (user.plan === 'pro') {
-        el.closest('.usage-pill').innerHTML = `⭐ Plan Pro · générations illimitées`;
+      if (user.plan !== 'free') {
+        el.closest('.usage-pill').innerHTML = `⭐ Plan ${user.plan === 'intensif' ? 'Intensif' : 'Pro'} · générations illimitées`;
+        // Show trial countdown banner if in first 7 days
+        if (user.planActivatedAt) {
+          const daysPro = (Date.now() - new Date(user.planActivatedAt).getTime()) / 86400000;
+          const daysLeft = Math.ceil(7 - daysPro);
+          if (daysPro < 7 && daysLeft > 0) {
+            const trialBanner = document.createElement('div');
+            trialBanner.style.cssText = 'background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;max-width:720px;margin-left:auto;margin-right:auto';
+            trialBanner.innerHTML = `<span>⏰ <strong style="color:#f87171">Essai Pro — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</strong> · Vous serez débité 9€/mois à l'issue de l'essai.</span><a href="/api/stripe-portal" style="font-size:12px;color:#f87171;font-weight:700;text-decoration:none;white-space:nowrap">Gérer →</a>`;
+            const appHeader = document.querySelector('.app-header');
+            if (appHeader) appHeader.parentNode.insertBefore(trialBanner, appHeader);
+          }
+        }
       } else if (remaining <= 0) {
-        el.closest('.usage-pill').innerHTML = `<span style="color:var(--rnb)">⛔ Limite atteinte</span> · <a href="/#pricing" class="upgrade-link">Passer Pro →</a>`;
+        el.closest('.usage-pill').innerHTML = `<span style="color:var(--rnb)">⛔ Limite atteinte</span> · <button onclick="showUpgradeModal()" style="color:var(--blb);font-weight:700;background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:inherit;padding:0">Passer Pro →</button>`;
+      } else if (remaining === 1) {
+        el.closest('.usage-pill').innerHTML = `⚠️ <span style="color:var(--ylb)"><strong>Dernière génération gratuite</strong></span> · <button onclick="showUpgradeModal()" style="color:var(--blb);font-weight:700;background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:inherit;padding:0">Passer Pro</button>`;
+        // Show a prominent last-gen banner
+        const lastGenBanner = document.createElement('div');
+        lastGenBanner.style.cssText = 'background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25);border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;max-width:720px;margin-left:auto;margin-right:auto';
+        lastGenBanner.innerHTML = `<span>⚠️ <strong style="color:var(--ylb)">C'est votre dernière génération gratuite.</strong> Passez Pro pour continuer sans limite.</span><button onclick="showUpgradeModal()" style="background:var(--grad-primary);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap">Essai gratuit 7j →</button>`;
+        const appHeader = document.querySelector('.app-header');
+        if (appHeader && !document.getElementById('lastGenBanner')) { lastGenBanner.id = 'lastGenBanner'; appHeader.parentNode.insertBefore(lastGenBanner, appHeader); }
       } else if (remaining <= 2) {
-        el.closest('.usage-pill').innerHTML = `⚠️ <span style="color:var(--ylb)"><strong>${remaining}</strong> génération${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}</span> · <a href="/#pricing" class="upgrade-link">Passer Pro</a>`;
+        el.closest('.usage-pill').innerHTML = `⚠️ <span style="color:var(--ylb)"><strong>${remaining}</strong> génération${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}</span> · <button onclick="showUpgradeModal()" style="color:var(--blb);font-weight:700;background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:inherit;padding:0">Passer Pro</button>`;
+        setTimeout(showFloatingNudge, 3000);
       } else {
-        el.closest('.usage-pill').innerHTML = `✨ <span><strong>${used}</strong> / ${limit} générations gratuites</span><a href="/#pricing" class="upgrade-link">Passer Pro</a>`;
+        el.closest('.usage-pill').innerHTML = `✨ <span><strong>${used}</strong> / ${limit} générations gratuites</span><button onclick="showUpgradeModal()" style="color:var(--blb);font-weight:700;background:none;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-size:inherit;padding:0;margin-left:8px">Passer Pro</button>`;
+        if (used >= 2) setTimeout(showFloatingNudge, 5000);
       }
     }
   }

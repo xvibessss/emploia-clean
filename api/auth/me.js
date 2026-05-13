@@ -156,6 +156,24 @@ export default async function handler(req) {
         )).catch(() => {});
       }
 
+      if (daysPro >= 5 && daysPro < 7) {
+        sendDrip('dripProTrialEndSent', `${firstName ? firstName + ', v' : 'V'}otre essai Pro expire dans ${Math.ceil(7 - daysPro)} jour${Math.ceil(7 - daysPro) > 1 ? 's' : ''} ⏰`, baseHtml(
+          `Votre accès Pro illimité expire bientôt`,
+          `<p style="color:#475569;line-height:1.6;margin:0 0 16px">Votre essai gratuit de 7 jours expire dans <strong style="color:#ef4444">${Math.ceil(7 - daysPro)} jour${Math.ceil(7 - daysPro) > 1 ? 's' : ''}</strong>. Après cette date, vous repasserez en plan gratuit (5 générations).</p>
+<div style="background:#fef2f2;border-left:4px solid #ef4444;padding:16px;border-radius:0 10px 10px 0;margin-bottom:20px">
+  <p style="font-size:13px;font-weight:700;color:#991b1b;margin:0 0 8px">Sans abonnement, vous perdrez l'accès à :</p>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:13px;color:#b91c1c;display:flex;align-items:center;gap:8px">✕ Générations illimitées (CV, lettre, score ATS)</div>
+    <div style="font-size:13px;color:#b91c1c;display:flex;align-items:center;gap:8px">✕ Coaching entretien IA illimité</div>
+    <div style="font-size:13px;color:#b91c1c;display:flex;align-items:center;gap:8px">✕ Smart Apply + Alertes jusqu'à 50 offres</div>
+  </div>
+</div>
+<p style="color:#475569;font-size:13px;margin:0 0 20px">Si vous continuez, <strong>seulement 9€/mois</strong> — annulable en 1 clic à tout moment. Pour vous remercier de votre confiance, votre carte ne sera débitée qu'à la fin de l'essai.</p>
+<a href="https://emploia.fr/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;margin-bottom:12px">Continuer avec Pro → 9€/mois</a>
+<p style="font-size:12px;color:#94a3b8;margin:8px 0 0">Annulez avant l'expiration et vous ne payez rien.</p>`
+        )).catch(() => {});
+      }
+
       if (daysPro >= 7 && daysPro < 14) {
         sendDrip('dripPro7Sent', `${firstName}, 1 semaine en Pro — conseil avancé pour doubler vos réponses 📈`, baseHtml(
           `7 jours en Pro : la technique que 80 % oublient`,

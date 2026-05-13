@@ -158,6 +158,30 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// ── CRISP LIVE CHAT ───────────────────────────────────
+// Load only on app/dashboard/pricing pages — not on blog/SEO pages
+// to avoid slowing down crawler indexing.
+(function() {
+  const path = window.location.pathname;
+  const chatPages = ['/app', '/dashboard', '/interview', '/profil', '/onboarding', '/apply-queue', '/alerts', '/cv-builder', '/'];
+  if (!chatPages.some(p => path === p || path.startsWith(p + '?'))) return;
+  window.$crisp = [];
+  window.CRISP_WEBSITE_ID = 'VOTRE_CRISP_ID';
+  const s = document.createElement('script');
+  s.src = 'https://client.crisp.chat/l.js';
+  s.async = true;
+  document.head.appendChild(s);
+  // Pre-fill with user info once auth resolves
+  window.addEventListener('empAuthChange', e => {
+    const u = e.detail?.user;
+    if (u && window.$crisp) {
+      if (u.email) window.$crisp.push(['set', 'user:email', [u.email]]);
+      if (u.name) window.$crisp.push(['set', 'user:nickname', [u.name]]);
+      if (u.plan && u.plan !== 'free') window.$crisp.push(['set', 'session:segments', [[u.plan]]]);
+    }
+  });
+})();
+
 // ── FAQ ACCORDION ─────────────────────────────────────
 document.querySelectorAll('.emp-faq-item').forEach(item => {
   const btn = item.querySelector('.emp-faq-q');
