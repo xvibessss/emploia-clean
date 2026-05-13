@@ -2,8 +2,14 @@
    EMPLOIA — Shared JavaScript utilities
 ═══════════════════════════════════════════════════ */
 
-// Plausible analytics — loaded once globally, privacy-first, no cookie needed
+// Plausible analytics + preconnect — loaded once globally, privacy-first
 (function() {
+  if (!document.querySelector('link[href="https://plausible.io"]')) {
+    const pre = document.createElement('link');
+    pre.rel = 'preconnect';
+    pre.href = 'https://plausible.io';
+    document.head.appendChild(pre);
+  }
   if (document.querySelector('script[data-domain="emploia.fr"]')) return;
   const s = document.createElement('script');
   s.defer = true;

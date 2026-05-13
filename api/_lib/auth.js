@@ -2,7 +2,7 @@
 // Uses Web Crypto API — 100% Edge Runtime compatible
 
 export const COOKIE_NAME = "__Host-emploia-token";
-export const FREE_LIMIT = 3;
+export const FREE_LIMIT = 5;
 
 // No fallback — fail loudly if secret not set
 function getJwtSecret() {
@@ -206,7 +206,8 @@ export async function incrementGenerations(user) {
   // Two simultaneous requests both reading generationsUsed=2 and both
   // writing 3 would effectively lose one increment. The INCR key is the
   // authoritative source; getCurrentUser merges it back into the user object.
-  await kvIncr(`gen:${user.email}`);
+  const { result } = await kvIncr(`gen:${user.email}`);
+  return typeof result === 'number' ? result : null;
 }
 
 // Exported so generate endpoints can do a fresh atomic read before
