@@ -1068,14 +1068,44 @@
   }
 
   function showScore(pillEl, data) {
-    pillEl.textContent = `✨ ${data.score}%`;
+    if (!pillEl) return;
+    const s = data.score;
+    const color = s >= 75 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
+    pillEl.textContent = `✨ ${s}%`;
     pillEl.style.pointerEvents = '';
+    pillEl.style.background = s >= 75 ? 'rgba(34,197,94,.15)' : s >= 50 ? 'rgba(245,158,11,.15)' : 'rgba(239,68,68,.1)';
+    pillEl.style.color = color;
+    pillEl.style.border = `1px solid ${color}40`;
     pillEl.title = [
       data.verdict,
       data.pros?.length ? '✅ ' + data.pros.join(' · ') : '',
       data.cons?.length ? '⚠️ ' + data.cons.join(' · ') : '',
       data.tip ? '💡 ' + data.tip : '',
     ].filter(Boolean).join('\n');
+  }
+
+  // Client-side instant scoring for all visible cards (no API, no rate limit)
+  function autoScoreAllJobs(jobs) {
+    const profile = (localStorage.getItem('emploia_profile_text') || '').toLowerCase();
+    if (!profile || profile.length < 20) return;
+
+    jobs.forEach(job => {
+      const pillEl = document.getElementById(`pill-${job.id}`);
+      if (!pillEl) return;
+      if (scoreCache[job.id]) { showScore(pillEl, scoreCache[job.id]); return; }
+
+      const jobText = ((job.title || '') + ' ' + (job.description || '')).toLowerCase();
+      const words = jobText.match(/\b[a-záàéèêëîïôùûüç]{4,}\b/gi) || [];
+      const freq = {};
+      words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+      const top = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 25).map(e => e[0]);
+      const matched = top.filter(k => profile.includes(k));
+      const score = Math.round(30 + (matched.length / Math.max(top.length, 1)) * 65);
+      const verdict = score >= 75 ? 'Bon match' : score >= 50 ? 'Match partiel' : 'Compétences à développer';
+      const data = { score, verdict, pros: matched.slice(0, 3), cons: [], tip: '' };
+      persistScore(job.id, data);
+      showScore(pillEl, data);
+    });
   }
 
   function typeClass(type) {
@@ -1211,6 +1241,8 @@
       allJobs = filteredJobs;
       document.getElementById('jobsList').innerHTML = filteredJobs.map(renderJob).join('');
       renderPagination(filteredJobs.length, salaryFilter ? filteredJobs.length : total);
+      // Auto-score all cards instantly (client-side, no API call)
+      requestAnimationFrame(() => autoScoreAllJobs(filteredJobs));
 
     } catch(e) {
       document.getElementById('jobsList').innerHTML = `

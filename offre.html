@@ -142,6 +142,16 @@
     .ats-kw-tag.match { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
     .ats-kw-tag.miss { background: var(--s3); color: var(--tx3); border: 1px solid var(--brd); }
 
+    /* Company insights */
+    .ins-block { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 12px 14px; }
+    .ins-block-label { font-size: 10px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .ins-block-val { font-size: 13px; color: var(--t1); font-weight: 600; line-height: 1.4; }
+    .ins-label { font-size: 12px; font-weight: 700; color: var(--t2); margin-bottom: 8px; }
+    .ins-list { margin: 0 0 0 16px; padding: 0; }
+    .ins-list li { font-size: 13px; color: var(--t2); line-height: 1.6; margin-bottom: 4px; }
+    .ins-loading { display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3);padding:16px 0; }
+    @media(max-width:600px) { #insightsGrid { grid-template-columns: 1fr; } }
+
     /* Interview prep link */
     .interview-prep-card { background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.2); border-radius: 12px; padding: 14px; margin-top: 12px; text-decoration: none; display: block; transition: .2s; }
     .interview-prep-card:hover { background: rgba(245,158,11,.1); }
@@ -202,6 +212,36 @@
     <div class="offre-section" id="offreDescSection">
       <h2>Description du poste</h2>
       <div id="offreDesc" style="font-size:14px;color:var(--t2);line-height:1.8">Chargement...</div>
+    </div>
+
+    <!-- Company Insights — lazy loaded -->
+    <div class="offre-section" id="insightsSection" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="margin:0">🔍 Insights entreprise</h2>
+        <span id="insightsCultureBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(99,102,241,.12);color:var(--acc)"></span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px" id="insightsGrid">
+        <div class="ins-block" id="insProcess"></div>
+        <div class="ins-block" id="insSalary"></div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div class="ins-label">📚 À préparer avant l'entretien</div>
+        <ul id="insResearch" class="ins-list"></ul>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="ins-label">💬 Questions à leur poser</div>
+        <ul id="insQuestions" class="ins-list"></ul>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="ins-label">🎯 Angles à valoriser</div>
+        <ul id="insTalking" class="ins-list"></ul>
+      </div>
+      <div id="insRedFlagsWrap" style="display:none;margin-bottom:14px">
+        <div class="ins-label" style="color:#ef4444">⚠️ Points d'attention</div>
+        <ul id="insRedFlags" class="ins-list" style="color:#ef4444"></ul>
+      </div>
     </div>
   </div>
 
@@ -379,6 +419,8 @@
 
     // ATS score after render
     setTimeout(computeATSScore, 400);
+    // Load company insights (lazy)
+    setTimeout(loadCompanyInsights, 800);
 
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('offreLayout').style.display = 'grid';
@@ -420,6 +462,7 @@
   let currentJob = null;
   let saData = null;
   let saTab = 'letter';
+  let insightsLoaded = false;
 
   // ── Smart Apply ───────────────────────────────────────────────────────────
   async function generateSA() {
@@ -536,6 +579,59 @@
     else { saved.push(id); btn.textContent = '⭐'; btn.classList.add('saved'); }
     localStorage.setItem('emploia_saved_jobs', JSON.stringify(saved));
     empToast(idx > -1 ? 'Retiré des favoris' : 'Sauvegardé !', 'success');
+  }
+
+  // ── Company Insights ──────────────────────────────────────────────────────
+  async function loadCompanyInsights() {
+    if (insightsLoaded || !currentJob) return;
+    const section = document.getElementById('insightsSection');
+    section.style.display = 'block';
+    section.querySelector('#insightsGrid').innerHTML = `<div class="ins-loading" style="grid-column:1/-1"><div class="spin"></div>Analyse de l'entreprise en cours…</div>`;
+
+    try {
+      const res = await fetch('/api/company-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: currentJob.company_name || '',
+          jobTitle: currentJob.title || '',
+          jobDescription: (currentJob.description || '').slice(0, 2000),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      insightsLoaded = true;
+
+      // Culture badge
+      const badge = document.getElementById('insightsCultureBadge');
+      badge.textContent = d.cultureType || '';
+
+      // Grid blocks
+      document.getElementById('insightsGrid').innerHTML = `
+        <div class="ins-block">
+          <div class="ins-block-label">🎤 Process entretien</div>
+          <div class="ins-block-val" style="font-size:12px;font-weight:400;color:var(--t2)">${esc(d.interviewProcess || '—')}</div>
+        </div>
+        <div class="ins-block">
+          <div class="ins-block-label">💰 Fourchette salariale</div>
+          <div class="ins-block-val">${esc(d.salaryContext || 'Non estimable')}</div>
+        </div>`;
+
+      const list = (el, items) => {
+        if (!items?.length) return;
+        document.getElementById(el).innerHTML = (items || []).map(i => `<li>${esc(i)}</li>`).join('');
+      };
+      list('insResearch', d.toResearch);
+      list('insQuestions', d.questionsToAsk);
+      list('insTalking', d.talkingPoints);
+
+      if (d.redFlags?.length) {
+        list('insRedFlags', d.redFlags);
+        document.getElementById('insRedFlagsWrap').style.display = 'block';
+      }
+    } catch {
+      document.getElementById('insightsSection').style.display = 'none';
+    }
   }
 
   loadOffer();

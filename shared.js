@@ -570,3 +570,141 @@ async function empAuthInit() {
   } catch (e) {}
 }
 
+
+// ── CMD+K GLOBAL SEARCH SPOTLIGHT ────────────────────────────────────────────
+(function () {
+  let spotlightOpen = false;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #empSpotlight { position:fixed;inset:0;z-index:99999;display:none;align-items:flex-start;justify-content:center;padding-top:15vh;background:rgba(0,0,0,.55);backdrop-filter:blur(6px); }
+    #empSpotlight.open { display:flex; }
+    #empSpotlightBox { background:var(--s2);border:1px solid var(--brd);border-radius:18px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5); }
+    #empSpotlightInput { width:100%;padding:18px 22px;background:transparent;border:none;outline:none;font-size:17px;color:var(--tx1);font-family:inherit;border-bottom:1px solid var(--brd); }
+    #empSpotlightInput::placeholder { color:var(--tx3); }
+    #empSpotlightResults { max-height:320px;overflow-y:auto; }
+    .sp-result { display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;transition:background .1s;text-decoration:none;color:var(--tx1); }
+    .sp-result:hover,.sp-result.active { background:var(--s3); }
+    .sp-result-icon { font-size:18px;width:32px;text-align:center; }
+    .sp-result-text { flex:1; }
+    .sp-result-title { font-size:14px;font-weight:600; }
+    .sp-result-sub { font-size:11px;color:var(--tx3);margin-top:1px; }
+    .sp-section { padding:8px 18px 4px;font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;border-top:1px solid var(--brd); }
+    #empSpotlightHint { padding:10px 18px;font-size:11px;color:var(--tx3);text-align:center;border-top:1px solid var(--brd); }
+  `;
+  document.head.appendChild(style);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'empSpotlight';
+  overlay.innerHTML = `
+    <div id="empSpotlightBox">
+      <input id="empSpotlightInput" placeholder="Rechercher offres, pages, actions…" autocomplete="off" spellcheck="false"/>
+      <div id="empSpotlightResults"></div>
+      <div id="empSpotlightHint">↑↓ Naviguer · Entrée Ouvrir · Échap Fermer</div>
+    </div>`;
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(overlay));
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeSpotlight(); });
+
+  const PAGES = [
+    { icon:'📋', title:'Offres d\'emploi', sub:'Trouver une offre', url:'/jobs' },
+    { icon:'📊', title:'Dashboard', sub:'Voir mes candidatures', url:'/dashboard' },
+    { icon:'✨', title:'Générer un CV', sub:'CV ATS-optimisé en 30s', url:'/app' },
+    { icon:'✉️', title:'Générer une lettre', sub:'Lettre de motivation IA', url:'/app?mode=cover' },
+    { icon:'🎤', title:'Simuler un entretien', sub:'Coach IA en temps réel', url:'/interview' },
+    { icon:'📬', title:'File de candidatures', sub:'Auto-apply en batch', url:'/apply-queue' },
+    { icon:'🔔', title:'Alertes emploi', sub:'Mes alertes et notifications', url:'/alerts' },
+    { icon:'👤', title:'Mon Profil', sub:'Compétences, expériences', url:'/profil' },
+    { icon:'🏗', title:'CV Builder', sub:'Éditeur visuel de CV', url:'/cv-builder' },
+    { icon:'📝', title:'Mon Profil de candidat', sub:'Éditer mon profil IA', url:'/app' },
+  ];
+
+  let activeIdx = -1;
+  let currentResults = [];
+
+  function openSpotlight() {
+    spotlightOpen = true;
+    overlay.classList.add('open');
+    setTimeout(() => {
+      const inp = document.getElementById('empSpotlightInput');
+      if (inp) { inp.value = ''; inp.focus(); renderSpotlightResults(''); }
+    }, 30);
+  }
+
+  function closeSpotlight() {
+    spotlightOpen = false;
+    overlay.classList.remove('open');
+    activeIdx = -1;
+  }
+
+  function renderSpotlightResults(q) {
+    const container = document.getElementById('empSpotlightResults');
+    if (!container) return;
+    const lower = q.toLowerCase().trim();
+    activeIdx = -1;
+
+    const pages = lower ? PAGES.filter(p => p.title.toLowerCase().includes(lower) || p.sub.toLowerCase().includes(lower)) : PAGES;
+    currentResults = [...pages];
+
+    let html = '';
+    if (pages.length) {
+      html += `<div class="sp-section">Navigation</div>`;
+      html += pages.map((p, i) => `<a class="sp-result" href="${p.url}" onclick="closeSpotlight()" data-idx="${i}">
+        <div class="sp-result-icon">${p.icon}</div>
+        <div class="sp-result-text"><div class="sp-result-title">${p.title}</div><div class="sp-result-sub">${p.sub}</div></div>
+      </a>`).join('');
+    }
+
+    if (lower) {
+      html += `<div class="sp-section">Recherche offres</div>
+        <a class="sp-result" href="/jobs?q=${encodeURIComponent(lower)}" onclick="closeSpotlight()">
+          <div class="sp-result-icon">🔍</div>
+          <div class="sp-result-text"><div class="sp-result-title">Offres "${q}"</div><div class="sp-result-sub">Rechercher sur Emploia</div></div>
+        </a>`;
+    }
+
+    if (!html) html = `<div style="padding:24px;text-align:center;font-size:13px;color:var(--tx3)">Aucun résultat</div>`;
+    container.innerHTML = html;
+  }
+
+  // Expose for onclick
+  window.closeSpotlight = closeSpotlight;
+
+  // Keyboard: Cmd+K or Ctrl+K
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      if (spotlightOpen) closeSpotlight(); else openSpotlight();
+      return;
+    }
+    if (!spotlightOpen) return;
+    if (e.key === 'Escape') { closeSpotlight(); return; }
+    const results = document.querySelectorAll('#empSpotlightResults .sp-result');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(activeIdx + 1, results.length - 1);
+      results.forEach((r, i) => r.classList.toggle('active', i === activeIdx));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(activeIdx - 1, 0);
+      results.forEach((r, i) => r.classList.toggle('active', i === activeIdx));
+    } else if (e.key === 'Enter') {
+      if (activeIdx >= 0 && results[activeIdx]) results[activeIdx].click();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const inp = document.getElementById('empSpotlightInput');
+    if (inp) inp.addEventListener('input', e => renderSpotlightResults(e.target.value));
+
+    // Add Cmd+K button to nav if space allows
+    const nav = document.querySelector('.emp-nav .nav-links') || document.querySelector('.emp-nav .emp-nav-links');
+    if (nav) {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--tx2);cursor:pointer;display:flex;align-items:center;gap:6px;';
+      btn.innerHTML = '🔍 <kbd style="font-size:10px;opacity:.6">⌘K</kbd>';
+      btn.title = 'Recherche globale (Cmd+K)';
+      btn.onclick = openSpotlight;
+      nav.appendChild(btn);
+    }
+  });
+})();

@@ -385,6 +385,44 @@
     }
 
     .kcard-btn:hover { background: var(--bld); }
+    .kcard-relance {
+      width: 100%; margin-top: 8px; padding: 5px 8px;
+      background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25);
+      border-radius: 7px; color: #f59e0b; font-size: 10px; font-weight: 700;
+      cursor: pointer; text-align: center; transition: .15s;
+    }
+    .kcard-relance:hover { background: rgba(245,158,11,.15); }
+    .kcard-note { font-size: 10px; color: var(--t3); margin: 4px 0 6px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+    /* Skills gap banner */
+    .skills-gap-card {
+      background: var(--s2); border: 1px solid var(--brd); border-radius: 16px;
+      padding: 18px 20px; margin-bottom: 20px; display: none;
+    }
+    .skills-gap-card h4 { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+    .skills-gap-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sg-tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); color: #ef4444; }
+    .sg-tag.partial { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.25); color: #f59e0b; }
+
+    /* Relance modal */
+    .relance-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .relance-modal-inner {
+      background: var(--s2); border: 1px solid var(--brd); border-radius: 20px;
+      padding: 28px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+    }
+    .relance-modal h3 { font-size: 17px; font-weight: 800; margin: 0 0 6px; }
+    .relance-modal p { font-size: 13px; color: var(--t2); margin: 0 0 18px; }
+    .relance-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+    .relance-tab { flex: 1; padding: 8px; background: var(--s3); border: 1px solid var(--brd); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; color: var(--t2); }
+    .relance-tab.active { background: var(--acc); border-color: var(--acc); color: #fff; }
+    .relance-content { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--t2); line-height: 1.7; white-space: pre-wrap; max-height: 260px; overflow-y: auto; margin-bottom: 10px; }
+    .relance-tips { margin-bottom: 14px; }
+    .relance-tip { font-size: 12px; color: var(--t3); padding: 4px 0; }
+    .relance-tip::before { content: '💡 '; }
 
     .kc-add {
       display: flex;
@@ -830,6 +868,15 @@
 
     <!-- LEFT: KANBAN / LIST -->
     <div>
+      <!-- SKILLS GAP -->
+      <div class="skills-gap-card" id="skillsGapCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h4>🧠 Compétences manquantes</h4>
+          <span style="font-size:11px;color:var(--t3)">Basé sur vos candidatures</span>
+        </div>
+        <div class="skills-gap-tags" id="skillsGapTags"></div>
+      </div>
+
       <!-- TOOLBAR -->
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
         <div class="dash-tabs">
@@ -1216,12 +1263,26 @@
     const extra = app.status === 'offer'     ? ' style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)"'
                 : app.status === 'interview'  ? ' style="border-color:rgba(245,158,11,.2)"'
                 : app.status === 'rejected'   ? ' style="opacity:.65"' : '';
+    const showRelance = app.status === 'applied' && daysAgo >= 7;
+    const noteSnippet = app.notes ? `<div class="kcard-note">${esc(app.notes.slice(0, 80))}</div>` : '';
+
+    // Interview countdown
+    let ivCountdown = '';
+    if (app.appInterviewDate) {
+      const ivDays = Math.ceil((new Date(app.appInterviewDate) - Date.now()) / 86400000);
+      if (ivDays === 0) ivCountdown = `<div style="font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:4px">🎤 Entretien aujourd'hui !</div>`;
+      else if (ivDays === 1) ivCountdown = `<div style="font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:4px">🎤 Entretien demain</div>`;
+      else if (ivDays > 0 && ivDays <= 7) ivCountdown = `<div style="font-size:10px;color:var(--ylb);margin-bottom:4px">🎤 Entretien dans ${ivDays}j</div>`;
+    }
+
     return `<div class="kanban-card"${extra} draggable="true"
       ondragstart="dragCard(event,'${esc(app.id)}')"
       onclick="openDetailModal('${esc(app.id)}')">
       <div class="kcard-company">${esc(app.company || '—')}</div>
       <div class="kcard-title">${esc(app.jobTitle || 'Candidature')}</div>
       ${app.salary ? `<div style="font-size:10px;color:var(--gnb);margin:2px 0 4px">💰 ${esc(app.salary)}</div>` : ''}
+      ${ivCountdown}
+      ${noteSnippet}
       <div class="kcard-footer">
         <span class="kcard-date">${dateStr}</span>
         <div class="kcard-actions">
@@ -1229,6 +1290,7 @@
           <button class="kcard-btn" title="Supprimer" onclick="event.stopPropagation();deleteApp('${esc(app.id)}')">🗑</button>
         </div>
       </div>
+      ${showRelance ? `<button class="kcard-relance" onclick="event.stopPropagation();openRelanceModal('${esc(app.id)}')">📧 Relancer (+${daysAgo}j)</button>` : ''}
     </div>`;
   }
 
@@ -1577,6 +1639,7 @@
 
     updateConseilDuJour(apps);
     renderActivityChart(apps);
+    computeSkillsGap(apps);
   }
 
   function renderActivityChart(apps) {
@@ -1722,6 +1785,134 @@
   loadSavedJobs();
   loadCurrentUser();
   loadJobsForYou();
+
+  // ── RELANCE EMAIL ─────────────────────────────────────────────────────────
+  let relanceApp = null;
+  let relanceData = null;
+  let relanceTab = 'short';
+
+  function openRelanceModal(id) {
+    const app = allApps.find(a => a.id === id);
+    if (!app) return;
+    relanceApp = app;
+    relanceData = null;
+    relanceTab = 'short';
+
+    // Inject modal HTML if not present
+    if (!document.getElementById('relanceModal')) {
+      const m = document.createElement('div');
+      m.id = 'relanceModal';
+      m.className = 'relance-modal';
+      m.style.display = 'none';
+      m.innerHTML = `
+        <div class="relance-modal-inner">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <h3>📧 Email de relance</h3>
+            <button onclick="closeRelanceModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3)">×</button>
+          </div>
+          <p id="relanceSubtitle"></p>
+          <div id="relanceSubjectBox" style="display:none;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:8px 12px;margin-bottom:10px">
+            <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Objet</div>
+            <div id="relanceSubjectText" style="font-size:13px;color:var(--acc);font-weight:600"></div>
+          </div>
+          <div class="relance-tabs">
+            <button class="relance-tab active" onclick="setRelanceTab('short',this)">Version courte</button>
+            <button class="relance-tab" onclick="setRelanceTab('long',this)">Version développée</button>
+          </div>
+          <div class="relance-content" id="relanceContent">⏳ Génération…</div>
+          <div class="relance-tips" id="relanceTips"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" style="flex:1" onclick="copyRelance()">📋 Copier l'email</button>
+            <button class="btn btn-ghost" onclick="closeRelanceModal()">Fermer</button>
+          </div>
+        </div>`;
+      document.body.appendChild(m);
+    }
+
+    const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt || Date.now())) / 86400000);
+    document.getElementById('relanceSubtitle').textContent = `${app.company || 'Entreprise'} — ${app.jobTitle || 'Poste'} · candidaté il y a ${daysAgo} jour${daysAgo !== 1 ? 's' : ''}`;
+    document.getElementById('relanceContent').textContent = '⏳ Génération de l\'email…';
+    document.getElementById('relanceModal').style.display = 'flex';
+
+    fetchRelance(app, daysAgo);
+  }
+
+  async function fetchRelance(app, daysAgo) {
+    try {
+      const res = await fetch('/api/generate/follow-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: app.jobTitle || '',
+          company: app.company || '',
+          daysAgo: daysAgo || 14,
+          senderName: window.empUser?.name || '',
+          tone: 'professional',
+        }),
+      });
+      if (!res.ok) throw new Error();
+      relanceData = await res.json();
+      document.getElementById('relanceSubjectBox').style.display = 'block';
+      document.getElementById('relanceSubjectText').textContent = relanceData.subject || '';
+      document.getElementById('relanceTips').innerHTML = (relanceData.tips || []).map(t => `<div class="relance-tip">${esc(t)}</div>`).join('');
+      setRelanceTab('short', document.querySelector('.relance-tab'));
+    } catch {
+      document.getElementById('relanceContent').textContent = 'Erreur lors de la génération. Réessayez.';
+    }
+  }
+
+  function setRelanceTab(tab, btn) {
+    relanceTab = tab;
+    document.querySelectorAll('.relance-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (!relanceData) return;
+    document.getElementById('relanceContent').textContent = relanceData[tab] || '—';
+  }
+
+  function copyRelance() {
+    if (!relanceData) return;
+    const txt = relanceData[relanceTab] || '';
+    navigator.clipboard.writeText(txt).then(() => empToast('Email copié !', 'success')).catch(() => empToast('Copie impossible', 'error'));
+  }
+
+  function closeRelanceModal() {
+    const m = document.getElementById('relanceModal');
+    if (m) m.style.display = 'none';
+  }
+
+  // ── SKILLS GAP ANALYSIS ───────────────────────────────────────────────────
+  function computeSkillsGap(apps) {
+    const profile = (localStorage.getItem('emploia_profile_text') || '').toLowerCase();
+    if (!profile || apps.length < 2) return;
+
+    // Extract keywords from job titles across all applied/wishlist apps
+    const jobWords = apps
+      .filter(a => a.status === 'applied' || a.status === 'wishlist' || a.status === 'interview')
+      .map(a => (a.jobTitle || '') + ' ' + (a.notes || ''))
+      .join(' ')
+      .toLowerCase();
+
+    const techSkills = [
+      'react','vue','angular','typescript','javascript','python','java','php','node','docker','kubernetes',
+      'aws','gcp','azure','sql','mongodb','postgresql','graphql','rest','api','git','agile','scrum',
+      'figma','photoshop','excel','powerpoint','salesforce','sap','hubspot','jira','notion',
+      'marketing','seo','sea','analytics','adwords','linkedin','crm','b2b','b2c',
+      'management','leadership','budget','p&l','kpi','reporting','excel','powerbi',
+      'english','german','spanish','mandarin','anglais','allemand','espagnol',
+    ];
+
+    const missing = techSkills.filter(skill => {
+      const inJobs = jobWords.includes(skill);
+      const inProfile = profile.includes(skill);
+      return inJobs && !inProfile;
+    }).slice(0, 8);
+
+    if (!missing.length) return;
+    const card = document.getElementById('skillsGapCard');
+    const tags = document.getElementById('skillsGapTags');
+    card.style.display = 'block';
+    tags.innerHTML = missing.map(s => `<span class="sg-tag">${s}</span>`).join('');
+  }
 </script>
 </body>
 </html>

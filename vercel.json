@@ -103,6 +103,12 @@
     },
     "api/smart-apply.js": {
       "maxDuration": 35
+    },
+    "api/company-insights.js": {
+      "maxDuration": 30
+    },
+    "api/generate/follow-up.js": {
+      "maxDuration": 20
     }
   },
   "rewrites": [
