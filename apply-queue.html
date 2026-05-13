@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>File de candidatures — Emploia</title>
+  <meta name="description" content="Gérez votre file de candidatures automatisées avec Emploia."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .queue-page { max-width: 860px; margin: 0 auto; padding: 32px 20px 100px; }
+
+    .queue-header { margin-bottom: 28px; }
+    .queue-header h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px; }
+    .queue-header p { color: var(--tx2); margin: 0 0 18px; font-size: 14px; }
+
+    .queue-toolbar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      background: var(--s2); border: 1px solid var(--brd); border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 24px;
+    }
+    .queue-toolbar .toolbar-left { flex: 1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .stat-pill {
+      background: var(--s3); border: 1px solid var(--brd); border-radius: 20px;
+      padding: 4px 12px; font-size: 12px; font-weight: 600; color: var(--tx2);
+    }
+    .stat-pill span { color: var(--acc); }
+
+    .progress-bar-wrap { width: 100%; margin-top: 10px; display: none; }
+    .progress-bar-wrap.active { display: block; }
+    .progress-bar { height: 4px; background: var(--s4); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--grad-primary); border-radius: 4px; transition: width .4s; }
+    .progress-label { font-size: 11px; color: var(--tx2); margin-top: 4px; text-align: center; }
+
+    .queue-empty {
+      text-align: center; padding: 60px 20px;
+      background: var(--s2); border: 2px dashed var(--brd); border-radius: 20px;
+      color: var(--tx2);
+    }
+    .queue-empty .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .queue-empty h3 { font-size: 18px; font-weight: 700; color: var(--tx1); margin: 0 0 8px; }
+    .queue-empty p { font-size: 14px; margin: 0 0 20px; }
+
+    .queue-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .qcard {
+      background: var(--s2); border: 1px solid var(--brd); border-radius: 16px;
+      padding: 18px 20px; position: relative; transition: border-color .2s;
+    }
+    .qcard.status-ready { border-color: rgba(34,197,94,.4); }
+    .qcard.status-applied { opacity: .7; }
+    .qcard.status-generating { border-color: var(--acc); }
+
+    .qcard-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .qcard-logo {
+      width: 44px; height: 44px; border-radius: 10px; background: var(--s3);
+      display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .qcard-info { flex: 1; min-width: 0; }
+    .qcard-title { font-weight: 700; font-size: 15px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .qcard-company { font-size: 13px; color: var(--tx2); }
+
+    .status-badge {
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      flex-shrink: 0; text-transform: uppercase; letter-spacing: .5px;
+    }
+    .status-badge.queued { background: rgba(99,102,241,.12); color: var(--acc); }
+    .status-badge.generating { background: rgba(245,158,11,.15); color: #f59e0b; }
+    .status-badge.ready { background: rgba(34,197,94,.12); color: #22c55e; }
+    .status-badge.applied { background: rgba(107,114,128,.12); color: #6b7280; }
+    .status-badge.error { background: rgba(239,68,68,.12); color: #ef4444; }
+
+    .qcard-letter {
+      background: var(--s3); border: 1px solid var(--brd); border-radius: 10px;
+      padding: 12px 14px; font-size: 12.5px; line-height: 1.7; color: var(--tx2);
+      max-height: 130px; overflow: hidden; position: relative; cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .qcard-letter.expanded { max-height: none; }
+    .qcard-letter::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+      background: linear-gradient(transparent, var(--s3));
+      pointer-events: none;
+    }
+    .qcard-letter.expanded::after { display: none; }
+
+    .qcard-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .qcard-pill {
+      background: var(--s3); border: 1px solid var(--brd); border-radius: 20px;
+      padding: 3px 10px; font-size: 11px; color: var(--tx2);
+    }
+
+    .qcard-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-qapply {
+      background: var(--grad-primary); color: #fff; border: none; border-radius: 10px;
+      padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-qapply:disabled { opacity: .5; cursor: default; }
+    .btn-qcopy {
+      background: var(--s3); border: 1px solid var(--brd); border-radius: 10px;
+      padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--tx1);
+    }
+    .btn-qremove {
+      background: transparent; border: 1px solid rgba(239,68,68,.3); color: #ef4444;
+      border-radius: 10px; padding: 8px 12px; font-size: 13px; cursor: pointer;
+    }
+    .btn-qmark {
+      background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); color: #22c55e;
+      border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer;
+    }
+
+    .how-it-works {
+      margin-top: 40px; background: var(--s2); border: 1px solid var(--brd);
+      border-radius: 16px; padding: 24px;
+    }
+    .how-it-works h3 { margin: 0 0 16px; font-size: 15px; font-weight: 700; }
+    .hiw-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .hiw-step { text-align: center; padding: 14px 10px; }
+    .hiw-step .hiw-num { width: 32px; height: 32px; border-radius: 50%; background: var(--grad-primary); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+    .hiw-step p { font-size: 12px; color: var(--tx2); margin: 0; line-height: 1.5; }
+
+    @media(max-width:600px) {
+      .queue-toolbar { flex-direction: column; align-items: stretch; }
+      .qcard-actions { flex-direction: column; }
+      .btn-qapply, .btn-qcopy, .btn-qremove, .btn-qmark { text-align: center; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+<div id="empToasts"></div>
+
+<nav class="emp-nav" id="empNav">
+  <a href="/" class="emp-logo">Emploia<span class="emp-logo-dot">.</span></a>
+  <div class="nav-links">
+    <a href="/jobs">Offres</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/alerts">Alertes</a>
+    <a href="/app" class="nav-cta">Outils IA</a>
+  </div>
+  <div class="nav-auth" id="navAuth"></div>
+</nav>
+
+<div class="queue-page">
+  <div class="queue-header">
+    <h1>🚀 File de candidatures</h1>
+    <p>Ajoutez des offres depuis <a href="/jobs">la page offres</a>, puis générez tous vos packs candidature en un clic.</p>
+  </div>
+
+  <div class="queue-toolbar">
+    <div class="toolbar-left">
+      <span class="stat-pill">Total : <span id="statTotal">0</span></span>
+      <span class="stat-pill">Prêts : <span id="statReady">0</span></span>
+      <span class="stat-pill">Envoyés : <span id="statApplied">0</span></span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="prepareAllBtn" onclick="prepareAll()">✨ Préparer tout</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearApplied()">🗑 Nettoyer envoyés</button>
+  </div>
+
+  <div class="progress-bar-wrap" id="progressWrap">
+    <div class="progress-bar"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">Préparation en cours…</div>
+  </div>
+
+  <div id="queueContainer">
+    <div class="queue-empty" id="emptyState">
+      <div class="empty-icon">📋</div>
+      <h3>Votre file est vide</h3>
+      <p>Allez sur la page <strong>Offres d'emploi</strong> et cliquez sur<br><strong>📬 Mettre en file</strong> sur les offres qui vous intéressent.</p>
+      <a href="/jobs" class="btn btn-primary">Voir les offres →</a>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+  </div>
+
+  <div class="how-it-works">
+    <h3>Comment ça marche ?</h3>
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-num">1</div>
+        <p><strong>Ajoutez des offres</strong><br>Cliquez sur "Mettre en file" depuis la page offres</p>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">2</div>
+        <p><strong>Préparez tout</strong><br>L'IA génère une lettre et des points CV pour chaque offre</p>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">3</div>
+        <p><strong>Postulez en 1 clic</strong><br>Lettre copiée + page offre ouverte automatiquement</p>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">4</div>
+        <p><strong>Suivi automatique</strong><br>Marquée "envoyée", ajoutée à votre dashboard</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="emp-bottom-nav">
+  <a href="/dashboard" class="bnav-item"><span>📊</span><small>Dashboard</small></a>
+  <a href="/jobs" class="bnav-item"><span>🔍</span><small>Offres</small></a>
+  <a href="/apply-queue" class="bnav-item active"><span>📬</span><small>File</small></a>
+  <a href="/app" class="bnav-item"><span>✨</span><small>IA</small></a>
+  <a href="/profil" class="bnav-item"><span>👤</span><small>Profil</small></a>
+</nav>
+
+<script src="shared.js"></script>
+<script>
+  const QUEUE_KEY = 'emploia_apply_queue';
+  let queue = [];
+  let isPreparing = false;
+
+  function loadQueue() {
+    try { queue = JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch { queue = []; }
+    renderQueue();
+  }
+
+  function saveQueue() {
+    localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  }
+
+  function renderQueue() {
+    const total = queue.length;
+    const ready = queue.filter(j => j.status === 'ready').length;
+    const applied = queue.filter(j => j.status === 'applied').length;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statReady').textContent = ready;
+    document.getElementById('statApplied').textContent = applied;
+
+    const empty = document.getElementById('emptyState');
+    const list = document.getElementById('queueList');
+
+    if (!total) {
+      empty.style.display = '';
+      list.innerHTML = '';
+      return;
+    }
+    empty.style.display = 'none';
+    list.innerHTML = queue.map(renderQCard).join('');
+  }
+
+  function renderQCard(job) {
+    const statusLabels = { queued: 'En attente', generating: 'Génération…', ready: 'Prêt', applied: 'Envoyé', error: 'Erreur' };
+    const letterPreview = job.letter
+      ? `<div class="qcard-letter" id="letter-${job.id}" onclick="toggleLetter('${job.id}')">${esc(job.letter.slice(0, 600))}</div>`
+      : '';
+    const skillPills = (job.skills || []).slice(0, 5).map(s => `<span class="qcard-pill">${esc(s)}</span>`).join('');
+
+    const canGenerate = job.status === 'queued' || job.status === 'error';
+    const canApply = job.status === 'ready';
+    const isApplied = job.status === 'applied';
+
+    return `<div class="qcard status-${job.status}" id="qcard-${job.id}">
+      <div class="qcard-top">
+        <div class="qcard-logo">🏢</div>
+        <div class="qcard-info">
+          <div class="qcard-title">${esc(job.title)}</div>
+          <div class="qcard-company">${esc(job.company)}${job.location ? ' · ' + esc(job.location) : ''}</div>
+        </div>
+        <span class="status-badge ${job.status}">${statusLabels[job.status] || job.status}</span>
+      </div>
+      ${letterPreview}
+      ${skillPills ? `<div class="qcard-pills">${skillPills}</div>` : ''}
+      <div class="qcard-actions">
+        ${canApply ? `<button class="btn-qapply" onclick="applyJob('${job.id}')">🚀 Postuler maintenant</button>` : ''}
+        ${canApply ? `<button class="btn-qcopy" onclick="copyLetter('${job.id}')">📋 Copier la lettre</button>` : ''}
+        ${canGenerate ? `<button class="btn-qcopy" onclick="prepareSingle('${job.id}')">✨ Préparer</button>` : ''}
+        ${isApplied ? `<span style="font-size:13px;color:#22c55e;font-weight:600;">✅ Candidature envoyée</span>` : ''}
+        ${!isApplied ? `<button class="btn-qmark" onclick="markApplied('${job.id}')">✓ Marquer envoyé</button>` : ''}
+        <button class="btn-qremove" onclick="removeJob('${job.id}')">✕</button>
+      </div>
+    </div>`;
+  }
+
+  function toggleLetter(id) {
+    const el = document.getElementById('letter-' + id);
+    if (el) el.classList.toggle('expanded');
+  }
+
+  async function prepareSingle(id) {
+    const job = queue.find(j => j.id === id);
+    if (!job) return;
+    const profile = localStorage.getItem('emploia_profile_text') || '';
+    job.status = 'generating';
+    saveQueue(); renderQueue();
+
+    try {
+      const res = await fetch('/api/smart-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: job.title,
+          company: job.company,
+          jobDescription: job.description || '',
+          userProfile: profile,
+        }),
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      job.letter = data.coverLetter || '';
+      job.cvBullets = data.cvBullets || [];
+      job.skills = data.skills || [];
+      job.pitch = data.pitch || '';
+      job.status = 'ready';
+      job.preparedAt = Date.now();
+    } catch {
+      job.status = 'error';
+      empToast(`Erreur pour "${job.title}" — réessayez`, 'error');
+    }
+    saveQueue(); renderQueue();
+  }
+
+  async function prepareAll() {
+    if (isPreparing) return;
+    const pending = queue.filter(j => j.status === 'queued' || j.status === 'error');
+    if (!pending.length) { empToast('Tous les jobs sont déjà prêts !', 'info'); return; }
+
+    isPreparing = true;
+    const btn = document.getElementById('prepareAllBtn');
+    btn.disabled = true; btn.textContent = '⏳ Préparation…';
+
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+    progressWrap.classList.add('active');
+
+    const profile = localStorage.getItem('emploia_profile_text') || '';
+    let done = 0;
+
+    for (const job of pending) {
+      progressLabel.textContent = `Préparation "${job.title}" (${done + 1}/${pending.length})…`;
+      progressFill.style.width = `${(done / pending.length) * 100}%`;
+      await prepareSingle(job.id);
+      done++;
+      await new Promise(r => setTimeout(r, 600));
+    }
+
+    progressFill.style.width = '100%';
+    progressLabel.textContent = `✅ ${done} candidature${done > 1 ? 's' : ''} préparée${done > 1 ? 's' : ''} !`;
+    setTimeout(() => progressWrap.classList.remove('active'), 3000);
+    empToast(`${done} pack${done > 1 ? 's' : ''} candidature généré${done > 1 ? 's' : ''} !`, 'success');
+
+    isPreparing = false;
+    btn.disabled = false; btn.textContent = '✨ Préparer tout';
+  }
+
+  function copyLetter(id) {
+    const job = queue.find(j => j.id === id);
+    if (!job?.letter) { empToast('Aucune lettre à copier', 'error'); return; }
+    navigator.clipboard.writeText(job.letter).then(() => empToast('Lettre copiée !', 'success')).catch(() => empToast('Copie impossible', 'error'));
+  }
+
+  function applyJob(id) {
+    const job = queue.find(j => j.id === id);
+    if (!job) return;
+    if (job.letter) {
+      navigator.clipboard.writeText(job.letter).catch(() => {});
+      empToast('Lettre copiée ! Collez-la dans le formulaire.', 'success');
+    }
+    if (job.url) {
+      setTimeout(() => window.open(job.url, '_blank'), 400);
+    } else {
+      empToast('Pas d\'URL pour cette offre', 'error');
+    }
+    setTimeout(() => markApplied(id), 1200);
+  }
+
+  function markApplied(id) {
+    const job = queue.find(j => j.id === id);
+    if (!job) return;
+    job.status = 'applied';
+    job.appliedAt = Date.now();
+    saveQueue(); renderQueue();
+    empToast('Candidature marquée comme envoyée ✓', 'success');
+
+    // Add to dashboard tracker
+    const tracked = JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]');
+    const alreadyTracked = tracked.some(t => t.id === id);
+    if (!alreadyTracked) {
+      tracked.unshift({
+        id, title: job.title, company: job.company,
+        location: job.location || '', url: job.url || '',
+        status: 'applied', addedAt: Date.now(),
+      });
+      localStorage.setItem('emploia_tracked_jobs', JSON.stringify(tracked.slice(0, 100)));
+    }
+  }
+
+  function removeJob(id) {
+    queue = queue.filter(j => j.id !== id);
+    saveQueue(); renderQueue();
+    empToast('Retiré de la file', 'info');
+  }
+
+  function clearApplied() {
+    const before = queue.length;
+    queue = queue.filter(j => j.status !== 'applied');
+    saveQueue(); renderQueue();
+    const removed = before - queue.length;
+    empToast(removed ? `${removed} entrée${removed > 1 ? 's' : ''} supprimée${removed > 1 ? 's' : ''}` : 'Rien à nettoyer', 'info');
+  }
+
+  loadQueue();
+
+  // Listen for storage changes (jobs page adds to queue)
+  window.addEventListener('storage', e => {
+    if (e.key === QUEUE_KEY) loadQueue();
+  });
+</script>
+</body>
+</html>

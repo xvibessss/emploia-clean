@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Emploia Smart Apply</title>
+  <link rel="stylesheet" href="popup.css"/>
+</head>
+<body>
+<div class="popup-wrap">
+
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="logo-mark">E</div>
+    <div>
+      <div class="logo-name">Emploia</div>
+      <div class="logo-sub">Smart Apply</div>
+    </div>
+    <div class="header-status" id="statusDot"></div>
+  </div>
+
+  <!-- Not connected -->
+  <div id="stateConnect" class="state-section">
+    <div class="connect-art">🔗</div>
+    <h2>Connectez votre profil</h2>
+    <p>Collez votre email Emploia et votre texte de profil pour activer le remplissage automatique.</p>
+    <div class="field-group">
+      <label>Email Emploia</label>
+      <input type="email" id="inputEmail" placeholder="vous@email.fr" autocomplete="email"/>
+    </div>
+    <div class="field-group">
+      <label>Texte de profil <span class="hint">(depuis /app ou LinkedIn)</span></label>
+      <textarea id="inputProfile" placeholder="Développeur Full-Stack avec 5 ans d'expérience en React, Node.js…" rows="5"></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field-group" style="flex:1">
+        <label>Prénom</label>
+        <input type="text" id="inputFirst" placeholder="Marie" autocomplete="given-name"/>
+      </div>
+      <div class="field-group" style="flex:1">
+        <label>Nom</label>
+        <input type="text" id="inputLast" placeholder="Dupont" autocomplete="family-name"/>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group" style="flex:1">
+        <label>Téléphone</label>
+        <input type="tel" id="inputPhone" placeholder="06 12 34 56 78" autocomplete="tel"/>
+      </div>
+      <div class="field-group" style="flex:1">
+        <label>Ville</label>
+        <input type="text" id="inputCity" placeholder="Paris" autocomplete="address-level2"/>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>LinkedIn URL</label>
+      <input type="url" id="inputLinkedin" placeholder="https://linkedin.com/in/..." autocomplete="url"/>
+    </div>
+    <div class="field-group">
+      <label>Titre / Poste actuel</label>
+      <input type="text" id="inputTitle" placeholder="Développeur Full-Stack Senior"/>
+    </div>
+    <button class="btn-primary" id="btnSave" onclick="saveProfile()">Sauvegarder le profil</button>
+    <a href="https://emploia.fr/profil" target="_blank" class="link-small">Récupérer depuis emploia.fr →</a>
+  </div>
+
+  <!-- Connected -->
+  <div id="stateProfile" class="state-section" style="display:none">
+    <div class="profile-header">
+      <div class="avatar" id="pAvatar">M</div>
+      <div>
+        <div class="profile-name" id="pName">Marie Dupont</div>
+        <div class="profile-title" id="pTitle">Développeuse Full-Stack</div>
+      </div>
+    </div>
+
+    <div class="autofill-card" id="autofillCard">
+      <div class="autofill-icon">✨</div>
+      <div class="autofill-text">
+        <strong>Prêt à remplir</strong>
+        <span id="siteLabel">Cliquez sur le bouton violet sur la page</span>
+      </div>
+    </div>
+
+    <div class="profile-fields">
+      <div class="pf-row"><span class="pf-label">Email</span><span class="pf-val" id="pEmail">—</span></div>
+      <div class="pf-row"><span class="pf-label">Tél.</span><span class="pf-val" id="pPhone">—</span></div>
+      <div class="pf-row"><span class="pf-label">Ville</span><span class="pf-val" id="pCity">—</span></div>
+      <div class="pf-row"><span class="pf-label">LinkedIn</span><span class="pf-val" id="pLinkedin">—</span></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="triggerAutofill()">⚡ Autofill maintenant</button>
+      <button class="btn-ghost" onclick="editProfile()">✏ Modifier</button>
+    </div>
+
+    <button class="btn-danger" onclick="disconnect()">Déconnecter</button>
+
+    <a href="https://emploia.fr/apply-queue" target="_blank" class="link-queue">📬 Ma file de candidatures →</a>
+  </div>
+
+  <div class="popup-footer">
+    <a href="https://emploia.fr" target="_blank">emploia.fr</a>
+    <span>·</span>
+    <span id="siteInfo">—</span>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

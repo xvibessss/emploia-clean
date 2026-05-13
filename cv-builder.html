@@ -566,8 +566,8 @@
   <!-- PREVIEW -->
   <div class="preview-panel">
     <div class="preview-toolbar">
-      <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ PDF</button>
-      <button class="btn btn-primary btn-sm" onclick="exportCV()">⬇ Télécharger</button>
+      <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Imprimer</button>
+      <button class="btn btn-primary btn-sm" onclick="exportCV()">⬇ Télécharger PDF</button>
     </div>
     <div class="cv-paper" id="cvPaper"></div>
   </div>
@@ -1359,9 +1359,36 @@ function aiSuggest(type) {
   empToast('💡 Optimisation IA à venir dans la prochaine mise à jour !', 'info');
 }
 
-function exportCV() {
-  empToast('📄 Ouverture de l\'impression…', 'success');
-  setTimeout(() => window.print(), 500);
+async function exportCV() {
+  const el = document.getElementById('cvPaper');
+  if (!el) return;
+  const btn = document.querySelector('[onclick="exportCV()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Génération…'; }
+  empToast('📄 Génération du PDF en cours…', 'info');
+  try {
+    if (!window.html2pdf) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    const name = (cv.name || 'CV').replace(/\s+/g, '-');
+    await html2pdf().set({
+      margin: 0,
+      filename: `CV-${name}-Emploia.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(el).save();
+    empToast('CV téléchargé en PDF !', 'success');
+  } catch (err) {
+    empToast('Erreur PDF — essayez l\'impression (Ctrl+P)', 'error');
+    window.print();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⬇ Télécharger PDF'; }
+  }
 }
 
 // ── PROFILE SYNC ──────────────────────────────────────────────────

@@ -1,0 +1,82 @@
+/* Emploia Smart Apply — injected styles */
+
+#emploia-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+  border-radius: 28px;
+  padding: 11px 18px 11px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  transition: transform .2s, box-shadow .2s;
+  letter-spacing: -0.2px;
+  animation: emploia-fab-in .4s cubic-bezier(.34,1.56,.64,1);
+}
+
+#emploia-fab:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.6);
+}
+
+#emploia-fab:active { transform: scale(.97); }
+
+#emploia-fab .fab-logo {
+  width: 22px; height: 22px; border-radius: 6px;
+  background: rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900;
+}
+
+#emploia-fab.filling {
+  background: linear-gradient(135deg, #10b981, #059669);
+  pointer-events: none;
+  animation: none;
+}
+
+#emploia-fab.done {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  animation: none;
+}
+
+@keyframes emploia-fab-in {
+  from { opacity: 0; transform: scale(.6) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#emploia-toast {
+  position: fixed;
+  bottom: 140px;
+  right: 20px;
+  z-index: 2147483647;
+  background: #1e1e2e;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  max-width: 280px;
+  line-height: 1.4;
+  animation: emploia-toast-in .3s ease;
+  pointer-events: none;
+}
+
+#emploia-toast.success { border-left: 3px solid #22c55e; }
+#emploia-toast.error { border-left: 3px solid #ef4444; }
+#emploia-toast.info { border-left: 3px solid #6366f1; }
+
+@keyframes emploia-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

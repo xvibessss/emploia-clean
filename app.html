@@ -894,15 +894,50 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     empToast('Copié dans le presse-papier !', 'success');
   }
 
-  function downloadResult() {
+  async function downloadResult() {
     if (!lastResult) return;
     const txt = typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult, null, 2);
-    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `emploia-${mode}-${Date.now()}.txt`;
-    a.click();
-    empToast('Téléchargé !', 'success');
+    empToast('📄 Génération du PDF…', 'info');
+    try {
+      if (!window.jspdf) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      const margin = 18;
+      const pageW = doc.internal.pageSize.getWidth();
+      const maxW = pageW - margin * 2;
+      const lines = txt.split('\n');
+      let y = margin + 5;
+      for (const rawLine of lines) {
+        const wrapped = doc.splitTextToSize(rawLine || ' ', maxW);
+        for (const wl of wrapped) {
+          if (y > 282) { doc.addPage(); y = margin; }
+          // Bold for separator lines (━━━) and ALL CAPS headers
+          const isBold = /^━+/.test(wl) || /^[A-ZÀÉÈÊËÎÏÔÙÛÜ\s]{5,}$/.test(wl.trim());
+          doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+          doc.text(wl, margin, y);
+          y += 5.2;
+        }
+        if (!rawLine.trim()) y += 1;
+      }
+      const label = mode === 'cv' ? 'CV' : mode === 'cover' ? 'Lettre-Motivation' : mode;
+      doc.save(`Emploia-${label}-${Date.now()}.pdf`);
+      empToast('PDF téléchargé !', 'success');
+    } catch {
+      // Fallback to .txt
+      const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `emploia-${mode}.txt`; a.click();
+      empToast('Téléchargé (format texte)', 'info');
+    }
   }
 
   function regenerate() { generate(); }

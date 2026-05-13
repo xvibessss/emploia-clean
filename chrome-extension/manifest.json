@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "Emploia — Autofill & Smart Apply",
+  "version": "1.0.0",
+  "description": "Remplissez automatiquement vos candidatures avec votre profil Emploia. Fonctionne sur LinkedIn, Indeed, Welcome to the Jungle et plus.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Emploia Smart Apply"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*",
+        "*://*.indeed.com/*",
+        "*://*.indeed.fr/*",
+        "*://*.welcometothejungle.com/*",
+        "*://*.jobteaser.com/*",
+        "*://*.hellowork.com/*",
+        "*://*.monster.fr/*",
+        "*://*.apec.fr/*",
+        "*://*.meteojob.com/*",
+        "*://*.cadremploi.fr/*",
+        "*://*.pole-emploi.fr/*",
+        "*://*.francetravail.fr/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://emploia.fr/*",
+    "https://emploia-clean.vercel.app/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png", "content.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
