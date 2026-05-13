@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -20,47 +20,44 @@ export default async function handler(req) {
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const rl = await checkRateLimit(`ip:${ip}`, 'follow-up', 20, 3600);
+  const rl = await checkRateLimit(`ip:${ip}`, 'linkedin-outreach', 15, 3600);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
-  const userRl = await checkRateLimit(`user:${user.email}`, 'follow-up', 15, 3600);
+  const userRl = await checkRateLimit(`user:${user.email}`, 'linkedin-outreach', 12, 3600);
   if (!userRl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
-  const bodyText = await req.text();
   let body;
-  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
-  const jobTitle    = sanitizeString(body.jobTitle   || '', 200);
-  const company     = sanitizeString(body.company    || '', 200);
-  const daysAgo     = Math.min(Math.max(parseInt(body.daysAgo) || 14, 1), 365);
-  const senderName  = sanitizeString(body.senderName || '', 100);
-  const contactName = sanitizeString(body.contactName || '', 100);
-  const tone        = body.tone === 'formal' ? 'très formel' : 'professionnel et chaleureux';
+  const company    = sanitizeString(body.company    || '', 200);
+  const jobTitle   = sanitizeString(body.jobTitle   || '', 200);
+  const senderName = sanitizeString(body.senderName || '', 100);
+  const profile    = sanitizeString((body.profile   || '').slice(0, 500), 500);
 
-  if (!company && !jobTitle) return new Response(JSON.stringify({ error: 'Entreprise ou poste requis' }), { status: 400, headers: H });
+  if (!company) return new Response(JSON.stringify({ error: 'Entreprise requise' }), { status: 400, headers: H });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
 
-  const prompt = `Tu es un expert en candidature sur le marché français. Génère un email de relance professionnel pour une candidature sans réponse.
+  const prompt = `Tu es un expert en networking professionnel sur le marché français.
+Génère 2 messages de connexion LinkedIn pour approcher des employés chez ${company}.
 
 CONTEXTE :
-- Poste postulé : ${jobTitle || 'Non précisé'}
-- Entreprise : ${company || 'Non précisée'}
-- Jours depuis la candidature : ${daysAgo} jours
-- Nom du candidat : ${senderName || '[Votre Prénom Nom]'}
-- Nom du contact (si connu) : ${contactName || 'Madame, Monsieur'}
-- Ton souhaité : ${tone}
+- Poste visé : ${jobTitle || 'un poste dans cette entreprise'}
+- Candidat : ${senderName || 'un candidat motivé'}
+- Profil résumé : ${profile || 'profil professionnel qualifié'}
 
-Génère 2 versions de l'email de relance :
-1. Version courte (5-6 lignes) — directe et percutante
-2. Version développée (8-10 lignes) — avec un rappel de motivation
+RÈGLES :
+- Max 300 caractères par message (contrainte LinkedIn)
+- Naturel, humain, jamais générique
+- Pas de "j'espère que ce message vous trouve bien"
+- Message 1 : pour un RH ou recruteur (direct, met en avant la valeur)
+- Message 2 : pour un employé du même domaine (curieux, cherche un échange d'expérience)
 
 Réponds UNIQUEMENT en JSON valide :
 {
-  "subject": "Objet de l'email",
-  "short": "Version courte complète (incluant formule de politesse, commence par la salutation appropriée)",
-  "long": "Version développée complète",
-  "tips": ["Conseil pratique pour maximiser les chances de réponse 1", "Conseil 2"]
+  "direct": "Message pour RH/recruteur (≤300 car.)",
+  "indirect": "Message pour employé du domaine (≤300 car.)",
+  "tip": "Un conseil pratique pour maximiser les chances de réponse sur LinkedIn"
 }`;
 
   try {
@@ -69,20 +66,19 @@ Réponds UNIQUEMENT en JSON valide :
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
+        max_tokens: 500,
         messages: [{ role: 'user', content: prompt }],
       }),
-    }), 20000);
+    }), 15000);
 
-    if (!res.ok) return new Response(JSON.stringify({ error: 'Erreur API' }), { status: 502, headers: H });
-
+    if (!res.ok) throw new Error('api_error');
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
     let result;
     try { result = JSON.parse(text); }
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
-    if (!result?.short) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    if (!result?.direct) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });

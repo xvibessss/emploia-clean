@@ -114,6 +114,20 @@
       border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer;
     }
 
+    .qcard-keywords { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .qcard-keyword {
+      background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.2);
+      border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--acc);
+    }
+    .qcard-questions { margin-bottom: 12px; }
+    .qcard-q {
+      background: var(--s3); border-left: 3px solid var(--acc); border-radius: 0 8px 8px 0;
+      padding: 8px 12px; margin-bottom: 6px; font-size: 12px;
+    }
+    .qcard-q-text { font-weight: 700; color: var(--t1); margin-bottom: 4px; }
+    .qcard-q-answer { color: var(--tx2); line-height: 1.5; }
+    .qcard-section-label { font-size: 11px; font-weight: 700; color: var(--tx2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+
     .how-it-works {
       margin-top: 40px; background: var(--s2); border: 1px solid var(--brd);
       border-radius: 16px; padding: 24px;
@@ -248,6 +262,13 @@
       ? `<div class="qcard-letter" id="letter-${job.id}" onclick="toggleLetter('${job.id}')">${esc(job.letter.slice(0, 600))}</div>`
       : '';
     const skillPills = (job.skills || []).slice(0, 5).map(s => `<span class="qcard-pill">${esc(s)}</span>`).join('');
+    const atsPills = (job.atsKeywords || []).slice(0, 6).map(k => `<span class="qcard-keyword">${esc(k)}</span>`).join('');
+    const emailSubjectLine = job.emailSubject
+      ? `<div style="margin-bottom:12px"><p class="qcard-section-label">Objet email suggéré</p><div style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--t1);font-weight:600">${esc(job.emailSubject)}</div></div>`
+      : '';
+    const questionsSection = (job.questions || []).length
+      ? `<div class="qcard-questions"><p class="qcard-section-label">Questions d'entretien probables</p>${(job.questions).slice(0, 3).map(q => `<div class="qcard-q"><div class="qcard-q-text">❓ ${esc(q.q)}</div><div class="qcard-q-answer">${esc(q.a)}</div></div>`).join('')}</div>`
+      : '';
 
     const canGenerate = job.status === 'queued' || job.status === 'error';
     const canApply = job.status === 'ready';
@@ -264,9 +285,13 @@
       </div>
       ${letterPreview}
       ${skillPills ? `<div class="qcard-pills">${skillPills}</div>` : ''}
+      ${atsPills ? `<div style="margin-bottom:12px"><p class="qcard-section-label">Mots-clés ATS</p><div class="qcard-keywords">${atsPills}</div></div>` : ''}
+      ${emailSubjectLine}
+      ${questionsSection}
       <div class="qcard-actions">
         ${canApply ? `<button class="btn-qapply" onclick="applyJob('${job.id}')">🚀 Postuler maintenant</button>` : ''}
         ${canApply ? `<button class="btn-qcopy" onclick="copyLetter('${job.id}')">📋 Copier la lettre</button>` : ''}
+        ${canApply && job.emailSubject ? `<button class="btn-qcopy" onclick="copyEmailSubject('${job.id}')">✉️ Copier l'objet</button>` : ''}
         ${canGenerate ? `<button class="btn-qcopy" onclick="prepareSingle('${job.id}')">✨ Préparer</button>` : ''}
         ${isApplied ? `<span style="font-size:13px;color:#22c55e;font-weight:600;">✅ Candidature envoyée</span>` : ''}
         ${!isApplied ? `<button class="btn-qmark" onclick="markApplied('${job.id}')">✓ Marquer envoyé</button>` : ''}
@@ -290,6 +315,7 @@
     try {
       const res = await fetch('/api/smart-apply', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jobTitle: job.title,
@@ -298,17 +324,24 @@
           userProfile: profile,
         }),
       });
-      if (!res.ok) throw new Error('API error');
+      if (res.status === 401) { window.location.href = '/app'; return; }
+      if (!res.ok) { const e = new Error('API error'); e.status = res.status; throw e; }
       const data = await res.json();
       job.letter = data.coverLetter || '';
       job.cvBullets = data.cvBullets || [];
       job.skills = data.skills || [];
       job.pitch = data.pitch || '';
+      job.questions = data.questions || [];
+      job.atsKeywords = data.atsKeywords || [];
+      job.emailSubject = data.emailSubject || '';
       job.status = 'ready';
       job.preparedAt = Date.now();
-    } catch {
+    } catch (err) {
       job.status = 'error';
-      empToast(`Erreur pour "${job.title}" — réessayez`, 'error');
+      const msg = err?.status === 429
+        ? `Limite atteinte pour "${job.title}" — réessayez dans 1h`
+        : `Erreur pour "${job.title}" — réessayez`;
+      empToast(msg, 'error');
     }
     saveQueue(); renderQueue();
   }
@@ -353,6 +386,12 @@
     navigator.clipboard.writeText(job.letter).then(() => empToast('Lettre copiée !', 'success')).catch(() => empToast('Copie impossible', 'error'));
   }
 
+  function copyEmailSubject(id) {
+    const job = queue.find(j => j.id === id);
+    if (!job?.emailSubject) { empToast('Aucun objet disponible', 'error'); return; }
+    navigator.clipboard.writeText(job.emailSubject).then(() => empToast('Objet email copié !', 'success')).catch(() => empToast('Copie impossible', 'error'));
+  }
+
   function applyJob(id) {
     const job = queue.find(j => j.id === id);
     if (!job) return;
@@ -368,7 +407,7 @@
     setTimeout(() => markApplied(id), 1200);
   }
 
-  function markApplied(id) {
+  async function markApplied(id) {
     const job = queue.find(j => j.id === id);
     if (!job) return;
     job.status = 'applied';
@@ -376,17 +415,23 @@
     saveQueue(); renderQueue();
     empToast('Candidature marquée comme envoyée ✓', 'success');
 
-    // Add to dashboard tracker
-    const tracked = JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]');
-    const alreadyTracked = tracked.some(t => t.id === id);
-    if (!alreadyTracked) {
-      tracked.unshift({
-        id, title: job.title, company: job.company,
-        location: job.location || '', url: job.url || '',
-        status: 'applied', addedAt: Date.now(),
+    // Sync to server-side applications tracker (dashboard reads from API)
+    try {
+      await fetch('/api/applications', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: job.title,
+          company: job.company,
+          location: job.location || '',
+          url: job.url || '',
+          status: 'applied',
+          coverLetter: job.letter || '',
+          notes: job.pitch ? `Pitch : ${job.pitch}` : '',
+        }),
       });
-      localStorage.setItem('emploia_tracked_jobs', JSON.stringify(tracked.slice(0, 100)));
-    }
+    } catch { /* silently ignore — localStorage already updated */ }
   }
 
   function removeJob(id) {
@@ -403,7 +448,26 @@
     empToast(removed ? `${removed} entrée${removed > 1 ? 's' : ''} supprimée${removed > 1 ? 's' : ''}` : 'Rien à nettoyer', 'info');
   }
 
+  // Auth check — smart-apply requires a logged-in account
+  async function initPage() {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) { window.location.href = '/app'; return; }
+      const user = await res.json();
+      if (user.plan === 'free') {
+        document.getElementById('queueContainer').innerHTML = `
+          <div class="queue-empty">
+            <div class="empty-icon">⭐</div>
+            <h3>Fonctionnalité Pro</h3>
+            <p>La file de candidatures automatisée est réservée aux abonnés Pro et Intensif.</p>
+            <a href="/#pricing" class="btn btn-primary">Passer à Pro →</a>
+          </div>`;
+      }
+    } catch { window.location.href = '/app'; }
+  }
+
   loadQueue();
+  initPage();
 
   // Listen for storage changes (jobs page adds to queue)
   window.addEventListener('storage', e => {

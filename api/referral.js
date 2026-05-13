@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
+import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, validateEmail } from './_lib/auth.js';
 
 // Referral system:
 // KV keys:
@@ -33,7 +33,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'referral', 30, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   // GET /api/referral — get or create referral code for logged-in user
   if (req.method === 'GET') {
@@ -68,18 +68,24 @@ export default async function handler(req) {
     // Validate code format
     if (!/^[A-Z0-9]{8}$/.test(code)) return new Response(JSON.stringify({ error: 'Code invalide' }), { status: 400, headers: H });
 
+    // Validate email to prevent garbage data in signups list
+    if (!validateEmail(String(newUserEmail).toLowerCase().trim())) {
+      return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers: H });
+    }
+    const normalizedNewEmail = String(newUserEmail).toLowerCase().trim();
+
     const refData = await kvGet(`ref:${code}`);
     if (!refData) return new Response(JSON.stringify({ error: 'Code introuvable' }), { status: 404, headers: H });
 
     // Don't let the owner refer themselves
-    if (refData.email === newUserEmail) return new Response(JSON.stringify({ ok: false, reason: 'self' }), { status: 200, headers: H });
+    if (refData.email === normalizedNewEmail) return new Response(JSON.stringify({ ok: false, reason: 'self' }), { status: 200, headers: H });
 
     // Don't double-count
-    if ((refData.signups || []).includes(newUserEmail)) {
+    if ((refData.signups || []).includes(normalizedNewEmail)) {
       return new Response(JSON.stringify({ ok: false, reason: 'already_counted' }), { status: 200, headers: H });
     }
 
-    const signups = [...(refData.signups || []), newUserEmail];
+    const signups = [...(refData.signups || []), normalizedNewEmail];
     const monthsEarned = Math.min(6, Math.floor(signups.length)); // max 6 months
     await kvSet(`ref:${code}`, { ...refData, signups, monthsEarned });
 

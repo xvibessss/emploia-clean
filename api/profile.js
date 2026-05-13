@@ -22,14 +22,14 @@ export default async function handler(req) {
 
   if (req.method === 'GET') {
     const rl = await checkRateLimit(`ip:${ip}`, 'profile-get', 120, 60);
-    if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+    if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '60' } });
     const profile = await kvGet(`profile:${user.email}`) || {};
     return new Response(JSON.stringify(profile), { status: 200, headers: H });
   }
 
   if (req.method === 'PUT') {
     const rl = await checkRateLimit(`ip:${ip}`, 'profile-put', 30, 3600);
-    if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+    if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
     const bodyText = await req.text();
     if (bodyText.length > 50000) return new Response(JSON.stringify({ error: 'Profil trop volumineux' }), { status: 413, headers: H });

@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet } from './_lib/auth.js';
+import { kvGet, kvSet, htmlEscape } from './_lib/auth.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -25,6 +25,17 @@ async function verifyStripeSignature(payload, header, secret) {
   return timingSafeEqual(computedHex, sig);
 }
 
+function sendEmail(resendKey, payload) {
+  return fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(8000),
+  }).catch(() => {});
+}
+
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+
 export default async function handler(req) {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
@@ -40,6 +51,8 @@ export default async function handler(req) {
   let event;
   try { event = JSON.parse(body); }
   catch { return new Response('Invalid JSON', { status: 400 }); }
+
+  const resendKey = process.env.RESEND_API_KEY;
 
   try {
     switch (event.type) {
@@ -59,24 +72,91 @@ export default async function handler(req) {
                 subscriptionId: session.subscription,
                 planActivatedAt: new Date().toISOString(),
                 generationsUsed: 0,
+                cancelAtPeriodEnd: false,
+                cancelAt: null,
               }),
-              // Store customerId → email mapping for subscription cancellation
+              // Store customerId → email mapping for later events
               kvSet(`stripe:${session.customer}`, normalizedEmail),
+              // Reset the atomic generation counter
+              kvSet(`gen:${normalizedEmail}`, 0),
             ]);
           }
         }
         break;
       }
+
+      case 'invoice.paid': {
+        // Reset generation counter at the start of each new billing cycle.
+        // Ensures paid users get a fresh counter each month and free users
+        // who were upgraded get properly unlocked on renewal.
+        const invoice = event.data.object;
+        if (!invoice.subscription) break; // skip one-time payments
+        const customerId = invoice.customer;
+        const email = await kvGet(`stripe:${customerId}`);
+        if (email) {
+          await kvSet(`gen:${email}`, 0);
+        }
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        const customerId = invoice.customer;
+        const email = invoice.customer_email?.toLowerCase() || await kvGet(`stripe:${customerId}`);
+        if (email && resendKey) {
+          const user = await kvGet(`user:${email}`);
+          const firstName = htmlEscape((user?.name || '').split(' ')[0] || 'là');
+          const attemptCount = invoice.attempt_count || 1;
+          const nextAttempt = invoice.next_payment_attempt
+            ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('fr-FR')
+            : null;
+
+          sendEmail(resendKey, {
+            from: 'Emploia <noreply@emploia.fr>',
+            to: [email],
+            subject: 'Problème de paiement sur votre abonnement Emploia',
+            html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+<div style="max-width:520px;margin:40px auto;padding:0 20px">
+  <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#ef4444,#f97316);padding:28px 32px">
+      <div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div>
+    </div>
+    <div style="padding:32px">
+      <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Échec du paiement${firstName !== 'là' ? `, ${firstName}` : ''}</h1>
+      <p style="color:#475569;line-height:1.6;margin:0 0 16px">Nous n'avons pas pu débiter votre carte pour votre abonnement Emploia (tentative ${attemptCount}).</p>
+      ${nextAttempt ? `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Prochain essai automatique prévu le <strong>${nextAttempt}</strong>.</p>` : ''}
+      <p style="color:#475569;line-height:1.6;margin:0 0 28px">Pour éviter l'interruption de votre accès, mettez à jour vos informations de paiement dès maintenant.</p>
+      <a href="${BASE_URL}/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">Mettre à jour ma carte →</a>
+      <p style="color:#94a3b8;font-size:12px;margin:28px 0 0;line-height:1.6">Si vous avez des questions, répondez directement à cet email.</p>
+    </div>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${BASE_URL}" style="color:#94a3b8">emploia.fr</a></p>
+</div>
+</body></html>`,
+          });
+        }
+        break;
+      }
+
       case 'customer.subscription.deleted': {
         const sub = event.data.object;
         const customerId = sub.customer;
         const email = await kvGet(`stripe:${customerId}`);
         if (email) {
           const user = await kvGet(`user:${email}`);
-          if (user) await kvSet(`user:${email}`, { ...user, plan: 'free', subscriptionId: null });
+          if (user) {
+            await kvSet(`user:${email}`, {
+              ...user,
+              plan: 'free',
+              subscriptionId: null,
+              subscriptionStatus: 'canceled',
+              planCanceledAt: new Date().toISOString(),
+            });
+          }
         }
         break;
       }
+
       case 'customer.subscription.updated': {
         const sub = event.data.object;
         const customerId = sub.customer;
@@ -84,7 +164,6 @@ export default async function handler(req) {
         if (email) {
           const user = await kvGet(`user:${email}`);
           if (user) {
-            // Extract plan from price metadata if available
             const priceId = sub.items?.data?.[0]?.price?.id;
             const PRICE_TO_PLAN = {
               [process.env.STRIPE_PRICE_PRO]: 'pro',
@@ -93,17 +172,58 @@ export default async function handler(req) {
               [process.env.STRIPE_PRICE_INTENSIF_ANNUAL]: 'intensif',
             };
             const newPlan = (priceId && PRICE_TO_PLAN[priceId]) || user.plan;
+            const wasScheduledForCancellation = user.cancelAtPeriodEnd;
+            const isNowScheduledForCancellation = sub.cancel_at_period_end;
+
             await kvSet(`user:${email}`, {
               ...user,
               plan: sub.status === 'active' ? newPlan : 'free',
               subscriptionId: sub.id,
               subscriptionStatus: sub.status,
+              cancelAtPeriodEnd: isNowScheduledForCancellation,
+              cancelAt: sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null,
             });
+
+            // Send retention email only the first time cancel_at_period_end becomes true
+            if (!wasScheduledForCancellation && isNowScheduledForCancellation && resendKey) {
+              const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
+              const cancelDate = sub.cancel_at
+                ? new Date(sub.cancel_at * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+                : 'en fin de période';
+
+              sendEmail(resendKey, {
+                from: 'Emploia <noreply@emploia.fr>',
+                to: [email],
+                subject: 'Votre abonnement Emploia sera annulé',
+                html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+<div style="max-width:520px;margin:40px auto;padding:0 20px">
+  <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px">
+      <div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div>
+    </div>
+    <div style="padding:32px">
+      <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Annulation confirmée${firstName !== 'là' ? `, ${firstName}` : ''}</h1>
+      <p style="color:#475569;line-height:1.6;margin:0 0 16px">Votre abonnement Emploia sera annulé le <strong>${cancelDate}</strong>. Jusqu'à cette date, vous conservez un accès complet.</p>
+      <p style="color:#475569;line-height:1.6;margin:0 0 8px">Vous avez changé d'avis ? Il n'est pas trop tard :</p>
+      <a href="${BASE_URL}/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px;margin-bottom:24px">Réactiver mon abonnement →</a>
+      <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-top:8px">
+        <p style="font-size:13px;color:#64748b;font-weight:600;margin:0 0 10px">Après le ${cancelDate}, vous perdrez l'accès à :</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:#ef4444;font-size:16px">✕</span><span style="color:#475569;font-size:13px">Générations illimitées de CV et lettres</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:#ef4444;font-size:16px">✕</span><span style="color:#475569;font-size:13px">Coaching IA entretiens avancé</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:#ef4444;font-size:16px">✕</span><span style="color:#475569;font-size:13px">Analyse de score illimitée</span></div>
+        </div>
+      </div>
+      <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;line-height:1.6">Une question ? Répondez directement à cet email, nous répondons sous 24h.</p>
+    </div>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${BASE_URL}" style="color:#94a3b8">emploia.fr</a></p>
+</div>
+</body></html>`,
+              });
+            }
           }
         }
-        break;
-      }
-      case 'invoice.payment_failed': {
         break;
       }
     }

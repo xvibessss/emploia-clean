@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, signToken, setCookieHeader, checkRateLimit, getAllowedOrigin, hashPassword, generateSalt } from '../_lib/auth.js';
+import { kvGet, kvSet, kvDel, signToken, setCookieHeader, checkRateLimit, getAllowedOrigin, hashPassword, generateSalt } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -18,7 +18,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'reset-password', 5, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   let body;
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
@@ -45,7 +45,7 @@ export default async function handler(req) {
   const salt = await generateSalt();
   const passwordHash = await hashPassword(password, salt);
   await kvSet(`user:${resetData.email}`, { ...user, passwordHash, passwordSalt: salt });
-  await kvSet(`reset:${token}`, null, 1); // invalidate token
+  await kvDel(`reset:${token}`);
 
   const authToken = await signToken(user.id);
   const safeUser = { id: user.id, name: user.name, email: user.email, plan: user.plan || 'free' };

@@ -32,6 +32,37 @@
       {"@type": "ListItem", "position": 3, "name": "CV sans expérience", "item": "https://emploia.fr/blog/cv-sans-experience"}
     ]}
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Combien de pages doit faire un CV sans expérience ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Une seule page, sans exception. Un CV sans expérience professionnelle sur 2 pages est perçu comme du remplissage. Soyez sélectif : ne gardez que les projets et expériences les plus pertinents pour le poste cible. Si votre CV ne tient pas en une page, c'est que vous ne filtrez pas assez."}
+      },
+      {
+        "@type": "Question",
+        "name": "Faut-il mettre une photo sur un CV sans expérience en France ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "La photo sur CV n'est pas obligatoire en France, mais reste courante dans les secteurs traditionnels (commerce, banque, conseil). Dans la tech et le marketing digital, elle est de moins en moins attendue. Si vous mettez une photo, elle doit être professionnelle : sourire neutre, fond uni, bonne résolution. Ne mettez pas de selfie ou de photo de voyage."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quels projets personnels mettre sur un CV pour la tech ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Mettez vos 2-3 meilleurs projets avec : la technologie utilisée, le résultat mesurable (utilisateurs, étoiles GitHub, score Lighthouse, trafic) et un lien vers le code ou le projet live. Un projet même simple avec 50 utilisateurs réels est plus convaincant qu'un projet complexe sans résultat visible. Les projets open-source avec des contributeurs externes sont un plus fort."}
+      },
+      {
+        "@type": "Question",
+        "name": "Comment valoriser les associations et le bénévolat sur un CV ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Présentez vos activités associatives comme des expériences professionnelles : poste occupé, responsabilités concrètes, résultats quantifiés. 'Président d'association étudiante — gestion d'un budget de 8 000 €, coordination de 12 membres, organisation de 4 événements annuels (400 participants)' est bien plus fort que 'membre actif'. Les compétences de leadership, gestion et communication sont directement transférables."}
+      },
+      {
+        "@type": "Question",
+        "name": "Peut-on mentionner des cours en ligne sur un CV sans expérience ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Oui, si ce sont des formations de plateformes reconnues (Coursera, Google, AWS, HubSpot, Microsoft) ou si vous avez un certificat à présenter. Mentionnez-les dans la section 'Certifications' avec le nom exact, la plateforme et la date. Une certification Google Analytics ou AWS Cloud Practitioner est plus crédible qu'une ligne 'formation YouTube'. Évitez de lister des cours qui n'ont pas abouti à un certificat."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -96,6 +127,20 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -125,12 +170,28 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav>
+      <ol>
+        <li><a href="#structure">La structure adaptée au profil sans expérience</a></li>
+        <li><a href="#projets">Projets personnels — votre CV invisible</a></li>
+        <li><a href="#academique">Projets académiques</a></li>
+        <li><a href="#associations">Associations et bénévolat</a></li>
+        <li><a href="#certifications">Certifications — des preuves validées par des tiers</a></li>
+        <li><a href="#exemples">Exemples de CV par secteur</a></li>
+        <li><a href="#ats">Adapter son CV à l'ATS</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </div>
+
   <div class="art-body">
     <p>Tout le monde a commencé sans expérience. Les recruteurs le savent. La vraie question n'est pas "avez-vous de l'expérience ?" mais <strong>"montrez-moi ce que vous savez faire"</strong>. Ce guide vous explique comment transformer vos projets, formations et soft skills en un CV qui convainc.</p>
 
     <div class="highlight">💡 <strong>La règle d'or :</strong> un CV sans expérience professionnelle ne doit pas ressembler à un CV vide — il doit ressembler à un CV de quelqu'un qui a investi son temps autrement. Chaque ligne doit prouver une compétence ou un résultat.</div>
 
-    <h2>🏗️ La structure adaptée au profil sans expérience</h2>
+    <h2 id="structure">🏗️ La structure adaptée au profil sans expérience</h2>
     <p>L'ordre des sections est crucial. Pour un profil sans expérience professionnelle, réorganisez ainsi :</p>
     <ol>
       <li><strong>En-tête</strong> — Prénom Nom, poste cible, contact, LinkedIn</li>
@@ -143,7 +204,7 @@
     </ol>
     <p>En mettant les projets avant la formation et les expériences, vous mettez en avant vos compétences concrètes au lieu de laisser une zone vide.</p>
 
-    <h2>✨ Ce qui remplace l'expérience (et convainc les recruteurs)</h2>
+    <h2 id="projets">✨ Ce qui remplace l'expérience (et convainc les recruteurs)</h2>
 
     <h3>1. Les projets personnels — votre CV invisible</h3>
     <p>Un projet personnel bien présenté vaut autant qu'un stage de 3 mois. La clé : <strong>parlez de résultats, pas de technologies.</strong></p>
@@ -189,7 +250,7 @@
       "Service en salle pour 80 couverts/soir. Gestion simultanée de 6-8 tables, encaissement, coordination cuisine. Développement de la résistance au stress et de la communication client en environnement haute pression."
     </div>
 
-    <h2>📝 Exemples de CV sans expérience par secteur</h2>
+    <h2 id="exemples">📝 Exemples de CV sans expérience par secteur</h2>
 
     <h3>Développeur web (Bac+3, école d'ingénieur)</h3>
     <div class="example-box">
@@ -210,7 +271,7 @@
       • Blog lifestyle personnel — 800 visites/mois, 1er sur 3 mots-clés longue traîne
     </div>
 
-    <h2>🎯 Adapter son CV sans expérience à l'ATS</h2>
+    <h2 id="ats">🎯 Adapter son CV sans expérience à l'ATS</h2>
     <p>Même sans expérience, les grandes entreprises utilisent des ATS. Voici les règles spécifiques :</p>
     <ul>
       <li>Reprenez <strong>exactement</strong> les mots-clés de l'offre dans vos projets et compétences</li>
@@ -220,6 +281,35 @@
     </ul>
 
     <div class="success">✨ <strong>Conseil Emploia :</strong> collez n'importe quelle offre dans Emploia, et l'IA génère un CV adapté à votre profil en 30 secondes — même sans expérience professionnelle. Elle valorise vos projets et formations selon les critères exact de l'offre.</div>
+  </div>
+
+  <div class="faq-section">
+    <h2 id="faq">❓ Questions fréquentes sur le CV sans expérience</h2>
+
+    <details class="faq-item">
+      <summary class="faq-item">Combien de pages doit faire un CV sans expérience ?</summary>
+      <div class="faq-body">Une seule page, sans exception. Un CV sans expérience professionnelle sur 2 pages est perçu comme du remplissage. Soyez sélectif : ne gardez que les projets et expériences les plus pertinents pour le poste cible. Si votre CV ne tient pas en une page, c'est que vous ne filtrez pas assez — priorisez qualité sur quantité.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Faut-il mettre une photo sur un CV sans expérience en France ?</summary>
+      <div class="faq-body">La photo sur CV n'est pas obligatoire en France, mais reste courante dans les secteurs traditionnels (commerce, banque, conseil). Dans la tech et le marketing digital, elle est de moins en moins attendue. Si vous mettez une photo, elle doit être professionnelle : sourire neutre, fond uni, bonne résolution. Ne mettez jamais un selfie ou une photo de voyage.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quels projets personnels mettre sur un CV pour la tech ?</summary>
+      <div class="faq-body">Mettez vos 2-3 meilleurs projets avec : la technologie utilisée, le résultat mesurable (utilisateurs, étoiles GitHub, score Lighthouse, trafic mensuel) et un lien vers le code ou le projet live. Un projet même simple avec 50 utilisateurs réels est plus convaincant qu'un projet complexe sans résultat visible. Les projets open-source avec des contributeurs externes sont particulièrement valorisants.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Comment valoriser les associations et le bénévolat sur un CV ?</summary>
+      <div class="faq-body">Présentez vos activités associatives comme des expériences professionnelles : poste occupé, responsabilités concrètes, résultats quantifiés. "Président d'association étudiante — budget de 8 000 €, coordination de 12 membres, 4 événements annuels (400 participants)" est bien plus fort que "membre actif". Les compétences de leadership, gestion et communication sont directement transférables.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Peut-on mentionner des cours en ligne sur un CV sans expérience ?</summary>
+      <div class="faq-body">Oui, si ce sont des formations de plateformes reconnues (Coursera, Google, AWS, HubSpot, Microsoft) avec un certificat. Mentionnez-les dans la section "Certifications" avec le nom exact, la plateforme et la date. Une certification Google Analytics ou AWS Cloud Practitioner est plus crédible qu'une ligne "formation YouTube". Évitez de lister des cours sans certificat officiel.</div>
+    </details>
   </div>
 
   <div class="share-bar">

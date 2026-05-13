@@ -26,6 +26,37 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/salaires-france-2026"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Quel est le salaire moyen d'un développeur junior en France en 2026 ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Un développeur junior (0-3 ans d'expérience) gagne entre 35 000 et 48 000 € brut par an en France en 2026. À Paris, la fourchette monte à 40 000-55 000 €. Les spécialités les mieux rémunérées en junior sont la data science/ML (42 000-52 000 €), le DevOps/Cloud (40 000-52 000 €) et le Product Management (42 000-54 000 €)."}
+      },
+      {
+        "@type": "Question",
+        "name": "Comment convertir un salaire brut en net en France ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Pour estimer votre salaire net à partir du brut, multipliez par 0.75 à 0.77 (selon votre situation, les cotisations salariales représentent 23-25% du brut). Exemple : 45 000 € brut/an = environ 2 815 € net/mois. Ce calcul est une approximation — votre salaire net exact dépend de votre convention collective, mutuelle d'entreprise, tickets restaurant et autres avantages."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence de salaire entre Paris et la province ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Paris et l'Île-de-France offrent en moyenne 15 à 25% de plus que le reste de la France pour des postes comparables. Lyon et Bordeaux sont à +5/+10%, Toulouse et Nantes proches de la moyenne nationale, et Marseille/Lille souvent 5-10% en dessous. Pour le full remote, les entreprises calent généralement les salaires sur Paris ou légèrement en dessous selon leur politique de rémunération géographique."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quand peut-on demander une augmentation de salaire en France ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Les moments les plus propices pour demander une augmentation : après la période d'essai (3-6 mois), lors de l'entretien annuel d'évaluation, après une réalisation significative et quantifiable, ou quand vous avez une autre offre en main (l'argument le plus efficace). En France, les augmentations annuelles moyennes sont de 2-4% pour un maintien de pouvoir d'achat. Une augmentation liée à une promotion peut aller de 10 à 25%."}
+      },
+      {
+        "@type": "Question",
+        "name": "Les salaires en France incluent-ils les avantages comme les tickets restaurant ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Les fourchettes salariales publiées sont généralement en salaire brut annuel fixe, hors avantages. En pratique, les avantages typiques en France représentent 3 000 à 8 000 € de valeur annuelle supplémentaire : tickets restaurant (jusqu'à 120 €/mois exonérés), mutuelle entreprise (200-500 €/an), RTT (équivalent 1-3 semaines de salaire), transport (50% pris en charge), et télétravail (économie de transport). Intégrez-les dans la négociation globale."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -89,6 +120,20 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -118,12 +163,29 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav>
+      <ol>
+        <li><a href="#tech">Tech &amp; Digital</a></li>
+        <li><a href="#marketing">Marketing &amp; Communication</a></li>
+        <li><a href="#finance">Finance &amp; Banque</a></li>
+        <li><a href="#rh">Ressources Humaines</a></li>
+        <li><a href="#commercial">Commercial &amp; Ventes</a></li>
+        <li><a href="#stages">Stages et Alternances 2026</a></li>
+        <li><a href="#region">Écart Paris vs Province</a></li>
+        <li><a href="#negociation">Comment négocier votre salaire</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </div>
+
   <div class="art-body">
     <p>Négocier son salaire sans données, c'est aller à un entretien sans CV. Voici les <strong>fourchettes salariales réelles en France pour 2026</strong>, compilées depuis les offres France Travail, APEC et LinkedIn Salary.</p>
 
     <div class="highlight">📌 Ces données sont des fourchettes brutes annuelles. Le salaire net est généralement 75-77% du brut. Paris est en moyenne 15-25% au-dessus de la province.</div>
 
-    <h2>💻 Tech &amp; Digital</h2>
+    <h2 id="tech">💻 Tech &amp; Digital</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Poste</th><th>Junior (0-3 ans)</th><th>Confirmé (3-7 ans)</th><th>Senior (7+ ans)</th></tr></thead>
@@ -140,7 +202,7 @@
       </table>
     </div>
 
-    <h2>📊 Marketing &amp; Communication</h2>
+    <h2 id="marketing">📊 Marketing &amp; Communication</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Poste</th><th>Junior</th><th>Confirmé</th><th>Senior / Manager</th></tr></thead>
@@ -154,7 +216,7 @@
       </table>
     </div>
 
-    <h2>🏦 Finance &amp; Banque</h2>
+    <h2 id="finance">🏦 Finance &amp; Banque</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Poste</th><th>Junior</th><th>Confirmé</th><th>Senior / Cadre</th></tr></thead>
@@ -168,7 +230,7 @@
       </table>
     </div>
 
-    <h2>🤝 Ressources Humaines</h2>
+    <h2 id="rh">🤝 Ressources Humaines</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Poste</th><th>Junior</th><th>Confirmé</th><th>Senior</th></tr></thead>
@@ -180,7 +242,7 @@
       </table>
     </div>
 
-    <h2>💼 Commercial &amp; Ventes</h2>
+    <h2 id="commercial">💼 Commercial &amp; Ventes</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Poste</th><th>Fixe junior</th><th>Fixe + variable junior</th><th>Fixe senior</th></tr></thead>
@@ -192,7 +254,7 @@
       </table>
     </div>
 
-    <h2>🎓 Stages et Alternances 2026</h2>
+    <h2 id="stages">🎓 Stages et Alternances 2026</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Type</th><th>Rémunération mensuelle</th><th>Note</th></tr></thead>
@@ -205,7 +267,7 @@
       </table>
     </div>
 
-    <h2>📍 Écart Paris vs Province</h2>
+    <h2 id="region">📍 Écart Paris vs Province</h2>
     <ul>
       <li><strong>Paris / Île-de-France :</strong> +15 à +25% par rapport à la moyenne nationale</li>
       <li><strong>Lyon, Bordeaux :</strong> +5 à +10% par rapport à la moyenne</li>
@@ -214,7 +276,7 @@
       <li><strong>Full remote :</strong> généralement aligné Paris ou légèrement en dessous</li>
     </ul>
 
-    <h2>💡 Comment négocier votre salaire</h2>
+    <h2 id="negociation">💡 Comment négocier votre salaire</h2>
     <ol>
       <li><strong>Arrivez avec une fourchette, pas un chiffre</strong> — donnez une plage de 5 000 € centrée sur votre cible</li>
       <li><strong>Citez des données</strong> — "selon les grilles APEC et les offres récentes, le marché pour ce niveau est de X à Y"</li>
@@ -224,6 +286,35 @@
     </ol>
 
     <div class="highlight">💡 <strong>Astuce :</strong> utilisez l'outil de score de compatibilité d'Emploia pour évaluer votre profil par rapport à une offre, et ainsi justifier une demande salariale dans le haut de la fourchette.</div>
+  </div>
+
+  <div class="faq-section">
+    <h2 id="faq">❓ Questions fréquentes sur les salaires en France</h2>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quel est le salaire moyen d'un développeur junior en France en 2026 ?</summary>
+      <div class="faq-body">Un développeur junior (0-3 ans d'expérience) gagne entre 35 000 et 48 000 € brut par an en France en 2026. À Paris, la fourchette monte à 40 000-55 000 €. Les spécialités les mieux rémunérées en junior sont la data science/ML (42 000-52 000 €), le DevOps/Cloud (40 000-52 000 €) et le Product Management (42 000-54 000 €).</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Comment convertir un salaire brut en net en France ?</summary>
+      <div class="faq-body">Pour estimer votre salaire net à partir du brut, multipliez par 0.75 à 0.77 (les cotisations salariales représentent 23-25% du brut). Exemple : 45 000 € brut/an = environ 2 815 € net/mois. Ce calcul est une approximation — votre net exact dépend de votre convention collective, mutuelle d'entreprise, tickets restaurant et autres avantages en nature.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quelle est la différence de salaire entre Paris et la province ?</summary>
+      <div class="faq-body">Paris et l'Île-de-France offrent en moyenne 15 à 25% de plus que le reste de la France pour des postes comparables. Lyon et Bordeaux sont à +5/+10%, Toulouse et Nantes proches de la moyenne nationale. Pour le full remote, les entreprises calent généralement les salaires sur Paris ou légèrement en dessous selon leur politique de rémunération géographique.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quand peut-on demander une augmentation de salaire en France ?</summary>
+      <div class="faq-body">Les moments les plus propices : après une réalisation significative et quantifiable, lors de l'entretien annuel d'évaluation, ou quand vous avez une autre offre en main (l'argument le plus efficace). En France, les augmentations annuelles moyennes sont de 2-4% pour un maintien de pouvoir d'achat. Une augmentation liée à une promotion peut aller de 10 à 25%.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Les salaires affichés incluent-ils les avantages comme les tickets restaurant ?</summary>
+      <div class="faq-body">Non, les fourchettes publiées sont en salaire brut annuel fixe, hors avantages. En pratique, les avantages typiques en France représentent 3 000 à 8 000 € de valeur annuelle supplémentaire : tickets restaurant (jusqu'à 120 €/mois exonérés), mutuelle (200-500 €/an), RTT, 50% transport, télétravail. Intégrez-les dans la négociation globale.</div>
+    </details>
   </div>
 
   <div class="share-bar">

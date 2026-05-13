@@ -255,6 +255,19 @@ export async function kvMget(...keys) {
   });
 }
 
+export async function kvSadd(key, ...members) {
+  return upstash(["SADD", key, ...members]);
+}
+
+export async function kvSrem(key, ...members) {
+  return upstash(["SREM", key, ...members]);
+}
+
+export async function kvSmembers(key) {
+  const { result } = await upstash(["SMEMBERS", key]);
+  return result || [];
+}
+
 // ── ALLOWED ORIGINS ────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://emploia.fr',

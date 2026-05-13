@@ -299,6 +299,60 @@ async function fetchAdzuna(q, type, location, page) {
   } catch { return []; }
 }
 
+// ── FRANCE TRAVAIL (OAuth2 + Offres API) ─────────────
+async function fetchFranceTravail(q, type, location, page) {
+  const clientId = process.env.FRANCE_TRAVAIL_CLIENT_ID;
+  const clientSecret = process.env.FRANCE_TRAVAIL_CLIENT_SECRET;
+  if (!clientId || !clientSecret) return [];
+  if (type === 'stage') return []; // stages not well represented
+  try {
+    const tokenRes = await withTimeout(
+      fetch('https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'client_credentials',
+          client_id: clientId,
+          client_secret: clientSecret,
+          scope: 'api_offresdemploiv2 o2dsoffre',
+        }).toString(),
+      }), 7000
+    );
+    if (!tokenRes.ok) return [];
+    const { access_token } = await tokenRes.json();
+    if (!access_token) return [];
+
+    const typeMap = { cdi: 'CDI', cdd: 'CDD', alternance: 'CA,CP', freelance: 'LIB' };
+    const start = page * 10;
+    const keywords = [q || 'emploi', location || ''].filter(Boolean).join(' ');
+    const params = new URLSearchParams({ motsCles: keywords, range: `${start}-${start + 9}`, sort: '1' });
+    if (typeMap[type]) params.set('typeContrat', typeMap[type]);
+
+    const jobsRes = await withTimeout(
+      fetch(`https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?${params}`, {
+        headers: { Authorization: `Bearer ${access_token}`, Accept: 'application/json' },
+      }), 10000
+    );
+    if (!jobsRes.ok) return [];
+    const data = await jobsRes.json();
+    return (data.resultats || []).slice(0, 8).map(j => ({
+      id: 'ft_' + j.id,
+      title: j.intitule,
+      company: j.entreprise?.nom || 'Confidentiel',
+      location: j.lieuTravail?.libelle || location || 'France',
+      type: j.typeContratLibelle || detectType(j.intitule, type),
+      salary: j.salaire?.libelle || null,
+      description: (j.description || '').slice(0, 300),
+      url: `https://candidat.francetravail.fr/offres/recherche/detail/${j.id}`,
+      date: j.dateCreation || new Date().toISOString(),
+      remote: (j.lieuTravail?.libelle || '').toLowerCase().includes('télétravail'),
+      source: 'France Travail',
+      logo: null,
+      country: 'FR',
+    }));
+  } catch { return []; }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location) {
   try {
@@ -377,7 +431,7 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`ip:${ip}`, 'jobs', 60, 60);
   if (!rl.allowed) return new Response(
     JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 minute.' }),
-    { status: 429, headers: H }
+    { status: 429, headers: { ...H, 'Retry-After': '60' } }
   );
 
   const url = new URL(req.url);
@@ -388,7 +442,7 @@ export default async function handler(req) {
   const page       = Math.max(0, Math.min(10, parseInt(url.searchParams.get('page') || '0')));
 
   try {
-    const [jsRes, fmRes, intRes, rmRes, abRes, azRes, empRes] = await Promise.allSettled([
+    const [jsRes, fmRes, intRes, rmRes, abRes, azRes, empRes, ftRes] = await Promise.allSettled([
       fetchJSearch(q, type, location, page),
       fetchFrenchMarket(q, type, location, page),
       fetchInternships(q, type, location),
@@ -396,11 +450,13 @@ export default async function handler(req) {
       fetchArbeitnow(q, type, page),
       fetchAdzuna(q, type, location, page),
       fetchEmployerJobs(q, type, location),
+      fetchFranceTravail(q, type, location, page),
     ]);
 
     const employerJobs = empRes.status === 'fulfilled' ? empRes.value : [];
     const allJobs = [
       ...employerJobs,
+      ...(ftRes.status === 'fulfilled' ? ftRes.value : []),
       ...(fmRes.status === 'fulfilled' ? fmRes.value : []),
       ...(jsRes.status === 'fulfilled' ? jsRes.value : []),
       ...(azRes.status === 'fulfilled' ? azRes.value : []),

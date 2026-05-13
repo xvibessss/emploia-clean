@@ -680,6 +680,21 @@
     .referral-link-input{flex:1;padding:9px 12px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;color:var(--t2);font-size:11px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .referral-copy-btn{padding:9px 14px;background:linear-gradient(135deg,var(--grn),rgba(16,185,129,.7));color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
 
+    /* CANCELLATION WARNING BANNER */
+    .cancel-banner {
+      background: linear-gradient(135deg, rgba(245,158,11,.08), rgba(239,68,68,.06));
+      border: 1px solid rgba(245,158,11,.35);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .cancel-banner-text { font-size: 13px; color: var(--t1); line-height: 1.5; }
+    .cancel-banner-text span { color: #f59e0b; font-weight: 800; }
+
     /* UPGRADE BANNER */
     .upgrade-banner {
       background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.08));
@@ -694,6 +709,24 @@
 
     .ub-text { font-size: 12px; color: var(--t2); line-height: 1.5; }
     .ub-text strong { color: var(--t1); }
+
+    /* Score progression chart */
+    .score-chart-canvas { width: 100%; height: 120px; display: block; }
+    .score-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+    .score-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--t3); }
+    .score-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Weekly report modal */
+    .report-modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+    .report-modal.open { display: flex; }
+    .report-inner { background: var(--s2); border: 1px solid var(--brd); border-radius: 20px; padding: 28px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .report-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+    .report-stat { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 12px; text-align: center; }
+    .report-stat-n { font-size: 22px; font-weight: 900; color: var(--t1); }
+    .report-stat-l { font-size: 10px; color: var(--t3); margin-top: 2px; }
+    .report-action { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--brd); font-size: 13px; color: var(--t2); }
+    .report-action:last-child { border-bottom: none; }
+    .report-action::before { content: '→'; color: var(--acc); font-weight: 700; flex-shrink: 0; }
 
     @media (max-width: 1400px) {
       .kanban-board { grid-template-columns: repeat(3, 1fr); }
@@ -769,9 +802,18 @@
       </div>
     </div>
     <div class="wb-right">
+      <button onclick="openWeeklyReport()" class="btn btn-ghost btn-sm">📧 Rapport hebdo</button>
       <a href="/jobs" class="btn btn-ghost btn-sm">📋 Chercher une offre</a>
       <a href="/app" class="btn btn-primary btn-sm">✨ Générer un CV</a>
     </div>
+  </div>
+
+  <!-- CANCELLATION WARNING BANNER -->
+  <div class="cancel-banner" id="cancelBanner" style="display:none">
+    <div class="cancel-banner-text">
+      ⚠️ Votre abonnement Pro sera annulé le <span id="cancelBannerDate">—</span>. Vous conserverez l'accès jusqu'à cette date.
+    </div>
+    <a href="/api/stripe-portal" class="btn btn-sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;white-space:nowrap;flex-shrink:0">Réactiver →</a>
   </div>
 
   <!-- ONBOARDING STEPS -->
@@ -1065,6 +1107,22 @@
         </div>
       </div>
 
+      <!-- SCORE PROGRESSION -->
+      <div class="gen-card" id="scoreChartCard" style="display:none">
+        <div class="gen-card-header">
+          <div class="gen-card-title">📈 Score évolution</div>
+          <span style="font-size:10px;color:var(--t3)" id="scoreChartMeta"></span>
+        </div>
+        <div class="gen-card-body" style="padding:12px 14px">
+          <canvas id="scoreCanvas" class="score-chart-canvas"></canvas>
+          <div class="score-legend">
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:#6366f1"></div>ATS</div>
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:#22c55e"></div>Match</div>
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:#f59e0b"></div>Entretien</div>
+          </div>
+        </div>
+      </div>
+
       <!-- TIPS -->
       <div class="gen-card">
         <div class="gen-card-header">
@@ -1092,6 +1150,51 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY REPORT MODAL -->
+<div class="report-modal" id="reportModal" onclick="if(event.target===this)closeReportModal()">
+  <div class="report-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <h3 style="font-size:17px;font-weight:900;letter-spacing:-.4px">📧 Rapport hebdomadaire</h3>
+      <button onclick="closeReportModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3)">×</button>
+    </div>
+    <div id="reportSubtitle" style="font-size:12px;color:var(--t3);margin-bottom:16px"></div>
+
+    <div id="reportLoading" style="text-align:center;padding:32px">
+      <div class="spin" style="margin:0 auto 12px"></div>
+      <div style="font-size:13px;color:var(--t3)">Génération de votre rapport IA…</div>
+    </div>
+
+    <div id="reportContent" style="display:none">
+      <div id="reportHeadline" style="font-size:16px;font-weight:800;color:var(--t1);margin-bottom:12px;line-height:1.3"></div>
+      <div id="reportSummary" style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px;background:var(--s3);border-radius:10px;padding:12px"></div>
+
+      <div class="report-stat-grid" id="reportStats"></div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px">✅ Points positifs</div>
+        <div id="reportHighlights" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px">🎯 Actions prioritaires</div>
+        <div id="reportActions"></div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(59,130,246,.05));border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:12px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--acc);margin-bottom:4px">💪 Objectif semaine prochaine</div>
+        <div id="reportGoal" style="font-size:13px;color:var(--t1);font-weight:600"></div>
+      </div>
+
+      <div id="reportMotivation" style="font-size:13px;color:var(--t2);font-style:italic;text-align:center;padding:8px 0;border-top:1px solid var(--brd)"></div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <a href="/alerts" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center">🔔 Gérer les alertes</a>
+      <button onclick="closeReportModal()" class="btn btn-ghost btn-sm">Fermer</button>
     </div>
   </div>
 </div>
@@ -1537,8 +1640,7 @@
     empToast('Export CSV téléchargé', 'success');
   }
 
-  // ── KEYBOARD ───────────────────────────────────────────────────────────────
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  // ── KEYBOARD (handled in score/report section below) ──────────────────────
 
   // ── REFERRAL ────────────────────────────────────────────────────────────────
   async function loadReferral() {
@@ -1729,6 +1831,12 @@
       const FREE_LIMIT = 3;
       const credits = plan === 'free' ? Math.max(0, FREE_LIMIT - (user.generationsUsed || 0)) : '∞';
       document.getElementById('wbCredits').textContent = credits;
+
+      if (user.cancelAtPeriodEnd && user.cancelAt) {
+        const cancelDate = new Date(user.cancelAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('cancelBannerDate').textContent = cancelDate;
+        document.getElementById('cancelBanner').style.display = 'flex';
+      }
     } catch {}
   }
 
@@ -1785,6 +1893,7 @@
   loadSavedJobs();
   loadCurrentUser();
   loadJobsForYou();
+  renderScoreChart();
 
   // ── RELANCE EMAIL ─────────────────────────────────────────────────────────
   let relanceApp = null;
@@ -1841,6 +1950,7 @@
     try {
       const res = await fetch('/api/generate/follow-up', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jobTitle: app.jobTitle || '',
@@ -1879,6 +1989,142 @@
     const m = document.getElementById('relanceModal');
     if (m) m.style.display = 'none';
   }
+
+  // ── SCORE PROGRESSION CHART ───────────────────────────────────────────────
+  function renderScoreChart() {
+    const KEY = 'emploia_scores_history';
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+    if (history.length < 2) return;
+
+    const card = document.getElementById('scoreChartCard');
+    card.style.display = 'block';
+
+    const canvas = document.getElementById('scoreCanvas');
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.parentElement.clientWidth - 28;
+    const H = 120;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const PAD = { top: 16, right: 8, bottom: 24, left: 28 };
+    const cW = W - PAD.left - PAD.right;
+    const cH = H - PAD.top - PAD.bottom;
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,.06)';
+    ctx.lineWidth = 1;
+    [0, 25, 50, 75, 100].forEach(v => {
+      const y = PAD.top + cH - (v / 100) * cH;
+      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + cW, y); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.3)';
+      ctx.font = `9px system-ui`;
+      ctx.fillText(v, 2, y + 3);
+    });
+
+    const types = ['ats', 'match', 'interview'];
+    const colors = { ats: '#6366f1', match: '#22c55e', interview: '#f59e0b' };
+    const sorted = [...history].sort((a, b) => a.ts - b.ts).slice(-20);
+
+    document.getElementById('scoreChartMeta').textContent = `${sorted.length} points`;
+
+    types.forEach(type => {
+      const pts = sorted.filter(s => s.type === type);
+      if (pts.length < 1) return;
+
+      const allTs = sorted.map(s => s.ts);
+      const minTs = allTs[0], maxTs = allTs[allTs.length - 1];
+      const tsRange = maxTs - minTs || 1;
+
+      ctx.strokeStyle = colors[type];
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      let first = true;
+      pts.forEach(p => {
+        const x = PAD.left + ((p.ts - minTs) / tsRange) * cW;
+        const y = PAD.top + cH - (Math.min(p.score, 100) / 100) * cH;
+        if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Dots
+      pts.forEach(p => {
+        const x = PAD.left + ((p.ts - minTs) / tsRange) * cW;
+        const y = PAD.top + cH - (Math.min(p.score, 100) / 100) * cH;
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = colors[type];
+        ctx.fill();
+      });
+    });
+  }
+
+  // ── WEEKLY REPORT ─────────────────────────────────────────────────────────
+  let reportLoaded = false;
+
+  async function openWeeklyReport() {
+    const modal = document.getElementById('reportModal');
+    modal.classList.add('open');
+    if (reportLoaded) return;
+    document.getElementById('reportLoading').style.display = 'block';
+    document.getElementById('reportContent').style.display = 'none';
+    document.getElementById('reportSubtitle').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    try {
+      const res = await fetch('/api/weekly-report', { credentials: 'include' });
+      if (res.status === 401) {
+        empShowAuth('login');
+        closeReportModal();
+        return;
+      }
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      reportLoaded = true;
+      renderReport(d);
+    } catch {
+      document.getElementById('reportLoading').innerHTML = '<div style="font-size:13px;color:var(--rnb)">Erreur de chargement. Réessayez.</div>';
+    }
+  }
+
+  function renderReport(d) {
+    document.getElementById('reportLoading').style.display = 'none';
+    document.getElementById('reportContent').style.display = 'block';
+
+    document.getElementById('reportHeadline').textContent = d.headline || '';
+    document.getElementById('reportSummary').textContent = d.summary || '';
+    document.getElementById('reportGoal').textContent = d.nextWeekGoal || '';
+    document.getElementById('reportMotivation').textContent = '"' + (d.motivation || '') + '"';
+
+    const s = d.stats || {};
+    document.getElementById('reportStats').innerHTML = [
+      { n: s.totalApps || 0, l: 'candidatures totales' },
+      { n: s.thisWeek || 0, l: 'cette semaine' },
+      { n: s.interviews || 0, l: 'entretiens' },
+      { n: (s.interviewRate || 0) + '%', l: 'taux entretien' },
+      { n: s.offers || 0, l: 'offres reçues' },
+      { n: s.overdueRelances || 0, l: 'relances à faire' },
+    ].map(x => `<div class="report-stat"><div class="report-stat-n">${x.n}</div><div class="report-stat-l">${x.l}</div></div>`).join('');
+
+    const hi = d.highlights || [];
+    document.getElementById('reportHighlights').innerHTML = hi.map(h => `<div style="font-size:13px;color:var(--gnb);display:flex;align-items:center;gap:6px;padding:3px 0">✅ ${esc(h)}</div>`).join('');
+
+    const actions = d.actions || [];
+    document.getElementById('reportActions').innerHTML = actions.map(a => `<div class="report-action">${esc(a)}</div>`).join('');
+  }
+
+  function closeReportModal() {
+    document.getElementById('reportModal').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); closeReportModal(); }
+  });
 
   // ── SKILLS GAP ANALYSIS ───────────────────────────────────────────────────
   function computeSkillsGap(apps) {

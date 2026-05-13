@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Réseaux sociaux et recherche d'emploi en 2026 : LinkedIn, Twitter/X, GitHub — Emploia Blog</title>
-  <meta name="description" content="Comment utiliser LinkedIn, Twitter/X et GitHub pour trouver un emploi en 2026. Profil, contenu, réseau, inbound recrutement — stratégie complète."/>
+  <meta name="description" content="Comment utiliser LinkedIn, Twitter/X et GitHub pour trouver un emploi en 2026. Profil, contenu, réseau, inbound recrutement — stratégie complète par plateforme."/>
   <link rel="canonical" href="https://emploia.fr/blog/reseaux-sociaux-recherche-emploi"/>
   <meta property="og:title" content="Réseaux sociaux et recherche d'emploi en 2026 : stratégie complète"/>
   <meta property="og:description" content="LinkedIn, Twitter/X, GitHub : comment utiliser chaque plateforme pour attirer les recruteurs et décrocher un emploi."/>
@@ -14,11 +14,17 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Réseaux sociaux et recherche d'emploi en 2026 : LinkedIn, Twitter/X, GitHub","description":"LinkedIn, Twitter/X, GitHub : comment utiliser chaque plateforme pour attirer les recruteurs et décrocher un emploi.","url":"https://emploia.fr/blog/reseaux-sociaux-recherche-emploi","datePublished":"24 mai 2026","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"Réseaux sociaux et recherche d'emploi en 2026 : LinkedIn, Twitter/X, GitHub","description":"LinkedIn, Twitter/X, GitHub : comment utiliser chaque plateforme pour attirer les recruteurs et décrocher un emploi.","url":"https://emploia.fr/blog/reseaux-sociaux-recherche-emploi","datePublished":"2026-05-24","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"À quelle fréquence publier sur LinkedIn pour être visible des recruteurs ?","acceptedAnswer":{"@type":"Answer","text":"1 à 3 posts par semaine est la fréquence optimale selon les études LinkedIn. En dessous, votre visibilité reste faible. Au-dessus de 3, vous risquez de saturer votre réseau. La régularité sur 3–6 mois est plus importante que l'intensité sur une courte période."}},{"@type":"Question","name":"Faut-il activer 'Open to Work' sur LinkedIn ?","acceptedAnswer":{"@type":"Answer","text":"Oui si vous êtes en recherche active. Le badge vert augmente de 40% vos chances d'être contacté par un recruteur. Vous pouvez le rendre visible uniquement aux recruteurs (pas à votre réseau actuel, donc invisible à votre employeur) dans les paramètres LinkedIn."}},{"@type":"Question","name":"GitHub est-il utile si je ne suis pas développeur ?","acceptedAnswer":{"@type":"Answer","text":"GitHub est principalement utile pour les développeurs, DevOps, data engineers et data scientists. Pour les autres profils, concentrez-vous sur LinkedIn. Si vous êtes dans un domaine créatif (design, contenu), un portfolio Behance, Dribbble ou un site personnel est plus pertinent."}},{"@type":"Question","name":"Comment trouver le bon contact pour envoyer une candidature directe ?","acceptedAnswer":{"@type":"Answer","text":"Sur LinkedIn, cherchez '[Entreprise] + Recruteur' ou '[Entreprise] + RH'. Vous pouvez aussi chercher le manager direct du poste (Chef de projet, CTO, DRH selon le niveau). Envoyez un message de connexion personnalisé en précisant votre intérêt. Le taux de réponse aux InMail personnalisés est 3x supérieur aux emails froids."}},{"@type":"Question","name":"Quelle est la longueur idéale d'un post LinkedIn pour maximiser l'engagement ?","acceptedAnswer":{"@type":"Answer","text":"Les posts de 800 à 1200 caractères (environ 6–10 lignes) performent le mieux sur LinkedIn selon les études 2026. Commencez par une accroche forte (première ligne visible sans cliquer), développez avec une histoire ou apprentissage concret, terminez par une question ou appel à l'action."}}]}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
+    .read-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#3b82f6); z-index: 9999; transition: width .1s linear; }
     .blog-layout { max-width: 760px; margin: 0 auto; padding: 100px 24px 80px; }
     .blog-category { display: inline-flex; align-items: center; gap: 8px; background: var(--ind2); border: 1px solid rgba(99,102,241,.2); color: var(--inb); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: .5px; }
     .blog-title { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; letter-spacing: -1.5px; margin-bottom: 20px; color: var(--t1); }
@@ -30,17 +36,49 @@
     .blog-body ul, .blog-body ol { padding-left: 24px; margin-bottom: 18px; }
     .blog-body li { margin-bottom: 8px; }
     .blog-body strong { color: var(--t1); font-weight: 700; }
-    .platform-header { display: flex; align-items: center; gap: 12px; background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
-    .platform-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .platform-header h2 { margin: 0; font-size: 18px; }
+    .blog-body table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    .blog-body th { background: var(--bg2); font-weight: 700; color: var(--t1); padding: 10px 14px; text-align: left; border: 1px solid var(--brd); }
+    .blog-body td { padding: 10px 14px; border: 1px solid var(--brd); vertical-align: top; }
+    .blog-body tr:nth-child(even) td { background: var(--bg2); }
+    .platform-header { display: flex; align-items: center; gap: 14px; background: var(--bg2); border: 1px solid var(--brd); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; }
+    .platform-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--s3); flex-shrink: 0; }
+    .platform-header .ph-info h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.5px; }
+    .platform-header .ph-info p { margin: 2px 0 0; font-size: 12px; color: var(--t3); }
+    .tip-box { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 12px; padding: 18px 20px; margin: 24px 0; font-size: 14px; }
+    .tip-box strong { color: #10b981; }
     .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
     .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
     .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
     .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
     .blog-back:hover { color: var(--t1); }
+    .toc { background: var(--bg2); border: 1px solid var(--brd); border-radius: 16px; padding: 24px 28px; margin: 32px 0; }
+    .toc-title { font-size: 13px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; margin: 0; }
+    .toc li { margin-bottom: 6px; font-size: 14px; }
+    .toc a { color: var(--inb); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .share-bar { display: flex; align-items: center; gap: 12px; padding: 24px 0; border-top: 1px solid var(--brd); border-bottom: 1px solid var(--brd); margin: 48px 0 32px; flex-wrap: wrap; }
+    .share-bar span { font-size: 13px; font-weight: 700; color: var(--t3); margin-right: 4px; }
+    .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--brd); color: var(--t2); background: var(--bg2); transition: all .15s; cursor: pointer; }
+    .share-btn:hover { border-color: var(--inb); color: var(--inb); }
+    .newsletter-widget { background: linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.07)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 32px; text-align: center; margin: 40px 0; }
+    .newsletter-widget h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .newsletter-widget p { font-size: 14px; color: var(--t2); margin-bottom: 20px; }
+    .newsletter-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
+    .newsletter-form input { flex: 1; padding: 11px 16px; border-radius: 100px; border: 1px solid var(--brd); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; }
+    .newsletter-form button { padding: 11px 22px; border-radius: 100px; background: linear-gradient(135deg,#6366f1,#3b82f6); color: #fff; font-weight: 700; font-size: 14px; border: none; cursor: pointer; white-space: nowrap; }
+    .related { margin-top: 48px; }
+    .related h4 { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: var(--t1); }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+    .related-card { background: var(--bg2); border: 1px solid var(--brd); border-radius: 14px; padding: 18px; text-decoration: none; display: block; transition: all .15s; }
+    .related-card:hover { border-color: var(--inb); transform: translateY(-2px); }
+    .related-card .rc-cat { font-size: 10px; font-weight: 700; color: var(--inb); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .related-card .rc-title { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.4; }
+    @media(max-width:600px){ .newsletter-form{flex-direction:column;} .newsletter-form button{width:100%;} }
   </style>
 </head>
 <body>
+<div class="read-progress" id="readProgress"></div>
 <nav class="emp-nav">
   <div class="emp-nav-inner">
     <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
@@ -64,81 +102,248 @@
 
 <div class="blog-layout page-enter">
   <a href="/blog" class="blog-back">← Retour au blog</a>
-  <div class="blog-category">recherche</div>
+  <div class="blog-category">Recherche d'emploi</div>
   <h1 class="blog-title">Réseaux sociaux et recherche d'emploi en 2026 : LinkedIn, Twitter/X, GitHub</h1>
   <div class="blog-meta">
     <span>📅 24 mai 2026</span>
-    <span>⏱ 8 min de lecture</span>
+    <span>⏱ 9 min de lecture</span>
     <span>✍️ Équipe Emploia</span>
   </div>
+
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <ol>
+      <li><a href="#pourquoi">Pourquoi les réseaux sociaux sont incontournables en 2026</a></li>
+      <li><a href="#linkedin">LinkedIn : votre CV vivant</a></li>
+      <li><a href="#contenu-linkedin">Stratégie de contenu LinkedIn</a></li>
+      <li><a href="#twitter">Twitter/X : pour les profils tech et créatifs</a></li>
+      <li><a href="#github">GitHub : le portfolio du développeur</a></li>
+      <li><a href="#autres">Les autres plateformes à connaître</a></li>
+      <li><a href="#multicanal">La stratégie multicanal</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ol>
+  </div>
+
   <div class="blog-body">
 
-    <p>En 2026, 85% des recruteurs cherchent les candidats sur les réseaux sociaux avant même de recevoir leur CV. Avoir un profil bien construit peut vous apporter des opportunités sans candidater. Voici la stratégie plateforme par plateforme.</p>
+    <h2 id="pourquoi">Pourquoi les réseaux sociaux sont incontournables en 2026</h2>
+    <p>En 2026, <strong>85% des recruteurs cherchent les candidats sur les réseaux sociaux</strong> avant même de recevoir leur CV. Votre profil en ligne précède votre candidature — il peut vous ouvrir des portes ou vous en fermer. Mais surtout, un profil bien construit peut <strong>attirer des opportunités sans candidater</strong> : c'est l'inbound recrutement.</p>
 
-    <h2>LinkedIn : votre CV vivant</h2>
+    <table>
+      <thead><tr><th>Plateforme</th><th>Profils cibles</th><th>Utilité principale</th><th>Score d'impact recrutement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>LinkedIn</strong></td><td>Tous</td><td>Profil professionnel, réseau, offres</td><td>★★★★★</td></tr>
+        <tr><td><strong>GitHub</strong></td><td>Dev, Data, DevOps</td><td>Portfolio code, projets open source</td><td>★★★★★</td></tr>
+        <tr><td><strong>Twitter / X</strong></td><td>Tech, Startups, Créatifs</td><td>Visibilité, networking fondateurs</td><td>★★★☆☆</td></tr>
+        <tr><td><strong>Behance / Dribbble</strong></td><td>Design, UX/UI</td><td>Portfolio visuel</td><td>★★★★☆</td></tr>
+        <tr><td><strong>Medium / Substack</strong></td><td>Tous (expertise)</td><td>Thought leadership, SEO</td><td>★★★☆☆</td></tr>
+        <tr><td><strong>YouTube / TikTok</strong></td><td>Créatifs, formateurs</td><td>Expertise visible, audience</td><td>★★☆☆☆</td></tr>
+      </tbody>
+    </table>
 
-    <h3>Le titre : votre première impression</h3>
-    <p>Ne mettez pas juste votre intitulé de poste. Votre titre LinkedIn doit contenir : rôle + spécialité + résultat ou différenciateur. Exemple : <strong>"Développeur React | Performance web | Ex-Doctolib"</strong> plutôt que "Développeur web".</p>
+    <h2 id="linkedin">LinkedIn : votre CV vivant</h2>
+
+    <div class="platform-header">
+      <div class="platform-icon">💼</div>
+      <div class="ph-info"><h2>LinkedIn</h2><p>Réseau indispensable pour tous les profils — 28 millions d'utilisateurs en France</p></div>
+    </div>
+
+    <h3>Le titre : votre première impression (visible en résultat de recherche)</h3>
+    <p>Ne mettez pas juste votre intitulé de poste actuel. Votre titre LinkedIn doit contenir : <strong>rôle + spécialité + différenciateur</strong>. 220 caractères maximum.</p>
+    <ul>
+      <li>Au lieu de "Développeur web" → <strong>"Développeur React | Performance web | Ex-Doctolib"</strong></li>
+      <li>Au lieu de "Responsable marketing" → <strong>"Growth Marketing Manager | SaaS B2B | 5M€ budget géré"</strong></li>
+      <li>Au lieu de "Chef de projet" → <strong>"Chef de Projet IT | Transformation digitale | PMP certifié"</strong></li>
+    </ul>
 
     <h3>Le "À propos" : votre pitch en 5 lignes</h3>
-    <p>Structurez en 3 blocs : (1) ce que vous faites et pour qui, (2) vos 2–3 réalisations les plus impressionnantes avec chiffres, (3) ce que vous cherchez. Terminez par un appel à l'action : "Vous cherchez un [profil] ? Contactez-moi."</p>
+    <p>Structurez en 3 blocs :</p>
+    <ol>
+      <li>Ce que vous faites et pour qui (1 ligne)</li>
+      <li>Vos 2–3 réalisations les plus impressionnantes avec chiffres (2–3 lignes)</li>
+      <li>Ce que vous cherchez + appel à l'action ("Disponible pour... Contactez-moi : email")</li>
+    </ol>
 
     <h3>Activer "Open to Work"</h3>
-    <p>Le badge vert "Open to Work" visible sur votre photo augmente de 40% vos chances d'être contacté par un recruteur. Vous pouvez le rendre visible uniquement aux recruteurs (pas à votre réseau actuel) dans les paramètres.</p>
+    <p>Le badge vert "Open to Work" visible sur votre photo <strong>augmente de 40% vos chances d'être contacté</strong> par un recruteur. Vous pouvez le rendre visible uniquement aux recruteurs (pas à votre réseau actuel, donc invisible à votre employeur actuel) dans les paramètres LinkedIn — rubrique "Préférences d'emploi".</p>
 
-    <h3>La stratégie de contenu</h3>
-    <p>Publier 1 à 3 posts par semaine sur votre domaine d'expertise augmente massivement votre visibilité. Partagez des apprentissages, des analyses de tendances, des retours d'expérience. Les posts avec une "bonne histoire" et un apprentissage concret performent le mieux sur LinkedIn.</p>
-
-    <h3>Le réseau actif</h3>
+    <h3>Soignez les expériences</h3>
     <ul>
-      <li>Connectez-vous avec les recruteurs de vos entreprises cibles (note de connexion personnalisée)</li>
-      <li>Rejoignez les groupes LinkedIn de votre secteur</li>
-      <li>Commentez les posts des décideurs de vos entreprises cibles — ils vous verront</li>
-      <li>Activez les alertes emploi pour vos mots-clés cibles</li>
+      <li>Ajoutez 3–5 bullet points de résultats chiffrés pour chaque expérience (pas de liste de tâches)</li>
+      <li>Utilisez les mots-clés de votre secteur dans les descriptions</li>
+      <li>Ajoutez des médias (présentations, liens vers des projets, articles) pour chaque poste</li>
+      <li>Demandez des recommandations à vos managers et collègues — ce sont des témoignages en or</li>
     </ul>
 
-    <h2>Twitter/X : pour les profils tech et créatifs</h2>
+    <div class="tip-box"><strong>✅ Score LinkedIn :</strong> Visez le statut "Expert absolu" (All-Star) dans les paramètres. LinkedIn favorise ces profils dans les résultats de recherche des recruteurs — cela multiplie votre visibilité par 5 selon les propres données de LinkedIn.</div>
 
-    <h3>Pourquoi X reste pertinent en 2026</h3>
-    <p>La communauté tech, startup et créative reste très active sur X/Twitter. Les fondateurs, CTO et recruteurs de startups y postent leurs offres en direct, souvent avant LinkedIn. Si vous ciblez les startups, X est incontournable.</p>
+    <h2 id="contenu-linkedin">Stratégie de contenu LinkedIn</h2>
+    <p>Publier régulièrement sur LinkedIn est le levier le plus puissant pour être trouvé par des recruteurs sans candidater. Un post qui performe peut atteindre 50 000–200 000 vues sur votre réseau étendu.</p>
 
-    <h3>La stratégie</h3>
+    <h3>Ce qui performe en 2026</h3>
+    <ul>
+      <li><strong>Apprentissages concrets</strong> : "3 choses que j'ai apprises en [X] sur [sujet]"</li>
+      <li><strong>Retours d'expérience honnêtes</strong> : succès ET échecs — l'authenticité performe</li>
+      <li><strong>Analyses sectorielles</strong> : tendances, données, votre point de vue expert</li>
+      <li><strong>Derrière les coulisses</strong> : comment vous travaillez, vos outils, vos méthodes</li>
+      <li><strong>Partages de ressources</strong> : articles, outils, livres avec votre commentaire personnel</li>
+    </ul>
+
+    <h3>Ce qu'il faut éviter</h3>
+    <ul>
+      <li>Les posts "Je cherche un emploi" sans valeur ajoutée (peu d'engagement, image peu valorisante)</li>
+      <li>Le contenu viral générique "posté par 1000 personnes" sans personnalisation</li>
+      <li>Les posts trop longs sans structure (pas d'alinéas, pas de rythme)</li>
+      <li>L'auto-promotion pure sans apprentissage partagé</li>
+    </ul>
+
+    <h3>La fréquence optimale</h3>
+    <p><strong>1 à 3 posts par semaine</strong> est la fréquence idéale selon les études LinkedIn 2026. La régularité sur 3–6 mois prime sur l'intensité sur une courte période. Planifiez vos posts à l'avance (l'outil natif LinkedIn permet de programmer).</p>
+
+    <h2 id="twitter">Twitter/X : pour les profils tech et créatifs</h2>
+
+    <div class="platform-header">
+      <div class="platform-icon">🐦</div>
+      <div class="ph-info"><h2>Twitter / X</h2><p>Incontournable pour les startups, la tech et les créatifs</p></div>
+    </div>
+
+    <p>La communauté tech, startup et créative reste très active sur X. Les fondateurs, CTO et recruteurs de startups y postent leurs offres en direct — souvent 24 à 48h avant LinkedIn. Si vous ciblez les startups, X est incontournable.</p>
+
+    <h3>Stratégie pour la recherche d'emploi sur X</h3>
     <ul>
       <li>Suivez et interagissez avec les founders et CTO de vos entreprises cibles</li>
-      <li>Partagez votre apprentissage en public : "Build in public", threads techniques, réflexions sur votre domaine</li>
-      <li>Cherchez les tweets "We're hiring" ou "Looking for [rôle]" — répondez directement</li>
-      <li>Bio claire : rôle, stack, lien vers portfolio/GitHub</li>
+      <li>"Build in public" : partagez votre apprentissage en temps réel, vos side projects</li>
+      <li>Cherchez les tweets "We're hiring", "Looking for [rôle]" — répondez directement</li>
+      <li>Bio claire et précise : rôle, stack, lien vers portfolio/GitHub/LinkedIn</li>
+      <li>Threads techniques ou analyses de votre domaine — excellent pour la crédibilité</li>
     </ul>
 
-    <h2>GitHub : le CV vivant du développeur</h2>
+    <h2 id="github">GitHub : le portfolio du développeur</h2>
 
-    <h3>Un GitHub actif vaut mieux qu'un CV</h3>
-    <p>Pour les développeurs, un GitHub avec des projets actifs est le signal de compétence le plus fort qu'un recruteur tech peut voir. En 2026, les CTO regardent le GitHub avant de lire le CV.</p>
+    <div class="platform-header">
+      <div class="platform-icon">⚡</div>
+      <div class="ph-info"><h2>GitHub</h2><p>Pour développeurs, DevOps, data engineers — le CV qui parle de lui-même</p></div>
+    </div>
+
+    <p>Pour les développeurs, un GitHub avec des projets actifs est le signal de compétence le plus fort qu'un recruteur tech peut voir. En 2026, les tech leads lisent le GitHub <strong>avant de lire le CV</strong>.</p>
 
     <h3>Ce qu'il faut avoir</h3>
     <ul>
-      <li><strong>Profile README</strong> : un README.md dans un repo éponyme qui vous présente, avec vos compétences, projets et liens</li>
-      <li><strong>2–3 projets vitrine</strong> : bien documentés, avec README complet, démo live, et code propre</li>
-      <li><strong>Contributions régulières</strong> : la "heatmap" verte est un signal de régularité apprécié</li>
-      <li><strong>Open source</strong> : même de petites contributions à des projets connus augmentent votre crédibilité</li>
+      <li><strong>Profile README</strong> — un fichier README.md dans un repo éponyme (ex: github.com/johndoe/johndoe). Présentez-vous avec votre stack, vos projets phares, vos liens.</li>
+      <li><strong>2–3 projets vitrine</strong> — bien documentés, README complet, démo live déployée, code propre et commenté aux endroits non-évidents</li>
+      <li><strong>Heatmap verte</strong> — activité régulière visible sur votre profil. Commitez quelque chose — même une documentation améliorée — plusieurs fois par semaine</li>
+      <li><strong>Contributions open source</strong> — même de petites contributions (correction de documentation, petite PR) à des projets connus</li>
     </ul>
 
-    <h3>Les projets qui impressionnent</h3>
-    <p>Évitez les projets "tutorial" (to-do list, weather app). Créez quelque chose d'utile, même simple : une CLI, une extension VS Code, un wrapper d'API, un outil open-source dans votre domaine. Le "pourquoi j'ai fait ça" dans le README fait toute la différence.</p>
+    <h3>Les projets qui impressionnent les CTO</h3>
+    <p>Évitez les projets "tutorial" (to-do list, weather app) que chaque bootcamp produit. Créez quelque chose d'utile, même simple : une CLI, une extension VS Code, un wrapper d'API utile, un outil open-source dans votre domaine. Le "pourquoi j'ai créé ça" dans le README fait toute la différence.</p>
 
-    <h2>La stratégie multicanal : coordonner les plateformes</h2>
-    <p>Le maximum d'impact s'obtient en coordonnant les trois plateformes : écrivez un thread sur X, adaptez-le en post LinkedIn, liez vers votre GitHub. Chaque plateforme amplifie les autres et vous construisez une présence cohérente qui vous rend mémorable.</p>
+    <h2 id="autres">Les autres plateformes à connaître</h2>
 
-    <p>La règle d'or : soyez présent là où sont vos recruteurs cibles, pas partout à la fois. Un profil parfait sur LinkedIn vaut mieux que trois profils médiocres.</p>
+    <table>
+      <thead><tr><th>Plateforme</th><th>Pour qui</th><th>Comment l'utiliser</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Behance / Dribbble</strong></td><td>Designers, UX/UI</td><td>Portfolio visuel soigné avec contexte des projets (brief, processus, résultat)</td></tr>
+        <tr><td><strong>Medium / Substack</strong></td><td>Tous profils experts</td><td>Articles de fond sur votre expertise — excellent pour le SEO et la crédibilité</td></tr>
+        <tr><td><strong>Kaggle</strong></td><td>Data scientists</td><td>Compétitions, notebooks publiés — profil visible des recruteurs data</td></tr>
+        <tr><td><strong>Product Hunt</strong></td><td>Product, Dev, Startup</td><td>Lancer vos side projects — visibilité auprès des founders qui recrutent</td></tr>
+        <tr><td><strong>Malt / Comet</strong></td><td>Freelances</td><td>Profil freelance pour être contacté directement par les entreprises</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="multicanal">La stratégie multicanal : coordonner les plateformes</h2>
+    <p>Le maximum d'impact s'obtient en <strong>coordonnant les plateformes</strong> autour d'un contenu central :</p>
+    <ol>
+      <li>Créez un projet ou un apprentissage (GitHub, Medium)</li>
+      <li>Partagez-le en thread sur X/Twitter</li>
+      <li>Adaptez en post long sur LinkedIn avec vos réflexions</li>
+      <li>Chaque plateforme amplifie les autres — votre audience se construit en quelques semaines</li>
+    </ol>
+
+    <div class="tip-box"><strong>Règle d'or :</strong> Soyez présent là où sont vos recruteurs cibles, pas partout à la fois. Un profil parfait sur LinkedIn vaut infiniment mieux que trois profils médiocres sur cinq plateformes. Identifiez LA plateforme de votre secteur et maîtrisez-la avant d'aller ailleurs.</div>
+
+    <h2 id="faq">FAQ — Réseaux sociaux et emploi</h2>
+
+    <h3>À quelle fréquence publier sur LinkedIn ?</h3>
+    <p>1 à 3 posts par semaine est la fréquence optimale. En dessous, votre visibilité reste faible. La régularité sur 3–6 mois est plus importante que l'intensité sur une courte période.</p>
+
+    <h3>Faut-il activer "Open to Work" sur LinkedIn ?</h3>
+    <p>Oui si vous êtes en recherche active. Le badge augmente de 40% vos chances d'être contacté. Vous pouvez le rendre visible uniquement aux recruteurs (pas à votre employeur actuel) dans les paramètres LinkedIn.</p>
+
+    <h3>GitHub est-il utile si je ne suis pas développeur ?</h3>
+    <p>GitHub est principalement utile pour les développeurs, DevOps et data engineers. Pour les autres profils, concentrez-vous sur LinkedIn. Si vous êtes dans un domaine créatif, un portfolio Behance, Dribbble ou un site personnel est plus pertinent.</p>
+
+    <h3>Comment trouver le bon contact pour une candidature directe ?</h3>
+    <p>Sur LinkedIn, cherchez "[Entreprise] + Recruteur" ou "[Entreprise] + RH". Envoyez un message de connexion personnalisé en précisant votre intérêt. Le taux de réponse aux messages LinkedIn personnalisés est 3x supérieur aux emails froids.</p>
+
+    <h3>Quelle est la longueur idéale d'un post LinkedIn ?</h3>
+    <p>Les posts de 800 à 1200 caractères (environ 6–10 lignes) performent le mieux. Commencez par une accroche forte (visible sans cliquer "voir plus"), développez avec une histoire concrète, terminez par une question ou appel à l'action.</p>
 
   </div>
+
+  <div class="share-bar">
+    <span>Partager :</span>
+    <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.fr/blog/reseaux-sociaux-recherche-emploi" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?text=Stratégie+réseaux+sociaux+pour+trouver+un+emploi+en+2026&url=https://emploia.fr/blog/reseaux-sociaux-recherche-emploi" target="_blank" rel="noopener">Twitter / X</a>
+    <button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='Lien copié ✓')">Copier le lien</button>
+  </div>
+
+  <div class="newsletter-widget">
+    <h4>Stratégies emploi dans votre boîte mail</h4>
+    <p>Chaque semaine, les meilleures ressources pour optimiser votre présence en ligne et décrocher des entretiens.</p>
+    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+      <input type="email" id="nlEmail" placeholder="votre@email.fr" required/>
+      <button type="submit">S'abonner</button>
+    </form>
+  </div>
+
   <div class="blog-cta">
     <h3>✨ Optimisez votre profil avec Emploia</h3>
-    <p>Notre IA analyse votre profil et génère un CV ATS adapté à chaque offre. Commencez gratuitement — sans CB.</p>
+    <p>Notre IA analyse votre profil et génère un CV ATS adapté à chaque offre — prêt à partager sur LinkedIn et envoyer aux recruteurs.</p>
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
+  </div>
+
+  <div class="related">
+    <h4>Articles liés</h4>
+    <div class="related-grid">
+      <a href="/blog/linkedin" class="related-card">
+        <div class="rc-cat">LinkedIn</div>
+        <div class="rc-title">Optimiser son profil LinkedIn pour les recruteurs</div>
+      </a>
+      <a href="/blog/portfolio-developpeur-2026" class="related-card">
+        <div class="rc-cat">Dev & Tech</div>
+        <div class="rc-title">Portfolio développeur : guide complet 2026</div>
+      </a>
+      <a href="/blog/email-candidature-parfait" class="related-card">
+        <div class="rc-cat">Candidature</div>
+        <div class="rc-title">L'email de candidature parfait : structure et exemples</div>
+      </a>
+      <a href="/blog/candidature-spontanee" class="related-card">
+        <div class="rc-cat">Candidature</div>
+        <div class="rc-title">Candidature spontanée : méthode et exemple</div>
+      </a>
+    </div>
   </div>
 </div>
 
+<footer style="text-align:center;padding:40px 24px;color:var(--t3);font-size:13px;border-top:1px solid var(--brd);margin-top:40px;">
+  <p>© 2026 Emploia — Le copilote IA de votre recherche d'emploi | <a href="/legal" style="color:var(--t3)">Mentions légales</a> · <a href="/blog" style="color:var(--t3)">Blog</a></p>
+</footer>
+
 <script src="/shared.js"></script>
+<script>
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+    document.getElementById('readProgress').style.width = pct + '%';
+  });
+  function subscribeNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('nlEmail').value;
+    fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+      .then(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; })
+      .catch(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; });
+  }
+</script>
 </body>
 </html>

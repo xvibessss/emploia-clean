@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, signToken, setCookieHeader } from '../../_lib/auth.js';
+import { kvGet, kvSet, signToken, setCookieHeader, htmlEscape } from '../../_lib/auth.js';
 
 export default async function handler(req) {
   const url = new URL(req.url);
@@ -77,7 +77,7 @@ export default async function handler(req) {
 
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {
-        const firstName = (user.name || '').split(' ')[0] || 'là';
+        const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
         fetch('https://api.resend.com/emails', {
           method: 'POST',
           signal: AbortSignal.timeout(8000),

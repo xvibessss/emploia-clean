@@ -315,6 +315,24 @@
         <p>Simulez un entretien pour ce poste avec notre coach IA.</p>
       </a>
 
+      <!-- LinkedIn networking -->
+      <div id="linkedinCard" style="display:none;background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px;margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--t2)">💼 Réseauter chez <span id="liCompanyName"></span></div>
+        </div>
+        <a id="liSearchLink" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;font-size:11px">🔍 Trouver des contacts LinkedIn →</a>
+        <button id="liMsgBtn" onclick="generateLinkedInMsg()" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:11px">✉️ Générer un message de connexion</button>
+        <div id="liResult" style="display:none;margin-top:10px">
+          <div style="display:flex;gap:4px;margin-bottom:8px">
+            <button class="sa-tab active" onclick="setLiTab('direct',this)" style="flex:1;padding:5px 4px;font-size:10px">RH / Recruteur</button>
+            <button class="sa-tab" onclick="setLiTab('indirect',this)" style="flex:1;padding:5px 4px;font-size:10px">Employé du métier</button>
+          </div>
+          <div id="liContent" class="sa-content" style="font-size:11.5px;max-height:140px"></div>
+          <div id="liTip" style="font-size:11px;color:var(--t3);margin-top:6px;line-height:1.5"></div>
+          <button onclick="copyLiMsg()" class="sa-copy-btn" style="margin-top:6px;width:100%;font-size:11px">📋 Copier</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -421,6 +439,8 @@
     setTimeout(computeATSScore, 400);
     // Load company insights (lazy)
     setTimeout(loadCompanyInsights, 800);
+    // Init LinkedIn networking card
+    initLinkedIn(job);
 
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('offreLayout').style.display = 'grid';
@@ -473,6 +493,7 @@
     try {
       const res = await fetch('/api/smart-apply', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jobTitle: currentJob.title || currentJob.title,
@@ -553,6 +574,69 @@
     kw.innerHTML = top.slice(0, 12).map(k =>
       `<span class="ats-kw-tag ${matched.includes(k) ? 'match' : 'miss'}">${matched.includes(k) ? '✓ ' : ''}${k}</span>`
     ).join('');
+
+    // Save score snapshot for progression chart
+    if (window.saveScoreSnapshot && currentJob) {
+      const label = `${currentJob.title || ''} — ${currentJob.company_name || ''}`;
+      window.saveScoreSnapshot('ats', score, label);
+    }
+  }
+
+  // ── LinkedIn Networking ───────────────────────────────────────────────────
+  let liData = null;
+  let liTab = 'direct';
+
+  function initLinkedIn(job) {
+    const company = job.company_name || '';
+    const title = job.title || '';
+    if (!company) return;
+    const card = document.getElementById('linkedinCard');
+    document.getElementById('liCompanyName').textContent = company;
+    const query = `"${company}" (RH OR recruteur OR "talent acquisition" OR "${title.split(' ')[0]}")`;
+    const liUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(query)}&origin=GLOBAL_SEARCH_HEADER`;
+    document.getElementById('liSearchLink').href = liUrl;
+    card.style.display = 'block';
+  }
+
+  async function generateLinkedInMsg() {
+    if (!currentJob) return;
+    const btn = document.getElementById('liMsgBtn');
+    btn.disabled = true; btn.textContent = '⏳ Génération…';
+    const profile = (localStorage.getItem('emploia_profile_text') || '').slice(0, 400);
+    try {
+      const res = await fetch('/api/generate/linkedin-outreach', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: currentJob.company_name || '',
+          jobTitle: currentJob.title || '',
+          senderName: window.empUser?.name || '',
+          profile,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      liData = await res.json();
+      document.getElementById('liResult').style.display = 'block';
+      setLiTab('direct', document.querySelector('#liResult .sa-tab'));
+      if (liData.tip) document.getElementById('liTip').textContent = '💡 ' + liData.tip;
+    } catch {
+      empToast('Erreur — réessayez', 'error');
+    }
+    btn.disabled = false; btn.textContent = '✉️ Regénérer';
+  }
+
+  function setLiTab(tab, btn) {
+    liTab = tab;
+    document.querySelectorAll('#liResult .sa-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (!liData) return;
+    document.getElementById('liContent').textContent = liData[tab] || '—';
+  }
+
+  function copyLiMsg() {
+    const txt = document.getElementById('liContent').textContent;
+    navigator.clipboard.writeText(txt).then(() => empToast('Message copié !', 'success')).catch(() => empToast('Copie impossible', 'error'));
   }
 
   // ── Queue & Save ──────────────────────────────────────────────────────────

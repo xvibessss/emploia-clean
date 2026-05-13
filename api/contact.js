@@ -21,7 +21,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'contact', 3, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de messages envoyés. Réessayez dans 1 heure.' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de messages envoyés. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   let body;
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }

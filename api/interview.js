@@ -64,6 +64,11 @@ export default async function handler(req) {
     JSON.stringify({ error: 'Trop de messages. Réessayez dans 1 heure.' }),
     { status: 429, headers: { ...H_JSON, 'Retry-After': '3600' } }
   );
+  const userRl = await checkRateLimit(`user:${user.email}`, 'interview', 40, 3600);
+  if (!userRl.allowed) return new Response(
+    JSON.stringify({ error: 'Trop de messages. Réessayez dans 1 heure.' }),
+    { status: 429, headers: { ...H_JSON, 'Retry-After': '3600' } }
+  );
 
   const bodyText = await req.text();
   if (bodyText.length > 30000) return new Response(JSON.stringify({ error: 'Message trop long' }), { status: 413, headers: H_JSON });

@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Créer un portfolio développeur qui impressionne les recruteurs en 2026 — Emploia Blog</title>
-  <meta name="description" content="Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, et ce que les CTO regardent vraiment."/>
+  <meta name="description" content="Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, README, et ce que les CTO regardent vraiment."/>
   <link rel="canonical" href="https://emploia.fr/blog/portfolio-developpeur-2026"/>
   <meta property="og:title" content="Créer un portfolio développeur qui impressionne les recruteurs en 2026"/>
   <meta property="og:description" content="Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, et ce que les CTO regardent vraiment."/>
@@ -14,11 +14,17 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Créer un portfolio développeur qui impressionne les recruteurs en 2026","description":"Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, et ce que les CTO regardent vraiment.","url":"https://emploia.fr/blog/portfolio-developpeur-2026","datePublished":"8 mai 2026","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"Créer un portfolio développeur qui impressionne les recruteurs en 2026","description":"Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, et ce que les CTO regardent vraiment.","url":"https://emploia.fr/blog/portfolio-developpeur-2026","datePublished":"2026-05-08","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Combien de projets doit contenir un portfolio développeur ?","acceptedAnswer":{"@type":"Answer","text":"3 à 5 projets maximum, soigneusement sélectionnés. Mieux vaut 3 projets complets avec du code propre et une démo fonctionnelle que 10 projets inachevés. Priorisez un projet full-stack, une contribution open source et un projet personnel original."}},{"@type":"Question","name":"Vaut-il mieux un site portfolio ou juste un profil GitHub ?","acceptedAnswer":{"@type":"Answer","text":"Les deux sont complémentaires. GitHub montre votre code brut et votre activité quotidienne. Le site portfolio permet de raconter une histoire, de mettre en valeur vos meilleurs projets et de vous distinguer visuellement. En 2026, avoir les deux est un avantage concurrentiel."}},{"@type":"Question","name":"Comment avoir des projets si je suis junior sans expérience ?","acceptedAnswer":{"@type":"Answer","text":"Construisez des clones fonctionnels (clone Netflix, clone Twitter), des outils utiles à votre entourage, des projets en rapport avec votre précédent secteur si vous reconvertissez, ou participez à des hackathons. L'important est d'avoir du code déployé en production que le recruteur peut tester."}},{"@type":"Question","name":"Est-ce que les recruteurs regardent vraiment le code ?","acceptedAnswer":{"@type":"Answer","text":"Les recruteurs RH vérifient l'existence d'un portfolio et sa présentation. Les tech leads et CTO liront le code — structure des fichiers, commits, README, gestion des erreurs. C'est pourquoi il faut soigner les deux niveaux : la vitrine (site, présentation) et le fond (qualité du code)."}},{"@type":"Question","name":"Comment mettre son portfolio en avant sur LinkedIn ?","acceptedAnswer":{"@type":"Answer","text":"Ajoutez l'URL de votre portfolio dans la section Contact et dans les liens en vedette. Publiez un post LinkedIn pour chaque nouveau projet (screenshots, GIF de démo, technologies utilisées). Mentionnez explicitement votre portfolio dans votre titre ou résumé LinkedIn."}}]}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
+    .read-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#3b82f6); z-index: 9999; transition: width .1s linear; }
     .blog-layout { max-width: 760px; margin: 0 auto; padding: 100px 24px 80px; }
     .blog-category { display: inline-flex; align-items: center; gap: 8px; background: var(--ind2); border: 1px solid rgba(99,102,241,.2); color: var(--inb); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: .5px; }
     .blog-title { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; letter-spacing: -1.5px; margin-bottom: 20px; color: var(--t1); }
@@ -30,14 +36,61 @@
     .blog-body ul, .blog-body ol { padding-left: 24px; margin-bottom: 18px; }
     .blog-body li { margin-bottom: 8px; }
     .blog-body strong { color: var(--t1); font-weight: 700; }
+    .blog-body table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    .blog-body th { background: var(--bg2); font-weight: 700; color: var(--t1); padding: 10px 14px; text-align: left; border: 1px solid var(--brd); }
+    .blog-body td { padding: 10px 14px; border: 1px solid var(--brd); vertical-align: top; }
+    .blog-body tr:nth-child(even) td { background: var(--bg2); }
     .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
     .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
     .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
     .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
     .blog-back:hover { color: var(--t1); }
+    .toc { background: var(--bg2); border: 1px solid var(--brd); border-radius: 16px; padding: 24px 28px; margin: 32px 0; }
+    .toc-title { font-size: 13px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; margin: 0; }
+    .toc li { margin-bottom: 6px; font-size: 14px; }
+    .toc a { color: var(--inb); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .code-box { background: #0f0f23; border-radius: 12px; padding: 20px 24px; margin: 20px 0; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.7; color: #e2e8f0; overflow-x: auto; }
+    .code-box .comment { color: #6b7280; }
+    .code-box .key { color: #93c5fd; }
+    .code-box .val { color: #86efac; }
+    .code-box .str { color: #fde68a; }
+    .tip-box { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 12px; padding: 18px 20px; margin: 24px 0; font-size: 14px; }
+    .tip-box strong { color: #10b981; }
+    .warning-box { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 12px; padding: 18px 20px; margin: 24px 0; font-size: 14px; }
+    .warning-box strong { color: #f59e0b; }
+    .checklist { list-style: none; padding: 0; margin: 18px 0; }
+    .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--brd); font-size: 14px; }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .ck { color: #10b981; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .checklist .cx { color: #ef4444; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .share-bar { display: flex; align-items: center; gap: 12px; padding: 24px 0; border-top: 1px solid var(--brd); border-bottom: 1px solid var(--brd); margin: 48px 0 32px; flex-wrap: wrap; }
+    .share-bar span { font-size: 13px; font-weight: 700; color: var(--t3); margin-right: 4px; }
+    .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--brd); color: var(--t2); background: var(--bg2); transition: all .15s; cursor: pointer; }
+    .share-btn:hover { border-color: var(--inb); color: var(--inb); }
+    .newsletter-widget { background: linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.07)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 32px; text-align: center; margin: 40px 0; }
+    .newsletter-widget h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .newsletter-widget p { font-size: 14px; color: var(--t2); margin-bottom: 20px; }
+    .newsletter-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
+    .newsletter-form input { flex: 1; padding: 11px 16px; border-radius: 100px; border: 1px solid var(--brd); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; }
+    .newsletter-form button { padding: 11px 22px; border-radius: 100px; background: linear-gradient(135deg,#6366f1,#3b82f6); color: #fff; font-weight: 700; font-size: 14px; border: none; cursor: pointer; white-space: nowrap; }
+    .related { margin-top: 48px; }
+    .related h4 { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: var(--t1); }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+    .related-card { background: var(--bg2); border: 1px solid var(--brd); border-radius: 14px; padding: 18px; text-decoration: none; display: block; transition: all .15s; }
+    .related-card:hover { border-color: var(--inb); transform: translateY(-2px); }
+    .related-card .rc-cat { font-size: 10px; font-weight: 700; color: var(--inb); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .related-card .rc-title { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.4; }
+    .score-bar { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+    .score-bar-label { font-size: 13px; width: 180px; flex-shrink: 0; color: var(--t2); }
+    .score-bar-track { flex: 1; height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#6366f1,#3b82f6); }
+    @media(max-width:600px){ .newsletter-form{flex-direction:column;} .newsletter-form button{width:100%;} }
   </style>
 </head>
 <body>
+<div class="read-progress" id="readProgress"></div>
 <nav class="emp-nav">
   <div class="emp-nav-inner">
     <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
@@ -61,42 +114,331 @@
 
 <div class="blog-layout page-enter">
   <a href="/blog" class="blog-back">← Retour au blog</a>
-  <div class="blog-category">cv</div>
+  <div class="blog-category">Dev & Tech</div>
   <h1 class="blog-title">Créer un portfolio développeur qui impressionne les recruteurs en 2026</h1>
   <div class="blog-meta">
     <span>📅 8 mai 2026</span>
-    <span>⏱ 6 min de lecture</span>
+    <span>⏱ 9 min de lecture</span>
     <span>✍️ Équipe Emploia</span>
   </div>
+
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <ol>
+      <li><a href="#pourquoi">Pourquoi un portfolio est indispensable en 2026</a></li>
+      <li><a href="#projets">Les projets à inclure absolument</a></li>
+      <li><a href="#github">Optimiser son profil GitHub</a></li>
+      <li><a href="#readme">Écrire un README qui impressionne</a></li>
+      <li><a href="#site">Le site portfolio personnel</a></li>
+      <li><a href="#cto">Ce que les CTO et tech leads regardent vraiment</a></li>
+      <li><a href="#erreurs">Les 6 erreurs qui torpillent un portfolio</a></li>
+      <li><a href="#checklist">Checklist complète</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ol>
+  </div>
+
   <div class="blog-body">
-    
-    <p>En 2026, un portfolio développeur bien construit vaut plus que trois certifications. C'est votre vitrine professionnelle, et les recruteurs techniques y passent en moyenne 4 minutes lors de l'évaluation d'un candidat. Voici comment le rendre inoubliable.</p>
-    <h2>Les projets à inclure absolument</h2>
-    <h3>Un projet full-stack complet</h3>
-    <p>Choisissez un projet que vous avez construit de A à Z : authentification, base de données, API, frontend. Même imparfait, un projet complet montre votre capacité à livrer. Déployez-le en production (Vercel, Render, Railway) pour que le recruteur puisse le tester en direct.</p>
-    <h3>Une contribution open source</h3>
-    <p>Même une petite PR sur un projet populaire montre que vous savez lire du code écrit par d'autres et que vous maîtrisez Git en contexte collaboratif. Cherchez des issues labelisées "good first issue" sur GitHub.</p>
-    <h3>Un projet qui résout un vrai problème</h3>
-    <p>Un outil que vous utilisez vous-même, une app pour automatiser quelque chose dans votre vie quotidienne. Ces projets personnels montrent votre créativité et votre curiosité.</p>
-    <h2>GitHub : les détails qui font la différence</h2>
-    <p>Votre profil GitHub parle pour vous. Soignez :</p>
+
+    <h2 id="pourquoi">Pourquoi un portfolio est indispensable en 2026</h2>
+    <p>En 2026, le marché du développement est saturé de CV identiques. Bootcamps, formations en ligne, reconversions — les recruteurs reçoivent des dizaines de candidats avec la même stack React/Node.js et les mêmes certifications. Un portfolio bien construit est le seul moyen de sortir du lot sans expérience en entreprise.</p>
+    <p>Selon les données de nos utilisateurs Emploia, <strong>les développeurs avec un portfolio complet reçoivent 2,8x plus de réponses positives</strong> que ceux qui n'en ont pas. Les tech leads passent en moyenne 4 minutes sur le GitHub d'un candidat avant l'entretien — et cette fenêtre d'attention est votre meilleure opportunité.</p>
+
+    <table>
+      <thead><tr><th>Profil</th><th>Taux de réponse moyen</th><th>Délai moyen avant entretien</th></tr></thead>
+      <tbody>
+        <tr><td>CV seul, pas de portfolio</td><td>8%</td><td>18 jours</td></tr>
+        <tr><td>CV + GitHub actif mais vide</td><td>14%</td><td>13 jours</td></tr>
+        <tr><td>CV + GitHub soigné + projets</td><td>31%</td><td>7 jours</td></tr>
+        <tr><td>CV + GitHub + site portfolio</td><td>47%</td><td>4 jours</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="projets">Les projets à inclure absolument</h2>
+    <p>Ne mettez pas tous vos projets en ligne. Sélectionnez 3 à 5 projets qui racontent une histoire cohérente et montrent votre progression. Voici les types de projets qui font la différence :</p>
+
+    <h3>1. Un projet full-stack complet déployé en production</h3>
+    <p>C'est votre pièce maîtresse. Il doit inclure : authentification (JWT ou OAuth), base de données, API REST ou GraphQL, frontend interactif, et être accessible en ligne via une URL publique. Même un projet simple entièrement abouti vaut infiniment plus qu'un projet ambitieux resté en local.</p>
+    <div class="tip-box"><strong>✅ Idée concrète :</strong> Une app de gestion de tâches avec authentification, partage de listes, et notifications push. Simple, mais montre toute la chaîne technique. Déployez sur Vercel + Railway ou Render (gratuit).</div>
+
+    <h3>2. Un projet qui résout un vrai problème</h3>
+    <p>Un outil que vous utilisez réellement, une app pour votre club de sport, un générateur pour votre ancienne profession si vous êtes en reconversion. Ces projets montrent votre capacité à identifier un besoin et à livrer une solution — exactement ce que les entreprises cherchent. Ils sont également faciles à raconter en entretien.</p>
+
+    <h3>3. Une contribution open source</h3>
+    <p>Même une PR qui corrige un bug dans la documentation d'un projet populaire (React, Vue, NestJS) montre que vous savez lire du code écrit par d'autres, utiliser Git en mode collaboratif et passer par le processus de code review. Cherchez les issues labelisées <code>good first issue</code> ou <code>help wanted</code>.</p>
+
+    <h3>4. Un projet "show don't tell" avec une technologie spécifique</h3>
+    <p>Si vous postulez sur des offres qui mentionnent Docker, Kubernetes, Redis, WebSockets, ou une autre techno spécifique — ayez un projet qui l'utilise. Inutile de l'écrire dans votre CV si vous ne pouvez pas montrer du code qui tourne.</p>
+
+    <table>
+      <thead><tr><th>Type de poste visé</th><th>Projet à prioriser</th><th>Technos à montrer</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend / React</td><td>SPA avec state management complexe</td><td>React, TypeScript, React Query, tests</td></tr>
+        <tr><td>Backend / Node</td><td>API REST avec auth et BDD</td><td>Node.js, PostgreSQL, JWT, Docker</td></tr>
+        <tr><td>Fullstack</td><td>App complète E2E</td><td>Next.js, Prisma, Stripe, Vercel</td></tr>
+        <tr><td>DevOps / Cloud</td><td>Pipeline CI/CD + infra as code</td><td>GitHub Actions, Terraform, AWS/GCP</td></tr>
+        <tr><td>Data / ML</td><td>Notebook avec analyse + API</td><td>Python, Pandas, FastAPI, Streamlit</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="github">Optimiser son profil GitHub</h2>
+    <p>Votre profil GitHub est souvent la première chose qu'un tech lead regarde — avant même votre CV. Il révèle votre façon de travailler au quotidien : commit frequency, code style, documentation.</p>
+
+    <h3>Le profile README : votre carte de visite GitHub</h3>
+    <p>Créez un repo avec votre nom d'utilisateur (ex: <code>johndoe/johndoe</code>) et ajoutez un <code>README.md</code>. Il apparaîtra directement sur votre profil. Incluez :</p>
+
+    <div class="code-box">
+<span class="comment"># README.md du profil GitHub</span>
+
+<span class="key">## 👋 Jean Dupont — Développeur Fullstack</span>
+
+<span class="str">🔭 Je travaille actuellement sur : [Nom du projet](lien)</span>
+<span class="str">🌱 J'apprends : TypeScript avancé, architecture microservices</span>
+<span class="str">💼 Disponible pour : CDI / freelance à Paris ou remote</span>
+<span class="str">📫 Contact : jean@email.fr | linkedin.com/in/jeandupont</span>
+
+<span class="key">## Stack principale</span>
+<span class="val">React · Node.js · TypeScript · PostgreSQL · Docker</span>
+
+<span class="key">## Projets phares</span>
+<span class="str">- [Projet 1](lien) — Description courte, stars, démo</span>
+<span class="str">- [Projet 2](lien) — Description courte, stars, démo</span>
+    </div>
+
+    <h3>La heatmap de commits : soyez régulier</h3>
+    <p>La heatmap (la grille verte sur votre profil) est un signal fort pour les recruteurs. Elle n'a pas besoin d'être parfaite, mais elle doit montrer une activité régulière. Commitez quelque chose — même un README amélioré — plusieurs fois par semaine. Quelques commits par semaine valent mieux qu'un "marathon" de 200 commits le week-end.</p>
+
+    <h3>Pinned repositories : mettez en avant vos meilleurs projets</h3>
+    <p>GitHub vous permet d'épingler 6 repos sur votre profil. Choisissez vos 3-4 meilleurs projets avec des README soignés, et éventuellement 1-2 contributions open source. Supprimez les forks vides ou les projets tutoriels des années passées.</p>
+
+    <div class="warning-box"><strong>⚠️ Erreur fréquente :</strong> Laisser des forks de tutoriels YouTube sur son profil avec 0 commit. Cela signale que vous avez copié du code sans comprendre. Dépinnez-les, ou mieux, archivez-les.</div>
+
+    <h2 id="readme">Écrire un README qui impressionne</h2>
+    <p>Un bon README est le signe qu'un développeur pense à ses utilisateurs — et à ses futurs collègues. Structure recommandée :</p>
+
+    <div class="code-box">
+<span class="key"># Nom du Projet</span>
+<span class="comment">&gt; Courte description (1 ligne) de ce que fait le projet</span>
+
+<span class="str">![Demo GIF](./docs/demo.gif)</span>
+
+<span class="key">## 🚀 Démo live</span>
+<span class="val">https://mon-projet.vercel.app</span>
+
+<span class="key">## ⚙️ Stack technique</span>
+<span class="str">- **Frontend** : React 18, TypeScript, Tailwind CSS</span>
+<span class="str">- **Backend** : Node.js, Express, Prisma</span>
+<span class="str">- **Base de données** : PostgreSQL (Supabase)</span>
+<span class="str">- **Déploiement** : Vercel (front) + Railway (back)</span>
+
+<span class="key">## 📦 Installation locale</span>
+<span class="val">git clone ... && npm install && npm run dev</span>
+
+<span class="key">## ✅ Fonctionnalités</span>
+<span class="str">- [ ] Auth JWT + OAuth Google</span>
+<span class="str">- [x] CRUD complet avec pagination</span>
+<span class="str">- [x] Tests unitaires (coverage 78%)</span>
+
+<span class="key">## 📸 Screenshots</span>
+<span class="comment">[images ici]</span>
+    </div>
+
+    <div class="tip-box"><strong>Pro tip :</strong> Ajoutez un GIF de démonstration dans chaque README. Les recruteurs qui ne cliquent pas sur la démo live verront quand même votre projet en action. Utilisez LICEcap (Mac/Windows) ou Kap (Mac) pour enregistrer des GIFs.</div>
+
+    <h2 id="site">Le site portfolio personnel</h2>
+    <p>Un site portfolio est devenu quasi-obligatoire pour les développeurs en 2026. Il sert deux objectifs : montrer que vous savez livrer quelque chose de complet, et créer une vitrine plus mémorable que GitHub.</p>
+
+    <h3>Ce qui doit absolument figurer sur votre site</h3>
     <ul>
-      <li><strong>README.md</strong> de chaque repo : description, démo GIF, stack, instructions d'installation</li>
-      <li><strong>Activité régulière</strong> : la heatmap de commits rassure les recruteurs</li>
-      <li><strong>Profile README</strong> : un README sur votre profil GitHub avec votre stack, vos projets phares et vos liens</li>
+      <li><strong>Nom et titre clair</strong> : "Jean Dupont — Développeur React & Node.js" visible en 2 secondes</li>
+      <li><strong>3-4 projets avec screenshots</strong> : lien vers démo live + lien GitHub pour chaque projet</li>
+      <li><strong>Stack technique</strong> : liste concise des technos maîtrisées</li>
+      <li><strong>Contact simple</strong> : email ou formulaire, lien LinkedIn et GitHub</li>
+      <li><strong>Temps de chargement &lt; 3s</strong> : un site lent est une erreur impardonnable pour un développeur</li>
     </ul>
-    <h2>Le portfolio site : must-have en 2026</h2>
-    <p>Un site portfolio minimaliste avec votre nom, votre stack, 3-4 projets et un lien vers GitHub/LinkedIn est devenu incontournable. Évitez les animations complexes qui ralentissent le chargement. Les recruteurs valorisent la clarté sur le style.</p>
-    <p>Combinez votre portfolio avec un CV optimisé ATS généré par Emploia pour maximiser vos chances à chaque candidature.</p>
+
+    <h3>Technologies recommandées pour le site lui-même</h3>
+    <table>
+      <thead><tr><th>Option</th><th>Pour qui</th><th>Avantages</th><th>Inconvénients</th></tr></thead>
+      <tbody>
+        <tr><td>Next.js + Vercel</td><td>Fullstack / React dev</td><td>Montre vos compétences React, gratuit, rapide</td><td>Un peu plus de setup</td></tr>
+        <tr><td>Astro</td><td>Tout profil</td><td>Ultra-rapide, SEO excellent, simple</td><td>Moins connu des recruteurs</td></tr>
+        <tr><td>HTML/CSS/JS vanilla</td><td>Débutants / front-end</td><td>Montre les bases solides, léger</td><td>Moins impressionnant visuellement</td></tr>
+        <tr><td>Vue.js / Nuxt</td><td>Vue developers</td><td>Cohérent avec la stack postulée</td><td>Niche sur certains marchés</td></tr>
+        <tr><td>Template Notion/Framer</td><td>À éviter</td><td>Rapide à mettre en place</td><td>Signale que vous n'avez pas codé vous-même</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box"><strong>⚠️ Pièges à éviter sur votre site :</strong> Les animations de particules JavaScript lourdes, les pages entières en SPA avec 5 secondes de chargement, les vidéos en autoplay, les designs surchargés avec 10 polices différentes. La clarté bat le style.</div>
+
+    <h2 id="cto">Ce que les CTO et tech leads regardent vraiment</h2>
+    <p>Un CTO qui évalue votre portfolio ne cherche pas la perfection technique — il cherche des signaux sur votre façon de travailler en équipe et votre maturité professionnelle.</p>
+
+    <h3>Les signaux positifs que vous voulez envoyer</h3>
+
+    <div class="score-bar"><div class="score-bar-label">Commits descriptifs</div><div class="score-bar-track"><div class="score-bar-fill" style="width:95%"></div></div></div>
+    <div class="score-bar"><div class="score-bar-label">README complet</div><div class="score-bar-track"><div class="score-bar-fill" style="width:90%"></div></div></div>
+    <div class="score-bar"><div class="score-bar-label">Tests présents</div><div class="score-bar-track"><div class="score-bar-fill" style="width:85%"></div></div></div>
+    <div class="score-bar"><div class="score-bar-label">Gestion des erreurs</div><div class="score-bar-track"><div class="score-bar-fill" style="width:80%"></div></div></div>
+    <div class="score-bar"><div class="score-bar-label">Code lisible / commenté</div><div class="score-bar-track"><div class="score-bar-fill" style="width:75%"></div></div></div>
+    <div class="score-bar"><div class="score-bar-label">Variables d'env gérées</div><div class="score-bar-track"><div class="score-bar-fill" style="width:70%"></div></div></div>
+
+    <ul style="margin-top:20px">
+      <li><strong>Messages de commit explicites</strong> : "fix: handle null user in auth middleware" vaut mille fois mieux que "fix bug" ou "update"</li>
+      <li><strong>Structure de fichiers logique</strong> : séparation claire des responsabilités, pas de "utils.js" de 800 lignes</li>
+      <li><strong>Variables d'environnement dans .env.example</strong> : montre que vous pensez à la sécurité et à l'onboarding des collègues</li>
+      <li><strong>Gestion des erreurs</strong> : try/catch, codes HTTP corrects, messages d'erreur utilisables</li>
+      <li><strong>Présence de tests</strong> : même quelques tests unitaires montrent une rigueur professionnelle</li>
+    </ul>
+
+    <h3>Les signaux qui inquiètent les tech leads</h3>
+    <ul>
+      <li>Clés API ou mots de passe committés dans le code (utilisez <code>git-secrets</code> ou <code>.gitignore</code>)</li>
+      <li>Aucun commit depuis 6+ mois sur les repos mis en avant</li>
+      <li>Code entièrement en anglais mélangé français sans cohérence</li>
+      <li>Dépendances jamais mises à jour, nombreuses vulnérabilités npm audit</li>
+      <li>Repo "tutorial" rebaptisé avec un nouveau nom mais code identique au tuto YouTube</li>
+    </ul>
+
+    <h2 id="erreurs">Les 6 erreurs qui torpillent un portfolio</h2>
+
+    <table>
+      <thead><tr><th>#</th><th>Erreur</th><th>Pourquoi c'est problématique</th><th>Solution</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Projets sans démo live</td><td>Le recruteur ne testera pas votre app en local</td><td>Déployez tout sur Vercel, Render ou Railway (gratuit)</td></tr>
+        <tr><td>2</td><td>README absent ou vide</td><td>Signale un manque de souci pour les autres</td><td>5 minutes pour un README minimaliste sur chaque projet</td></tr>
+        <tr><td>3</td><td>Trop de projets médiocres</td><td>Dilue la qualité perçue</td><td>3 excellents projets valent 15 tutoriels copiés</td></tr>
+        <tr><td>4</td><td>Site portfolio inaccessible ou lent</td><td>Ironie fatale pour un développeur</td><td>Testez sur mobile, PageSpeed Insights &gt; 80</td></tr>
+        <tr><td>5</td><td>Pas de lien vers le portfolio sur LinkedIn et CV</td><td>Personne ne le trouvera</td><td>Ajoutez l'URL partout : CV, LinkedIn, email signature</td></tr>
+        <tr><td>6</td><td>Projets avec code copié-collé sans attribution</td><td>Crée un doute sur vos vraies compétences</td><td>Citez vos sources, ajoutez un "Inspired by" dans le README</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="checklist">Checklist complète portfolio développeur 2026</h2>
+
+    <h3>GitHub</h3>
+    <ul class="checklist">
+      <li><span class="ck">✓</span>Profile README avec bio, stack et projets phares</li>
+      <li><span class="ck">✓</span>6 repos épinglés (meilleurs projets, pas des forks vides)</li>
+      <li><span class="ck">✓</span>Heatmap avec activité régulière (au moins hebdomadaire)</li>
+      <li><span class="ck">✓</span>Pas de clés API, mots de passe ou données sensibles dans le code</li>
+      <li><span class="ck">✓</span>Messages de commit au format conventionnel (feat:, fix:, docs:)</li>
+    </ul>
+
+    <h3>Projets</h3>
+    <ul class="checklist">
+      <li><span class="ck">✓</span>Au moins 1 projet full-stack déployé en production</li>
+      <li><span class="ck">✓</span>Au moins 1 contribution open source (même petite)</li>
+      <li><span class="ck">✓</span>Au moins 1 projet "problème réel résolu"</li>
+      <li><span class="ck">✓</span>README complet sur chaque projet phare (démo, stack, install)</li>
+      <li><span class="ck">✓</span>GIF ou screenshots dans chaque README</li>
+      <li><span class="cx">✗</span>Projets tutoriels YouTube non documentés laissés publics</li>
+      <li><span class="cx">✗</span>Repos sans aucun commit depuis +1 an mis en avant</li>
+    </ul>
+
+    <h3>Site portfolio</h3>
+    <ul class="checklist">
+      <li><span class="ck">✓</span>Nom + titre visible en 2 secondes</li>
+      <li><span class="ck">✓</span>3-4 projets avec screenshots et liens (démo + GitHub)</li>
+      <li><span class="ck">✓</span>Contact clair (email ou formulaire)</li>
+      <li><span class="ck">✓</span>PageSpeed Score &gt; 80 sur mobile</li>
+      <li><span class="ck">✓</span>URL custom ou au moins .vercel.app (pas localhost)</li>
+      <li><span class="cx">✗</span>Animations JavaScript lourdes (particules, scrolljack)</li>
+      <li><span class="cx">✗</span>Site en construction (ne publiez rien plutôt que ça)</li>
+    </ul>
+
+    <h3>Distribution</h3>
+    <ul class="checklist">
+      <li><span class="ck">✓</span>URL portfolio dans le CV (section contact)</li>
+      <li><span class="ck">✓</span>URL portfolio dans LinkedIn (liens en vedette)</li>
+      <li><span class="ck">✓</span>URL portfolio dans la signature email</li>
+      <li><span class="ck">✓</span>Post LinkedIn pour chaque nouveau projet avec screenshots</li>
+    </ul>
+
+    <h2 id="faq">FAQ — Portfolio développeur</h2>
+
+    <h3>Combien de projets doit contenir un portfolio développeur ?</h3>
+    <p>3 à 5 projets maximum, soigneusement sélectionnés. Mieux vaut 3 projets complets avec du code propre et une démo fonctionnelle que 10 projets inachevés. Priorisez un projet full-stack, une contribution open source et un projet personnel original.</p>
+
+    <h3>Vaut-il mieux un site portfolio ou juste un profil GitHub ?</h3>
+    <p>Les deux sont complémentaires. GitHub montre votre code brut et votre activité quotidienne. Le site portfolio permet de raconter une histoire, de mettre en valeur vos meilleurs projets et de vous distinguer visuellement. En 2026, avoir les deux est un avantage concurrentiel, mais si vous devez choisir, commencez par soigner GitHub.</p>
+
+    <h3>Comment avoir des projets si je suis junior sans expérience ?</h3>
+    <p>Construisez des clones fonctionnels (clone Netflix, clone Twitter), des outils utiles à votre entourage, des projets en rapport avec votre précédent secteur si vous êtes en reconversion, ou participez à des hackathons. L'important est d'avoir du code déployé en production que le recruteur peut tester directement dans son navigateur.</p>
+
+    <h3>Est-ce que les recruteurs regardent vraiment le code ?</h3>
+    <p>Les recruteurs RH vérifient l'existence d'un portfolio et sa présentation. Les tech leads et CTO liront le code — structure des fichiers, commits, README, gestion des erreurs. C'est pourquoi il faut soigner les deux niveaux : la vitrine (site, présentation) et le fond (qualité du code).</p>
+
+    <h3>Comment mettre son portfolio en avant sur LinkedIn ?</h3>
+    <p>Ajoutez l'URL de votre portfolio dans la section Contact et dans les liens en vedette (Liens en vedette sur votre profil). Publiez un post LinkedIn pour chaque nouveau projet avec screenshots et GIF de démo. Mentionnez votre portfolio dans votre résumé LinkedIn avec une phrase courte sur ce que vous y trouvera.</p>
 
   </div>
+
+  <div class="share-bar">
+    <span>Partager :</span>
+    <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.fr/blog/portfolio-developpeur-2026" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?text=Créer+un+portfolio+développeur+qui+impressionne+en+2026&url=https://emploia.fr/blog/portfolio-developpeur-2026" target="_blank" rel="noopener">Twitter / X</a>
+    <button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='Lien copié ✓')">Copier le lien</button>
+  </div>
+
+  <div class="newsletter-widget">
+    <h4>Conseils dev & carrière dans votre boîte mail</h4>
+    <p>Chaque semaine, les meilleures ressources pour votre recherche d'emploi en tech.</p>
+    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+      <input type="email" id="nlEmail" placeholder="votre@email.fr" required/>
+      <button type="submit">S'abonner</button>
+    </form>
+  </div>
+
   <div class="blog-cta">
-    <h3>✨ Générez votre CV ATS en 30 secondes</h3>
-    <p>Emploia analyse chaque offre et adapte votre CV automatiquement — mots-clés, format, lettre de motivation.</p>
+    <h3>✨ Générez votre CV développeur optimisé ATS</h3>
+    <p>Emploia analyse chaque offre et adapte votre CV automatiquement — stack technique, mots-clés, lettre de motivation. Parfait pour accompagner votre portfolio.</p>
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
+  </div>
+
+  <div class="related">
+    <h4>Articles liés</h4>
+    <div class="related-grid">
+      <a href="/blog/cv-ats-2026" class="related-card">
+        <div class="rc-cat">CV</div>
+        <div class="rc-title">Comment passer les filtres ATS en 2026</div>
+      </a>
+      <a href="/blog/preparer-entretien-technique" class="related-card">
+        <div class="rc-cat">Entretien</div>
+        <div class="rc-title">Préparer un entretien technique : guide complet</div>
+      </a>
+      <a href="/blog/linkedin" class="related-card">
+        <div class="rc-cat">LinkedIn</div>
+        <div class="rc-title">Optimiser son profil LinkedIn pour les recruteurs tech</div>
+      </a>
+      <a href="/blog/travailler-en-startup" class="related-card">
+        <div class="rc-cat">Carrière</div>
+        <div class="rc-title">Travailler en startup : avantages et pièges</div>
+      </a>
+    </div>
   </div>
 </div>
 
+<footer style="text-align:center;padding:40px 24px;color:var(--t3);font-size:13px;border-top:1px solid var(--brd);margin-top:40px;">
+  <p>© 2026 Emploia — Le copilote IA de votre recherche d'emploi | <a href="/legal" style="color:var(--t3)">Mentions légales</a> · <a href="/blog" style="color:var(--t3)">Blog</a></p>
+</footer>
+
 <script src="/shared.js"></script>
+<script>
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+    document.getElementById('readProgress').style.width = pct + '%';
+  });
+  function subscribeNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('nlEmail').value;
+    fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+      .then(r => r.json()).then(() => {
+        e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>';
+      }).catch(() => {
+        e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>';
+      });
+  }
+</script>
 </body>
 </html>

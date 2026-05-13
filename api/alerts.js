@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
+import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, kvSadd, kvSrem } from './_lib/auth.js';
 
 // KV key: alerts:{email} → { keywords, location, type, frequency, active }
 // GET → { alerts }
@@ -22,7 +22,7 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`ip:${ip}`, 'alerts', 30, 60);
   if (!rl.allowed) {
     return new Response(JSON.stringify({ error: 'Rate limit' }), {
-      status: 429, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
+      status: 429, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true', 'Retry-After': '60' }
     });
   }
 
@@ -37,7 +37,8 @@ export default async function handler(req) {
 
   if (req.method === 'GET') {
     const alerts = await kvGet(kvKey) || [];
-    return new Response(JSON.stringify({ alerts }), {
+    const maxAlerts = (user.plan === 'pro' || user.plan === 'intensif') ? 50 : 10;
+    return new Response(JSON.stringify({ alerts, maxAlerts, plan: user.plan || 'free' }), {
       status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
     });
   }
@@ -46,31 +47,52 @@ export default async function handler(req) {
     let body;
     try { body = await req.json(); } catch { body = {}; }
 
-    const { keywords = '', location = '', type = 'all', frequency = 'daily' } = body;
-    if (!keywords.trim()) {
+    const VALID_TYPES = ['all', 'CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'];
+    const VALID_FREQUENCIES = ['daily', 'weekly', 'realtime'];
+
+    const rawKeywords  = String(body.keywords  || '').trim();
+    const rawLocation  = String(body.location  || '').trim();
+    const rawType      = String(body.type      || 'all');
+    const rawFrequency = String(body.frequency || 'daily');
+
+    if (!rawKeywords) {
       return new Response(JSON.stringify({ error: 'keywords requis' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
+      });
+    }
+    if (!VALID_TYPES.includes(rawType)) {
+      return new Response(JSON.stringify({ error: 'Type invalide' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
+      });
+    }
+    if (!VALID_FREQUENCIES.includes(rawFrequency)) {
+      return new Response(JSON.stringify({ error: 'Fréquence invalide' }), {
         status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
       });
     }
 
     const alerts = await kvGet(kvKey) || [];
-    if (alerts.length >= 10) {
-      return new Response(JSON.stringify({ error: 'Maximum 10 alertes' }), {
+    const maxAlerts = (user.plan === 'pro' || user.plan === 'intensif') ? 50 : 10;
+    if (alerts.length >= maxAlerts) {
+      return new Response(JSON.stringify({ error: `Maximum ${maxAlerts} alertes${maxAlerts === 10 ? ' (passez Pro pour 50 alertes)' : ''}` }), {
         status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
       });
     }
 
     const alert = {
-      id: Date.now().toString(36),
-      keywords: keywords.trim().slice(0, 100),
-      location: location.trim().slice(0, 60),
-      type,
-      frequency,
+      id: crypto.randomUUID(),
+      keywords: rawKeywords.slice(0, 100),
+      location: rawLocation.slice(0, 60),
+      type: rawType,
+      frequency: rawFrequency,
       active: true,
       createdAt: new Date().toISOString(),
     };
     alerts.push(alert);
-    await kvSet(kvKey, alerts, 86400 * 365);
+    await Promise.all([
+      kvSet(kvKey, alerts, 86400 * 365),
+      kvSadd('alert_subscribers', user.email),
+    ]);
 
     return new Response(JSON.stringify({ alert, total: alerts.length }), {
       status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }
@@ -88,7 +110,10 @@ export default async function handler(req) {
 
     const alerts = await kvGet(kvKey) || [];
     const filtered = alerts.filter(a => a.id !== id);
-    await kvSet(kvKey, filtered, 86400 * 365);
+    const ops = [kvSet(kvKey, filtered, 86400 * 365)];
+    // Remove from subscriber index if no active alerts remain
+    if (!filtered.some(a => a.active)) ops.push(kvSrem('alert_subscribers', user.email));
+    await Promise.all(ops);
 
     return new Response(JSON.stringify({ ok: true, total: filtered.length }), {
       status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Credentials': 'true' }

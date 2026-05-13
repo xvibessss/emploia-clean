@@ -6,6 +6,37 @@
 <title>Négocier son salaire en entretien : guide complet + scripts (2026)</title>
 <meta name="description" content="Comment négocier son salaire en entretien d'embauche en France. Timing, scripts exacts, combien demander, comment répondre aux prétentions salariales. Exemples concrets."/>
 <link rel="canonical" href="https://emploia.fr/blog/negocier-salaire-entretien"/>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quand faut-il aborder le sujet du salaire en entretien ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Ne négociez jamais pendant le premier entretien RH, sauf si le recruteur aborde le sujet lui-même. Le meilleur moment est après la promesse d'embauche (offre orale) — l'entreprise a déjà choisi, vous avez le plus de levier. Si on vous demande vos prétentions tôt, donnez une fourchette large ou renvoyez la question : 'Quelle est la fourchette prévue pour ce poste ?'"}
+    },
+    {
+      "@type": "Question",
+      "name": "Comment calculer son salaire cible pour une négociation ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Benchmarkez votre marché (LinkedIn Salary, Glassdoor, grilles sectorielles). Définissez votre minimum absolu (BATNA), votre cible à 15% au-dessus, et votre maximum demandé à 20-25% au-dessus. Annoncez toujours votre maximum en premier — vous pouvez toujours descendre, jamais remonter."}
+    },
+    {
+      "@type": "Question",
+      "name": "Que dire quand le recruteur demande vos prétentions salariales ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Renvoyez d'abord la question : 'Je préfère mieux comprendre les responsabilités du poste. Pourriez-vous me donner la fourchette prévue ?' Si insistance : 'En me basant sur les offres similaires pour ce niveau de poste à [ville], je situe mes prétentions entre X et Y euros brut annuel, à affiner selon le package global.'"}
+    },
+    {
+      "@type": "Question",
+      "name": "Que faire si l'entreprise ne peut pas augmenter le salaire fixe ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Négociez le package global : télétravail supplémentaire (2j/semaine = 3 000-5 000€ économisés/an), prime à la signature (sign-on), jours de RTT, révision salariale à 3 ou 6 mois, budget formation, mutuelle améliorée, ou matériel de qualité. Ces éléments ont une valeur réelle souvent équivalente à plusieurs milliers d'euros par an."}
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on négocier son salaire même pour un premier emploi ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Oui — selon Robert Half, 85% des recruteurs ont une marge de 10 à 20% au-dessus de leur première offre. Ils ne la proposent jamais d'eux-mêmes. Même pour un premier poste, une négociation respectueuse et argumentée est perçue positivement. Préparez 1-2 arguments (formation, projet personnel, compétence spécifique)."}
+    }
+  ]
+}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -99,6 +130,20 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
 .nw-btn{padding:11px 22px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;}
 .nw-success{font-size:13px;color:var(--gnb);font-weight:700;display:none;}
 @media(max-width:600px){.related-grid{grid-template-columns:1fr;}.share-bar{flex-direction:column;align-items:flex-start;}}
+.toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin:28px 0 36px;}
+.toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+.toc nav ol{margin:0;padding-left:18px;}
+.toc nav ol li{margin-bottom:6px;}
+.toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+.toc nav ol a:hover{color:var(--inb);}
+.faq-section{margin:40px 0;}
+.faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+.faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+details[open] .faq-item summary::after{transform:rotate(45deg);}
+.faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
 </style>
 </head>
 <body>
@@ -128,13 +173,25 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
     </div>
   </header>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav><ol>
+      <li><a href="#quand-negocier">Quand négocier son salaire</a></li>
+      <li><a href="#calculer-fourchette">Calculer votre fourchette cible</a></li>
+      <li><a href="#scripts">Les scripts exacts à utiliser</a></li>
+      <li><a href="#negocier-package">Ce que vous pouvez négocier en plus</a></li>
+      <li><a href="#apres-negociation">Après la négociation</a></li>
+      <li><a href="#faq-salaire">FAQ — Questions fréquentes</a></li>
+    </ol></nav>
+  </div>
+
   <article class="art-body">
 
     <p><strong>70% des candidats acceptent la première offre salariale sans négocier.</strong> Résultat : ils perdent en moyenne 5 000 à 12 000€ par an — une différence qui se cumule sur toute une carrière. Ce guide vous donne les mots exacts pour négocier sans maladresse.</p>
 
     <div class="highlight">💡 <strong>Le chiffre qui change tout :</strong> selon une étude Robert Half, 85% des recruteurs ont une marge de négociation de 10 à 20% au-dessus de leur première offre. Ils ne le proposent jamais d'eux-mêmes.</div>
 
-    <h2>1. Quand négocier son salaire</h2>
+    <h2 id="quand-negocier">1. Quand négocier son salaire</h2>
 
     <p>La règle d'or : <strong>ne négociez jamais pendant le premier entretien</strong> — sauf si le recruteur aborde le sujet lui-même. La bonne séquence :</p>
 
@@ -146,7 +203,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
 
     <div class="success">✅ <strong>Règle pratique :</strong> celui qui dit un chiffre en premier perd. Si on vous demande vos prétentions avant que vous ayez une offre, renvoyez la question : "Quelle est la fourchette prévue pour ce poste ?" Si insistance, donnez une fourchette haute.</div>
 
-    <h2>2. Comment calculer votre fourchette cible</h2>
+    <h2 id="calculer-fourchette">2. Comment calculer votre fourchette cible</h2>
 
     <p>Avant tout entretien, faites vos devoirs :</p>
 
@@ -169,7 +226,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
       </tbody>
     </table>
 
-    <h2>3. Les scripts exacts à utiliser</h2>
+    <h2 id="scripts">3. Les scripts exacts à utiliser</h2>
 
     <h3>Situation 1 — On vous demande vos prétentions en début d'entretien</h3>
 
@@ -199,7 +256,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
       <div class="script-text">"Je comprends les contraintes de la grille. Dans ce cas, est-ce qu'on peut regarder le package global ? Un jour de télétravail supplémentaire, une prime à la signature, ou une révision salariale à 6 mois pourraient compenser."</div>
     </div>
 
-    <h2>4. Ce que vous pouvez négocier en dehors du salaire fixe</h2>
+    <h2 id="negocier-package">4. Ce que vous pouvez négocier en dehors du salaire fixe</h2>
 
     <p>Le salaire brut annuel n'est qu'une partie du package. <strong>Ces éléments ont une valeur réelle :</strong></p>
 
@@ -221,7 +278,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
     <br>4. Annoncer un chiffre trop précis (47 832€) — ça décrédibilise
     <br>5. Faire un ultimatum sans être prêt(e) à partir</div>
 
-    <h2>5. Après la négociation</h2>
+    <h2 id="apres-negociation">5. Après la négociation</h2>
 
     <p>Une fois un accord trouvé :</p>
 
@@ -234,6 +291,30 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
     <div class="highlight">💡 <strong>Conseil Emploia :</strong> utilisez notre outil de score de compatibilité pour analyser chaque offre. Plus votre score est élevé, plus vous avez de levier de négociation — un profil rare justifie une prétention salariale dans le haut de la fourchette.</div>
 
   </article>
+
+  <div class="faq-section" id="faq-salaire">
+    <h2>FAQ — Questions fréquentes sur la négociation salariale</h2>
+    <details class="faq-item">
+      <summary>Quand faut-il aborder le sujet du salaire en entretien ?</summary>
+      <div class="faq-body">Ne négociez jamais pendant le premier entretien RH, sauf si le recruteur aborde le sujet lui-même. Le meilleur moment est après la promesse d'embauche (offre orale) — l'entreprise a déjà choisi et vous avez le plus de levier.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Comment calculer son salaire cible pour une négociation ?</summary>
+      <div class="faq-body">Benchmarkez votre marché (LinkedIn Salary, Glassdoor, grilles sectorielles). Définissez votre minimum absolu (BATNA), votre cible à 15% au-dessus, et votre maximum demandé à 20-25% au-dessus. Annoncez toujours votre maximum en premier.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Que dire quand le recruteur demande vos prétentions salariales ?</summary>
+      <div class="faq-body">Renvoyez d'abord la question : "Je préfère mieux comprendre les responsabilités du poste. Pourriez-vous me donner la fourchette prévue ?" Si insistance : donnez une fourchette large basée sur le marché, pas un chiffre unique.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Que faire si l'entreprise ne peut pas augmenter le salaire fixe ?</summary>
+      <div class="faq-body">Négociez le package global : télétravail supplémentaire (2j/semaine = 3 000-5 000€ économisés/an), prime à la signature, jours de RTT, révision salariale à 6 mois, budget formation (1 000-3 000€/an), ou mutuelle améliorée.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Peut-on négocier son salaire même pour un premier emploi ?</summary>
+      <div class="faq-body">Oui — selon Robert Half, 85% des recruteurs ont une marge de 10 à 20% au-dessus de leur première offre. Ils ne la proposent jamais d'eux-mêmes. Une négociation respectueuse et argumentée est perçue positivement, même pour un premier poste.</div>
+    </details>
+  </div>
 
   <div class="share-bar">
     <span>Partager :</span>

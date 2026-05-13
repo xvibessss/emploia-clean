@@ -15,6 +15,7 @@
   <meta name="description" content="Configurez votre profil candidat pour personnaliser vos recommandations d'offres et générer des CV adaptés à vos objectifs."/>
   <link rel="canonical" href="https://emploia.fr/onboarding"/>
   <meta name="robots" content="noindex"/>
+  <script defer data-domain="emploia.fr" src="https://plausible.io/js/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
@@ -332,9 +333,10 @@ Canva, Google Analytics, Semrush, Notion"></textarea>
     runLoadingAnimation();
 
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'cv', jobOffer, userProfile, stream: true }),
+      const res = await fetch('/api/generate/cv', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobOffer, profile: userProfile, stream: true }),
       });
 
       if (!res.ok) {
@@ -368,6 +370,7 @@ Canva, Google Analytics, Semrush, Notion"></textarea>
       finishLoading();
       if (result) {
         generatedResult = result;
+        if (window.plausible) plausible('onboarding_cv_generated');
         showResult(result);
         const credits = parseInt(localStorage.getItem('emploia_credits') ?? '5') - 1;
         localStorage.setItem('emploia_credits', Math.max(0, credits));

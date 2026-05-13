@@ -851,10 +851,19 @@
 
           <div class="emp-divider" style="margin:8px 0"></div>
 
+          <div id="subscriptionSection" style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:8px;display:none">
+            <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:12px">💳 Abonnement</div>
+            <div style="font-size:13px;color:var(--t2);margin-bottom:12px">Plan actuel : <strong id="subPlanLabel" style="color:var(--t1)">—</strong></div>
+            <div id="cancelWarning" style="display:none;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#f59e0b;margin-bottom:12px">
+              ⚠️ Votre abonnement sera annulé le <span id="subCancelDate">—</span>
+            </div>
+            <a href="/api/stripe-portal" class="btn btn-ghost btn-sm" style="display:inline-block">Gérer mon abonnement →</a>
+          </div>
+
           <div style="background:var(--rnd);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
             <div style="font-size:14px;font-weight:700;color:var(--rnb);margin-bottom:8px">⚠️ Zone de danger</div>
             <p style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6">La suppression de votre compte est irréversible. Toutes vos données, candidatures et documents seront effacés définitivement.</p>
-            <button class="btn" style="background:rgba(239,68,68,.15);color:var(--rnb);border:1px solid rgba(239,68,68,.2)" onclick="empToast('Contactez contact@emploia.fr pour supprimer votre compte','error')">Supprimer mon compte</button>
+            <button class="btn" style="background:rgba(239,68,68,.15);color:var(--rnb);border:1px solid rgba(239,68,68,.2)" onclick="confirmDeleteAccount()">Supprimer mon compte</button>
           </div>
         </div>
       </div>
@@ -963,6 +972,7 @@
       try {
         const res = await fetch('/api/import-cv', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pdfBase64: base64 }),
         });
@@ -1073,8 +1083,54 @@
     } catch {}
   }
 
-  window.addEventListener('empAuthChange', e => { if (e.detail.user) loadProfileFromServer(); });
-  setTimeout(loadProfileFromServer, 900);
+  window.addEventListener('empAuthChange', e => {
+    if (e.detail.user) { loadProfileFromServer(); showSubscriptionInfo(e.detail.user); }
+  });
+  setTimeout(async () => {
+    loadProfileFromServer();
+    // Load user for subscription info
+    try {
+      const r = await fetch('/api/auth/me', { credentials: 'include' });
+      if (r.ok) { const u = await r.json(); showSubscriptionInfo(u); }
+    } catch {}
+  }, 900);
+
+  function showSubscriptionInfo(user) {
+    if (!user || user.plan === 'free') return;
+    const section = document.getElementById('subscriptionSection');
+    if (!section) return;
+    section.style.display = 'block';
+    const labels = { pro: 'Pro', intensif: 'Intensif' };
+    document.getElementById('subPlanLabel').textContent = labels[user.plan] || user.plan;
+    if (user.cancelAtPeriodEnd && user.cancelAt) {
+      const d = new Date(user.cancelAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('subCancelDate').textContent = d;
+      document.getElementById('cancelWarning').style.display = 'block';
+    }
+  }
+
+  async function confirmDeleteAccount() {
+    const confirmed = window.confirm(
+      'Supprimer votre compte ? Cette action est irréversible.\n\nToutes vos données seront effacées (candidatures, documents, alertes).'
+    );
+    if (!confirmed) return;
+    const btn = document.querySelector('button[onclick="confirmDeleteAccount()"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Suppression…'; }
+    try {
+      const res = await fetch('/api/auth/delete-account', { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        empToast('Compte supprimé. Redirection…', 'success');
+        setTimeout(() => { window.location.href = '/'; }, 1500);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        empToast(data.error || 'Erreur lors de la suppression', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Supprimer mon compte'; }
+      }
+    } catch {
+      empToast('Erreur réseau — réessayez', 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'Supprimer mon compte'; }
+    }
+  }
 
   // ── LinkedIn Import ──────────────────────────────────────────────────────
   function toggleLinkedInImport() {

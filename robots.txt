@@ -5,5 +5,10 @@ Disallow: /dashboard
 Disallow: /onboarding
 Disallow: /profil
 Disallow: /app
+Disallow: /cv-builder
+Disallow: /interview
+Disallow: /alerts
+Disallow: /apply-queue
+Disallow: /reset-password
 
 Sitemap: https://emploia.fr/sitemap.xml

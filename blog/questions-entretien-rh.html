@@ -26,6 +26,37 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/questions-entretien-rh"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence entre un entretien RH et un entretien technique ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "L'entretien RH (ou entretien de présélection) évalue votre personnalité, votre motivation et votre adéquation culturelle. Il est mené par un recruteur ou DRH. L'entretien technique est mené par le manager ou un expert et évalue vos compétences métier concrètes. En France, le premier entretien est presque toujours RH, suivi d'un ou deux entretiens techniques."}
+      },
+      {
+        "@type": "Question",
+        "name": "Combien de temps dure généralement un entretien RH en France ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Un entretien RH standard dure entre 45 minutes et 1h30 en France. Les entretiens téléphoniques de pré-qualification sont plus courts (15-30 min). En visioconférence, comptez 45-60 minutes. Les grandes entreprises et cabinets de conseil peuvent conduire des entretiens structurés de 2h avec plusieurs intervenants."}
+      },
+      {
+        "@type": "Question",
+        "name": "Comment se préparer à la question 'Quels sont vos défauts ?' en entretien ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "La formule qui fonctionne : citez un vrai défaut (pas une fausse qualité déguisée comme 'je suis perfectionniste'), montrez les actions concrètes que vous prenez pour le corriger, et donnez un résultat mesurable de vos progrès. Les recruteurs expérimentés détectent immédiatement les réponses préfabriquées — soyez authentique."}
+      },
+      {
+        "@type": "Question",
+        "name": "Peut-on aborder le sujet du salaire lors du premier entretien RH ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Si le recruteur aborde le sujet, donnez une fourchette large plutôt qu'un chiffre précis. 'J'anticipe une fourchette de X à Y, à affiner selon les avantages du poste' est une réponse solide. Si le recruteur n'en parle pas, ne l'initiez pas au premier entretien — attendez d'avoir une offre pour négocier dans les meilleures conditions."}
+      },
+      {
+        "@type": "Question",
+        "name": "Faut-il préparer des questions à poser au recruteur en entretien RH ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Absolument — les candidats qui ne posent pas de questions sont perçus comme peu motivés. Préparez 3-4 questions réelles : 'Qu'est-ce qui différencie les personnes qui réussissent dans ce rôle ?', 'Comment mesurez-vous la réussite à 6 mois ?', 'Quels sont les principaux défis de l'équipe en ce moment ?'. Évitez les questions sur le salaire, les congés ou les avantages lors du premier entretien."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -89,6 +120,20 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -118,12 +163,24 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav><ol>
+      <li><a href="#questions-ouverture">Les questions d'ouverture</a></li>
+      <li><a href="#personnalite">Questions sur votre personnalité</a></li>
+      <li><a href="#motivation">Questions sur votre motivation</a></li>
+      <li><a href="#salaire">La question du salaire</a></li>
+      <li><a href="#pieges">Les questions pièges</a></li>
+      <li><a href="#faq-rh">FAQ — Questions fréquentes</a></li>
+    </ol></nav>
+  </div>
+
   <div class="art-body">
     <p>L'entretien RH (premier entretien) a un objectif précis : évaluer votre personnalité, votre motivation et votre adéquation culturelle. Pas vos compétences techniques — c'est le job de l'entretien technique. Voici les 30 questions les plus posées avec les meilleures réponses.</p>
 
     <div class="highlight">💡 <strong>Méthode :</strong> pour chaque question, nous donnons ce que le recruteur cherche vraiment à comprendre, une réponse type, et l'erreur à éviter. Adaptez toujours à votre situation réelle.</div>
 
-    <h2>🎯 Les questions d'ouverture</h2>
+    <h2 id="questions-ouverture">🎯 Les questions d'ouverture</h2>
 
     <div class="q-block">
       <div class="q-question"><span class="q-number">1</span>"Parlez-moi de vous" / "Présentez-vous"</div>
@@ -146,7 +203,7 @@
       <div class="q-avoid">❌ Jamais : critiquer votre employeur actuel · parler de problèmes personnels · mentir (c'est souvent vérifié)</div>
     </div>
 
-    <h2>💡 Les questions sur votre personnalité</h2>
+    <h2 id="personnalite">💡 Les questions sur votre personnalité</h2>
 
     <div class="q-block">
       <div class="q-question"><span class="q-number">4</span>"Quels sont vos points forts ?"</div>
@@ -173,7 +230,7 @@
       <div class="q-answer">Renseignez-vous sur la culture de l'entreprise avant. Si c'est une startup : adaptabilité, autonomie, vite. Si c'est un grand groupe : rigueur, process, documentation. Adaptez votre réponse en conséquence, tout en restant honnête.</div>
     </div>
 
-    <h2>🏢 Les questions sur votre motivation</h2>
+    <h2 id="motivation">🏢 Les questions sur votre motivation</h2>
 
     <div class="q-block">
       <div class="q-question"><span class="q-number">8</span>"Qu'est-ce qui vous motive au travail ?"</div>
@@ -194,7 +251,7 @@
       <div class="q-avoid">❌ Évitez : "Et le salaire ?" (trop tôt) · "Combien de jours de congés ?" · "Vous avez un parking ?"</div>
     </div>
 
-    <h2>💰 La question du salaire</h2>
+    <h2 id="salaire">💰 La question du salaire</h2>
 
     <div class="q-block">
       <div class="q-question"><span class="q-number">11</span>"Quelles sont vos prétentions salariales ?"</div>
@@ -202,7 +259,7 @@
       <div class="q-answer"><strong>Technique 1 — retournez la question :</strong> "Quelle est la fourchette prévue pour ce poste ?" (marche souvent en France).<br/><br/><strong>Technique 2 — donnez une fourchette :</strong> "Selon les grilles du marché pour ce niveau d'expérience en [ville], je me situe entre X et Y € bruts annuels. Je suis ouvert à la discussion selon le package global."<br/><br/>Consultez notre <a href="/blog/salaires-france-2026">grille des salaires 2026</a> pour calibrer.</div>
     </div>
 
-    <h2>🎭 Les questions pièges</h2>
+    <h2 id="pieges">🎭 Les questions pièges</h2>
 
     <div class="q-block">
       <div class="q-question"><span class="q-number">12</span>"Êtes-vous en processus chez d'autres entreprises ?"</div>
@@ -231,6 +288,30 @@
     <p style="margin-top:24px;padding:16px;background:var(--s2);border-radius:12px;font-size:13px;color:var(--t2)">
       <strong style="color:var(--t1)">Questions 16 à 30 :</strong> travail en équipe · gestion des conflits · leadership · créativité · adaptation au changement · gestion de l'échec · feedback négatif · décision difficile · priorités contradictoires · client difficile · initiative non demandée · processus d'apprentissage · feedback positif donné · gestion de l'ambiguïté · situation d'urgence. Entraînez-vous avec notre <a href="/interview" style="color:var(--blb)">simulateur d'entretien IA</a> qui pose ces questions dans l'ordre adapté à votre poste et évalue vos réponses en temps réel.
     </p>
+  </div>
+
+  <div class="faq-section" id="faq-rh">
+    <h2>FAQ — Questions fréquentes sur l'entretien RH</h2>
+    <details class="faq-item">
+      <summary>Quelle est la différence entre un entretien RH et un entretien technique ?</summary>
+      <div class="faq-body">L'entretien RH évalue votre personnalité, votre motivation et votre adéquation culturelle. Il est mené par un recruteur ou DRH. L'entretien technique est mené par le manager ou un expert et évalue vos compétences métier concrètes. En France, le premier entretien est presque toujours RH, suivi d'un ou deux entretiens techniques.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Combien de temps dure généralement un entretien RH en France ?</summary>
+      <div class="faq-body">Un entretien RH standard dure entre 45 minutes et 1h30. Les entretiens téléphoniques de pré-qualification sont plus courts (15-30 min). En visioconférence, comptez 45-60 minutes. Les grandes entreprises peuvent conduire des entretiens structurés de 2h avec plusieurs intervenants.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Comment répondre à "Quels sont vos défauts ?" en entretien ?</summary>
+      <div class="faq-body">La formule gagnante : citez un vrai défaut (pas une fausse qualité déguisée comme "je suis perfectionniste"), montrez les actions concrètes que vous prenez pour le corriger, et donnez un résultat mesurable de vos progrès. Les recruteurs expérimentés détectent immédiatement les réponses préfabriquées.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Peut-on parler du salaire lors du premier entretien RH ?</summary>
+      <div class="faq-body">Si le recruteur aborde le sujet, donnez une fourchette large plutôt qu'un chiffre précis. Si le recruteur n'en parle pas, ne l'initiez pas au premier entretien — attendez d'avoir une offre pour négocier dans les meilleures conditions.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Faut-il préparer des questions à poser au recruteur en fin d'entretien ?</summary>
+      <div class="faq-body">Absolument — les candidats qui ne posent pas de questions sont perçus comme peu motivés. Préparez 3-4 questions réelles : "Qu'est-ce qui différencie les personnes qui réussissent dans ce rôle ?", "Comment mesurez-vous la réussite à 6 mois ?", "Quels sont les principaux défis de l'équipe ?" Évitez les questions sur le salaire ou les congés lors du premier entretien.</div>
+    </details>
   </div>
 
   <div class="share-bar">

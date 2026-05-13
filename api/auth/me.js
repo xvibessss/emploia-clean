@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX } from "../_lib/auth.js";
+import { getCurrentUser, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -19,7 +19,7 @@ export default async function handler(req) {
   // Light rate limit on /me
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'me', 60, 60);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '60' } });
 
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
@@ -46,6 +46,8 @@ export default async function handler(req) {
     provider: user.provider || 'email',
     subscriptionId: user.subscriptionId || null,
     stripeCustomerId: user.stripeCustomerId || null,
+    cancelAtPeriodEnd: user.cancelAtPeriodEnd || false,
+    cancelAt: user.cancelAt || null,
     referral,
   };
 
@@ -53,7 +55,7 @@ export default async function handler(req) {
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey && user.createdAt && user.email) {
     const daysSince = (Date.now() - new Date(user.createdAt).getTime()) / 86400000;
-    const firstName = (user.name || '').split(' ')[0] || 'là';
+    const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
     const sendDrip = async (key, subject, html) => {
       const fullUser = await kvGet(`user:${user.email}`);
       if (fullUser?.[key]) return;
@@ -127,6 +129,55 @@ export default async function handler(req) {
 <a href="https://emploia.fr/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Essayer Pro gratuitement →</a>`
       )).catch(() => {});
     }
+    // ── Drip Pro : onboarding des utilisateurs payants ──────────────────────
+    // Déclenché sur planActivatedAt, pas createdAt, pour cibler les vrais payants.
+    if (user.plan !== 'free' && user.planActivatedAt) {
+      const daysPro = (Date.now() - new Date(user.planActivatedAt).getTime()) / 86400000;
+
+      if (daysPro >= 0.5 && daysPro < 3) {
+        sendDrip('dripPro1Sent', `Bienvenue dans Emploia Pro, ${firstName} ! Voici comment en tirer le max 🚀`, baseHtml(
+          `Vous êtes Pro — voici votre guide de démarrage`,
+          `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Bienvenue dans Emploia Pro ! Votre accès illimité est actif. Voici les 3 actions les plus impactantes que nos meilleurs utilisateurs font dans les 48 premières heures :</p>
+<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px">
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
+    <span style="font-size:24px;flex-shrink:0">1️⃣</span>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Uploadez votre CV existant</div><div style="font-size:13px;color:#475569">Importez votre CV PDF dans Emploia — il sera analysé et pré-rempli dans votre profil pour accélérer toutes vos générations futures.</div></div>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
+    <span style="font-size:24px;flex-shrink:0">2️⃣</span>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Configurez une alerte emploi</div><div style="font-size:13px;color:#475569">Activez vos alertes pour recevoir les meilleures offres correspondant à votre profil chaque matin directement dans votre boîte mail.</div></div>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
+    <span style="font-size:24px;flex-shrink:0">3️⃣</span>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Testez le simulateur d'entretien</div><div style="font-size:13px;color:#475569">Préparez vos entretiens avec l'IA en mode recruteur — posez-lui votre prochain poste cible et entraînez-vous aux questions les plus probables.</div></div>
+  </div>
+</div>
+<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer maintenant →</a>`
+        )).catch(() => {});
+      }
+
+      if (daysPro >= 7 && daysPro < 14) {
+        sendDrip('dripPro7Sent', `${firstName}, 1 semaine en Pro — conseil avancé pour doubler vos réponses 📈`, baseHtml(
+          `7 jours en Pro : la technique que 80 % oublient`,
+          `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Une semaine d'accès Pro. La majorité des candidats génèrent un CV, postulent… et attendent. Les meilleurs font quelque chose en plus.</p>
+<div style="background:#f0f9ff;border-left:4px solid #6366f1;padding:16px;border-radius:0 12px 12px 0;margin-bottom:24px">
+  <p style="font-size:14px;font-weight:800;color:#1e293b;margin:0 0 8px">La technique du "double signal" :</p>
+  <p style="font-size:13px;color:#475569;line-height:1.6;margin:0">Après avoir postulé : envoyez un message LinkedIn à un employé du domaine (pas au RH — à quelqu'un qui fait le même métier). Utilisez l'outil LinkedIn Emploia pour générer le message en 10 secondes.</p>
+</div>
+<p style="color:#475569;line-height:1.6;margin:0 0 20px">Ce double contact augmente le taux de réponse de <strong>3,2×</strong> selon nos données.</p>
+<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+  <a href="https://emploia.fr/jobs" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+    <span style="font-size:20px">🔍</span><div style="font-size:13px;font-weight:700;color:#0f172a">Trouver des offres + employés à contacter</div>
+  </a>
+  <a href="https://emploia.fr/interview" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+    <span style="font-size:20px">🎤</span><div style="font-size:13px;font-weight:700;color:#0f172a">Préparer votre prochain entretien</div>
+  </a>
+</div>
+<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Ouvrir mon espace →</a>`
+        )).catch(() => {});
+      }
+    }
+
     if (daysSince >= 30 && daysSince < 50) {
       sendDrip('drip30Sent', `${firstName}, on ne vous a pas perdu(e) 💪`, baseHtml(
         `Un mois. On garde votre compte actif.`,

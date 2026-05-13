@@ -20,6 +20,7 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Emploia","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Copilote de candidature IA — CV ATS-optimisé, lettre de motivation, coaching entretien, 100% français.","url":"https://emploia.fr","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"127"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Emploia","url":"https://emploia.fr","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://emploia.fr/jobs?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Emploia est-il gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui, Emploia propose un plan gratuit avec accès aux fonctionnalités essentielles. Des plans Pro et Intensif sont disponibles pour un usage avancé."}},{"@type":"Question","name":"Combien de temps faut-il pour générer un CV avec Emploia ?","acceptedAnswer":{"@type":"Answer","text":"Moins de 30 secondes. L'IA génère un CV ATS-optimisé adapté à l'offre d'emploi que vous ciblez."}},{"@type":"Question","name":"Emploia fonctionne-t-il pour les stages et alternances ?","acceptedAnswer":{"@type":"Answer","text":"Oui, Emploia est conçu pour toutes les formes d'emploi : CDI, CDD, stage, alternance et télétravail."}},{"@type":"Question","name":"Mes données sont-elles sécurisées ?","acceptedAnswer":{"@type":"Answer","text":"Vos données sont hébergées en Europe et ne sont jamais revendues. Emploia est 100% conforme RGPD."}}]}</script>
+  <script defer data-domain="emploia.fr" src="https://plausible.io/js/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="shared.css"/>
@@ -1136,8 +1137,8 @@
 
   <!-- CTAs -->
   <div class="hero-ctas" id="heroCtas">
-    <a href="/app" class="btn btn-primary btn-xl">✨ Générer mon CV — Gratuit</a>
-    <a href="/jobs" class="btn btn-ghost btn-lg">Voir les offres →</a>
+    <a href="/app" class="btn btn-primary btn-xl" onclick="if(window.plausible)plausible('hero_cta_click')">✨ Générer mon CV — Gratuit</a>
+    <a href="/jobs" class="btn btn-ghost btn-lg" onclick="if(window.plausible)plausible('hero_jobs_click')">Voir les offres →</a>
   </div>
 
   <div class="hero-proof">
@@ -1576,10 +1577,11 @@
           <li class="dim"><span class="pfc">✗</span> Générations illimitées</li>
           <li class="dim"><span class="pfc">✗</span> Optimisation LinkedIn</li>
         </ul>
-        <a href="/app" class="btn-plan bp-outline">Commencer gratuitement</a>
+        <a href="/app" class="btn-plan bp-outline" onclick="if(window.plausible)plausible('free_plan_cta')">Commencer gratuitement</a>
       </div>
       <div class="pc pop">
         <span class="pop-badge">✦ PLUS POPULAIRE</span>
+        <div style="display:inline-block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#ef4444;font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🔥 Prix de lancement</div>
         <div class="plan-name">Pro</div>
         <div class="plan-price" id="proPrice">9<sup>€</sup></div>
         <div class="plan-period" id="proPeriod">/ mois · sans engagement</div>
@@ -1595,7 +1597,7 @@
           <li><span class="pfc">✓</span> Recherche d'offres premium</li>
           <li><span class="pfc">✓</span> Dashboard + Export CSV</li>
         </ul>
-        <button class="btn-plan bp-primary" onclick="openPayment('pro','9€/mois','Pro')">Démarrer l'essai gratuit →</button>
+        <button class="btn-plan bp-primary" onclick="if(window.plausible)plausible('pro_plan_cta');openPayment('pro','9€/mois','Pro')">Démarrer l'essai gratuit →</button>
         <div class="plan-guarantee">🔒 Annulation en 1 clic · Aucun engagement</div>
       </div>
       <div class="pc">
@@ -1611,7 +1613,7 @@
           <li><span class="pfc">✓</span> Accès anticipé nouvelles fonctions</li>
           <li><span class="pfc">✓</span> Support prioritaire dédié</li>
         </ul>
-        <button class="btn-plan bp-outline" onclick="openPayment('intensif','19€/mois','Intensif')">Décrocher vite →</button>
+        <button class="btn-plan bp-outline" onclick="if(window.plausible)plausible('intensif_plan_cta');openPayment('intensif','19€/mois','Intensif')">Décrocher vite →</button>
         <div class="plan-guarantee">🔒 Annulation en 1 clic · Aucun engagement</div>
       </div>
     </div>
@@ -1632,7 +1634,7 @@
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="faqToggle(this)">La recherche d'offres est-elle en temps réel ? <span class="faq-icon">+</span></div>
-        <div class="faq-a">En mode démo, nous affichons des offres représentatives. La version Pro intègre l'API officielle France Travail (Pôle Emploi) pour 400 000+ offres en temps réel, incluant stages, alternances, CDI, CDD. 100% légal et officiel.</div>
+        <div class="faq-a">Oui, la recherche est en temps réel via l'API officielle France Travail (Pôle Emploi) — 400 000+ offres actualisées en permanence, incluant stages, alternances, CDI, CDD. 100% légal et officiel.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="faqToggle(this)">En quoi Emploia est différent de Jobright, Teal ou LinkedIn ? <span class="faq-icon">+</span></div>
@@ -1765,7 +1767,7 @@
     <!-- Trust signals -->
     <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">
       <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">🔒 Stripe PCI DSS</span>
-      <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">✗ Annulation en 1 clic</span>
+      <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">✓ Annulation en 1 clic</span>
       <span style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px">🇫🇷 Données FR</span>
     </div>
     <div style="font-size:11px;color:var(--t3);text-align:center">En continuant, vous acceptez nos <a href="/legal/cgu" style="color:var(--blb)">CGU</a> et notre <a href="/legal/privacy" style="color:var(--blb)">Politique de confidentialité</a>.</div>
@@ -1941,6 +1943,7 @@
 
   function openPayment(plan, price, name) {
     curPlan = plan;
+    if (window.plausible) plausible('payment_modal_open', { props: { plan } });
     document.getElementById('pmPlan').textContent = name;
     document.getElementById('pmPrice').textContent = price;
     document.getElementById('pmPriceDisplay').textContent = price;
@@ -1976,9 +1979,11 @@
     const btn = document.getElementById('pmPayBtn');
     btn.disabled = true;
     btn.textContent = '⏳ Redirection Stripe...';
+    if (window.plausible) plausible('checkout_started', { props: { plan: curPlan } });
     try {
       const res = await fetch('/api/stripe-checkout', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: curPlan, email })
       });
@@ -2068,7 +2073,7 @@
       <h2 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 10px;letter-spacing:-.5px">Avant de partir…</h2>
       <p style="font-size:14px;color:#94a3b8;line-height:1.6;margin:0 0 24px">Essayez Emploia gratuitement — optimisez votre CV pour les ATS et décrochez plus d'entretiens.</p>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="#" onclick="empShowAuth('register');document.getElementById('exit-overlay').style.display='none';return false" style="display:block;padding:13px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:14px;text-decoration:none">Créer mon compte gratuit →</a>
+        <a href="/app" style="display:block;padding:13px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:14px;text-decoration:none">Créer mon compte gratuit →</a>
         <button id="exit-no" style="padding:10px;border-radius:11px;background:transparent;border:1px solid rgba(255,255,255,.1);color:#475569;font-size:13px;cursor:pointer;font-family:Sora,sans-serif">Non merci, je pars sans essayer</button>
       </div>`;
     overlay.appendChild(box);

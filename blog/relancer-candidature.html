@@ -26,6 +26,37 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/relancer-candidature"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Combien de fois peut-on relancer un recruteur après un entretien ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "2 à 3 relances maximum par processus de recrutement. Au-delà, c'est contre-productif et cela peut donner une image négative. La séquence recommandée : email de remerciement à J+1, première relance à J+7/J+10, deuxième relance (optionnelle) à J+14/J+21 si vous avez une autre offre, puis email de clôture à J+30 si toujours pas de réponse."}
+      },
+      {
+        "@type": "Question",
+        "name": "Vaut-il mieux relancer par email ou par téléphone ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Privilégiez toujours l'email sauf si le recruteur vous a lui-même proposé de l'appeler. Le téléphone est intrusif et peut déstabiliser un recruteur occupé. L'email lui permet de répondre quand il le souhaite et vous permet de préparer un message soigné. Sur LinkedIn, n'utilisez ce canal qu'en complément — jamais en doublant votre email."}
+      },
+      {
+        "@type": "Question",
+        "name": "Que faire si un recruteur ne répond pas à mes relances ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Après 2-3 relances sans réponse, envoyez un email de clôture court et positif qui laisse une porte ouverte pour l'avenir, puis passez à autre chose. L'absence de réponse signifie généralement que le poste est pourvu ou que le profil ne correspond pas — ça n'a rien de personnel. Concentrez votre énergie sur vos autres candidatures actives."}
+      },
+      {
+        "@type": "Question",
+        "name": "Est-il efficace de mentionner une autre offre dans son email de relance ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Oui, si c'est vrai. Mentionner une offre concurrente crée une urgence légitime et montre que vous êtes en demande sur le marché — ce qui valorise votre profil. Mais ne mentez jamais : les recruteurs se parlent entre eux, et une fausse offre concurrente découverte est éliminatoire. Si vous avez vraiment plusieurs processus en cours, c'est l'un des arguments les plus efficaces."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quel est le meilleur moment de la semaine pour envoyer un email de relance ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Mardi ou mercredi, entre 9h et 11h, sont les créneaux optimaux. Les taux d'ouverture d'email professionnels sont 23% plus élevés en début de semaine le matin. Évitez le lundi matin (trop de mails), le vendredi après-midi (esprit déjà au week-end) et le week-end (intrusif)."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -92,6 +123,25 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .table-wrap{overflow-x:auto;margin:20px 0;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{background:var(--s2);color:var(--t1);font-weight:700;padding:10px 14px;text-align:left;border-bottom:1px solid var(--brd);}
+    td{padding:10px 14px;border-bottom:1px solid var(--brd);color:var(--t2);}
+    tr:last-child td{border-bottom:none;}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -121,12 +171,26 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav>
+      <ol>
+        <li><a href="#timing">Timing parfait selon la situation</a></li>
+        <li><a href="#emails">Les 4 emails à copier-coller</a></li>
+        <li><a href="#regles">Règles d'or de la relance</a></li>
+        <li><a href="#erreurs">Ce qu'il ne faut jamais faire</a></li>
+        <li><a href="#canal">Email ou LinkedIn : quel canal choisir ?</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </div>
+
   <div class="art-body">
     <p>80% des candidats qui obtiennent une offre ont relancé au moins une fois. Et pourtant, la plupart des candidats n'osent pas relancer par peur de paraître insistants. Ce guide vous donne le timing exact et les formulations qui fonctionnent — sans jamais passer pour un harceleur.</p>
 
     <div class="highlight">📊 <strong>Statistique clé :</strong> les recruteurs français gèrent en moyenne 40-60 candidatures simultanément. Relancer n'est pas insistant — c'est rappeler votre existence à quelqu'un de débordé.</div>
 
-    <h2>⏱ Le timing parfait selon la situation</h2>
+    <h2 id="timing">⏱ Le timing parfait selon la situation</h2>
 
     <div class="timeline-card">
       <div class="tc-timing">J+1</div>
@@ -145,7 +209,7 @@
       <div class="tc-content"><strong>Email de clôture</strong> — si toujours rien. Court, sans rancœur, laisse une porte ouverte. Après ça, passez à autre chose.</div>
     </div>
 
-    <h2>📧 Les 4 emails à copier-coller</h2>
+    <h2 id="emails">📧 Les 4 emails à copier-coller</h2>
 
     <h3>Email 1 — Remerciement post-entretien (J+1)</h3>
     <div class="email-example">
@@ -185,7 +249,7 @@
       <p>[Prénom Nom] — [LinkedIn]</p>
     </div>
 
-    <h2>💡 Règles d'or de la relance</h2>
+    <h2 id="regles">💡 Règles d'or de la relance</h2>
     <ul>
       <li><strong>Maximum 2-3 relances</strong> par processus — après, c'est contre-productif</li>
       <li><strong>Toujours par email</strong> — le téléphone est intrusif sauf si le recruteur vous l'a proposé</li>
@@ -196,7 +260,7 @@
 
     <div class="success">✨ <strong>Suivez toutes vos relances avec le Dashboard Emploia</strong> — le Kanban vous montre exactement à quelle étape est chaque candidature et quand relancer. Ne laissez plus aucune opportunité tomber dans l'oubli.</div>
 
-    <h2>🚫 Ce qu'il ne faut jamais faire</h2>
+    <h2 id="erreurs">🚫 Ce qu'il ne faut jamais faire</h2>
     <ul>
       <li>Relancer après 48h (trop tôt — le recruteur n'a pas eu le temps de se décider)</li>
       <li>Envoyer un message sur LinkedIn ET un email le même jour</li>
@@ -206,6 +270,50 @@
     </ul>
 
     <div class="highlight">💡 <strong>Meilleur moment pour envoyer un email de relance :</strong> mardi ou mercredi, entre 9h et 11h. Les taux d'ouverture email sont 23% plus élevés en début de semaine le matin.</div>
+
+    <h2 id="canal">📱 Email ou LinkedIn : quel canal choisir ?</h2>
+    <p>La règle simple : <strong>un seul canal par relance</strong>. N'envoyez pas un email ET un message LinkedIn le même jour — c'est perçu comme de l'acharnement.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situation</th><th>Canal recommandé</th><th>Pourquoi</th></tr></thead>
+        <tbody>
+          <tr><td>Vous avez contacté le recruteur par email au départ</td><td>Email</td><td>Gardez la continuité du fil de conversation</td></tr>
+          <tr><td>Vous vous êtes connectés sur LinkedIn</td><td>LinkedIn message</td><td>Plus naturel, fil de conversation visible</td></tr>
+          <tr><td>Aucune réponse à vos emails</td><td>LinkedIn (tentative unique)</td><td>Canal de secours — mentionnez que vous avez envoyé un email</td></tr>
+          <tr><td>Remerciement post-entretien</td><td>Email professionnel</td><td>Plus formel, reste dans leur boîte professionnelle</td></tr>
+          <tr><td>Vous avez un lien commun</td><td>LinkedIn</td><td>Le lien commun peut mentionner votre nom</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="faq-section">
+    <h2 id="faq">❓ Questions fréquentes sur les relances</h2>
+
+    <details class="faq-item">
+      <summary class="faq-item">Combien de fois peut-on relancer un recruteur après un entretien ?</summary>
+      <div class="faq-body">2 à 3 relances maximum par processus. Au-delà, c'est contre-productif. La séquence recommandée : email de remerciement à J+1, première relance à J+7/J+10, deuxième relance (optionnelle) à J+14/J+21 si vous avez une autre offre, puis email de clôture à J+30. Après cela, passez à autre chose.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Vaut-il mieux relancer par email ou par téléphone ?</summary>
+      <div class="faq-body">Privilégiez toujours l'email sauf si le recruteur vous a lui-même proposé de l'appeler. Le téléphone est intrusif et peut déstabiliser un recruteur occupé. L'email lui permet de répondre quand il le souhaite. Sur LinkedIn, n'utilisez ce canal qu'en complément — jamais en doublant votre email le même jour.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Que faire si le recruteur ne répond pas à mes relances ?</summary>
+      <div class="faq-body">Après 2-3 relances sans réponse, envoyez un email de clôture court et positif qui laisse une porte ouverte, puis concentrez-vous sur vos autres candidatures actives. L'absence de réponse signifie souvent que le poste est pourvu ou que le profil ne correspond pas — ça n'a rien de personnel. Continuez à candidater en parallèle.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Est-il efficace de mentionner une autre offre dans l'email de relance ?</summary>
+      <div class="faq-body">Oui, si c'est vrai. Mentionner une offre concurrente crée une urgence légitime et montre que vous êtes en demande sur le marché. Mais ne mentez jamais : les recruteurs se parlent entre eux, et une fausse offre concurrente découverte est éliminatoire. Si vous avez vraiment plusieurs processus en cours, c'est l'un des arguments les plus efficaces.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quel est le meilleur moment de la semaine pour envoyer une relance ?</summary>
+      <div class="faq-body">Mardi ou mercredi, entre 9h et 11h. Les taux d'ouverture d'emails professionnels sont 23% plus élevés en début de semaine le matin. Évitez le lundi matin (débordé de mails), le vendredi après-midi (esprit déjà au week-end) et surtout le week-end.</div>
+    </details>
   </div>
 
   <div class="share-bar">

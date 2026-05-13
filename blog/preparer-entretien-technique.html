@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Comment préparer un entretien technique (dev, data, DevOps) en 2026 — Emploia Blog</title>
-  <meta name="description" content="Algorithmes, system design, live coding, pair programming : comment préparer un entretien technique en 2026. Ressources, méthode et pièges à éviter."/>
+  <meta name="description" content="Algorithmes, system design, live coding, pair programming : comment préparer un entretien technique en 2026. Ressources, méthode SNAKE, questions type et pièges à éviter."/>
   <link rel="canonical" href="https://emploia.fr/blog/preparer-entretien-technique"/>
   <meta property="og:title" content="Comment préparer un entretien technique (dev, data, DevOps) en 2026"/>
   <meta property="og:description" content="Algorithmes, system design, live coding, pair programming : méthode complète pour préparer un entretien technique."/>
@@ -14,11 +14,17 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6366f1"/>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Comment préparer un entretien technique (dev, data, DevOps) en 2026","description":"Algorithmes, system design, live coding, pair programming : méthode complète pour préparer un entretien technique.","url":"https://emploia.fr/blog/preparer-entretien-technique","datePublished":"20 mai 2026","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}</script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"Comment préparer un entretien technique (dev, data, DevOps) en 2026","description":"Algorithmes, system design, live coding, pair programming : méthode complète pour préparer un entretien technique.","url":"https://emploia.fr/blog/preparer-entretien-technique","datePublished":"2026-05-20","author":{"@type":"Organization","name":"Emploia"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.fr"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Combien de temps faut-il pour préparer un entretien technique ?","acceptedAnswer":{"@type":"Answer","text":"Pour un poste junior : 2–4 semaines en pratiquant 1–2h par jour. Pour un poste senior avec system design : 4–8 semaines. La régularité compte plus que l'intensité : 1h par jour pendant 4 semaines vaut mieux que 40h en un week-end. Commencez par les structures de données et algorithmes de base avant de passer au system design."}},{"@type":"Question","name":"Que faire si je suis bloqué pendant le live coding ?","acceptedAnswer":{"@type":"Answer","text":"Verbalisez votre blocage : 'Je vois deux approches possibles, mais je suis incertain sur la complexité de la deuxième — pouvez-vous me donner un indice ?' Montrer que vous savez identifier où vous bloquez et demander de l'aide est un signal positif. Ne restez jamais silencieux plus de 2–3 minutes."}},{"@type":"Question","name":"Les entretiens FAANG-style (LeetCode difficile) sont-ils courants en France ?","acceptedAnswer":{"@type":"Answer","text":"Non, les entretiens de style FAANG (LeetCode difficile, graphes complexes) sont rares dans les entreprises françaises. La majorité teste des algorithmes de niveau Easy à Medium et se concentre davantage sur la qualité du code, le raisonnement et les connaissances pratiques (SQL, design patterns, API REST) que sur les puzzles algorithmiques purs."}},{"@type":"Question","name":"Comment préparer un take-home project ?","acceptedAnswer":{"@type":"Answer","text":"Soignez 5 aspects : (1) README complet avec démo live, (2) Code structuré et lisible avec nommage clair, (3) Tests unitaires même basiques, (4) Gestion des erreurs propre, (5) Variables d'environnement dans un .env.example. Ne sur-engineerez pas — faites simple mais solide. Déployez sur Vercel ou Railway pour que le jury puisse tester sans setup."}},{"@type":"Question","name":"Faut-il apprendre des algorithmes si je code au quotidien avec ChatGPT/Copilot ?","acceptedAnswer":{"@type":"Answer","text":"Oui, pour deux raisons : (1) Les interviewers testent votre capacité à raisonner sans assistant IA — un candidat qui ne comprend pas la complexité algorithmique est un risque pour l'équipe. (2) Comprendre les structures de données vous permet d'évaluer et de corriger le code généré par l'IA, ce qui est une compétence clé en 2026."}}]}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
+    .read-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#3b82f6); z-index: 9999; transition: width .1s linear; }
     .blog-layout { max-width: 760px; margin: 0 auto; padding: 100px 24px 80px; }
     .blog-category { display: inline-flex; align-items: center; gap: 8px; background: var(--ind2); border: 1px solid rgba(99,102,241,.2); color: var(--inb); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: .5px; }
     .blog-title { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; letter-spacing: -1.5px; margin-bottom: 20px; color: var(--t1); }
@@ -30,16 +36,54 @@
     .blog-body ul, .blog-body ol { padding-left: 24px; margin-bottom: 18px; }
     .blog-body li { margin-bottom: 8px; }
     .blog-body strong { color: var(--t1); font-weight: 700; }
-    .blog-body code { background: var(--s3); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; }
-    .tip-box { background: rgba(99,102,241,.06); border-left: 3px solid var(--inb); border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 24px 0; }
+    .blog-body code { background: var(--bg2); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 13px; border: 1px solid var(--brd); }
+    .blog-body table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    .blog-body th { background: var(--bg2); font-weight: 700; color: var(--t1); padding: 10px 14px; text-align: left; border: 1px solid var(--brd); }
+    .blog-body td { padding: 10px 14px; border: 1px solid var(--brd); vertical-align: top; }
+    .blog-body tr:nth-child(even) td { background: var(--bg2); }
     .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
     .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
     .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
     .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
     .blog-back:hover { color: var(--t1); }
+    .toc { background: var(--bg2); border: 1px solid var(--brd); border-radius: 16px; padding: 24px 28px; margin: 32px 0; }
+    .toc-title { font-size: 13px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; margin: 0; }
+    .toc li { margin-bottom: 6px; font-size: 14px; }
+    .toc a { color: var(--inb); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .tip-box { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); border-radius: 12px; padding: 18px 20px; margin: 24px 0; font-size: 14px; }
+    .tip-box strong { color: #10b981; }
+    .warning-box { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 12px; padding: 18px 20px; margin: 24px 0; font-size: 14px; }
+    .warning-box strong { color: #f59e0b; }
+    .snake-step { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--brd); }
+    .snake-step:last-child { border-bottom: none; }
+    .snake-letter { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); color: #fff; font-weight: 900; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .snake-content strong { font-size: 15px; color: var(--t1); display: block; margin-bottom: 2px; }
+    .snake-content span { font-size: 13px; color: var(--t2); }
+    .phase-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px; background: var(--bg2); border: 1px solid var(--brd); color: var(--t3); margin-right: 8px; margin-bottom: 4px; }
+    .share-bar { display: flex; align-items: center; gap: 12px; padding: 24px 0; border-top: 1px solid var(--brd); border-bottom: 1px solid var(--brd); margin: 48px 0 32px; flex-wrap: wrap; }
+    .share-bar span { font-size: 13px; font-weight: 700; color: var(--t3); margin-right: 4px; }
+    .share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--brd); color: var(--t2); background: var(--bg2); transition: all .15s; cursor: pointer; }
+    .share-btn:hover { border-color: var(--inb); color: var(--inb); }
+    .newsletter-widget { background: linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.07)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 32px; text-align: center; margin: 40px 0; }
+    .newsletter-widget h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .newsletter-widget p { font-size: 14px; color: var(--t2); margin-bottom: 20px; }
+    .newsletter-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
+    .newsletter-form input { flex: 1; padding: 11px 16px; border-radius: 100px; border: 1px solid var(--brd); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; }
+    .newsletter-form button { padding: 11px 22px; border-radius: 100px; background: linear-gradient(135deg,#6366f1,#3b82f6); color: #fff; font-weight: 700; font-size: 14px; border: none; cursor: pointer; white-space: nowrap; }
+    .related { margin-top: 48px; }
+    .related h4 { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: var(--t1); }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+    .related-card { background: var(--bg2); border: 1px solid var(--brd); border-radius: 14px; padding: 18px; text-decoration: none; display: block; transition: all .15s; }
+    .related-card:hover { border-color: var(--inb); transform: translateY(-2px); }
+    .related-card .rc-cat { font-size: 10px; font-weight: 700; color: var(--inb); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .related-card .rc-title { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.4; }
+    @media(max-width:600px){ .newsletter-form{flex-direction:column;} .newsletter-form button{width:100%;} }
   </style>
 </head>
 <body>
+<div class="read-progress" id="readProgress"></div>
 <nav class="emp-nav">
   <div class="emp-nav-inner">
     <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
@@ -63,96 +107,291 @@
 
 <div class="blog-layout page-enter">
   <a href="/blog" class="blog-back">← Retour au blog</a>
-  <div class="blog-category">entretien</div>
+  <div class="blog-category">Entretien</div>
   <h1 class="blog-title">Comment préparer un entretien technique (dev, data, DevOps) en 2026</h1>
   <div class="blog-meta">
     <span>📅 20 mai 2026</span>
-    <span>⏱ 11 min de lecture</span>
+    <span>⏱ 12 min de lecture</span>
     <span>✍️ Équipe Emploia</span>
   </div>
+
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <ol>
+      <li><a href="#formats">Les formats d'entretien technique en 2026</a></li>
+      <li><a href="#algos">Algorithmes et structures de données</a></li>
+      <li><a href="#system-design">Le system design : méthode SNAKE</a></li>
+      <li><a href="#live-coding">Réussir le live coding</a></li>
+      <li><a href="#take-home">Le take-home project</a></li>
+      <li><a href="#comportemental">Questions comportementales tech</a></li>
+      <li><a href="#profils">Ressources par profil</a></li>
+      <li><a href="#jour-j">Le jour J : checklist complète</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ol>
+  </div>
+
   <div class="blog-body">
 
-    <p>L'entretien technique reste l'étape la plus redoutée dans le recrutement tech. En 2026, les formats ont évolué : moins de puzzles algorithmiques purs, plus de system design, pair programming et revues de code réelles. Voici la méthode complète pour vous préparer efficacement.</p>
+    <p>L'entretien technique reste l'étape la plus redoutée dans le recrutement tech. En 2026, les formats ont évolué : <strong>moins de puzzles algorithmiques purs, plus de system design, pair programming et revues de code réelles</strong>. Voici la méthode complète pour vous préparer efficacement, sans passer 6 mois sur LeetCode.</p>
 
-    <h2>Comprendre les différents formats en 2026</h2>
+    <h2 id="formats">Les formats d'entretien technique en 2026</h2>
 
-    <h3>Le live coding (45–90 min)</h3>
-    <p>Toujours très répandu. Vous codez sur un outil partagé (CoderPad, HackerRank) pendant que l'interviewer observe. L'objectif n'est pas d'avoir la solution parfaite immédiatement, mais de montrer votre raisonnement. <strong>Parlez à voix haute</strong> pendant que vous codez.</p>
+    <table>
+      <thead><tr><th>Format</th><th>Durée</th><th>Fréquence</th><th>Ce que ça évalue</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Live coding</strong></td><td>45–90 min</td><td>Très courante</td><td>Raisonnement, code propre, communication</td></tr>
+        <tr><td><strong>System design</strong></td><td>60–90 min</td><td>Senior 3+ ans</td><td>Vision architecture, trade-offs, scalabilité</td></tr>
+        <tr><td><strong>Revue de code</strong></td><td>30–60 min</td><td>Courante</td><td>Lecture de code, détection bugs, bonnes pratiques</td></tr>
+        <tr><td><strong>Take-home project</strong></td><td>3–7 jours</td><td>PME / startups</td><td>Qualité code, initiative, documentation</td></tr>
+        <tr><td><strong>Pair programming</strong></td><td>60–120 min</td><td>En croissance</td><td>Collaboration, communication, adaptabilité</td></tr>
+        <tr><td><strong>Quiz technique</strong></td><td>20–40 min</td><td>Screening initial</td><td>Bases du langage / framework</td></tr>
+      </tbody>
+    </table>
 
-    <h3>Le system design (60–90 min)</h3>
-    <p>Pour les profils senior (3+ ans). On vous demande de concevoir un système distribué : "Designez Twitter", "Comment feriez-vous tenir 1 million de connexions simultanées ?". Évalue votre compréhension des trade-offs architecturaux.</p>
+    <div class="tip-box"><strong>✅ Tendance 2026 :</strong> De plus en plus d'entreprises françaises remplacent le live coding algorithmique pur par des sessions de pair programming sur du code "proche de la réalité" (codebase existante, bugfix réel). C'est plus révélateur de votre façon de travailler en équipe.</div>
 
-    <h3>La revue de code (30–60 min)</h3>
-    <p>On vous donne un bout de code existant à analyser : bugs, problèmes de performance, lisibilité, sécurité. Très courant en 2026 car plus proche de la réalité du travail quotidien.</p>
+    <h2 id="algos">Algorithmes et structures de données</h2>
+    <p>Même si les entretiens FAANG-style sont rares en France, les bases algorithmiques restent testées partout. Concentrez-vous sur les sujets à fort ROI :</p>
 
-    <h3>Le take-home project (3–7 jours)</h3>
-    <p>Un mini-projet à rendre chez soi. Avantage : moins de stress. Inconvénient : demande du temps. Soignez la qualité du code, les tests, la documentation du README et le déploiement (Vercel, Railway).</p>
-
-    <h2>Préparer les algorithmes et structures de données</h2>
-
-    <p>Même si les FAANG-style interviews sont moins fréquents en France, les bases restent testées. Concentrez-vous sur :</p>
+    <h3>Structures de données à maîtriser</h3>
     <ul>
-      <li><strong>Structures de données</strong> : tableaux, hash maps, listes chaînées, arbres, graphes, piles, files</li>
-      <li><strong>Algorithmes clés</strong> : tri (quicksort, mergesort), recherche binaire, BFS/DFS, sliding window</li>
-      <li><strong>Complexité</strong> : savoir expliquer O(n), O(log n), O(n²) — et pourquoi ça compte</li>
+      <li><strong>Tableaux / listes</strong> — manipulation, sliding window, two pointers</li>
+      <li><strong>Hash maps / sets</strong> — détection de doublons, comptage, lookup O(1)</li>
+      <li><strong>Listes chaînées</strong> — inversion, détection de cycle (Floyd)</li>
+      <li><strong>Arbres binaires</strong> — parcours (BFS, DFS), BST, hauteur</li>
+      <li><strong>Graphes</strong> — BFS/DFS, détection de cycle, chemins</li>
+      <li><strong>Piles et files</strong> — parenthèses valides, BFS en graphe</li>
     </ul>
 
-    <div class="tip-box">
-      <strong>Ressources recommandées</strong> : LeetCode (cibler les "Easy" et "Medium" français), Exercism.io pour pratiquer en français, AlgoExpert pour les explications vidéo.
+    <h3>Algorithmes clés</h3>
+    <ul>
+      <li><strong>Tri</strong> : quicksort, mergesort — savoir expliquer, pas forcément coder de mémoire</li>
+      <li><strong>Recherche binaire</strong> — sur tableau trié, variations (lower/upper bound)</li>
+      <li><strong>Programmation dynamique</strong> — pour les postes senior uniquement (fibonacci, sac à dos)</li>
+      <li><strong>Récursion</strong> — factorielle, permutations, arbres</li>
+    </ul>
+
+    <h3>Comprendre la complexité</h3>
+    <table>
+      <thead><tr><th>Notation</th><th>Exemple</th><th>Performance pour n=1M</th></tr></thead>
+      <tbody>
+        <tr><td><code>O(1)</code></td><td>Accès tableau par index</td><td>1 opération</td></tr>
+        <tr><td><code>O(log n)</code></td><td>Recherche binaire</td><td>~20 opérations</td></tr>
+        <tr><td><code>O(n)</code></td><td>Parcours de liste</td><td>1 000 000 opérations</td></tr>
+        <tr><td><code>O(n log n)</code></td><td>Tri efficace</td><td>~20 000 000 opérations</td></tr>
+        <tr><td><code>O(n²)</code></td><td>Boucles imbriquées</td><td>10¹² opérations — éviter</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip-box"><strong>Ressources recommandées :</strong> LeetCode (cibler les "Easy" et "Medium" — arrêtez-vous à 80–100 exercices), NeetCode.io (classement par patterns), Exercism.io pour pratiquer en Python/JS. Pour les bases : "Introduction to Algorithms" (CLRS) pour aller en profondeur.</div>
+
+    <h2 id="system-design">Le system design : méthode SNAKE</h2>
+    <p>Pour les postes senior (3+ ans), le system design est l'exercice qui différencie les candidats. L'objectif n'est pas de trouver "la bonne réponse" — il n'y en a pas — mais de montrer que vous raisonnez sur les <strong>trade-offs architecturaux</strong>.</p>
+
+    <h3>Le framework SNAKE (5 étapes)</h3>
+
+    <div class="snake-step">
+      <div class="snake-letter">S</div>
+      <div class="snake-content"><strong>Scénario — Clarifier les exigences</strong><span>Posez des questions avant de dessiner quoi que ce soit. Fonctionnel : quelles features ? Non-fonctionnel : latence, disponibilité, cohérence ? "Concevez Twitter" a 10 interprétations — clarifiez en 5 minutes.</span></div>
+    </div>
+    <div class="snake-step">
+      <div class="snake-letter">N</div>
+      <div class="snake-content"><strong>Nécessités — Estimer le volume</strong><span>Calculez à voix haute : utilisateurs actifs, requêtes/seconde, stockage par an. "1M utilisateurs × 10 requêtes/jour = ~116 req/s" — l'interviewer veut voir votre raisonnement, pas un chiffre exact.</span></div>
+    </div>
+    <div class="snake-step">
+      <div class="snake-letter">A</div>
+      <div class="snake-content"><strong>Architecture — Les briques principales</strong><span>Proposez une architecture de haut niveau : clients, API gateway, services, base de données, cache, message queue. Dessinez sur un whiteboard ou un outil partagé.</span></div>
+    </div>
+    <div class="snake-step">
+      <div class="snake-letter">K</div>
+      <div class="snake-content"><strong>Key components — Détailler les critiques</strong><span>Plongez dans les 1–2 composants les plus complexes ou importants pour votre système : le schéma de base de données, l'algorithme de feed, le service d'authentification.</span></div>
+    </div>
+    <div class="snake-step">
+      <div class="snake-letter">E</div>
+      <div class="snake-content"><strong>Évaluation — Trade-offs et points de défaillance</strong><span>Discutez proactivement les limites : "Ce design fonctionne jusqu'à 10k req/s — au-delà, on sharde la DB. Le point faible est le cache — voici comment je gère l'invalidation."</span></div>
     </div>
 
-    <h2>Préparer le system design</h2>
+    <h3>Concepts à maîtriser pour le system design</h3>
+    <table>
+      <thead><tr><th>Concept</th><th>À savoir expliquer</th></tr></thead>
+      <tbody>
+        <tr><td>Load balancing</td><td>Round-robin, least connections, sticky sessions</td></tr>
+        <tr><td>CDN</td><td>Edge caching, géo-distribution, invalidation</td></tr>
+        <tr><td>SQL vs NoSQL</td><td>Quand utiliser PostgreSQL vs MongoDB vs Redis vs Cassandra</td></tr>
+        <tr><td>Sharding / Réplication</td><td>Horizontal scaling, consistency vs availability</td></tr>
+        <tr><td>Message queues</td><td>Kafka (stream), RabbitMQ (queue), use cases</td></tr>
+        <tr><td>Caching</td><td>Redis, stratégies (write-through, write-back, cache-aside), TTL</td></tr>
+        <tr><td>Microservices vs monolithe</td><td>Quand migrer, coûts opérationnels des microservices</td></tr>
+        <tr><td>CAP theorem</td><td>Consistency, Availability, Partition tolerance — choisir deux</td></tr>
+      </tbody>
+    </table>
 
-    <h3>Le framework SNAKE</h3>
+    <h2 id="live-coding">Réussir le live coding</h2>
+    <p>Le live coding teste autant votre façon de communiquer que vos compétences techniques. La majorité des candidats échouent non pas parce qu'ils ne savent pas coder, mais parce qu'ils codent en silence pendant 45 minutes sans expliquer leur raisonnement.</p>
+
+    <h3>Le processus en 5 étapes</h3>
     <ol>
-      <li><strong>S</strong>cénario — clarifier les exigences fonctionnelles et non-fonctionnelles</li>
-      <li><strong>N</strong>écessités — estimer le volume : utilisateurs, requêtes/s, stockage</li>
-      <li><strong>A</strong>rchitecture — proposer les briques : API, DB, cache, message queue</li>
-      <li><strong>K</strong>ey components — détailler les composants critiques</li>
-      <li><strong>E</strong>valuation — discuter les trade-offs et les points de défaillance</li>
+      <li><strong>Clarifiez</strong> (2–3 min) : posez des questions sur les contraintes, les types d'input, les edge cases attendus</li>
+      <li><strong>Pensez à voix haute</strong> : verbalisez votre approche avant d'écrire une ligne</li>
+      <li><strong>Solution brute d'abord</strong> : implémentez une solution simple qui marche, même O(n²)</li>
+      <li><strong>Optimisez</strong> : proposez l'optimisation après avoir une base qui fonctionne</li>
+      <li><strong>Testez</strong> : parcourez mentalement votre code avec des exemples + edge cases</li>
     </ol>
 
-    <h3>Concepts à maîtriser</h3>
+    <div class="warning-box"><strong>⚠️ Pièges à éviter :</strong> Coder en silence pendant 20 minutes (l'interviewer ne sait pas où vous allez), chercher la solution parfaite avant d'avoir une base qui marche, ignorer les edge cases (null, tableau vide, négatifs), et ne pas tester son code à la fin.</div>
+
+    <h2 id="take-home">Le take-home project</h2>
+    <p>Le take-home est de plus en plus courant dans les PME et startups françaises. Avantage : vous travaillez à votre rythme. Inconvénient : on attend un niveau de qualité proche du "vrai" travail.</p>
+
+    <h3>Les 5 aspects que les tech leads évaluent</h3>
     <ul>
-      <li>Load balancing, CDN, reverse proxy</li>
-      <li>SQL vs NoSQL — quand utiliser quoi</li>
-      <li>Sharding, réplication, consistency vs availability (CAP theorem)</li>
-      <li>Message queues (Kafka, RabbitMQ)</li>
-      <li>Caching (Redis, Memcached) et stratégies d'invalidation</li>
-      <li>Microservices vs monolithe — les vrais trade-offs</li>
+      <li><strong>README complet</strong> : démo live, stack, instructions d'installation, choix techniques expliqués</li>
+      <li><strong>Structure du code</strong> : séparation des responsabilités, nommage clair, pas de "code spaghetti"</li>
+      <li><strong>Tests</strong> : au minimum quelques tests unitaires sur la logique métier principale</li>
+      <li><strong>Gestion des erreurs</strong> : pas de crash sur des inputs invalides, messages d'erreur clairs</li>
+      <li><strong>Déploiement</strong> : déployez sur Vercel, Railway ou Render — le jury doit pouvoir tester sans setup local</li>
     </ul>
 
-    <h2>Préparer les questions comportementales tech</h2>
-    <p>Même en entretien technique, vous aurez des questions comme : "Parlez d'un incident de production que vous avez géré", "Un désaccord technique avec un collègue — comment ça s'est passé ?"</p>
-    <p>Utilisez la méthode STAR (Situation, Tâche, Action, Résultat) avec des exemples précis. Préparez 4–5 anecdotes réelles couvrant : réussite technique, gestion d'erreur, collaboration, décision sous incertitude.</p>
+    <div class="tip-box"><strong>✅ Conseil :</strong> Ne sur-engineerez pas un take-home. Un projet simple, complet et bien documenté bat un projet ambitieux incomplet. Si vous manquez de temps, choisissez la qualité sur la quantité de features.</div>
 
-    <h2>Le jour J : les bonnes pratiques</h2>
+    <h2 id="comportemental">Questions comportementales tech</h2>
+    <p>Même en entretien technique, 30–40% du temps est consacré aux questions comportementales liées à votre façon de travailler. Préparez 4–5 anecdotes réelles avec la méthode <strong>STAR (Situation, Tâche, Action, Résultat)</strong>.</p>
+
+    <table>
+      <thead><tr><th>Question type</th><th>Ce que ça évalue</th><th>Angle de réponse</th></tr></thead>
+      <tbody>
+        <tr><td>"Parlez d'un incident de production que vous avez géré"</td><td>Gestion du stress, responsabilité, process</td><td>Focus sur la réaction et les améliorations post-incident</td></tr>
+        <tr><td>"Un désaccord technique avec un collègue — comment ça s'est passé ?"</td><td>Collaboration, ego technique, communication</td><td>Montrez que vous avez écouté et cherché un compromis data-driven</td></tr>
+        <tr><td>"Vous avez raté une deadline — qu'est-ce qui s'est passé ?"</td><td>Ownership, communication proactive</td><td>Ownership total, actions correctives, transparence avec l'équipe</td></tr>
+        <tr><td>"Décrivez une décision technique dont vous êtes fier"</td><td>Autonomie, jugement, impact</td><td>Focus sur l'impact mesurable et le raisonnement derrière le choix</td></tr>
+        <tr><td>"Comment vous tenez-vous au courant des nouvelles technos ?"</td><td>Curiosité, apprentissage continu</td><td>Soyez précis : blogs, conférences, side projects, contributions OS</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="profils">Ressources spécifiques par profil</h2>
+
+    <h3>Développeur backend / fullstack</h3>
     <ul>
-      <li><strong>Clarifiez avant de coder</strong> : posez 2–3 questions pour comprendre les contraintes ("Peut-il y avoir des doublons ?", "Quelle taille max pour les inputs ?")</li>
-      <li><strong>Pensez à voix haute</strong> : l'interviewer veut voir votre raisonnement, pas juste la solution</li>
-      <li><strong>Commencez par une solution brute</strong>, puis optimisez — ne bloquez pas sur la solution parfaite</li>
-      <li><strong>Testez votre code</strong> avec des exemples, incluant les edge cases</li>
-      <li><strong>Si vous êtes bloqué</strong>, dites-le : "Je vois deux approches, la première est… la deuxième est…"</li>
+      <li><span class="phase-badge">Algo</span>LeetCode 80–100 exercices Easy/Medium, NeetCode 150</li>
+      <li><span class="phase-badge">System Design</span>"Designing Data-Intensive Applications" (Kleppmann), System Design Primer (GitHub)</li>
+      <li><span class="phase-badge">Stack</span>REST vs GraphQL, transactions ACID, indexation SQL, Docker basics</li>
     </ul>
 
-    <h2>Ressources spécifiques par profil</h2>
-    <h3>Développeur backend/fullstack</h3>
-    <p>LeetCode (150 problèmes minimum), Designing Data-Intensive Applications (livre), System Design Primer (GitHub). Pratiquez aussi les questions sur votre stack : REST vs GraphQL, gestion des transactions, indexation SQL.</p>
+    <h3>Frontend / React developer</h3>
+    <ul>
+      <li><span class="phase-badge">JS</span>Closures, event loop, promises, async/await, prototypal inheritance</li>
+      <li><span class="phase-badge">React</span>Virtual DOM, reconciliation, hooks (useState, useEffect, useMemo), state management</li>
+      <li><span class="phase-badge">Perf</span>Lazy loading, code splitting, Core Web Vitals, accessibilité (WCAG)</li>
+    </ul>
 
     <h3>Data scientist / Data engineer</h3>
-    <p>SQL avancé (window functions, CTEs), statistiques (p-value, régression, A/B testing), Python pandas/numpy. Pour le data engineering : Spark, Airflow, architecture lambda/kappa.</p>
+    <ul>
+      <li><span class="phase-badge">SQL</span>Window functions, CTEs, GROUP BY complexes, optimisation de requêtes</li>
+      <li><span class="phase-badge">Stats</span>p-value, intervalles de confiance, régression, A/B testing, overfitting</li>
+      <li><span class="phase-badge">Data Eng</span>Spark, Airflow, architecture lambda/kappa, data modeling (étoile, flocon)</li>
+    </ul>
 
     <h3>DevOps / SRE</h3>
-    <p>Kubernetes, Docker, CI/CD (GitHub Actions, GitLab CI), observabilité (Prometheus, Grafana, ELK). Questions sur les SLO/SLA/SLI et la gestion des incidents en production.</p>
+    <ul>
+      <li><span class="phase-badge">Infra</span>Kubernetes (Pods, Deployments, Services, Ingress), Docker multi-stage builds</li>
+      <li><span class="phase-badge">CI/CD</span>GitHub Actions, GitLab CI — pipeline complet avec tests, lint, déploiement</li>
+      <li><span class="phase-badge">Observabilité</span>Prometheus, Grafana, ELK, SLO/SLA/SLI, gestion d'incidents (runbook)</li>
+    </ul>
+
+    <h2 id="jour-j">Le jour J : checklist complète</h2>
+    <ul>
+      <li>Relisez le code de votre portfolio ou dernier projet — les questions porteront dessus</li>
+      <li>Testez votre setup technique : micro, caméra, partage d'écran, éditeur de code</li>
+      <li>Clarifiez avant de coder : "Peut-il y avoir des doublons ? Quelle taille max pour les inputs ?"</li>
+      <li>Pensez à voix haute en permanence — ne codez jamais en silence plus de 2 minutes</li>
+      <li>Commencez par une solution brute qui marche, puis optimisez si le temps le permet</li>
+      <li>Testez votre code avec des exemples + edge cases (null, vide, très grand)</li>
+      <li>Si vous êtes bloqué, dites-le : "Je vois deux approches — pouvez-vous me guider ?"</li>
+      <li>Préparez 2–3 questions pertinentes à poser sur l'architecture, les pratiques de l'équipe</li>
+    </ul>
+
+    <h2 id="faq">FAQ — Entretien technique</h2>
+
+    <h3>Combien de temps faut-il pour préparer un entretien technique ?</h3>
+    <p>Pour un poste junior : 2–4 semaines en pratiquant 1–2h par jour. Pour un poste senior avec system design : 4–8 semaines. La régularité compte plus que l'intensité : 1h par jour pendant 4 semaines vaut mieux que 40h en un week-end. Commencez par les structures de données de base avant de passer au system design.</p>
+
+    <h3>Que faire si je suis bloqué pendant le live coding ?</h3>
+    <p>Verbalisez votre blocage : "Je vois deux approches possibles, mais je suis incertain sur la complexité de la deuxième — pouvez-vous me donner un indice ?" Montrer que vous savez identifier où vous bloquez et demander de l'aide est un signal positif. Ne restez jamais silencieux plus de 2–3 minutes.</p>
+
+    <h3>Les entretiens FAANG-style (LeetCode difficile) sont-ils courants en France ?</h3>
+    <p>Non. Les entretiens de style FAANG (LeetCode difficile, graphes complexes) sont rares dans les entreprises françaises. La majorité teste des algorithmes de niveau Easy à Medium et se concentre davantage sur la qualité du code, le raisonnement et les connaissances pratiques (SQL, design patterns, API REST) que sur les puzzles algorithmiques purs.</p>
+
+    <h3>Comment préparer un take-home project ?</h3>
+    <p>Soignez 5 aspects : (1) README complet avec démo live, (2) Code structuré et lisible, (3) Tests unitaires même basiques, (4) Gestion des erreurs propre, (5) .env.example pour les variables d'environnement. Déployez sur Vercel ou Railway pour que le jury puisse tester sans setup local. Ne sur-engineerez pas.</p>
+
+    <h3>Faut-il apprendre des algorithmes si je code au quotidien avec GitHub Copilot ?</h3>
+    <p>Oui, pour deux raisons : les interviewers testent votre capacité à raisonner sans assistant IA. Et comprendre les structures de données vous permet d'évaluer et corriger le code généré par l'IA — c'est une compétence clé en 2026.</p>
 
   </div>
+
+  <div class="share-bar">
+    <span>Partager :</span>
+    <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.fr/blog/preparer-entretien-technique" target="_blank" rel="noopener">LinkedIn</a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?text=Préparer+un+entretien+technique+en+2026+%3A+méthode+complète&url=https://emploia.fr/blog/preparer-entretien-technique" target="_blank" rel="noopener">Twitter / X</a>
+    <button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='Lien copié ✓')">Copier le lien</button>
+  </div>
+
+  <div class="newsletter-widget">
+    <h4>Préparez vos entretiens avec les meilleurs conseils tech</h4>
+    <p>Ressources, exercices et actualités du marché tech — chaque semaine dans votre boîte mail.</p>
+    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+      <input type="email" id="nlEmail" placeholder="votre@email.fr" required/>
+      <button type="submit">S'abonner</button>
+    </form>
+  </div>
+
   <div class="blog-cta">
-    <h3>✨ Préparez votre entretien avec Emploia</h3>
-    <p>Simulez des entretiens techniques avec notre IA, adaptez votre CV à chaque poste et suivez vos candidatures depuis votre dashboard.</p>
+    <h3>✨ Simulez votre entretien technique avec Emploia</h3>
+    <p>Notre IA simule des entretiens techniques en temps réel — questions adaptées à votre stack, feedback immédiat sur vos réponses. Préparez-vous sans stress.</p>
     <a href="/interview" class="btn btn-primary btn-lg">Simuler un entretien →</a>
+  </div>
+
+  <div class="related">
+    <h4>Articles liés</h4>
+    <div class="related-grid">
+      <a href="/blog/entretien-en-anglais" class="related-card">
+        <div class="rc-cat">Entretien</div>
+        <div class="rc-title">Réussir un entretien en anglais : phrases et stratégies</div>
+      </a>
+      <a href="/blog/questions-entretien" class="related-card">
+        <div class="rc-cat">Entretien</div>
+        <div class="rc-title">50 questions d'entretien et les meilleures réponses</div>
+      </a>
+      <a href="/blog/portfolio-developpeur-2026" class="related-card">
+        <div class="rc-cat">Dev & Tech</div>
+        <div class="rc-title">Portfolio développeur : guide complet 2026</div>
+      </a>
+      <a href="/blog/ia-et-emploi-2026" class="related-card">
+        <div class="rc-cat">Carrière & IA</div>
+        <div class="rc-title">IA et emploi : quels métiers vont résister ?</div>
+      </a>
+    </div>
   </div>
 </div>
 
+<footer style="text-align:center;padding:40px 24px;color:var(--t3);font-size:13px;border-top:1px solid var(--brd);margin-top:40px;">
+  <p>© 2026 Emploia — Le copilote IA de votre recherche d'emploi | <a href="/legal" style="color:var(--t3)">Mentions légales</a> · <a href="/blog" style="color:var(--t3)">Blog</a></p>
+</footer>
+
 <script src="/shared.js"></script>
+<script>
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
+    document.getElementById('readProgress').style.width = pct + '%';
+  });
+  function subscribeNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('nlEmail').value;
+    fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+      .then(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; })
+      .catch(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; });
+  }
+</script>
 </body>
 </html>

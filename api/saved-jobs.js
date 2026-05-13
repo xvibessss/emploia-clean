@@ -21,7 +21,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'saved-jobs', 60, 60);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...headers, 'Retry-After': '60' } });
 
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers });

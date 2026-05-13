@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, getAllowedOrigin, withTimeout } from './_lib/auth.js';
+import { checkRateLimit, getAllowedOrigin, withTimeout, getCurrentUser } from './_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -16,9 +16,12 @@ export default async function handler(req) {
   });
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
 
+  const user = await getCurrentUser(req);
+  if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
+
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'import-cv', 5, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. 5 imports/heure max.' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. 5 imports/heure max.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   const bodyText = await req.text();
   if (bodyText.length > 4_500_000) return new Response(JSON.stringify({ error: 'Fichier trop volumineux (max 3 MB)' }), { status: 413, headers: H });

@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import {
   kvGet, kvSet, signToken, setCookieHeader, checkRateLimit,
-  hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString
+  hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape
 } from "../_lib/auth.js";
 
 const FORBIDDEN_DISPOSABLE = ['mailinator', 'guerrillamail', 'tempmail', 'throwam', 'yopmail', '10minutemail'];
@@ -99,7 +99,14 @@ export default async function handler(req) {
 
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
-    const firstName = name.split(' ')[0];
+    const firstName = htmlEscape(name.split(' ')[0]);
+    const refChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const refSeed = id.slice(-8);
+    let refCode = '';
+    for (let i = 0; i < 8; i++) {
+      refCode += refChars[(refSeed.charCodeAt(i % refSeed.length) + i * 7) % refChars.length];
+    }
+    const refLink = `https://emploia.fr/?ref=${refCode}`;
     fetch('https://api.resend.com/emails', {
       method: 'POST',
       signal: AbortSignal.timeout(8000),
@@ -107,7 +114,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         from: 'Emploia <noreply@emploia.fr>',
         to: [email],
-        subject: `Bienvenue sur Emploia, ${firstName} ! 🎉`,
+        subject: `Bienvenue sur Emploia, ${firstName} ! Voici vos 5 générations gratuites 🎉`,
         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:520px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
@@ -116,20 +123,34 @@ export default async function handler(req) {
     </div>
     <div style="padding:32px">
       <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Bienvenue, ${firstName} ! 🎉</h1>
-      <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez accès à votre copilote de candidature IA — le premier 100% français.</p>
-      <p style="color:#475569;line-height:1.6;margin:0 0 28px">Avec Emploia, générez des CV et lettres de motivation optimisés ATS, analysez votre score de compatibilité sur chaque offre, et entraînez-vous aux entretiens avec l'IA.</p>
-      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">Commencer ma recherche →</a>
-      <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e2e8f0">
-        <p style="color:#64748b;font-size:13px;margin:0 0 12px;font-weight:600">Ce que vous pouvez faire :</p>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">✨</span><span style="color:#475569;font-size:13px"><strong>Générer</strong> — CV et lettre de motivation IA en 30 secondes</span></div>
-          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard</strong> — Suivre toutes vos candidatures en kanban</span></div>
-          <div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Entretien</strong> — Préparez-vous avec le coaching IA</span></div>
+      <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez <strong style="color:#0f172a">5 générations gratuites</strong> prêtes à l'emploi — votre copilote de candidature IA 100% français.</p>
+      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Générer mon premier CV →</a>
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid #e2e8f0">
+        <p style="color:#64748b;font-size:13px;margin:0 0 14px;font-weight:700">Commencez par ça :</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:14px">1️⃣</div>
+            <div><strong style="color:#0f172a;font-size:13px">Complétez votre profil</strong><br/><span style="color:#64748b;font-size:12px">Ajoutez vos expériences une fois — Emploia les réutilise pour chaque candidature.</span><br/><a href="https://emploia.fr/profil" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Compléter mon profil</a></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:8px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:14px">2️⃣</div>
+            <div><strong style="color:#0f172a;font-size:13px">Trouvez une offre & générez votre CV</strong><br/><span style="color:#64748b;font-size:12px">Collez une offre d'emploi → CV ATS-optimisé en 30 secondes.</span><br/><a href="https://emploia.fr/app" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Générer mon CV</a></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="min-width:28px;height:28px;border-radius:8px;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:14px">3️⃣</div>
+            <div><strong style="color:#0f172a;font-size:13px">Préparez votre entretien</strong><br/><span style="color:#64748b;font-size:12px">Entraînez-vous avec notre simulateur IA avant le grand jour.</span><br/><a href="https://emploia.fr/interview" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Démarrer le simulateur</a></div>
+          </div>
         </div>
+      </div>
+      <div style="margin-top:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
+        <p style="color:#0f172a;font-size:13px;font-weight:700;margin:0 0 8px">🎁 Votre code de parrainage</p>
+        <p style="color:#475569;font-size:12px;margin:0 0 12px;line-height:1.5">Partagez Emploia et gagnez <strong>1 mois Pro offert</strong> par ami inscrit (max 3 mois).</p>
+        <div style="background:#fff;border:1.5px dashed #6366f1;border-radius:10px;padding:10px 16px;text-align:center;font-size:18px;font-weight:900;color:#6366f1;letter-spacing:3px">${refCode}</div>
+        <a href="${refLink}" style="display:block;margin-top:10px;text-align:center;font-size:12px;color:#6366f1;text-decoration:none">Ou partagez ce lien →</a>
       </div>
     </div>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a> · <a href="https://emploia.fr/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a></p>
 </div>
 </body></html>`,
       }),

@@ -752,6 +752,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               }
               if (parsed.done) {
                 lastResult = fullText;
+                if (window.plausible) plausible('generation_complete', { props: { type: mode } });
               }
             } catch (e) {
               if (e.message !== 'Unexpected end of JSON input') throw e;
@@ -761,6 +762,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       } else {
         const data = await res.json();
         const result = data.result || data;
+        if (window.plausible) plausible('generation_complete', { props: { type: mode } });
         showResult(result);
       }
     } catch (e) {

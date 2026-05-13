@@ -2,6 +2,16 @@
    EMPLOIA — Shared JavaScript utilities
 ═══════════════════════════════════════════════════ */
 
+// Plausible analytics — loaded once globally, privacy-first, no cookie needed
+(function() {
+  if (document.querySelector('script[data-domain="emploia.fr"]')) return;
+  const s = document.createElement('script');
+  s.defer = true;
+  s.dataset.domain = 'emploia.fr';
+  s.src = 'https://plausible.io/js/script.js';
+  document.head.appendChild(s);
+})();
+
 // HTML escaping — used by all pages to prevent XSS
 function esc(s) {
   return (s == null ? '' : String(s))
@@ -111,12 +121,6 @@ function empToast(msg, type = 'success') {
   window.empAcceptCookies = function() {
     localStorage.setItem(KEY, 'accepted');
     banner.style.display = 'none';
-    // load analytics
-    const s = document.createElement('script');
-    s.defer = true;
-    s.dataset.domain = 'emploia.fr';
-    s.src = 'https://plausible.io/js/script.js';
-    document.head.appendChild(s);
   };
   window.empDeclineCookies = function() {
     localStorage.setItem(KEY, 'declined');
@@ -402,6 +406,7 @@ window.empSubmitLogin = async function(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur de connexion');
+    if (window.plausible) plausible('login');
     empCloseModal('empAuthModal');
     window.empUser = data.user;
     empUpdateNav(data.user);
@@ -431,6 +436,7 @@ window.empSubmitRegister = async function(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Erreur d'inscription");
+    if (window.plausible) plausible('signup');
     window.empUser = data.user;
     empUpdateNav(data.user);
     window.dispatchEvent(new CustomEvent('empAuthChange', { detail: { user: data.user } }));
@@ -470,7 +476,8 @@ window.empLogout = async function() {
   empUpdateNav(null);
   empToast('Déconnecté', 'info');
   window.dispatchEvent(new CustomEvent('empAuthChange', { detail: { user: null } }));
-  if (['/dashboard', '/profil'].includes(window.location.pathname)) window.location.href = '/';
+  const authPaths = ['/dashboard', '/profil', '/app', '/cv-builder', '/interview', '/alerts', '/apply-queue', '/onboarding'];
+  if (authPaths.some(p => window.location.pathname.startsWith(p))) window.location.href = '/';
 };
 
 window.empUpdateNav = function(user) {
@@ -495,8 +502,9 @@ window.empUpdateNav = function(user) {
         <a href="/dashboard">📊 Dashboard</a>
         <a href="/profil">👤 Mon profil</a>
         <div class="emp-user-sep"></div>
-        <div class="emp-user-plan">Plan : <strong>${user.plan === 'pro' ? '⭐ Pro' : 'Gratuit'}</strong></div>
+        <div class="emp-user-plan">Plan : <strong>${user.plan === 'pro' ? '⭐ Pro' : user.plan === 'intensif' ? '🚀 Intensif' : 'Gratuit'}</strong></div>
         <div class="emp-user-sep"></div>
+        ${!user.provider || user.provider === 'email' ? `<button onclick="empShowChangePwd()">🔑 Changer le mot de passe</button>` : ''}
         <button class="emp-user-theme" onclick="empToggleTheme()" id="empThemeBtn">${document.body.classList.contains('light') ? '🌙 Mode sombre' : '☀️ Mode clair'}</button>
         <div class="emp-user-sep"></div>
         <button class="emp-user-logout" onclick="empLogout()">Déconnexion</button>
@@ -706,5 +714,128 @@ async function empAuthInit() {
       btn.onclick = openSpotlight;
       nav.appendChild(btn);
     }
+  });
+})();
+
+// ── SCORE SNAPSHOT ───────────────────────────────────────────────────────────
+// Saves score history to localStorage for dashboard progression chart
+// type: 'ats' | 'interview' | 'match'
+window.saveScoreSnapshot = function(type, score, label) {
+  if (typeof score !== 'number' || isNaN(score)) return;
+  const KEY = 'emploia_scores_history';
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+  history.push({ ts: Date.now(), type, score: Math.round(score), label: (label || '').slice(0, 60) });
+  if (history.length > 50) history = history.slice(-50);
+  try { localStorage.setItem(KEY, JSON.stringify(history)); } catch {}
+};
+
+// ── CHANGE PASSWORD MODAL ─────────────────────────────────────────────────────
+(function () {
+  const style = document.createElement('style');
+  style.textContent = `
+    #empChangePwdModal .emp-auth-modal { max-width: 400px; }
+  `;
+  document.head.appendChild(style);
+
+  const modal = document.createElement('div');
+  modal.id = 'empChangePwdModal';
+  modal.className = 'emp-modal-backdrop';
+  modal.innerHTML = `
+    <div class="emp-auth-modal">
+      <button class="emp-modal-close" onclick="empCloseModal('empChangePwdModal')" aria-label="Fermer">✕</button>
+      <div class="emp-auth-logo" style="font-size:20px">🔑</div>
+      <h2 class="emp-auth-title">Changer le mot de passe</h2>
+      <p class="emp-auth-subtitle" style="margin-bottom:20px">Entrez votre mot de passe actuel puis choisissez un nouveau.</p>
+      <form id="empChangePwdForm" onsubmit="empSubmitChangePwd(event)">
+        <div class="emp-auth-field">
+          <label>Mot de passe actuel</label>
+          <input type="password" id="empCurPwd" placeholder="••••••••" autocomplete="current-password" required/>
+        </div>
+        <div class="emp-auth-field">
+          <label>Nouveau mot de passe</label>
+          <input type="password" id="empNewPwd" placeholder="8 car. min, 1 majuscule, 1 chiffre" autocomplete="new-password" required oninput="empPwdStrength(this.value)"/>
+          <div class="emp-pwd-strength"><div class="emp-pwd-bar" id="empPwdBar2"></div></div>
+        </div>
+        <div class="emp-auth-field">
+          <label>Confirmer le nouveau mot de passe</label>
+          <input type="password" id="empConfirmPwd" placeholder="••••••••" autocomplete="new-password" required/>
+        </div>
+        <div id="empChangePwdError" class="emp-auth-error" style="display:none"></div>
+        <div id="empChangePwdSuccess" class="emp-auth-success" style="display:none">Mot de passe modifié avec succès ✓</div>
+        <button type="submit" class="emp-auth-submit" id="empChangePwdBtn">Modifier le mot de passe</button>
+      </form>
+    </div>`;
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(modal));
+  modal.addEventListener('click', e => { if (e.target === modal) empCloseModal('empChangePwdModal'); });
+
+  // Reuse the same strength bar id logic
+  const origStrength = window.empPwdStrength;
+  window.empPwdStrength = function(pwd) {
+    origStrength(pwd);
+    const bar2 = document.getElementById('empPwdBar2');
+    if (!bar2) return;
+    const score = [pwd.length >= 8, /[A-Z]/.test(pwd), /[0-9]/.test(pwd), pwd.length >= 12, /[^a-zA-Z0-9]/.test(pwd)].filter(Boolean).length;
+    const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a'];
+    bar2.style.width = (score * 20) + '%';
+    bar2.style.background = colors[score - 1] || '#ef4444';
+  };
+})();
+
+window.empShowChangePwd = function() {
+  document.getElementById('empChangePwdError').style.display = 'none';
+  document.getElementById('empChangePwdSuccess').style.display = 'none';
+  document.getElementById('empChangePwdForm').reset();
+  document.getElementById('empUserDropdown')?.classList.remove('open');
+  empOpenModal('empChangePwdModal');
+};
+
+window.empSubmitChangePwd = async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('empChangePwdBtn');
+  const errEl = document.getElementById('empChangePwdError');
+  const okEl  = document.getElementById('empChangePwdSuccess');
+  errEl.style.display = 'none';
+  okEl.style.display = 'none';
+
+  const newPwd  = document.getElementById('empNewPwd').value;
+  const confirm = document.getElementById('empConfirmPwd').value;
+  if (newPwd !== confirm) {
+    errEl.textContent = 'Les deux nouveaux mots de passe ne correspondent pas.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Modification…';
+  try {
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        currentPassword: document.getElementById('empCurPwd').value,
+        newPassword: newPwd,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur');
+    okEl.style.display = 'block';
+    document.getElementById('empChangePwdForm').reset();
+    setTimeout(() => empCloseModal('empChangePwdModal'), 1800);
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Modifier le mot de passe';
+  }
+};
+
+// ── NATIVE IMAGE LAZY LOADING ─────────────────────────────────────────────────
+// Applies loading="lazy" to all below-fold <img> that don't have an explicit attribute
+(function () {
+  if (!('loading' in HTMLImageElement.prototype)) return;
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('img:not([loading])').forEach((img, idx) => {
+      if (idx > 1) img.loading = 'lazy';
+    });
   });
 })();

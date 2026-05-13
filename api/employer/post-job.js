@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, checkRateLimit, getAllowedOrigin, validateEmail } from '../_lib/auth.js';
+import { kvGet, kvSet, checkRateLimit, getAllowedOrigin, validateEmail, htmlEscape } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -18,7 +18,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'employer_post', 5, 86400);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Limite atteinte. Maximum 5 offres par jour par IP.' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Limite atteinte. Maximum 5 offres par jour par IP.' }), { status: 429, headers: { ...H, 'Retry-After': '86400' } });
 
   let body;
   try { body = await req.json(); }
@@ -86,19 +86,30 @@ export default async function handler(req) {
 
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
+    const eTitle       = htmlEscape(title);
+    const eCompany     = htmlEscape(company);
+    const eLocation    = htmlEscape(location);
+    const eType        = htmlEscape(type);
+    const eSalary      = htmlEscape(salary || 'NC');
+    const eContactEmail = htmlEscape(contactEmail || '—');
+    const eApplyUrl    = htmlEscape(applyUrl || '—');
+    const eId          = htmlEscape(id);
+    const eIp          = htmlEscape(ip);
+    const eDesc        = htmlEscape(description).replace(/\n/g, '<br>');
+
     const adminHtml = `<h2 style="font-family:sans-serif">Nouvelle offre directe Emploia</h2>
 <table style="font-family:sans-serif;border-collapse:collapse;font-size:14px">
-  <tr><td style="padding:6px 12px;color:#64748b;white-space:nowrap">Poste</td><td style="padding:6px 12px;font-weight:600">${title}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">Entreprise</td><td style="padding:6px 12px">${company}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">Lieu</td><td style="padding:6px 12px">${location} ${remote ? '(télétravail)' : ''}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">Type</td><td style="padding:6px 12px">${type}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">Salaire</td><td style="padding:6px 12px">${salary || 'NC'}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">Contact</td><td style="padding:6px 12px">${contactEmail || '—'}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">URL</td><td style="padding:6px 12px">${applyUrl || '—'}</td></tr>
-  <tr><td style="padding:6px 12px;color:#64748b">ID</td><td style="padding:6px 12px;font-size:11px;color:#94a3b8">${id}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b;white-space:nowrap">Poste</td><td style="padding:6px 12px;font-weight:600">${eTitle}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">Entreprise</td><td style="padding:6px 12px">${eCompany}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">Lieu</td><td style="padding:6px 12px">${eLocation} ${remote ? '(télétravail)' : ''}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">Type</td><td style="padding:6px 12px">${eType}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">Salaire</td><td style="padding:6px 12px">${eSalary}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">Contact</td><td style="padding:6px 12px">${eContactEmail}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">URL</td><td style="padding:6px 12px">${eApplyUrl}</td></tr>
+  <tr><td style="padding:6px 12px;color:#64748b">ID</td><td style="padding:6px 12px;font-size:11px;color:#94a3b8">${eId}</td></tr>
 </table>
-<p style="font-family:sans-serif;margin-top:16px"><strong>Description :</strong><br>${description.replace(/\n/g, '<br>')}</p>
-<p style="font-family:sans-serif;font-size:11px;color:#94a3b8">IP: ${ip}</p>`;
+<p style="font-family:sans-serif;margin-top:16px"><strong>Description :</strong><br>${eDesc}</p>
+<p style="font-family:sans-serif;font-size:11px;color:#94a3b8">IP: ${eIp}</p>`;
 
     fetch('https://api.resend.com/emails', {
       method: 'POST', signal: AbortSignal.timeout(8000),
@@ -115,7 +126,7 @@ export default async function handler(req) {
           from: 'Emploia <noreply@emploia.fr>',
           to: [contactEmail],
           subject: `Votre offre "${title}" est en ligne sur Emploia ✅`,
-          html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Votre offre est en ligne ✅</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">L'offre <strong>"${title}"</strong> pour <strong>${company}</strong> est maintenant visible par les candidats sur Emploia.</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Poste :</strong> ${title}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Lieu :</strong> ${location}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Type :</strong> ${type}</p>${salary ? `<p style="font-size:13px;color:#475569;margin:0"><strong>Salaire :</strong> ${salary}</p>` : ''}</div><a href="https://emploia.fr/jobs" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir mon offre →</a><p style="margin-top:24px;font-size:13px;color:#94a3b8">Des questions ? Répondez à cet email ou écrivez à <a href="mailto:contact@emploia.fr" style="color:#6366f1">contact@emploia.fr</a></p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${year} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p></div></body></html>`,
+          html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Votre offre est en ligne ✅</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">L'offre <strong>&ldquo;${eTitle}&rdquo;</strong> pour <strong>${eCompany}</strong> est maintenant visible par les candidats sur Emploia.</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Poste :</strong> ${eTitle}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Lieu :</strong> ${eLocation}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Type :</strong> ${eType}</p>${salary ? `<p style="font-size:13px;color:#475569;margin:0"><strong>Salaire :</strong> ${eSalary}</p>` : ''}</div><a href="https://emploia.fr/jobs" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir mon offre →</a><p style="margin-top:24px;font-size:13px;color:#94a3b8">Des questions ? Répondez à cet email ou écrivez à <a href="mailto:contact@emploia.fr" style="color:#6366f1">contact@emploia.fr</a></p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${year} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p></div></body></html>`,
         }),
       }).catch(() => {});
     }

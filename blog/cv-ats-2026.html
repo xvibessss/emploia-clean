@@ -32,6 +32,37 @@
       {"@type": "ListItem", "position": 3, "name": "CV ATS 2026", "item": "https://emploia.fr/blog/cv-ats-2026"}
     ]}
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Qu'est-ce qu'un logiciel ATS et comment fonctionne-t-il ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Un ATS (Applicant Tracking System) est un logiciel de gestion des candidatures utilisé par 78% des grandes entreprises françaises. Il analyse automatiquement votre CV et lui attribue un score de compatibilité basé sur la correspondance avec l'offre d'emploi (mots-clés, structure, format). Seuls les CVs dépassant un seuil (généralement 70/100) sont transmis à un recruteur humain."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quel format de fichier envoyer pour passer les filtres ATS ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Envoyez votre CV en PDF texte (généré depuis Word, Google Docs ou Emploia — jamais un scan). Le PDF texte conserve la mise en page tout en restant lisible par machine. Évitez les fichiers DOCX si l'offre ne le spécifie pas, et surtout les images PNG/JPG. Nommez votre fichier Prenom-Nom-PosteVise.pdf."}
+      },
+      {
+        "@type": "Question",
+        "name": "Peut-on utiliser un CV en colonnes multiples ou avec des tableaux ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Non — les colonnes multiples et les tableaux perturbent la lecture des ATS qui parcourent le document de gauche à droite. L'ATS peut mélanger les informations ou les ignorer. Utilisez une mise en page linéaire à colonne unique. Les graphiques de compétences (barres de niveau) sont également ignorés par les ATS."}
+      },
+      {
+        "@type": "Question",
+        "name": "Comment savoir si mon CV est bien optimisé pour les ATS ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Utilisez un outil d'analyse ATS comme Emploia : collez votre CV et l'offre d'emploi, et obtenez votre score de compatibilité sur 100, les mots-clés manquants et les sections à améliorer. Un CV générique obtient en moyenne 40-50/100. Un CV adapté à l'offre spécifique obtient 75-95/100."}
+      },
+      {
+        "@type": "Question",
+        "name": "Les ATS pénalisent-ils les CVs avec des photos ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Les ATS ne pénalisent pas la photo mais l'ignorent complètement — la photo est une image que l'ATS ne peut pas analyser. En revanche, une photo peut prendre de l'espace et réduire la place pour du contenu indexable. Pour les candidatures en France via ATS (grandes entreprises), il vaut mieux ne pas inclure de photo et utiliser cet espace pour des mots-clés et réalisations."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -113,6 +144,20 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -142,11 +187,24 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav><ol>
+      <li><a href="#comment-fonctionne">Comment fonctionne un ATS ?</a></li>
+      <li><a href="#ats-france">Les ATS les plus utilisés en France</a></li>
+      <li><a href="#regles-or">Les règles d'or du CV ATS-optimisé</a></li>
+      <li><a href="#adapter-cv">Adapter son CV à chaque offre</a></li>
+      <li><a href="#checklist">Checklist finale avant d'envoyer</a></li>
+      <li><a href="#tester-score">Comment tester votre score ATS</a></li>
+      <li><a href="#faq-ats">FAQ — Questions fréquentes</a></li>
+    </ol></nav>
+  </div>
+
   <div class="art-body">
     <p><strong>78% des CVs sont rejetés avant même d'être lus par un humain.</strong> En France, la quasi-totalité des grandes entreprises utilisent des logiciels ATS (Applicant Tracking System) pour pré-filtrer automatiquement les candidatures. Si votre CV n'est pas optimisé, il ne sera jamais vu — peu importe votre expérience.</p>
     <p>Ce guide vous explique exactement comment fonctionnent ces systèmes et comment optimiser votre CV pour maximiser vos chances d'être sélectionné.</p>
 
-    <h2>🤖 Comment fonctionne un ATS ?</h2>
+    <h2 id="comment-fonctionne">🤖 Comment fonctionne un ATS ?</h2>
     <p>Un ATS analyse votre CV automatiquement et lui attribue un <strong>score de compatibilité</strong> basé sur la correspondance avec l'offre d'emploi. Ce score détermine si votre candidature sera transmise à un recruteur humain.</p>
     <p>Le logiciel scanne votre document à la recherche de :</p>
     <ul>
@@ -157,7 +215,7 @@
     </ul>
     <div class="highlight">💡 <strong>Seuil critique :</strong> Un CV doit généralement obtenir un score supérieur à <strong>70/100</strong> pour passer la première sélection automatique. En dessous, il est archivé sans être lu.</div>
 
-    <h2>🏢 Les ATS les plus utilisés en France</h2>
+    <h2 id="ats-france">🏢 Les ATS les plus utilisés en France</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Logiciel ATS</th><th>Qui l'utilise</th><th>Ce qu'il analyse en priorité</th></tr></thead>
@@ -171,7 +229,7 @@
       </table>
     </div>
 
-    <h2>✅ Les règles d'or du CV ATS-optimisé</h2>
+    <h2 id="regles-or">✅ Les règles d'or du CV ATS-optimisé</h2>
     <h3>1. Format : simple et machine-lisible</h3>
     <ul>
       <li>Utilisez un <strong>PDF texte</strong> (exporté depuis Word, Google Docs ou Emploia — pas scanné)</li>
@@ -211,7 +269,7 @@
       <li>✅ "Réduction du temps de chargement de 4,2s à 1,1s (+73%) via optimisation des images et mise en cache CDN"</li>
     </ul>
 
-    <h2>🔍 Adapter son CV à chaque offre</h2>
+    <h2 id="adapter-cv">🔍 Adapter son CV à chaque offre</h2>
     <p>Un CV générique obtient un score ATS moyen de 40-50/100. Un CV adapté à l'offre spécifique obtient 75-95/100. La différence est radicale.</p>
     <p>Pour chaque candidature :</p>
     <ol>
@@ -222,7 +280,7 @@
     </ol>
     <div class="success">✨ <strong>Emploia automatise cette étape :</strong> collez l'offre d'emploi dans Emploia et obtenez un CV ATS-optimisé adapté en 30 secondes. Le score ATS moyen passe de 48 à 91/100.</div>
 
-    <h2>📊 Checklist finale avant d'envoyer</h2>
+    <h2 id="checklist">📊 Checklist finale avant d'envoyer</h2>
     <ul>
       <li>☐ Format PDF texte (pas scanné)</li>
       <li>☐ Nom du fichier : "Prenom-Nom-Poste.pdf"</li>
@@ -235,7 +293,7 @@
       <li>☐ Pas de tableaux à colonnes multiples</li>
     </ul>
 
-    <h2>🚀 Comment tester votre score ATS</h2>
+    <h2 id="tester-score">🚀 Comment tester votre score ATS</h2>
     <p>Avant d'envoyer, testez votre CV avec l'outil d'analyse ATS d'Emploia. Collez votre CV + l'offre d'emploi, et obtenez en 30 secondes :</p>
     <ul>
       <li>Votre score ATS précis sur 100</li>
@@ -243,6 +301,30 @@
       <li>Les sections à améliorer</li>
       <li>Un verdict : "Excellent match", "Bon profil", "Profil partiel"</li>
     </ul>
+  </div>
+
+  <div class="faq-section" id="faq-ats">
+    <h2>FAQ — Questions fréquentes sur les ATS</h2>
+    <details class="faq-item">
+      <summary>Qu'est-ce qu'un logiciel ATS et comment fonctionne-t-il ?</summary>
+      <div class="faq-body">Un ATS (Applicant Tracking System) est un logiciel de gestion des candidatures utilisé par 78% des grandes entreprises françaises. Il analyse automatiquement votre CV et lui attribue un score de compatibilité basé sur la correspondance avec l'offre d'emploi. Seuls les CVs dépassant un seuil (généralement 70/100) sont transmis à un recruteur humain.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Quel format de fichier envoyer pour passer les filtres ATS ?</summary>
+      <div class="faq-body">Envoyez votre CV en PDF texte (généré depuis Word, Google Docs ou Emploia — jamais un scan). Le PDF texte conserve la mise en page tout en restant lisible par machine. Évitez les fichiers DOCX si l'offre ne le spécifie pas, et surtout les images PNG/JPG. Nommez votre fichier Prenom-Nom-PosteVise.pdf.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Peut-on utiliser un CV en colonnes multiples ou avec des tableaux ?</summary>
+      <div class="faq-body">Non — les colonnes multiples et les tableaux perturbent la lecture des ATS qui parcourent le document de gauche à droite. L'ATS peut mélanger les informations ou les ignorer complètement. Utilisez une mise en page linéaire à colonne unique. Les graphiques de compétences sont également ignorés par les ATS.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Comment savoir si mon CV est bien optimisé pour les ATS ?</summary>
+      <div class="faq-body">Utilisez un outil d'analyse ATS comme Emploia : collez votre CV et l'offre d'emploi, et obtenez votre score de compatibilité sur 100, les mots-clés manquants et les sections à améliorer. Un CV générique obtient en moyenne 40-50/100. Un CV adapté à l'offre spécifique obtient 75-95/100.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Les ATS pénalisent-ils les CVs avec des photos ?</summary>
+      <div class="faq-body">Les ATS ne pénalisent pas la photo mais l'ignorent complètement. En revanche, une photo peut prendre de l'espace et réduire la place pour du contenu indexable. Pour les candidatures en France via ATS (grandes entreprises), il vaut mieux ne pas inclure de photo et utiliser cet espace pour des mots-clés et réalisations.</div>
+    </details>
   </div>
 
   <div class="share-bar">

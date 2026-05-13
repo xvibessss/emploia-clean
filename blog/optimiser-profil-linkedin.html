@@ -26,6 +26,37 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/optimiser-profil-linkedin"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Mon profil LinkedIn doit-il être rédigé en français ou en anglais ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Cela dépend de votre secteur et de vos cibles. Pour les entreprises françaises (PME, secteur public, entreprises non-internationales), le français est préférable. Pour les multinationales, la tech et les startups internationales, l'anglais ou un profil bilingue est recommandé. Une astuce : créez votre profil en anglais car LinkedIn indexe mieux les profils anglais dans les recherches des recruteurs multinationaux."}
+      },
+      {
+        "@type": "Question",
+        "name": "Faut-il publier régulièrement sur LinkedIn pour apparaître dans les recherches de recruteurs ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Non — les publications améliorent votre visibilité dans le feed de votre réseau, mais pas votre classement dans les recherches de recruteurs. Ce qui compte pour les recherches : la complétude du profil, les mots-clés dans votre titre et résumé, et le niveau LinkedIn (Intermédiaire vs Complet). Publiez si vous le souhaitez pour renforcer votre personal brand, mais ce n'est pas obligatoire pour être trouvé par les recruteurs."}
+      },
+      {
+        "@type": "Question",
+        "name": "Les recruteurs regardent-ils vraiment LinkedIn avant d'envoyer une offre ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Oui, 87% des recruteurs utilisent LinkedIn pour sourcer des candidats, et pratiquement 100% vérifient votre profil après réception de votre CV. Un profil incomplet ou incohérent avec votre CV peut éliminer une candidature avant même un entretien. À l'inverse, un profil riche avec des recommandations et des résultats chiffrés peut faire la différence face à un profil CV identique."}
+      },
+      {
+        "@type": "Question",
+        "name": "Faut-il activer le badge vert 'Open to Work' quand on est en poste ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Le badge vert 'Open to Work' est visible par tout le monde, y compris votre employeur actuel. Si vous êtes en poste, utilisez le mode 'Recruiter Mode' : dans les paramètres, activez 'Open to Work' puis sélectionnez 'Recruteurs uniquement'. Vos recherches restent confidentielles pour votre réseau et votre employeur, mais les recruteurs LinkedIn Premium peuvent vous trouver."}
+      },
+      {
+        "@type": "Question",
+        "name": "Combien de temps faut-il pour optimiser son profil LinkedIn ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Un profil LinkedIn complet et optimisé peut être créé en 2 à 4 heures. La partie la plus longue est la rédaction du résumé 'À propos' et la reformulation des expériences en résultats quantifiés. Commencez par les 3 sections les plus impactantes : le titre (5 min), la photo (variable), et le résumé 'À propos' (30-60 min). Les autres sections peuvent être optimisées progressivement."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -76,7 +107,6 @@
     .share-tw{background:rgba(29,155,240,.1);border:1px solid rgba(29,155,240,.25);color:#60a5fa;}
     .share-cp{background:var(--s3);border:1px solid var(--brd);color:var(--t2);cursor:pointer;font-family:inherit;}
     @media(max-width:600px){.related-grid{grid-template-columns:1fr;}.share-bar{flex-direction:column;align-items:flex-start;}}
-
     #read-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(135deg,var(--blue),var(--ind));width:0%;z-index:999;transition:width .1s linear;}
     .newsletter-widget{margin:40px 0;padding:28px 32px;background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:16px;}
     .nw-title{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:8px;}
@@ -86,6 +116,28 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .table-wrap{overflow-x:auto;margin:20px 0;}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{background:var(--s2);color:var(--t1);font-weight:700;padding:10px 14px;text-align:left;border-bottom:1px solid var(--brd);}
+    td{padding:10px 14px;border-bottom:1px solid var(--brd);color:var(--t2);}
+    tr:last-child td{border-bottom:none;}
+    .score-bar{display:flex;align-items:center;gap:10px;margin:4px 0;}
+    .score-fill{height:8px;border-radius:4px;background:linear-gradient(135deg,var(--ind),var(--blue));}
+    .score-label{font-size:11px;color:var(--t3);min-width:50px;}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
   </style>
 </head>
 <body>
@@ -115,27 +167,64 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav>
+      <ol>
+        <li><a href="#algorithme">Comment fonctionne l'algorithme LinkedIn</a></li>
+        <li><a href="#sections-critiques">Les 7 sections critiques à optimiser</a></li>
+        <li><a href="#titre">1. Le titre — votre mot-clé principal</a></li>
+        <li><a href="#photo">2. Photo et bannière</a></li>
+        <li><a href="#a-propos">3. Le résumé "À propos"</a></li>
+        <li><a href="#experiences">4. Expériences — résultats, pas responsabilités</a></li>
+        <li><a href="#competences">5–7. Compétences, recommandations, Open to Work</a></li>
+        <li><a href="#actions-rapides">3 actions à faire maintenant</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </div>
+
   <div class="art-body">
     <p>87% des recruteurs utilisent LinkedIn pour trouver des candidats. Pourtant, <strong>la plupart des profils n'apparaissent jamais dans leurs recherches</strong>. L'algorithme LinkedIn fonctionne comme un ATS : il classe les profils selon des mots-clés, le niveau de complétude et l'engagement. Ce guide vous donne les 7 optimisations qui changent tout.</p>
 
     <div class="highlight">📊 <strong>Un profil LinkedIn optimisé reçoit 5x plus de vues et 3x plus de messages de recruteurs</strong> qu'un profil standard — même avec la même expérience.</div>
 
-    <h2>Les 7 sections critiques à optimiser</h2>
+    <h2 id="algorithme">🤖 Comment fonctionne l'algorithme LinkedIn</h2>
+    <p>LinkedIn classe les profils dans les résultats de recherche recruteur en combinant plusieurs facteurs. Voici leur poids estimé :</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Facteur</th><th>Impact SEO</th><th>Ce qu'il faut faire</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Mots-clés dans le titre</strong></td><td>⭐⭐⭐⭐⭐ Très fort</td><td>Poste exact + 2-3 mots-clés techniques</td></tr>
+          <tr><td><strong>Niveau de complétude du profil</strong></td><td>⭐⭐⭐⭐⭐ Très fort</td><td>Atteindre le niveau "Complet" (toutes sections)</td></tr>
+          <tr><td><strong>Mots-clés dans le résumé</strong></td><td>⭐⭐⭐⭐ Fort</td><td>Répétez vos 5-10 compétences clés naturellement</td></tr>
+          <tr><td><strong>Mots-clés dans les expériences</strong></td><td>⭐⭐⭐⭐ Fort</td><td>Nommez les outils, frameworks, méthodes utilisés</td></tr>
+          <tr><td><strong>Validations de compétences</strong></td><td>⭐⭐⭐ Moyen</td><td>Demandez 5+ validations sur vos top 3 compétences</td></tr>
+          <tr><td><strong>Recommandations reçues</strong></td><td>⭐⭐⭐ Moyen</td><td>3+ recommandations de managers ou clients</td></tr>
+          <tr><td><strong>Connexions au recruteur</strong></td><td>⭐⭐ Faible</td><td>Être connecté au 1er ou 2e degré aide</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-    <h3><span class="section-num">1</span> Le titre — votre mot-clé principal</h3>
+    <h2 id="sections-critiques">Les 7 sections critiques à optimiser</h2>
+
+    <h3 id="titre"><span class="section-num">1</span> Le titre — votre mot-clé principal</h3>
     <p>Le titre LinkedIn est la section la plus importante pour l'algorithme. Il doit contenir votre <strong>poste exact + 2-3 mots-clés de votre secteur</strong>.</p>
     <p>❌ "Étudiant en Master 2 à l'ESCP"<br/>❌ "En recherche d'opportunités"<br/>❌ "Passionné par l'innovation et le digital"</p>
     <div class="example-box">✅ "Développeur React.js | TypeScript | Node.js | Open to Work"<br/>✅ "Data Scientist | Python · ML · Pandas | En recherche d'alternance sept. 2026"<br/>✅ "Business Developer SaaS B2B | 3 ans exp. | Paris · Remote"</div>
+    <p>Conseil supplémentaire : LinkedIn vous accorde 220 caractères pour le titre. Utilisez-les tous. Les séparateurs "|" et "·" sont lisibles et permettent de lister plusieurs mots-clés.</p>
 
-    <h3><span class="section-num">2</span> La photo de profil — +14x plus de vues</h3>
+    <h3 id="photo"><span class="section-num">2</span> La photo de profil — +14x plus de vues</h3>
     <ul>
       <li>Photo professionnelle avec fond neutre (pas selfie, pas soirée)</li>
       <li>Visage prenant 60% du cadre, sourire naturel</li>
       <li>Tenue adaptée au secteur cible (tech = casual pro, finance = cravate)</li>
+      <li>Résolution minimale : 400x400 pixels</li>
       <li>Ajoutez une photo de bannière avec votre secteur / stack / spécialité</li>
     </ul>
+    <div class="success">✨ <strong>Hack bannière :</strong> utilisez Canva gratuitement pour créer une bannière LinkedIn professionnelle avec votre titre, vos compétences clés et un fond sobre. Ça prend 15 minutes et ça change radicalement la première impression.</div>
 
-    <h3><span class="section-num">3</span> Le résumé "À propos" — votre pitch en 3 paragraphes</h3>
+    <h3 id="a-propos"><span class="section-num">3</span> Le résumé "À propos" — votre pitch en 3 paragraphes</h3>
     <p>Le résumé est votre lettre de motivation permanente. Structure idéale :</p>
     <ol>
       <li><strong>Paragraphe 1 :</strong> qui vous êtes + votre spécialité (2-3 phrases, mots-clés inclus)</li>
@@ -148,7 +237,7 @@
       Je recherche un poste de Senior Backend Engineer à Paris ou full remote. Disponible à partir de septembre 2026. Contact : [email] ou message direct."
     </div>
 
-    <h3><span class="section-num">4</span> Les expériences — résultats, pas responsabilités</h3>
+    <h3 id="experiences"><span class="section-num">4</span> Les expériences — résultats, pas responsabilités</h3>
     <p>La plupart des profils listent des missions. Les profils qui ressortent listent des <strong>résultats quantifiés</strong>.</p>
     <p>❌ "Développement de nouvelles fonctionnalités pour l'application mobile"<br/>❌ "Participation aux réunions de sprint et daily stand-up"</p>
     <div class="example-box">
@@ -156,8 +245,9 @@
       ✅ Refonte de l'architecture Redux → -40% de bugs signalés en production<br/>
       ✅ Mise en place des tests E2E (Cypress) → couverture 0% → 78% en 3 mois"
     </div>
+    <p>Pour chaque poste, ajoutez aussi les outils et technologies utilisés dans la description — l'algorithme les indexe et ils apparaissent dans les recherches recruteurs.</p>
 
-    <h3><span class="section-num">5</span> Les compétences — 10 compétences ciblées</h3>
+    <h3 id="competences"><span class="section-num">5</span> Les compétences — 10 compétences ciblées</h3>
     <p>LinkedIn permet d'afficher jusqu'à 50 compétences, mais l'algorithme favorise les <strong>10 premières</strong>. Placez en priorité :</p>
     <ul>
       <li>Votre technologie / outil principal (React, Python, Salesforce, etc.)</li>
@@ -173,16 +263,16 @@
       <li>Un client ou partenaire avec qui vous avez bien travaillé</li>
       <li>Un collaborateur qui peut témoigner d'une compétence précise</li>
     </ul>
-    <p>Facilitez-leur la tâche : envoyez-leur 2-3 points clés que vous voulez qu'ils mentionnent.</p>
+    <p>Facilitez-leur la tâche : envoyez-leur 2-3 points clés que vous voulez qu'ils mentionnent, avec un exemple concret si possible.</p>
 
     <h3><span class="section-num">7</span> Le mode "Open to Work" — visible ou discret</h3>
     <ul>
       <li><strong>Cadre vert "Open to Work" :</strong> visible par tous — signal fort pour les recruteurs, mais votre employeur actuel le voit aussi</li>
-      <li><strong>Mode discret :</strong> "Recruiter Mode" — visible uniquement des recruteurs LinkedIn, pas de votre employeur actuel</li>
+      <li><strong>Mode discret "Recruiter Mode" :</strong> visible uniquement des recruteurs LinkedIn Premium, pas de votre employeur actuel</li>
     </ul>
-    <p>Précisez dans "Open to Work" : le(s) poste(s) cible(s), la localisation, le type de contrat et la disponibilité.</p>
+    <p>Précisez dans "Open to Work" : le(s) poste(s) cible(s), la localisation souhaitée, le type de contrat (CDI, freelance, alternance) et votre disponibilité.</p>
 
-    <h2>⚡ 3 actions à faire dans les 30 prochaines minutes</h2>
+    <h2 id="actions-rapides">⚡ 3 actions à faire dans les 30 prochaines minutes</h2>
     <ol>
       <li><strong>Mettez à jour votre titre</strong> avec votre poste exact + 2 mots-clés techniques</li>
       <li><strong>Ajoutez "Open to Work"</strong> avec vos critères de recherche précis</li>
@@ -190,6 +280,35 @@
     </ol>
 
     <div class="highlight">💡 <strong>Conseil Emploia :</strong> votre profil LinkedIn et votre CV doivent être cohérents. Utilisez Emploia pour générer un CV ATS-optimisé basé sur votre profil, puis copiez les formulations qui fonctionnent le mieux dans votre résumé LinkedIn.</div>
+  </div>
+
+  <div class="faq-section">
+    <h2 id="faq">❓ Questions fréquentes sur LinkedIn</h2>
+
+    <details class="faq-item">
+      <summary class="faq-item">Mon profil LinkedIn doit-il être en français ou en anglais ?</summary>
+      <div class="faq-body">Cela dépend de votre secteur et de vos cibles. Pour les entreprises françaises (PME, secteur public, entreprises non-internationales), le français est préférable. Pour les multinationales, la tech et les startups internationales, l'anglais ou un profil bilingue est recommandé. Vous pouvez créer votre profil en deux langues via "Ajouter un profil dans une autre langue" dans les paramètres LinkedIn.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Faut-il publier régulièrement pour apparaître dans les recherches recruteurs ?</summary>
+      <div class="faq-body">Non — les publications améliorent votre visibilité dans le feed de votre réseau, mais pas votre classement dans les recherches de recruteurs. Ce qui compte pour les recherches : la complétude du profil, les mots-clés dans votre titre et résumé, et les validations de compétences. Publiez si vous le souhaitez pour renforcer votre personal brand, mais ce n'est pas obligatoire pour être trouvé.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Les recruteurs regardent-ils vraiment LinkedIn avant d'envoyer une offre ?</summary>
+      <div class="faq-body">Oui — 87% des recruteurs utilisent LinkedIn pour sourcer, et pratiquement 100% vérifient votre profil après réception de votre CV. Un profil incomplet ou incohérent avec votre CV peut éliminer une candidature avant même un entretien. À l'inverse, un profil riche avec recommandations et résultats chiffrés peut faire la différence face à un profil CV identique.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Faut-il activer le badge vert 'Open to Work' quand on est en poste ?</summary>
+      <div class="faq-body">Le badge vert "Open to Work" est visible par tout le monde, y compris votre employeur. Si vous êtes en poste, utilisez le mode discret : dans les paramètres Open to Work, sélectionnez "Recruteurs uniquement". Vos recherches restent confidentielles pour votre réseau et votre employeur, mais les recruteurs avec LinkedIn Recruiter peuvent vous trouver.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Combien de temps faut-il pour optimiser son profil LinkedIn ?</summary>
+      <div class="faq-body">Un profil complet et optimisé peut être créé en 2 à 4 heures. La partie la plus longue est la rédaction du résumé "À propos" et la reformulation des expériences en résultats quantifiés. Commencez par les 3 sections les plus impactantes : le titre (5 min), la photo (variable), et le résumé (30-60 min). Les autres sections s'optimisent progressivement sur plusieurs jours.</div>
+    </details>
   </div>
 
   <div class="share-bar">
@@ -214,6 +333,7 @@
     </form>
     <div class="nw-success" style="display:none">✅ Vous êtes abonné(e) ! À bientôt dans votre boîte.</div>
   </div>
+
   <div class="related">
     <h3>Articles similaires</h3>
     <div class="related-grid">
@@ -222,7 +342,7 @@
         <div class="rel-card-title">Optimiser son CV pour les ATS en 2026</div>
       </a>
       <a href="/blog/lettre-motivation-2026" class="rel-card">
-        <div class="rel-card-tag">✉️ CV &amp; ATS</div>
+        <div class="rel-card-tag">✉️ Candidature</div>
         <div class="rel-card-title">Lettre de motivation percutante en 2026</div>
       </a>
       <a href="/blog/methode-star-entretien" class="rel-card">
@@ -236,6 +356,7 @@
     </div>
   </div>
 </div>
+
 <footer style="border-top:1px solid var(--brd);padding:32px 24px;text-align:center;">
   <p style="font-size:12px;color:var(--t3)">© <script>document.write(new Date().getFullYear())</script> Emploia · <a href="/blog" style="color:var(--t3)">Blog</a> · <a href="/contact" style="color:var(--t3)">Contact</a></p>
 </footer>

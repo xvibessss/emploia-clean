@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, getAllowedOrigin, validateEmail } from './_lib/auth.js';
+import { checkRateLimit, getAllowedOrigin, validateEmail, getCurrentUser } from './_lib/auth.js';
 
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
 const PRICE_IDS = {
@@ -31,7 +31,7 @@ export default async function handler(req) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'stripe', 5, 3600);
   if (!rl.allowed)
-    return new Response(JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 1 heure.' }), { status: 429, headers });
+    return new Response(JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 1 heure.' }), { status: 429, headers: { ...headers, 'Retry-After': '3600' } });
 
   if (!STRIPE_SECRET) {
     // Demo mode — return a mock checkout URL
@@ -45,11 +45,14 @@ export default async function handler(req) {
   let body;
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
 
-  const { plan, email } = body;
+  const { plan } = body;
   if (!plan || !(plan in PRICE_IDS)) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
   const priceId = PRICE_IDS[plan];
   if (!priceId) return new Response(JSON.stringify({ error: 'Plan annuel non configuré' }), { status: 400, headers });
-  if (email && !validateEmail(email)) return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers });
+
+  // Prefer authenticated user email over body-supplied email to prevent spoofing
+  const sessionUser = await getCurrentUser(req);
+  const resolvedEmail = sessionUser?.email || (validateEmail(body.email || '') ? body.email : null);
 
   try {
     const session = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -64,7 +67,7 @@ export default async function handler(req) {
         'line_items[0][quantity]': '1',
         success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/app?success=1`,
         cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/#pricing`,
-        ...(email ? { customer_email: email } : {}),
+        ...(resolvedEmail ? { customer_email: resolvedEmail } : {}),
         'metadata[plan]': plan,
         locale: 'fr',
         'payment_method_types[0]': 'card',

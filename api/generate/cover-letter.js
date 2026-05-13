@@ -11,10 +11,13 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'generate-lm', 20, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de générations. Réessayez dans 1 heure.' }), { status: 429, headers: H_JSON });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de générations. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H_JSON, 'Retry-After': '3600' } });
 
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H_JSON });
+
+  const userRl = await checkRateLimit(`user:${user.email}`, 'generate-lm', 15, 3600);
+  if (!userRl.allowed) return new Response(JSON.stringify({ error: 'Limite de génération atteinte. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H_JSON, 'Retry-After': '3600' } });
 
   let body;
   try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H_JSON }); }

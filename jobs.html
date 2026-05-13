@@ -1468,6 +1468,7 @@
     try {
       const res = await fetch('/api/smart-apply', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           jobTitle: currentDrawerJob.title,
@@ -1476,6 +1477,8 @@
           userProfile,
         }),
       });
+      if (res.status === 401) { empShowAuth('login'); btn.disabled = false; btn.textContent = '✨ Générer mon pack candidature'; return; }
+      if (res.status === 403) { empToast('Fonctionnalité réservée aux abonnés Pro — <a href="/#pricing" style="color:inherit;text-decoration:underline">Voir les offres</a>', 'error'); btn.disabled = false; btn.textContent = '✨ Générer mon pack candidature'; return; }
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'Erreur');

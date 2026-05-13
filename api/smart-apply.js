@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout } from './_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser } from './_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -16,9 +16,15 @@ export default async function handler(req) {
   });
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
 
+  const user = await getCurrentUser(req);
+  if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
+  if (!user.plan || user.plan === 'free') return new Response(JSON.stringify({ error: 'Abonnement Pro requis' }), { status: 403, headers: H });
+
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'smart-apply', 10, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
+  const userRl = await checkRateLimit(`user:${user.email}`, 'smart-apply', 8, 3600);
+  if (!userRl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   const bodyText = await req.text();
   if (bodyText.length > 30000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });

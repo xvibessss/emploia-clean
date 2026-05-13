@@ -26,13 +26,25 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/lettre-motivation-2026"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question", "name": "Faut-il encore envoyer une lettre de motivation en 2026 ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui dans 60% des cas. Une étude APEC 2025 montre que 62% des recruteurs français lisent encore la lettre de motivation avant d'ouvrir le CV. Elle reste obligatoire pour les candidatures spontanées et très utile pour les postes où la personnalité compte (commercial, RH, management)."}},
+      {"@type": "Question", "name": "Quelle doit être la longueur d'une lettre de motivation en 2026 ?", "acceptedAnswer": {"@type": "Answer", "text": "Maximum 300 mots pour une lettre standard. Les recruteurs y consacrent 47 secondes en moyenne. Une lettre de moins de 200 mots peut sembler bâclée ; plus de 350 mots risque de ne pas être lue en entier. Visez 250-300 mots sur une page A4."}},
+      {"@type": "Question", "name": "Quelle est la différence entre une lettre de motivation et un email de candidature ?", "acceptedAnswer": {"@type": "Answer", "text": "L'email de candidature (corps du mail) est un condensé de 100-150 mots. La lettre de motivation est un document plus structuré (250-300 mots), souvent envoyé en pièce jointe ou exigé dans les formulaires de candidature des grandes entreprises. En startup et PME, l'email remplace souvent la lettre."}},
+      {"@type": "Question", "name": "Comment personnaliser une lettre de motivation rapidement ?", "acceptedAnswer": {"@type": "Answer", "text": "Conservez le §2 (votre valeur ajoutée) et le §3 (appel à l'action) identiques pour chaque variante. Personnalisez uniquement le §1 (accroche spécifique à l'entreprise) : 1 fait concret sur l'entreprise (levée de fonds, produit, article, post LinkedIn). Cela prend 10-15 minutes par candidature."}},
+      {"@type": "Question", "name": "Peut-on utiliser l'IA pour rédiger sa lettre de motivation ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, à condition de personnaliser le résultat. Une lettre générée 100% par IA sans modification est souvent détectée par les recruteurs expérimentés — le style est trop lisse. Utilisez l'IA comme base (structure + formulations), puis ajoutez 1-2 détails vraiment personnels sur l'entreprise et relisez pour ajuster le ton à votre voix."}}
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#04080f;--s1:#0d1424;--s2:#111827;--s3:#1a2236;--brd:rgba(255,255,255,.07);--brdh:rgba(255,255,255,.13);--blue:#3b82f6;--blb:#60a5fa;--ind:#6366f1;--inb:#818cf8;--ind2:rgba(99,102,241,.1);--grn:#10b981;--gnb:#34d399;--gnd:rgba(16,185,129,.1);--red:#ef4444;--rnb:#f87171;--rnd:rgba(239,68,68,.08);--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;}
+    :root{--bg:#04080f;--s1:#0d1424;--s2:#111827;--s3:#1a2236;--brd:rgba(255,255,255,.07);--brdh:rgba(255,255,255,.13);--blue:#3b82f6;--blb:#60a5fa;--ind:#6366f1;--inb:#818cf8;--ind2:rgba(99,102,241,.1);--grn:#10b981;--gnb:#34d399;--gnd:rgba(16,185,129,.1);--red:#ef4444;--rnb:#f87171;--rnd:rgba(239,68,68,.08);--ylw:#f59e0b;--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;}
     html{scroll-behavior:smooth;}body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
     .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 35% at 15% 5%,rgba(99,102,241,.09) 0%,transparent 60%);}
+    #read-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(135deg,var(--blue),var(--ind));width:0%;z-index:999;transition:width .1s linear;}
     nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:0 24px;}
     .nav-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
     .logo{font-size:16px;font-weight:800;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:9px;}
@@ -47,6 +59,12 @@
     .art-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--inb);background:var(--ind2);border:1px solid rgba(99,102,241,.2);padding:4px 12px;border-radius:6px;margin-bottom:18px;}
     .art-h1{font-size:clamp(26px,4vw,38px);font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1.25;margin-bottom:16px;}
     .art-meta{font-size:12px;color:var(--t3);margin-bottom:32px;display:flex;gap:16px;flex-wrap:wrap;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc ol{padding-left:20px;margin:0;}
+    .toc li{margin-bottom:6px;}
+    .toc a{color:var(--inb);font-size:14px;text-decoration:none;}
+    .toc a:hover{text-decoration:underline;}
     .art-body{font-size:15px;color:var(--t2);line-height:1.9;}
     .art-body h2{font-size:20px;font-weight:800;color:var(--t1);margin:36px 0 14px;}
     .art-body h3{font-size:16px;font-weight:700;color:var(--blb);margin:24px 0 10px;}
@@ -54,12 +72,22 @@
     .art-body ul,.art-body ol{margin:0 0 16px 20px;}
     .art-body li{margin-bottom:8px;}
     .art-body strong{color:var(--t1);}
+    .art-body table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
+    .art-body th{background:var(--s3);color:var(--t1);font-weight:700;padding:10px 14px;text-align:left;border-bottom:1px solid var(--brd);}
+    .art-body td{padding:10px 14px;border-bottom:1px solid var(--brd);color:var(--t2);vertical-align:top;}
     .highlight{background:var(--ind2);border-left:3px solid var(--ind);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;}
     .danger{background:var(--rnd);border-left:3px solid var(--red);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;}
     .success{background:var(--gnd);border-left:3px solid var(--grn);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;}
+    .warning{background:rgba(245,158,11,.08);border-left:3px solid var(--ylw);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;}
     .letter-example{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:24px 28px;margin:20px 0;font-size:13px;color:var(--t2);line-height:1.8;}
     .letter-example p{margin-bottom:12px;}
     .letter-example strong{color:var(--t1);}
+    .letter-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--inb);margin-bottom:14px;display:block;}
+    .faq-item{border-bottom:1px solid var(--brd);}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:14px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:15px;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    details p{padding:0 0 16px;color:var(--t2);font-size:14px;line-height:1.7;}
     .art-cta{margin-top:48px;padding:28px 32px;background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.2);border-radius:16px;text-align:center;}
     .art-cta h3{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:10px;}
     .art-cta p{font-size:14px;color:var(--t2);margin-bottom:20px;}
@@ -78,8 +106,6 @@
     .share-tw{background:rgba(29,155,240,.1);border:1px solid rgba(29,155,240,.25);color:#60a5fa;}
     .share-cp{background:var(--s3);border:1px solid var(--brd);color:var(--t2);cursor:pointer;font-family:inherit;}
     @media(max-width:600px){.related-grid{grid-template-columns:1fr;}.share-bar{flex-direction:column;align-items:flex-start;}}
-
-    #read-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(135deg,var(--blue),var(--ind));width:0%;z-index:999;transition:width .1s linear;}
     .newsletter-widget{margin:40px 0;padding:28px 32px;background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:16px;}
     .nw-title{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:8px;}
     .nw-sub{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6;}
@@ -113,43 +139,66 @@
   <h1 class="art-h1">Rédiger une lettre de motivation percutante en 2026 — Guide + exemples</h1>
   <div class="art-meta">
     <span>📅 Mis à jour avril 2026</span>
-    <span>⏱ 7 min de lecture</span>
+    <span>⏱ 9 min de lecture</span>
     <span>✍️ Équipe Emploia</span>
   </div>
 
-  <div class="art-body">
-    <p>Les recruteurs français lisent une lettre de motivation en <strong>47 secondes en moyenne</strong>. En 47 secondes, une phrase maladroite peut éliminer des semaines de recherche. Ce guide vous donne la structure exacte qui fonctionne, avec des exemples réels.</p>
+  <nav class="toc" aria-label="Sommaire">
+    <div class="toc-title">Sommaire</div>
+    <ol>
+      <li><a href="#phrases-tuer">Les phrases qui tuent votre candidature</a></li>
+      <li><a href="#structure">La structure qui convertit en 2026</a></li>
+      <li><a href="#exemples">2 exemples complets annotés</a></li>
+      <li><a href="#ton">Adapter le ton au secteur</a></li>
+      <li><a href="#regles">Les 5 règles immuables</a></li>
+      <li><a href="#erreurs">Les 7 erreurs fréquentes</a></li>
+      <li><a href="#faq">Questions fréquentes</a></li>
+    </ol>
+  </nav>
 
-    <h2>🚫 Les phrases qui tuent votre candidature</h2>
+  <div class="art-body">
+    <p>Les recruteurs français lisent une lettre de motivation en <strong>47 secondes en moyenne</strong>. En 47 secondes, une phrase maladroite peut éliminer des semaines de recherche. Ce guide vous donne la structure exacte qui fonctionne, avec des exemples réels et tous les pièges à éviter.</p>
+
+    <h2 id="phrases-tuer">Les phrases qui tuent votre candidature</h2>
     <p>Ces phrases sont si communes qu'elles font fuir les recruteurs instantanément :</p>
     <div class="danger">
       ❌ "Je me permets de vous contacter suite à votre annonce..."<br/>
       ❌ "Mon parcours atypique m'a permis de développer des compétences transversales..."<br/>
       ❌ "Je suis motivé, dynamique et rigoureux..."<br/>
-      ❌ "Dans l'attente de votre réponse, veuillez agréer, Madame, Monsieur, mes sincères salutations..."<br/>
+      ❌ "Dans l'attente de votre réponse, veuillez agréer mes sincères salutations..."<br/>
       ❌ "Je pense que je pourrais peut-être contribuer à votre équipe..."
     </div>
-    <p>Ces phrases sont génériques, vides et montrent que vous n'avez pas personnalisé votre lettre. Elles indiquent au recruteur que vous envoyez 50 lettres identiques.</p>
+    <p>Ces phrases sont génériques et montrent que vous n'avez pas personnalisé votre lettre. Elles indiquent au recruteur que vous envoyez 50 lettres identiques — ce qui est rédhibitoire dans une candidature.</p>
 
-    <h2>✅ La structure qui convertit en 2026</h2>
+    <h2 id="structure">La structure qui convertit en 2026</h2>
 
-    <h3>Paragraphe 1 — L'accroche spécifique (2-3 phrases)</h3>
+    <table>
+      <tr><th>Paragraphe</th><th>Longueur</th><th>Objectif</th></tr>
+      <tr><td>§1 — Accroche spécifique</td><td>2-3 phrases</td><td>Montrer que vous connaissez l'entreprise</td></tr>
+      <tr><td>§2 — Valeur ajoutée prouvée</td><td>80-100 mots</td><td>2-3 réalisations chiffrées liées au poste</td></tr>
+      <tr><td>§3 — Appel à l'action direct</td><td>40-60 mots</td><td>Motivation pour CE poste + invitation à l'entretien</td></tr>
+      <tr><td>Signature</td><td>3-4 lignes</td><td>Prénom Nom, email, LinkedIn, téléphone</td></tr>
+    </table>
+
+    <h3>§1 — L'accroche spécifique (2-3 phrases)</h3>
     <p>Montrez que vous connaissez l'entreprise avec un fait précis. Pas une généralité — un détail qui prouve que vous vous êtes renseigné.</p>
     <div class="success">
-      ✅ "Votre levée de série B de 42M€ en mars pour accélérer votre expansion en Allemagne est exactement le type de projet sur lequel j'ai travaillé chez [nom de votre ancienne boîte]..."<br/><br/>
-      ✅ "J'ai lu l'interview de votre CTO dans The Family sur votre architecture microservices — c'est la même approche que nous avons implémentée pour passer de 10 000 à 800 000 utilisateurs..."
+      ✅ "Votre levée de série B de 42M€ en mars pour accélérer votre expansion en Allemagne est exactement le type de projet sur lequel j'ai travaillé chez [ancienne boîte]..."<br/><br/>
+      ✅ "J'ai lu l'interview de votre CTO dans The Family sur votre architecture microservices — c'est la même approche que nous avons implémentée pour passer de 10K à 800K utilisateurs..."
     </div>
 
-    <h3>Paragraphe 2 — Votre valeur ajoutée prouvée (80-100 mots)</h3>
+    <h3>§2 — Votre valeur ajoutée prouvée (80-100 mots)</h3>
     <p>2-3 réalisations concrètes, quantifiées, directement liées aux besoins du poste. Pas votre CV en prose. Des résultats.</p>
-    <div class="highlight">💡 Formula gagnante : "<strong>[Action]</strong> → <strong>[résultat chiffré]</strong> → <strong>[impact business]</strong>"<br/>Exemple : "Refonte de notre pipeline CI/CD → -40% de délai de déploiement → équipe capable de livrer 3x plus de fonctionnalités par sprint."</div>
+    <div class="highlight">💡 <strong>Formule gagnante :</strong> "<strong>[Action]</strong> → <strong>[résultat chiffré]</strong> → <strong>[impact business]</strong>"<br/>Exemple : "Refonte de notre pipeline CI/CD → -40% de délai de déploiement → équipe capable de livrer 3x plus de fonctionnalités par sprint."</div>
 
-    <h3>Paragraphe 3 — L'appel à l'action direct (40-60 mots)</h3>
+    <h3>§3 — L'appel à l'action direct (40-60 mots)</h3>
     <p>Exprimez votre motivation pour CE poste spécifiquement et proposez un entretien. Soyez direct et confiant.</p>
     <div class="success">✅ "Ce poste correspond exactement à la prochaine étape que je cible : [raison précise en lien avec l'offre]. Je serais ravi d'en discuter lors d'un entretien à votre convenance. Disponible dès la semaine prochaine."</div>
 
-    <h2>📋 Exemple de lettre qui fonctionne — Développeur Frontend</h2>
+    <h2 id="exemples">2 exemples complets annotés</h2>
+
     <div class="letter-example">
+      <span class="letter-label">Exemple 1 — Développeur Frontend React (4 ans)</span>
       <p><strong>Objet : Candidature Développeur Frontend React — 4 ans d'exp.</strong></p>
       <p>Madame, Monsieur,</p>
       <p>Votre article sur l'optimisation des performances de votre app mobile (passage de 3s à 0,8s de temps de chargement) m'a directement interpelé — c'est le type de défi technique sur lequel j'ai passé la dernière année chez Malt.</p>
@@ -158,8 +207,8 @@
       <p>Cordialement,<br/>[Prénom Nom] — [email] — [LinkedIn]</p>
     </div>
 
-    <h2>📋 Exemple — Stage Marketing Digital</h2>
     <div class="letter-example">
+      <span class="letter-label">Exemple 2 — Stage Marketing Digital (M2)</span>
       <p><strong>Objet : Stage Marketing Digital 6 mois — M2 Marketing Digital</strong></p>
       <p>Madame, Monsieur,</p>
       <p>Votre campagne "La vérité sur les cosmétiques" lancée en janvier a eu un taux d'engagement Instagram 3x supérieur à la moyenne du secteur — j'ai analysé votre stratégie pour un cours de marketing de contenu en M1 et ça m'a donné envie d'y contribuer.</p>
@@ -168,7 +217,18 @@
       <p>Avec enthousiasme,<br/>[Prénom Nom]</p>
     </div>
 
-    <h2>⚡ Les 5 règles immuables</h2>
+    <h2 id="ton">Adapter le ton au secteur</h2>
+
+    <table>
+      <tr><th>Secteur</th><th>Ton recommandé</th><th>À éviter</th></tr>
+      <tr><td>Startup tech</td><td>Direct, conversationnel, chiffres</td><td>Formules trop formelles, jargon RH</td></tr>
+      <tr><td>Grand groupe (CAC40)</td><td>Professionnel mais humain, précis</td><td>Trop casual, abréviations</td></tr>
+      <tr><td>Finance / Banque</td><td>Formel, structuré, sobre</td><td>Humour, informalité</td></tr>
+      <tr><td>Créatif / Agence</td><td>Ton original, ancrage visuel, énergie</td><td>Lettre générique sans personnalité</td></tr>
+      <tr><td>ONG / Secteur public</td><td>Engagement, impact collectif, clarté</td><td>Langage purement commercial</td></tr>
+    </table>
+
+    <h2 id="regles">Les 5 règles immuables</h2>
     <ol>
       <li><strong>Maximum 300 mots</strong> — les recruteurs français n'aiment pas les lettres longues</li>
       <li><strong>1 seul objet de mail, précis</strong> — "Candidature [Poste] — [N] ans d'exp."</li>
@@ -176,6 +236,57 @@
       <li><strong>Finissez par un CTA actif</strong> — "seriez-vous disponible ?" pas "en attente de votre réponse"</li>
       <li><strong>Adaptez le ton au secteur</strong> — startup tech = direct et conversationnel ; banque = légèrement plus formel</li>
     </ol>
+
+    <h2 id="erreurs">Les 7 erreurs fréquentes</h2>
+
+    <table>
+      <tr><th>Erreur</th><th>Pourquoi c'est fatal</th><th>Solution</th></tr>
+      <tr><td>Démarrer par "Je"</td><td>Rupture immédiate d'attention</td><td>Commencez par l'entreprise ou un fait</td></tr>
+      <tr><td>Copier la fiche de poste</td><td>Aucune valeur ajoutée</td><td>Montrez ce que vous apportez, pas ce qu'ils cherchent</td></tr>
+      <tr><td>Envoyer une lettre générique</td><td>Éliminatoire en tri rapide</td><td>1 fait spécifique par entreprise dans §1</td></tr>
+      <tr><td>Trop longue (&gt;350 mots)</td><td>Non lue en entier</td><td>Cibler 250-300 mots</td></tr>
+      <tr><td>Pas de résultat chiffré</td><td>Vague, non mémorable</td><td>Au moins 2 chiffres dans §2</td></tr>
+      <tr><td>Fautes d'orthographe</td><td>Éliminatoire immédiat</td><td>Relisez 2 fois + LanguageTool</td></tr>
+      <tr><td>CTA passif ("en attente de vous lire")</td><td>Posture de demandeur</td><td>Proposez une date d'entretien</td></tr>
+    </table>
+
+    <h2>FAQ — Lettre de motivation</h2>
+
+    <details>
+      <div class="faq-item">
+        <summary>Faut-il encore envoyer une lettre de motivation en 2026 ?</summary>
+        <p>Oui dans 60% des cas. Une étude APEC 2025 montre que 62% des recruteurs français lisent encore la lettre avant d'ouvrir le CV. Elle reste obligatoire pour les candidatures spontanées et très utile pour les postes où la personnalité compte.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Quelle doit être la longueur idéale ?</summary>
+        <p>Maximum 300 mots. Les recruteurs y consacrent 47 secondes. Une lettre de moins de 200 mots peut sembler bâclée ; plus de 350 mots risque de ne pas être lue en entier. Visez 250-300 mots sur une page A4.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Comment personnaliser rapidement sa lettre ?</summary>
+        <p>Conservez le §2 (valeur ajoutée) et le §3 (CTA) fixes. Personnalisez uniquement le §1 : 1 fait concret sur l'entreprise (levée, produit, article). Cela prend 10-15 minutes par candidature — pas 2 heures.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Peut-on utiliser l'IA pour rédiger sa lettre ?</summary>
+        <p>Oui, à condition de personnaliser le résultat. Une lettre générée 100% par IA sans modification est souvent détectée. Utilisez l'IA comme base, puis ajoutez 1-2 détails vraiment personnels sur l'entreprise et ajustez le ton à votre voix.</p>
+      </div>
+    </details>
+
+    <details>
+      <div class="faq-item">
+        <summary>Lettre de motivation ou email de candidature — quelle différence ?</summary>
+        <p>L'email (corps du mail) est un condensé de 100-150 mots. La lettre est un document plus structuré (250-300 mots), souvent exigé dans les formulaires des grandes entreprises. En startup et PME, l'email remplace souvent la lettre.</p>
+      </div>
+    </details>
+
   </div>
 
   <div class="share-bar">
@@ -207,6 +318,10 @@
         <div class="rel-card-tag">📄 CV &amp; ATS</div>
         <div class="rel-card-title">Optimiser son CV pour les ATS en 2026</div>
       </a>
+      <a href="/blog/email-candidature-parfait" class="rel-card">
+        <div class="rel-card-tag">✉️ Candidature</div>
+        <div class="rel-card-title">L'email de candidature parfait — objet, structure, exemples</div>
+      </a>
       <a href="/blog/methode-star-entretien" class="rel-card">
         <div class="rel-card-tag">🎤 Entretien</div>
         <div class="rel-card-title">La méthode STAR en entretien</div>
@@ -215,15 +330,11 @@
         <div class="rel-card-tag">💼 LinkedIn</div>
         <div class="rel-card-title">Optimiser son profil LinkedIn pour être recruté</div>
       </a>
-      <a href="/blog/trouver-alternance-2026" class="rel-card">
-        <div class="rel-card-tag">🔄 Recherche</div>
-        <div class="rel-card-title">Trouver une alternance : guide complet 2026</div>
-      </a>
     </div>
   </div>
 </div>
 <footer style="border-top:1px solid var(--brd);padding:32px 24px;text-align:center;">
-  <p style="font-size:12px;color:var(--t3)">© <script>document.write(new Date().getFullYear())</script> Emploia · <a href="/blog" style="color:var(--t3)">Blog</a> · <a href="/contact" style="color:var(--t3)">Contact</a></p>
+  <p style="font-size:12px;color:var(--t3)">© 2026 Emploia · <a href="/blog" style="color:var(--t3)">Blog</a> · <a href="/contact" style="color:var(--t3)">Contact</a></p>
 </footer>
 <script>
 document.addEventListener('scroll',()=>{const h=document.documentElement;const el=document.getElementById('read-progress');if(el)el.style.width=Math.min((h.scrollTop/(h.scrollHeight-h.clientHeight))*100,100)+'%';});

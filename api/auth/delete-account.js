@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import {
   getCurrentUser, kvGet, kvDel, kvSet, verifyPassword,
-  getAllowedOrigin, checkRateLimit, COOKIE_NAME,
+  getAllowedOrigin, checkRateLimit, COOKIE_NAME, kvSrem,
 } from '../_lib/auth.js';
 
 export default async function handler(req) {
@@ -21,7 +21,7 @@ export default async function handler(req) {
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'delete-account', 3, 3600);
-  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 1 heure.' }), { status: 429, headers: H });
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
@@ -57,14 +57,18 @@ export default async function handler(req) {
   // Get referral code to clean up
   const refCode = await kvGet(`refcode:${user.id}`);
 
-  // Delete all user data in parallel
+  // Delete all user data in parallel (RGPD Article 17 — right to erasure)
   await Promise.allSettled([
     kvDel(`user:${user.email}`),
     kvDel(`userid:${user.id}`),
     kvDel(`profile:${user.email}`),
     kvDel(`apps:${user.email}`),
     kvDel(`gen:${user.email}`),
+    kvDel(`alerts:${user.email}`),
+    kvDel(`saved:${user.email}`),
+    kvDel(`push:${user.email}`),
     kvDel(`refcode:${user.id}`),
+    kvSrem('alert_subscribers', user.email),
     refCode ? kvDel(`ref:${refCode}`) : Promise.resolve(),
     user.stripeCustomerId ? kvDel(`stripe:${user.stripeCustomerId}`) : Promise.resolve(),
   ]);

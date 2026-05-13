@@ -26,6 +26,37 @@
     "image": "https://emploia.fr/opengraph.jpg",
     "url": "https://emploia.fr/blog/trouver-alternance-2026"
   }</script>
+  <script type="application/ld+json">{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Peut-on trouver une alternance en dehors de la période mars-juin ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Oui, même si mars-juin est la période de pic, des offres paraissent toute l'année. En juillet-août, certaines entreprises cherchent en urgence des alternants pour la rentrée de septembre. Les PME et startups recrutent souvent plus tard que les grands groupes. En dehors de ces périodes, les candidatures spontanées sont encore plus efficaces car la concurrence est moins forte."}
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence entre une alternance et un stage ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "L'alternance est un contrat de travail (CDI ou CDD) avec rémunération légale obligatoire et formation en école. Le stage est une convention de formation sans contrat de travail, avec une gratification plafonnée et une durée maximum de 6 mois. L'alternance offre des droits salariés complets (congés payés, chômage, retraite) et une rémunération souvent 2 à 5 fois supérieure à un stage pour les plus de 18 ans."}
+      },
+      {
+        "@type": "Question",
+        "name": "Peut-on négocier sa rémunération en alternance ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Oui, au-dessus du minimum légal, la rémunération est librement négociable. Les startups et scale-ups tech paient souvent 20-40% de plus que le minimum. Pour négocier efficacement : attendez d'avoir une offre verbale, comparez avec d'autres offres ou le marché, et mettez en avant vos compétences spécifiques (langages maîtrisés, projets, expériences). Plus vous avez d'offres concurrentes, plus votre position de négociation est forte."}
+      },
+      {
+        "@type": "Question",
+        "name": "Comment trouver une alternance dans une startup ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Les startups publient peu sur les grandes plateformes — elles recrutent via LinkedIn, Welcome to the Jungle, et les réseaux de leurs fondateurs. Stratégie recommandée : identifiez 20-30 startups dans votre secteur, connectez-vous avec le CTO ou fondateur sur LinkedIn, et envoyez un message personnalisé qui montre que vous connaissez leur produit. La candidature spontanée fonctionne très bien dans les startups car les processus sont agiles et les besoins évoluent vite."}
+      },
+      {
+        "@type": "Question",
+        "name": "Que faire si mon école n'a pas encore signé la convention avec l'entreprise ?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Ce délai administratif est normal — il ne doit pas vous empêcher de vous engager verbalement avec l'entreprise. Informez le service des relations entreprises de votre école dès que vous avez une promesse d'alternance. La plupart des écoles ont des processus accélérés pour signer en urgence en juillet-août. L'entreprise peut rédiger une lettre d'intention pendant ce délai pour sécuriser la relation."}
+      }
+    ]
+  }</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -65,6 +96,7 @@
     table{width:100%;border-collapse:collapse;font-size:13px;}
     th{background:var(--s2);color:var(--t1);font-weight:700;padding:10px 14px;text-align:left;border-bottom:1px solid var(--brd);}
     td{padding:10px 14px;border-bottom:1px solid var(--brd);color:var(--t2);}
+    tr:last-child td{border-bottom:none;}
     .art-cta{margin-top:48px;padding:28px 32px;background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.2);border-radius:16px;text-align:center;}
     .art-cta h3{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:10px;}
     .art-cta p{font-size:14px;color:var(--t2);margin-bottom:20px;}
@@ -83,7 +115,6 @@
     .share-tw{background:rgba(29,155,240,.1);border:1px solid rgba(29,155,240,.25);color:#60a5fa;}
     .share-cp{background:var(--s3);border:1px solid var(--brd);color:var(--t2);cursor:pointer;font-family:inherit;}
     @media(max-width:600px){.related-grid{grid-template-columns:1fr;}.share-bar{flex-direction:column;align-items:flex-start;}}
-
     #read-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(135deg,var(--blue),var(--ind));width:0%;z-index:999;transition:width .1s linear;}
     .newsletter-widget{margin:40px 0;padding:28px 32px;background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:16px;}
     .nw-title{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:8px;}
@@ -93,6 +124,26 @@
     .nw-input:focus{border-color:rgba(99,102,241,.5);}
     .nw-btn{padding:11px 20px;background:linear-gradient(135deg,var(--ind),var(--blue));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
     .nw-success{margin-top:12px;font-size:13px;color:#34d399;font-weight:600;}
+    .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin-bottom:36px;}
+    .toc-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:12px;}
+    .toc nav ol{margin:0;padding-left:18px;}
+    .toc nav ol li{margin-bottom:6px;}
+    .toc nav ol a{font-size:13px;color:var(--t2);text-decoration:none;transition:color .15s;}
+    .toc nav ol a:hover{color:var(--inb);}
+    .faq-section{margin:40px 0;}
+    .faq-section h2{font-size:20px;font-weight:800;color:var(--t1);margin-bottom:20px;letter-spacing:-.3px;}
+    .faq-item{border:1px solid var(--brd);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .faq-item summary{font-weight:700;cursor:pointer;padding:16px 20px;list-style:none;display:flex;justify-content:space-between;align-items:center;color:var(--t1);font-size:14px;background:var(--s2);}
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
+    details[open] .faq-item summary::after{transform:rotate(45deg);}
+    .faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
+    .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+    .compare-card{background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:16px 18px;}
+    .compare-title{font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--brd);}
+    .compare-row{font-size:12px;color:var(--t2);padding:5px 0;display:flex;gap:8px;}
+    .compare-row strong{color:var(--t1);}
+    @media(max-width:600px){.compare-grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
@@ -122,19 +173,58 @@
     <span>✍️ Équipe Emploia</span>
   </div>
 
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <nav>
+      <ol>
+        <li><a href="#alternance-vs-stage">Alternance vs stage : les différences clés</a></li>
+        <li><a href="#calendrier">Le calendrier 2026 à respecter</a></li>
+        <li><a href="#plateformes">Les meilleures plateformes par type d'entreprise</a></li>
+        <li><a href="#candidatures-spontanees">La stratégie gagnante : candidatures spontanées</a></li>
+        <li><a href="#remuneration">Rémunération des alternants en 2026</a></li>
+        <li><a href="#secteurs">Les secteurs qui recrutent le plus</a></li>
+        <li><a href="#checklist">Checklist avant de candidater</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </div>
+
   <div class="art-body">
     <p>L'alternance est le <strong>meilleur tremplin vers l'emploi en France</strong> : 7 alternants sur 10 sont embauchés par leur entreprise d'accueil à l'issue du contrat. Avec 1 million d'alternants en France en 2026, le marché est compétitif — mais avec la bonne stratégie, vous pouvez décrocher votre alternance en moins de 6 semaines.</p>
 
-    <h2>📅 Le calendrier 2026 à respecter absolument</h2>
+    <h2 id="alternance-vs-stage">📌 Alternance vs stage : les différences clés</h2>
+    <p>Avant de chercher, assurez-vous de bien distinguer ces deux formats :</p>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-title">🔄 Alternance</div>
+        <div class="compare-row"><strong>Statut :</strong> Contrat de travail (CDD/CDI)</div>
+        <div class="compare-row"><strong>Durée :</strong> 1 à 3 ans</div>
+        <div class="compare-row"><strong>Rémunération :</strong> 27% à 100% du SMIC selon l'âge</div>
+        <div class="compare-row"><strong>Droits :</strong> Congés payés, chômage, retraite</div>
+        <div class="compare-row"><strong>Avantage :</strong> 70% d'embauche à l'issue</div>
+        <div class="compare-row"><strong>Type :</strong> Apprentissage ou contrat pro</div>
+      </div>
+      <div class="compare-card">
+        <div class="compare-title">📋 Stage</div>
+        <div class="compare-row"><strong>Statut :</strong> Convention de formation (pas de contrat)</div>
+        <div class="compare-row"><strong>Durée :</strong> 6 mois maximum</div>
+        <div class="compare-row"><strong>Rémunération :</strong> Gratification plafonnée (env. 600 €/mois)</div>
+        <div class="compare-row"><strong>Droits :</strong> Aucun droit salarié</div>
+        <div class="compare-row"><strong>Avantage :</strong> Plus flexible, accessible plus tôt</div>
+        <div class="compare-row"><strong>Type :</strong> Convention école-entreprise</div>
+      </div>
+    </div>
+
+    <h2 id="calendrier">📅 Le calendrier 2026 à respecter absolument</h2>
     <div class="timeline">
       <div class="tl-item"><div class="tl-month">Jan – Fév</div><div class="tl-content"><strong>Préparation :</strong> finalisez votre CV, définissez vos entreprises cibles, créez votre profil LinkedIn. C'est le moment de commencer les candidatures spontanées pour les grandes entreprises.</div></div>
       <div class="tl-item"><div class="tl-month">Mar – Avr</div><div class="tl-content"><strong>Peak des offres :</strong> la majorité des entreprises publient leurs offres d'alternance. Candidatez massivement — objectif : 3-5 candidatures/semaine sur les offres publiées + candidatures spontanées en parallèle.</div></div>
       <div class="tl-item"><div class="tl-month">Mai – Juin</div><div class="tl-content"><strong>Entretiens et négociation :</strong> préparez vos entretiens avec le simulateur IA, comparez les offres. Les signatures se font généralement entre mai et juillet.</div></div>
-      <div class="tl-item"><div class="tl-month">Juillet</div><div class="tl-content"><strong>Urgence :</strong> dernières places. Les entreprises qui n'ont pas trouvé leur alternant publient en urgence. C'est le moment de négocier la rémunération à la hausse.</div></div>
-      <div class="tl-item"><div class="tl-month">Août – Sep</div><div class="tl-content"><strong>Signatures tardives :</strong> certaines PME et startups recrutent jusqu'en septembre. Ne baissez pas les bras.</div></div>
+      <div class="tl-item"><div class="tl-month">Juillet</div><div class="tl-content"><strong>Urgence :</strong> dernières places. Les entreprises qui n'ont pas trouvé leur alternant publient en urgence. C'est le moment de négocier la rémunération à la hausse — vous avez le rapport de force.</div></div>
+      <div class="tl-item"><div class="tl-month">Août – Sep</div><div class="tl-content"><strong>Signatures tardives :</strong> certaines PME et startups recrutent jusqu'en septembre. Ne baissez pas les bras — la fenêtre est courte mais réelle.</div></div>
     </div>
 
-    <h2>🌐 Les meilleures plateformes par type d'entreprise</h2>
+    <h2 id="plateformes">🌐 Les meilleures plateformes par type d'entreprise</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Plateforme</th><th>Type d'entreprise</th><th>Points forts</th></tr></thead>
@@ -146,11 +236,12 @@
           <tr><td><strong>L'Étudiant.fr / Studyrama</strong></td><td>Tous types</td><td>Spécialisé étudiants, nombreuses offres alternance</td></tr>
           <tr><td><strong>APEC</strong></td><td>Cadres, Bac+4/+5</td><td>Offres sérieuses, salaires visibles</td></tr>
           <tr><td><strong>Hellowork</strong></td><td>Tous types</td><td>Bon volume d'offres régionales</td></tr>
+          <tr><td><strong>1jeune1solution.gouv.fr</strong></td><td>Secteur public, associations</td><td>Plateforme officielle, aides à l'embauche</td></tr>
         </tbody>
       </table>
     </div>
 
-    <h2>💡 La stratégie gagnante : les candidatures spontanées</h2>
+    <h2 id="candidatures-spontanees">💡 La stratégie gagnante : les candidatures spontanées</h2>
     <p><strong>40% des alternances se trouvent par candidature spontanée</strong>. C'est contre-intuitif mais vrai : les entreprises reçoivent tellement moins de candidatures spontanées que votre profil se démarque immédiatement.</p>
 
     <h3>Les 4 étapes de la candidature spontanée efficace</h3>
@@ -166,8 +257,8 @@
       "Bonjour [Prénom], je suis en [formation] à [école] et je recherche une alternance en [domaine] pour [période]. Votre travail sur [projet/initiative spécifique] m'a particulièrement inspiré. Seriez-vous disponible pour un échange de 15 minutes ? Je vous ai envoyé une demande de connexion."
     </div>
 
-    <h2>💰 Rémunération des alternants en 2026</h2>
-    <p>La rémunération minimale légale est un pourcentage du SMIC selon l'âge et l'année de contrat :</p>
+    <h2 id="remuneration">💰 Rémunération des alternants en 2026</h2>
+    <p>La rémunération minimale légale est un pourcentage du SMIC selon l'âge et l'année de contrat (SMIC brut 2026 : ~1 698 €/mois) :</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Âge</th><th>1re année</th><th>2e année</th><th>3e année</th></tr></thead>
@@ -178,28 +269,64 @@
         </tbody>
       </table>
     </div>
-    <p>En pratique, les grandes entreprises et les startups tech paient souvent <strong>20 à 50% au-dessus du minimum légal</strong>. N'hésitez pas à négocier — surtout si vous avez plusieurs offres.</p>
+    <p>En pratique, les grandes entreprises et les startups tech paient souvent <strong>20 à 50% au-dessus du minimum légal</strong>. N'hésitez pas à négocier — surtout si vous avez plusieurs offres. La rémunération d'alternance est exonérée d'impôt sur le revenu jusqu'à 21 547 € brut/an.</p>
 
-    <h2>🎓 Les secteurs qui recrutent le plus en 2026</h2>
-    <ul>
-      <li><strong>Tech / Digital :</strong> développement (React, Python), data, cybersécurité, DevOps</li>
-      <li><strong>Marketing digital :</strong> réseaux sociaux, SEO, growth, content</li>
-      <li><strong>Finance :</strong> contrôle de gestion, audit (Big 4 très actifs), banque</li>
-      <li><strong>RH :</strong> recrutement, SIRH, formation</li>
-      <li><strong>Commerce / Ventes :</strong> business development, account management</li>
-      <li><strong>Ingénierie :</strong> aéronautique, énergie, bâtiment</li>
-    </ul>
+    <h2 id="secteurs">🎓 Les secteurs qui recrutent le plus en 2026</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Secteur</th><th>Profils recherchés</th><th>Rémunération typique (18-25 ans)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Tech / Digital</strong></td><td>Dev React/Python, Data, Cybersécurité, DevOps</td><td>900–1 400 €/mois</td></tr>
+          <tr><td><strong>Marketing digital</strong></td><td>SEO, Growth, Content, Social Media</td><td>750–1 100 €/mois</td></tr>
+          <tr><td><strong>Finance / Audit</strong></td><td>Big 4, contrôle de gestion, banque</td><td>900–1 200 €/mois</td></tr>
+          <tr><td><strong>Commerce / Ventes</strong></td><td>Business Dev SaaS, Account Manager</td><td>800–1 200 €/mois + variable</td></tr>
+          <tr><td><strong>RH</strong></td><td>Recrutement, SIRH, L&amp;D</td><td>750–950 €/mois</td></tr>
+          <tr><td><strong>Ingénierie</strong></td><td>Aéronautique, Énergie, Bâtiment</td><td>900–1 300 €/mois</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-    <h2>✅ Checklist avant de candidater</h2>
+    <h2 id="checklist">✅ Checklist avant de candidater</h2>
     <ul>
       <li>☐ CV adapté à l'alternance (mention de l'école, du rythme, de la période)</li>
       <li>☐ Lettre de motivation personnalisée pour chaque entreprise</li>
       <li>☐ Profil LinkedIn à jour avec "En recherche d'alternance [domaine] [période]"</li>
       <li>☐ Contact avec votre CFA / école pour la signature du contrat</li>
       <li>☐ Tableau de suivi de vos candidatures (Emploia Dashboard)</li>
+      <li>☐ Message LinkedIn personnalisé prêt pour chaque entreprise cible</li>
+      <li>☐ Références prêtes (professeur référent, ancien stage, projet académique)</li>
     </ul>
 
     <div class="success">✨ <strong>Astuce Emploia :</strong> utilisez le Dashboard Kanban pour suivre toutes vos candidatures alternance — de "Wishlist" à "Entretien" à "Offre signée". Ça prend 2 minutes à configurer et ça évite de candidater deux fois chez la même entreprise.</div>
+  </div>
+
+  <div class="faq-section">
+    <h2 id="faq">❓ Questions fréquentes sur l'alternance</h2>
+
+    <details class="faq-item">
+      <summary class="faq-item">Peut-on trouver une alternance en dehors de la période mars-juin ?</summary>
+      <div class="faq-body">Oui, même si mars-juin est le pic, des offres paraissent toute l'année. En juillet-août, certaines entreprises cherchent en urgence pour la rentrée de septembre. Les PME et startups recrutent souvent plus tard que les grands groupes. En dehors de ces périodes, les candidatures spontanées sont encore plus efficaces car la concurrence est moins forte — vous serez souvent le seul profil reçu.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Quelle est la différence entre alternance et stage ?</summary>
+      <div class="faq-body">L'alternance est un contrat de travail (CDI ou CDD) avec rémunération légale obligatoire, congés payés et droits salariés. Le stage est une convention de formation (pas de contrat), durée maximum 6 mois, avec une gratification plafonnée à environ 600 €/mois. L'alternance offre en général une rémunération 2 à 5 fois supérieure à un stage pour les plus de 18 ans, et 70% des alternants sont embauchés à l'issue du contrat.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Peut-on négocier sa rémunération d'alternance ?</summary>
+      <div class="faq-body">Oui, au-dessus du minimum légal, la rémunération est librement négociable. Les startups et scale-ups tech paient souvent 20-40% de plus que le minimum. Pour négocier efficacement : attendez d'avoir une offre verbale, comparez avec d'autres offres ou le marché, et mettez en avant vos compétences spécifiques (langages maîtrisés, projets, expériences). Plus vous avez d'offres concurrentes, plus votre position est forte.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Comment trouver une alternance dans une startup ?</summary>
+      <div class="faq-body">Les startups publient peu sur les grandes plateformes — elles recrutent via LinkedIn, Welcome to the Jungle, et les réseaux de leurs fondateurs. Stratégie recommandée : identifiez 20-30 startups dans votre secteur, connectez-vous avec le CTO ou fondateur sur LinkedIn, et envoyez un message personnalisé qui montre que vous connaissez leur produit. La candidature spontanée fonctionne très bien car les processus sont agiles.</div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-item">Que faire si mon école n'a pas signé la convention avec l'entreprise ?</summary>
+      <div class="faq-body">Ce délai administratif est normal — il ne doit pas vous empêcher de vous engager verbalement avec l'entreprise. Informez le service des relations entreprises de votre école dès que vous avez une promesse d'alternance. La plupart des écoles ont des processus accélérés pour signer en urgence en juillet-août. L'entreprise peut rédiger une lettre d'intention pendant ce délai pour sécuriser la relation.</div>
+    </details>
   </div>
 
   <div class="share-bar">
@@ -224,6 +351,7 @@
     </form>
     <div class="nw-success" style="display:none">✅ Vous êtes abonné(e) ! À bientôt dans votre boîte.</div>
   </div>
+
   <div class="related">
     <h3>Articles similaires</h3>
     <div class="related-grid">
@@ -232,7 +360,7 @@
         <div class="rel-card-title">Optimiser son CV pour les ATS en 2026</div>
       </a>
       <a href="/blog/lettre-motivation-2026" class="rel-card">
-        <div class="rel-card-tag">✉️ CV &amp; ATS</div>
+        <div class="rel-card-tag">✉️ Candidature</div>
         <div class="rel-card-title">Lettre de motivation percutante en 2026</div>
       </a>
       <a href="/blog/salaires-france-2026" class="rel-card">
@@ -246,6 +374,7 @@
     </div>
   </div>
 </div>
+
 <footer style="border-top:1px solid var(--brd);padding:32px 24px;text-align:center;">
   <p style="font-size:12px;color:var(--t3)">© <script>document.write(new Date().getFullYear())</script> Emploia · <a href="/blog" style="color:var(--t3)">Blog</a> · <a href="/contact" style="color:var(--t3)">Contact</a></p>
 </footer>

@@ -30,7 +30,7 @@
       "maxDuration": 25
     },
     "api/jobs.js": {
-      "maxDuration": 20
+      "maxDuration": 30
     },
     "api/stripe-checkout.js": {
       "maxDuration": 15
@@ -92,6 +92,9 @@
     "api/auth/delete-account.js": {
       "maxDuration": 15
     },
+    "api/auth/change-password.js": {
+      "maxDuration": 15
+    },
     "api/stripe-portal.js": {
       "maxDuration": 15
     },
@@ -109,8 +112,33 @@
     },
     "api/generate/follow-up.js": {
       "maxDuration": 20
+    },
+    "api/generate/linkedin-outreach.js": {
+      "maxDuration": 20
+    },
+    "api/push-subscribe.js": {
+      "maxDuration": 10
+    },
+    "api/weekly-report.js": {
+      "maxDuration": 30
+    },
+    "api/cron/send-alerts.js": {
+      "maxDuration": 45
+    },
+    "api/cron/send-weekly-digest.js": {
+      "maxDuration": 45
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/send-alerts",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/send-weekly-digest",
+      "schedule": "0 7 * * 1"
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
@@ -315,7 +343,10 @@
     { "source": "/blog/email-candidature-parfait", "destination": "/blog/email-candidature-parfait.html" },
     { "source": "/blog/reseaux-sociaux-recherche-emploi", "destination": "/blog/reseaux-sociaux-recherche-emploi.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
-    { "source": "/apply-queue", "destination": "/apply-queue.html" }
+    { "source": "/apply-queue", "destination": "/apply-queue.html" },
+    { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },
+    { "source": "/api/weekly-report", "destination": "/api/weekly-report" },
+    { "source": "/api/generate/linkedin-outreach", "destination": "/api/generate/linkedin-outreach" }
   ],
   "headers": [
     {
@@ -344,6 +375,18 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Permitted-Cross-Domain-Policies",
+          "value": "none"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "same-origin"
         }
       ]
     },
@@ -352,7 +395,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.anthropic.com https://emploia.fr https://emploia-clean.vercel.app https://remotive.com https://www.arbeitnow.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://emploia.fr https://emploia-clean.vercel.app https://remotive.com https://www.arbeitnow.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     },
