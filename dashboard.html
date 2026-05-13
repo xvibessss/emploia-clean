@@ -812,6 +812,19 @@
     </div>
   </div>
 
+  <!-- ACTIVITY CHART -->
+  <div id="activityChart" style="background:var(--s2);border:1px solid var(--brd);border-radius:18px;padding:20px 24px;margin-bottom:24px;display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:14px;font-weight:700">Activité candidature</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px" id="chartSubtitle">7 derniers jours</div>
+      </div>
+      <div style="font-size:22px;font-weight:800;color:var(--acc)" id="chartTotal">0</div>
+    </div>
+    <div id="chartBars" style="display:flex;align-items:flex-end;gap:6px;height:60px"></div>
+    <div id="chartLabels" style="display:flex;gap:6px;margin-top:6px"></div>
+  </div>
+
   <!-- MAIN GRID -->
   <div class="dash-grid">
 
@@ -1563,6 +1576,58 @@
     else { cls('statPendingDelta', ''); s('statPendingDelta', '—'); }
 
     updateConseilDuJour(apps);
+    renderActivityChart(apps);
+  }
+
+  function renderActivityChart(apps) {
+    if (!apps.length) return;
+    const chart = document.getElementById('activityChart');
+    chart.style.display = 'block';
+
+    // Build 7-day buckets
+    const days = [];
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      days.push({ date: d, label: i === 0 ? 'Auj.' : d.toLocaleDateString('fr-FR', { weekday: 'short' }).slice(0, 3), count: 0 });
+    }
+    apps.forEach(a => {
+      const ts = a.createdAt || a.updatedAt;
+      if (!ts) return;
+      const d = new Date(ts); d.setHours(0, 0, 0, 0);
+      const bucket = days.find(b => b.date.getTime() === d.getTime());
+      if (bucket) bucket.count++;
+    });
+
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    const total7 = days.reduce((s, d) => s + d.count, 0);
+    document.getElementById('chartTotal').textContent = total7;
+    document.getElementById('chartSubtitle').textContent = `${total7} candidature${total7 !== 1 ? 's' : ''} cette semaine`;
+
+    const barsEl = document.getElementById('chartBars');
+    const labelsEl = document.getElementById('chartLabels');
+    barsEl.innerHTML = '';
+    labelsEl.innerHTML = '';
+
+    days.forEach(day => {
+      const pct = Math.max((day.count / maxCount) * 100, day.count > 0 ? 8 : 3);
+      const isToday = day.label === 'Auj.';
+      const bar = document.createElement('div');
+      bar.style.cssText = `flex:1;border-radius:6px 6px 0 0;background:${isToday ? 'var(--grad-primary)' : 'var(--s4)'};height:${pct}%;transition:height .5s ease;position:relative;cursor:default;`;
+      bar.title = `${day.label} : ${day.count} candidature${day.count !== 1 ? 's' : ''}`;
+      if (day.count > 0) {
+        const num = document.createElement('div');
+        num.style.cssText = 'position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--t2);white-space:nowrap;';
+        num.textContent = day.count;
+        bar.appendChild(num);
+      }
+      barsEl.appendChild(bar);
+
+      const lbl = document.createElement('div');
+      lbl.style.cssText = `flex:1;text-align:center;font-size:10px;color:${isToday ? 'var(--acc)' : 'var(--t3)'};font-weight:${isToday ? '700' : '400'};`;
+      lbl.textContent = day.label;
+      labelsEl.appendChild(lbl);
+    });
   }
 
   function updateConseilDuJour(apps) {

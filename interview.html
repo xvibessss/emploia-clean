@@ -444,6 +444,27 @@
 
     .quick-tip:last-child { margin-bottom: 0; }
 
+    .session-hist-item {
+      padding: 8px 10px; background: var(--s3); border: 1px solid var(--brd);
+      border-radius: 8px; cursor: pointer; transition: .15s; font-size: 11.5px;
+    }
+    .session-hist-item:hover { border-color: var(--brdh); background: var(--s4); }
+    .session-hist-role { font-weight: 700; color: var(--t1); margin-bottom: 2px; }
+    .session-hist-meta { color: var(--t3); font-size: 10.5px; display: flex; gap: 8px; }
+    .session-hist-score { font-weight: 700; }
+    .session-hist-score.good { color: var(--gnb); }
+    .session-hist-score.ok { color: var(--ylb); }
+    .session-hist-score.low { color: #ef4444; }
+
+    /* Feedback badges */
+    .fb-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 10px; font-size: 10px; font-weight: 700; margin-right: 4px;
+    }
+    .fb-badge.star { background: rgba(34,197,94,.15); color: #22c55e; }
+    .fb-badge.warn { background: rgba(245,158,11,.15); color: #f59e0b; }
+    .fb-badge.info { background: rgba(99,102,241,.15); color: var(--blb); }
+
     /* MOBILE TOGGLES */
     .iv-mobile-tabs {
       display: none;
@@ -577,7 +598,8 @@
         </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" onclick="exportChat()">⬇ Exporter</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveSession()">💾 Sauver</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportChat()">⬇ PDF</button>
         <button class="btn btn-secondary btn-sm" onclick="resetChat()">🔄 Reset</button>
       </div>
     </div>
@@ -631,6 +653,12 @@
         <button class="tpl-card" onclick="askQ('Pourquoi cette entreprise ?')">Pourquoi cette entreprise ?</button>
         <button class="tpl-card" onclick="askQ('Où vous voyez-vous dans 5 ans ?')">Dans 5 ans ?</button>
       </div>
+    </div>
+
+    <div class="coach-card">
+      <h4>🕒 Sessions précédentes</h4>
+      <div id="sessionHistory" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto"></div>
+      <div id="sessionHistoryEmpty" style="font-size:12px;color:var(--t3)">Aucune session sauvegardée.</div>
     </div>
   </aside>
 
@@ -874,8 +902,7 @@
     inp.value = '';
     autoResize(inp);
     updateStats();
-
-    addFeedback('⏱', `${text.split(/\s+/).length} mots — ${text.length > 150 ? 'bonne longueur' : 'développez davantage'}`);
+    analyzeUserAnswer(text);
 
     await streamBotResponse();
   }
@@ -892,7 +919,7 @@
     updateStats();
   }
 
-  function addFeedback(emoji, text) {
+  function addFeedback(emoji, text, badges = []) {
     const list = document.getElementById('feedbackList');
     if (list.querySelector('.feedback-item')?.textContent.includes('Démarrez une session')) {
       list.innerHTML = '';
@@ -903,10 +930,28 @@
     emojiEl.className = 'feedback-emoji';
     emojiEl.textContent = emoji;
     const textEl = document.createElement('div');
-    textEl.textContent = text;
+    textEl.innerHTML = badges.map(b => `<span class="fb-badge ${b.type}">${b.label}</span>`).join('') + text;
     item.append(emojiEl, textEl);
     list.insertBefore(item, list.firstChild);
-    if (list.children.length > 6) list.lastChild.remove();
+    if (list.children.length > 8) list.lastChild.remove();
+  }
+
+  function analyzeUserAnswer(text) {
+    const words = text.split(/\s+/).length;
+    const hasSTAR = /situation|tâche|action|résultat|j'ai|nous avons|j'étais|objectif/i.test(text);
+    const hasNumbers = /\d+\s*%|\d+\s*k€|\d+\s*(ans|mois|jours|utilisateurs|projets|clients)/i.test(text);
+    const hasFillers = /(euh|bon ben|en fait|voilà|donc euh)/i.test(text);
+    const badges = [];
+    if (hasSTAR) badges.push({ type: 'star', label: '✓ STAR' });
+    if (hasNumbers) badges.push({ type: 'star', label: '📊 Chiffres' });
+    if (words < 30) badges.push({ type: 'warn', label: '⚠ Court' });
+    if (words > 200) badges.push({ type: 'warn', label: '⚠ Long' });
+    if (hasFillers) badges.push({ type: 'warn', label: '⚠ Hésitations' });
+    const feedback = words < 30 ? 'Réponse courte — développez avec un exemple concret'
+      : words > 200 ? 'Trop long — résumez en 90-120 mots max'
+      : hasSTAR ? 'Bonne structure STAR !'
+      : 'Pensez à structurer : Situation → Action → Résultat';
+    addFeedback('💬', `${words} mots — ${feedback}`, badges);
   }
 
   function updateStats() {
@@ -955,19 +1000,122 @@
     }
   }
 
-  function exportChat() {
+  async function exportChat() {
     const visible = messages.filter(m => m.role !== 'user' || messages.indexOf(m) > 0);
     if (!visible.length) return empToast('Aucun message à exporter', 'info');
-    const txt = visible.map(m => `[${new Date(m.ts).toLocaleString('fr-FR')}] ${m.role === 'assistant' ? '🤖 Coach' : '🧑 Vous'}\n${m.content}\n`).join('\n---\n\n');
-    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `entretien-emploia-${new Date().toISOString().slice(0,10)}.txt`;
-    a.click();
-    empToast('Conversation exportée !', 'success');
+    const txt = visible.map(m => `[${new Date(m.ts).toLocaleString('fr-FR')}] ${m.role === 'assistant' ? 'Coach IA' : 'Vous'}\n${m.content}\n`).join('\n---\n\n');
+    empToast('📄 Génération du PDF…', 'info');
+    try {
+      if (!window.jspdf) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const role = currentRole || document.getElementById('cfgRole').value.trim() || 'Poste';
+      const company = currentCompany || document.getElementById('cfgCompany').value.trim();
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.text(`Simulation d'entretien — ${role}${company ? ' @ ' + company : ''}`, 15, 20);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.setTextColor(120); doc.text(`Emploia · ${new Date().toLocaleDateString('fr-FR')} · ${questionCount} questions · Score ${document.getElementById('statS').textContent}`, 15, 28);
+      doc.setTextColor(30); doc.setFontSize(10.5);
+      let y = 38;
+      for (const line of txt.split('\n')) {
+        const wrapped = doc.splitTextToSize(line || ' ', 180);
+        for (const wl of wrapped) {
+          if (y > 282) { doc.addPage(); y = 15; }
+          const isSpeaker = wl.startsWith('[') || wl === '---';
+          doc.setFont('helvetica', isSpeaker ? 'bold' : 'normal');
+          doc.setTextColor(isSpeaker ? 80 : 30);
+          doc.text(wl, 15, y);
+          y += 5.2;
+        }
+      }
+      doc.save(`entretien-emploia-${new Date().toISOString().slice(0,10)}.pdf`);
+      empToast('PDF exporté !', 'success');
+    } catch {
+      const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = `entretien-emploia.txt`; a.click();
+      empToast('Exporté (format texte)', 'info');
+    }
+  }
+
+  // ── Session persistence ───────────────────────────────────────────────────
+  const SESSION_KEY = 'emploia_interview_sessions';
+
+  function saveSession() {
+    if (!messages.length || !startTime) return;
+    const scoreEl = document.getElementById('statS');
+    const session = {
+      id: Date.now(),
+      role: currentRole || document.getElementById('cfgRole').value.trim() || 'Poste',
+      company: currentCompany || document.getElementById('cfgCompany').value.trim() || '',
+      date: new Date().toISOString(),
+      duration: document.getElementById('statT').textContent,
+      questions: questionCount,
+      words: totalWords,
+      score: scoreEl.textContent !== '—' ? parseInt(scoreEl.textContent) : null,
+      messages: messages.slice(0, 40),
+    };
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '[]');
+    sessions.unshift(session);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessions.slice(0, 10)));
+    renderSessionHistory();
+    empToast('Session sauvegardée !', 'success');
+  }
+
+  function renderSessionHistory() {
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '[]');
+    const container = document.getElementById('sessionHistory');
+    const empty = document.getElementById('sessionHistoryEmpty');
+    if (!sessions.length) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    container.innerHTML = sessions.map(s => {
+      const date = new Date(s.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const scoreClass = s.score >= 75 ? 'good' : s.score >= 50 ? 'ok' : 'low';
+      return `<div class="session-hist-item" onclick="loadSession(${s.id})">
+        <div class="session-hist-role">${esc(s.role)}${s.company ? ' @ ' + esc(s.company) : ''}</div>
+        <div class="session-hist-meta">
+          <span>${date}</span>
+          <span>${s.questions}Q</span>
+          <span class="session-hist-score ${scoreClass}">${s.score ? s.score + '%' : '—'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function loadSession(id) {
+    const sessions = JSON.parse(localStorage.getItem(SESSION_KEY) || '[]');
+    const s = sessions.find(s => s.id === id);
+    if (!s) return;
+    if (!confirm(`Charger la session "${s.role}" du ${new Date(s.date).toLocaleDateString('fr-FR')} ? La session actuelle sera perdue.`)) return;
+    messages = s.messages || [];
+    questionCount = s.questions || 0;
+    totalWords = s.words || 0;
+    currentRole = s.role; currentCompany = s.company;
+    document.getElementById('cfgRole').value = s.role;
+    document.getElementById('cfgCompany').value = s.company || '';
+    const box = document.getElementById('ivMessages');
+    box.innerHTML = '';
+    messages.forEach(m => {
+      const time = new Date(m.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const div = document.createElement('div');
+      div.className = 'iv-msg ' + (m.role === 'assistant' ? 'bot' : 'user');
+      div.innerHTML = `<div class="iv-msg-avatar">${m.role === 'assistant' ? '🤖' : '🧑'}</div><div class="iv-msg-bubble">${esc(m.content).replace(/\n/g,'<br>')}<div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:right">${time}</div></div>`;
+      box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+    updateStats();
+    empToast('Session chargée', 'success');
   }
 
   function resetChat() {
+    if (messages.length > 2) saveSession();
     if (!confirm('Réinitialiser cette session ?')) return;
     messages = [];
     questionCount = 0;
@@ -997,6 +1145,16 @@
       sendMsg();
     }
   });
+
+  // Pre-fill from URL params (from offre.html "Préparer l'entretien" link)
+  (() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('role')) document.getElementById('cfgRole').value = params.get('role');
+    if (params.get('company')) document.getElementById('cfgCompany').value = params.get('company');
+  })();
+
+  // Load session history
+  renderSessionHistory();
 
   // Init — require auth
   document.getElementById('ivSendBtn').disabled = true;

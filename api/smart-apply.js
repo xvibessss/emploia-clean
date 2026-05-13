@@ -35,27 +35,39 @@ export default async function handler(req) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
 
-  const prompt = `Tu es un expert RH et rédacteur professionnel spécialisé dans le marché français de l'emploi. Génère un pack candidature complet et personnalisé.
+  const prompt = `Tu es un expert RH senior et rédacteur de candidatures pour le marché français. Ta mission : générer un pack candidature hyper-personnalisé qui maximise les chances d'obtenir un entretien.
 
-OFFRE D'EMPLOI :
+═══ OFFRE ═══
 Poste : ${jobTitle}
 Entreprise : ${company || 'Non précisée'}
-${jobDescription ? `Description : ${jobDescription}` : '(description non disponible)'}
+${jobDescription ? `Annonce :\n${jobDescription}` : '(description non disponible — génère un contenu adapté au poste)'}
 
-PROFIL CANDIDAT :
-${userProfile || 'Profil non renseigné — génère un contenu générique professionnel adapté au poste, à compléter par le candidat.'}
+═══ PROFIL ═══
+${userProfile || 'Non renseigné — génère un contenu professionnel générique adapté au poste, avec des placeholders [À COMPLÉTER].'}
 
-Réponds UNIQUEMENT en JSON valide sans markdown ni backtick ni commentaire :
+═══ RÈGLES ═══
+- Lettre : 3 paragraphes clairs, ~220 mots, style professionnel français, sans flatteries inutiles
+- Commence par "Madame, Monsieur," et termine par "Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées."
+- Mentionne explicitement l'entreprise${company ? ` "${company}"` : ''} et le poste dans la lettre
+- CV bullets : verbes d'action forts au présent/passé, résultats quantifiés si possible
+- Questions d'entretien : les plus probables pour CE poste, réponses STAR concrètes
+- Objet email : court, percutant, inclut le titre du poste
+- Extrais les mots-clés ATS importants de l'offre dans atsKeywords
+
+Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de backtick) :
 {
-  "coverLetter": "Lettre de motivation complète (3 paragraphes, ~200 mots, ton professionnel et chaleureux, style français, commence par 'Madame, Monsieur,' et termine par une formule de politesse complète)",
-  "cvBullets": ["Réalisation ou compétence clé 1 (format: verbe d'action + résultat quantifié si possible)", "Réalisation 2", "Réalisation 3", "Réalisation 4"],
-  "skills": ["Compétence technique 1 à mettre en avant", "Compétence 2", "Compétence 3", "Soft skill 1", "Soft skill 2"],
+  "coverLetter": "...",
+  "cvBullets": ["bullet 1", "bullet 2", "bullet 3", "bullet 4", "bullet 5"],
+  "skills": ["compétence 1", "compétence 2", "compétence 3", "soft skill 1", "soft skill 2"],
   "questions": [
-    {"q": "Question d'entretien probable 1 ?", "a": "Réponse modèle en 3-4 phrases avec méthode STAR si applicable, adaptée au contexte français."},
-    {"q": "Question difficile probable 2 ?", "a": "Réponse modèle structurée."},
-    {"q": "Question sur la motivation 3 ?", "a": "Réponse modèle montrant l'alignement avec l'entreprise."}
+    {"q": "...", "a": "..."},
+    {"q": "...", "a": "..."},
+    {"q": "...", "a": "..."},
+    {"q": "...", "a": "..."}
   ],
-  "pitch": "Pitch d'introduction percutant en 2 phrases pour débuter l'entretien, qui résume le profil et la valeur ajoutée."
+  "pitch": "...",
+  "emailSubject": "Candidature — ${jobTitle}${company ? ' chez ' + company : ''}",
+  "atsKeywords": ["mot-clé 1", "mot-clé 2", "mot-clé 3", "mot-clé 4", "mot-clé 5"]
 }`;
 
   try {

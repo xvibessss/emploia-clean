@@ -926,8 +926,12 @@
           <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px">Lettre de motivation</div>
           <button onclick="copyApplyText('coverLetter')" class="btn btn-ghost btn-sm" style="font-size:10px;padding:4px 10px">📋 Copier</button>
         </div>
-        <div id="drawerLetter" style="background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:12.5px;color:var(--t2);line-height:1.8;white-space:pre-wrap;max-height:360px;overflow-y:auto"></div>
-        <div style="margin-top:14px">
+        <div id="drawerLetter" style="background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:14px;font-size:12.5px;color:var(--t2);line-height:1.8;white-space:pre-wrap;max-height:320px;overflow-y:auto"></div>
+        <div id="drawerEmailSubjectWrap" style="margin-top:8px;display:none;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:8px 12px">
+          <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Objet email</div>
+          <div id="drawerEmailSubject" style="font-size:12px;color:var(--acc)"></div>
+        </div>
+        <div style="margin-top:12px">
           <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">⚡ Pitch 30 secondes</div>
           <div id="drawerPitch" style="background:var(--bls);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--blb);line-height:1.7;font-style:italic"></div>
         </div>
@@ -1191,9 +1195,22 @@
         return;
       }
 
-      allJobs = data.jobs;
-      document.getElementById('jobsList').innerHTML = data.jobs.map(renderJob).join('');
-      renderPagination(data.jobs.length, total);
+      // Client-side salary filter
+      const salaryFilter = document.getElementById('filterSalaire')?.value || '';
+      let filteredJobs = data.jobs;
+      if (salaryFilter) {
+        const [minS, maxS] = salaryFilter.split('-');
+        const minK = minS ? parseInt(minS) * 1000 : 0;
+        const maxK = maxS ? parseInt(maxS) * 1000 : Infinity;
+        filteredJobs = data.jobs.filter(j => {
+          const s = j.salary_min || j.salary_max;
+          if (!s) return true; // show jobs without salary info
+          return s >= minK && s <= maxK;
+        });
+      }
+      allJobs = filteredJobs;
+      document.getElementById('jobsList').innerHTML = filteredJobs.map(renderJob).join('');
+      renderPagination(filteredJobs.length, salaryFilter ? filteredJobs.length : total);
 
     } catch(e) {
       document.getElementById('jobsList').innerHTML = `
@@ -1446,6 +1463,10 @@
   function renderApplyResults(data) {
     document.getElementById('drawerLetter').textContent = data.coverLetter || '';
     document.getElementById('drawerPitch').textContent = data.pitch || '';
+    const esWrap = document.getElementById('drawerEmailSubjectWrap');
+    const esEl = document.getElementById('drawerEmailSubject');
+    if (data.emailSubject) { esEl.textContent = data.emailSubject; esWrap.style.display = 'block'; }
+    else { esWrap.style.display = 'none'; }
 
     document.getElementById('drawerBullets').innerHTML = (data.cvBullets || []).map(b => `
       <div style="display:flex;align-items:flex-start;gap:8px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:10px 12px">
