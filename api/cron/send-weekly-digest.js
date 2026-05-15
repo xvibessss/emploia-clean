@@ -23,11 +23,11 @@ async function fetchTrendingJobs() {
 
 // Latest blog articles (static — update when new articles are added)
 const RECENT_ARTICLES = [
-  { slug: 'teletravail-negocier-2026',        title: 'Négocier le télétravail en 2026 : script + arguments qui marchent', emoji: '🏠' },
-  { slug: 'secteurs-qui-recrutent-2026',      title: 'Les 10 secteurs qui recrutent le plus en 2026',               emoji: '📈' },
+  { slug: 'reseaux-sociaux-recherche-emploi', title: 'Réseaux sociaux et recherche d\'emploi : guide 2026',           emoji: '🌐' },
+  { slug: 'preparer-entretien-technique',     title: 'Préparer un entretien technique en 48h',                        emoji: '💻' },
+  { slug: 'email-candidature-parfait',        title: "L'email de candidature parfait — structure + exemples",         emoji: '✉️' },
+  { slug: 'secteurs-qui-recrutent-2026',      title: 'Les 10 secteurs qui recrutent le plus en 2026',                emoji: '📈' },
   { slug: 'ia-et-emploi-2026',               title: 'IA et emploi 2026 : ce qui change pour les candidats',          emoji: '🤖' },
-  { slug: 'email-candidature-parfait',        title: "L'email de candidature parfait — structure + exemples",        emoji: '✉️' },
-  { slug: 'negocier-salaire-entretien',       title: 'Négocier son salaire sans se dévaluer — guide pratique',       emoji: '💰' },
 ];
 
 function jobRow(job) {
