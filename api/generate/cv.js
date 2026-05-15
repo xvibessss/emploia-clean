@@ -26,6 +26,14 @@ export default async function handler(req) {
   const profile = sanitizeString(body.profile, 8000);
   if (!jobOffer || !profile) return new Response(JSON.stringify({ error: "Offre et profil requis" }), { status: 400, headers: H_JSON });
 
+  const profileHints = {
+    'jeune-diplome': 'Le candidat est un jeune diplômé avec peu d\'expérience. Mets en avant la formation, les projets académiques, les stages et le potentiel d\'apprentissage.',
+    'experience': 'Le candidat est actuellement en poste et cherche discrètement. Valorise les réalisations chiffrées, la progression de carrière et l\'expertise métier.',
+    'reconversion': 'Le candidat est en reconversion professionnelle. Identifie et mets en avant les compétences transférables depuis son ancien secteur, et montre sa motivation pour le nouveau domaine.',
+    'recherche': 'Le candidat est en recherche active (France Travail / APEC). Optimise pour maximiser le score ATS et l\'impact dès la première lecture.',
+  };
+  const profileHint = profileHints[body.profileType] || '';
+
   if (user.plan === "free") {
     const freshCount = await getGenerationsUsed(user.email);
     const used = freshCount !== null ? freshCount : user.generationsUsed;
@@ -56,7 +64,7 @@ export default async function handler(req) {
         }],
         messages: [{
           role: "user",
-          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}\n\nGénère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:\n- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS\n- Mettre en avant les compétences les plus pertinentes pour le poste\n- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues\n- Utiliser des verbes d'action forts\n- Être concis et percutant`,
+          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:\n- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS\n- Mettre en avant les compétences les plus pertinentes pour le poste\n- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues\n- Utiliser des verbes d'action forts\n- Être concis et percutant`,
         }],
       }),
     });

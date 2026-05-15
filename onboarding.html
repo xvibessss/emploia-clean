@@ -213,7 +213,7 @@
             <div class="profile-opt-desc">France Travail / APEC</div>
           </div>
         </div>
-        <button class="btn-next" onclick="goStep(2)">Continuer →</button>
+        <button class="btn-next" onclick="validateStep1()">Continuer →</button>
       </div>
 
       <!-- STEP 2 -->
@@ -303,6 +303,19 @@ Canva, Google Analytics, Semrush, Notion"></textarea>
   let generatedResult = '';
   let selectedProfile = 'jeune-diplome';
 
+  function validateStep1() {
+    const name = document.getElementById('firstName').value.trim();
+    if (!name) {
+      const input = document.getElementById('firstName');
+      input.style.borderColor = '#f87171';
+      input.placeholder = 'Votre prénom est requis';
+      input.focus();
+      setTimeout(() => { input.style.borderColor = ''; }, 2500);
+      return;
+    }
+    goStep(2);
+  }
+
   function goStep(n) {
     document.getElementById('step-'+currentStep).classList.remove('active');
     // Update sidebar
@@ -346,7 +359,7 @@ Canva, Google Analytics, Semrush, Notion"></textarea>
       const res = await fetch('/api/generate/cv', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobOffer, profile: userProfile, stream: true }),
+        body: JSON.stringify({ jobOffer, profile: userProfile, profileType: selectedProfile, stream: true }),
       });
 
       if (!res.ok) {

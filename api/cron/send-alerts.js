@@ -45,14 +45,14 @@ function jobCard(job) {
 export default async function handler(req) {
   // Vercel injects Authorization: Bearer <CRON_SECRET> for scheduled calls
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
     return new Response('Unauthorized', { status: 401 });
   }
 
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return new Response(JSON.stringify({ error: 'No RESEND_API_KEY' }), { status: 500 });
 
-  const subscribers = await kvSmembers('alert_subscribers');
+  const subscribers = (await kvSmembers('alert_subscribers')) || [];
   const today = new Date().toISOString().split('T')[0];
 
   let sent = 0;

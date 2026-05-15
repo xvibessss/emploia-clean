@@ -51,7 +51,7 @@ function articleRow(article) {
 export default async function handler(req) {
   // Vercel injects Authorization: Bearer <CRON_SECRET> for scheduled calls
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
     return new Response('Unauthorized', { status: 401 });
   }
 

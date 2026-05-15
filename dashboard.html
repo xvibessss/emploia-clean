@@ -1617,7 +1617,7 @@
     try {
       const endpoints = { cv: '/api/generate/cv', lettre: '/api/generate/cover-letter', ats: '/api/generate/ats-score' };
       const body = curGenTab === 'ats' ? { jobOffer: offer, cvText: profile } : { jobOffer: offer, profile };
-      const res  = await fetch(endpoints[curGenTab], { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: body }) });
+      const res  = await fetch(endpoints[curGenTab], { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: body }) });
       const data = await res.json();
       if (data.result) {
         result.className = 'gen-result has-content';
