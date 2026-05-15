@@ -53,7 +53,7 @@ export default async function handler(req) {
       location: String(body.location || '').slice(0, 100),
       type: String(body.type || '').slice(0, 30),
       salary: body.salary ? String(body.salary).slice(0, 80) : null,
-      url: body.url ? String(body.url).slice(0, 500) : null,
+      url: body.url && /^https?:\/\//i.test(String(body.url)) ? String(body.url).slice(0, 500) : null,
       source: String(body.source || '').slice(0, 30),
       savedAt: new Date().toISOString(),
     };
