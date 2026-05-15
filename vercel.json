@@ -412,7 +412,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://emploia.fr https://emploia-clean.vercel.app https://plausible.io https://remotive.com https://www.arbeitnow.com https://api.stripe.com; frame-src https://js.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://js.stripe.com https://client.crisp.chat; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://emploia.fr https://emploia-clean.vercel.app https://plausible.io https://remotive.com https://www.arbeitnow.com https://api.stripe.com https://client.crisp.chat wss://client.relay.crisp.chat; frame-src https://js.stripe.com https://game.crisp.chat; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     },

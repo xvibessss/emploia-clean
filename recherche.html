@@ -1,1 +1,321 @@
-fatal: bad object origin/main:recherche.html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Recherche d'emploi en France — Emploia</title>
+  <meta name="description" content="Recherchez parmi des milliers d'offres d'emploi en France. CDI, CDD, alternance, stage — générez votre CV ATS en 30 secondes pour chaque offre."/>
+  <link rel="canonical" href="https://emploia.fr/recherche"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .rech-layout { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; }
+    .rech-hero { text-align: center; margin-bottom: 40px; }
+    .rech-hero h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 12px; }
+    .rech-hero p { font-size: 15px; color: var(--t2); }
+    .rech-search-box {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+    .rech-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    @media (max-width: 640px) { .rech-inputs { grid-template-columns: 1fr; } }
+    .rech-field label { font-size: 12px; color: var(--t3); font-weight: 600; margin-bottom: 6px; display: block; }
+    .rech-field input, .rech-field select {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r);
+      padding: 11px 14px;
+      color: var(--t1);
+      font-size: 14px;
+      transition: border-color .15s;
+    }
+    .rech-field input:focus, .rech-field select:focus {
+      outline: none;
+      border-color: var(--ind);
+    }
+    .rech-filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--brd2);
+    }
+    .rech-filter {
+      padding: 5px 14px;
+      border-radius: 100px;
+      background: var(--s3);
+      border: 1px solid var(--brd);
+      color: var(--t2);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .rech-filter.active {
+      background: var(--ind2);
+      border-color: var(--ind);
+      color: var(--inb);
+    }
+    .rech-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; font-size: 13px; color: var(--t3);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .rech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    .job-card {
+      background: var(--s2);
+      border: 1px solid var(--brd);
+      border-radius: var(--r3);
+      padding: 22px;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+    .job-card:hover { border-color: var(--brdh); transform: translateY(-2px); background: var(--s3); }
+    .job-card-top { display: flex; gap: 14px; margin-bottom: 14px; }
+    .job-logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: var(--s4);
+      border: 1px solid var(--brd);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .job-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+    .job-info { flex: 1; min-width: 0; }
+    .job-title { font-size: 15px; font-weight: 700; color: var(--t1); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .job-company { font-size: 13px; color: var(--t2); }
+    .job-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .job-tag { padding: 3px 10px; border-radius: 100px; font-size: 11px; background: var(--s3); border: 1px solid var(--brd); color: var(--t3); }
+    .job-tag.type { background: var(--ind2); border-color: rgba(99,102,241,.2); color: var(--inb); }
+    .job-card-footer { display: flex; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--brd2); }
+    .job-card-footer .btn { flex: 1; font-size: 12px; padding: 8px 12px; justify-content: center; }
+    .rech-empty { text-align: center; padding: 80px 24px; }
+    .rech-empty h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .rech-empty p { font-size: 14px; color: var(--t2); }
+    .rech-load-more { text-align: center; margin-top: 32px; }
+  </style>
+</head>
+<body>
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <a href="/profil" class="emp-nav-a">Profil</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">📋 Offres d'emploi</a>
+  <a href="/app">✨ Générer CV</a>
+  <a href="/interview">🎤 Entretien IA</a>
+  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/profil">👤 Mon Profil</a>
+  <div class="mn-div"></div>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
+
+<div class="rech-layout page-enter">
+  <div class="rech-hero">
+    <h1>Trouvez votre prochain emploi <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en France</span></h1>
+    <p>Milliers d'offres CDI, CDD, alternance et stage — générez votre CV pour chaque poste en 30 secondes</p>
+  </div>
+
+  <div class="rech-search-box">
+    <div class="rech-inputs">
+      <div class="rech-field">
+        <label>Poste, compétence, entreprise</label>
+        <input type="text" id="queryInput" placeholder="ex: Développeur React, Marketing, RH..." value=""/>
+      </div>
+      <div class="rech-field">
+        <label>Ville ou région</label>
+        <input type="text" id="locationInput" placeholder="ex: Paris, Lyon, Remote..."/>
+      </div>
+      <button class="btn btn-primary" onclick="doSearch()" style="white-space:nowrap">Rechercher</button>
+    </div>
+    <div class="rech-filters">
+      <span class="rech-filter active" data-type="">Tous</span>
+      <span class="rech-filter" data-type="full_time">CDI</span>
+      <span class="rech-filter" data-type="contract">CDD</span>
+      <span class="rech-filter" data-type="apprenticeship">Alternance</span>
+      <span class="rech-filter" data-type="internship">Stage</span>
+      <span class="rech-filter" data-type="freelance">Freelance</span>
+    </div>
+  </div>
+
+  <div class="rech-meta">
+    <span id="rechCount">Chargement des offres...</span>
+    <span id="rechTime" style="display:none;color:var(--t3)"></span>
+  </div>
+
+  <div class="rech-grid" id="rechGrid"></div>
+  <div id="rechEmpty" class="rech-empty" style="display:none">
+    <div style="font-size:48px;margin-bottom:16px">🔍</div>
+    <h2>Aucune offre trouvée</h2>
+    <p>Essayez d'autres mots-clés ou supprimez les filtres.</p>
+  </div>
+  <div class="rech-load-more" id="loadMoreDiv" style="display:none">
+    <button class="btn btn-ghost" onclick="loadMore()">Charger plus d'offres</button>
+  </div>
+</div>
+
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="/shared.js"></script>
+<script>
+  const JOB_TYPES = { full_time: 'CDI', part_time: 'Temps partiel', contract: 'CDD', internship: 'Stage', apprenticeship: 'Alternance', temporary: 'Intérim', freelance: 'Freelance' };
+  let allJobs = [], page = 1, activeType = '', isLoading = false;
+
+  function formatDate(d) {
+    if (!d) return '';
+    const diff = Math.floor((Date.now() - new Date(d)) / 86400000);
+    if (diff === 0) return "Aujourd'hui";
+    if (diff === 1) return "Hier";
+    if (diff < 7) return `Il y a ${diff}j`;
+    return `Il y a ${Math.floor(diff/7)} sem.`;
+  }
+
+  function renderJob(job) {
+    const card = document.createElement('div');
+    card.className = 'job-card reveal';
+    const typeLabel = JOB_TYPES[job.job_type] || job.job_type || '';
+    const encoded = encodeURIComponent((job.title || '') + (job.company_name ? ' chez ' + job.company_name : ''));
+    const logo = job.company_logo
+      ? `<img src="${esc(job.company_logo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🏢'">`
+      : '🏢';
+    card.innerHTML = `
+      <div class="job-card-top">
+        <div class="job-logo">${logo}</div>
+        <div class="job-info">
+          <div class="job-title">${esc(job.title || 'Poste non précisé')}</div>
+          <div class="job-company">${esc(job.company_name || '')}${job.location ? ' · ' + esc(job.location) : ''}</div>
+        </div>
+      </div>
+      <div class="job-tags">
+        ${typeLabel ? `<span class="job-tag type">${esc(typeLabel)}</span>` : ''}
+        ${job.remote ? '<span class="job-tag">🌐 Remote</span>' : ''}
+        ${job.created_at || job.date_posted ? `<span class="job-tag">${formatDate(job.created_at || job.date_posted)}</span>` : ''}
+      </div>
+      ${job.description ? `<div style="font-size:12px;color:var(--t3);line-height:1.6;margin-bottom:14px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(job.description.slice(0,200))}</div>` : ''}
+      <div class="job-card-footer">
+        <a href="/app?offre=${encoded}" class="btn btn-primary">✨ Générer CV</a>
+        ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>` : ''}
+      </div>`;
+
+    // Store job data for offre page
+    if (job.id) sessionStorage.setItem(`job_${job.id}`, JSON.stringify(job));
+    card.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      if (job.id) window.location.href = `/offre/${job.id}`;
+    });
+    return card;
+  }
+
+  async function doSearch(reset = true) {
+    if (isLoading) return;
+    isLoading = true;
+    if (reset) { allJobs = []; page = 1; }
+
+    const q = document.getElementById('queryInput').value.trim();
+    const loc = document.getElementById('locationInput').value.trim();
+    const grid = document.getElementById('rechGrid');
+
+    if (reset) { grid.innerHTML = '<div class="loading-state"><div class="spin"></div><span>Recherche en cours...</span></div>'; }
+
+    document.getElementById('rechCount').textContent = 'Recherche en cours...';
+    document.getElementById('rechEmpty').style.display = 'none';
+    document.getElementById('loadMoreDiv').style.display = 'none';
+
+    const t0 = Date.now();
+    try {
+      const params = new URLSearchParams({ page, limit: 24 });
+      if (q) params.set('q', q);
+      if (loc) params.set('location', loc);
+      if (activeType) params.set('type', activeType);
+
+      const r = await fetch(`/api/jobs-search?${params}`);
+      const data = await r.json();
+      const jobs = data.jobs || data.results || [];
+
+      if (reset) grid.innerHTML = '';
+      jobs.forEach(j => { allJobs.push(j); grid.appendChild(renderJob(j)); });
+
+      const total = data.total || allJobs.length;
+      document.getElementById('rechCount').textContent = `${total.toLocaleString('fr-FR')} offre${total > 1 ? 's' : ''} trouvée${total > 1 ? 's' : ''}`;
+      document.getElementById('rechTime').textContent = `en ${Date.now() - t0}ms`;
+      document.getElementById('rechTime').style.display = '';
+
+      if (jobs.length === 0 && allJobs.length === 0) document.getElementById('rechEmpty').style.display = 'block';
+      if (jobs.length === 24) { page++; document.getElementById('loadMoreDiv').style.display = 'block'; }
+
+      // Trigger scroll reveal
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    } catch {
+      document.getElementById('rechCount').textContent = 'Erreur lors de la recherche';
+    }
+    isLoading = false;
+  }
+
+  function loadMore() { doSearch(false); }
+
+  // Filter buttons
+  document.querySelectorAll('.rech-filter').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('.rech-filter').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      activeType = f.dataset.type;
+      doSearch();
+    });
+  });
+
+  // Search on Enter
+  document.getElementById('queryInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  document.getElementById('locationInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // Pre-fill from URL params
+  const sp = new URLSearchParams(window.location.search);
+  if (sp.get('q')) document.getElementById('queryInput').value = sp.get('q');
+  if (sp.get('location')) document.getElementById('locationInput').value = sp.get('location');
+  if (sp.get('type')) {
+    activeType = sp.get('type');
+    document.querySelectorAll('.rech-filter').forEach(f => {
+      f.classList.toggle('active', f.dataset.type === activeType);
+    });
+  }
+
+  doSearch();
+</script>
+</body>
+</html>
