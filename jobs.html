@@ -1004,6 +1004,7 @@
   const saved   = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs')   || '[]'); } catch { return []; } })());
   let allJobs = [];
   const tracked = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]'); } catch { return []; } })());
+  let applyQueueIds = new Set((() => { try { return (JSON.parse(localStorage.getItem('emploia_apply_queue') || '[]')).map(q => String(q.id)); } catch { return []; } })());
 
   function setType(btn) {
     document.querySelectorAll('.type-chip').forEach(b => b.classList.remove('active'));
@@ -1124,8 +1125,7 @@
     const isNew = daysSince < 3;
     const isSaved = saved.has(job.id);
     const isTracked = tracked.has(job.id);
-    const applyQueue = JSON.parse(localStorage.getItem('emploia_apply_queue') || '[]');
-    const isQueued = applyQueue.some(q => String(q.id) === String(job.id));
+    const isQueued = applyQueueIds.has(String(job.id));
     const sourceStyle = {
       'France Travail': 'color:var(--blb);background:var(--bld)',
       'APEC': 'color:#a78bfa;background:rgba(167,139,250,.1)',
@@ -1285,9 +1285,9 @@
     const job = allJobs.find(j => String(j.id) === String(id));
     if (!job) return;
     const queueKey = 'emploia_apply_queue';
-    let queue = JSON.parse(localStorage.getItem(queueKey) || '[]');
-    const already = queue.some(q => String(q.id) === String(id));
-    if (already) {
+    let queue;
+    try { queue = JSON.parse(localStorage.getItem(queueKey) || '[]'); } catch { queue = []; }
+    if (queue.some(q => String(q.id) === String(id))) {
       window.location.href = '/apply-queue';
       return;
     }
@@ -1298,6 +1298,7 @@
       status: 'queued', addedAt: Date.now(),
     });
     localStorage.setItem(queueKey, JSON.stringify(queue.slice(0, 50)));
+    applyQueueIds.add(String(id));
     btn.textContent = '📬 En file';
     btn.classList.add('queued');
     empToast('Ajouté à la file ! <a href="/apply-queue" style="color:inherit;text-decoration:underline">Voir la file →</a>', 'success');
@@ -1385,8 +1386,9 @@
     const p = new URLSearchParams(window.location.search);
     if (p.get('q')) document.getElementById('searchInput').value = p.get('q');
     if (p.get('location')) document.getElementById('locationInput').value = p.get('location');
-    if (p.get('type') && p.get('type') !== 'tous') {
-      const btn = document.querySelector(`.type-chip[data-type="${p.get('type')}"]`);
+    const typeParam = (p.get('type') || '').replace(/[^a-z0-9-]/gi, '');
+    if (typeParam && typeParam !== 'tous') {
+      const btn = document.querySelector(`.type-chip[data-type="${typeParam}"]`);
       if (btn) setType(btn);
     }
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
@@ -1597,6 +1599,7 @@
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: copilotHistory }),
       });
