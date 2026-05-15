@@ -1055,6 +1055,7 @@
       const userProfile = localStorage.getItem('emploia_profile_text') || '';
       const res = await fetch('/api/match-score', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jobTitle, jobDescription: jobDescription.slice(0, 800), userProfile }),
       });

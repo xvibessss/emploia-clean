@@ -1052,7 +1052,7 @@
     if (window.empUser) {
       try {
         const res = await fetch('/api/profile', {
-          method: 'PUT', credentials: 'same-origin',
+          method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
@@ -1074,7 +1074,7 @@
   async function loadProfileFromServer() {
     if (!window.empUser) return;
     try {
-      const res = await fetch('/api/profile', { credentials: 'same-origin' });
+      const res = await fetch('/api/profile', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data || !data.firstName) return;
@@ -1152,7 +1152,7 @@
       localStorage.setItem('emploia_profile_text', raw);
       // Try to extract structured info with Claude via /api/import-cv
       const res = await fetch('/api/import-cv', {
-        method: 'POST', credentials: 'same-origin',
+        method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: raw }),
       });

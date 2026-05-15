@@ -740,7 +740,7 @@ function saveCV() {
     if (window.empUser) {
       try {
         await fetch('/api/profile', {
-          method: 'PUT', credentials: 'same-origin',
+          method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             firstName: cv.name?.split(' ')[0] || '',
@@ -1418,7 +1418,7 @@ async function loadFromProfile(user) {
   const isDefault = cv.name === 'Marie Dupont';
   if (!isDefault) return;
   try {
-    const res = await fetch('/api/profile', { credentials: 'same-origin' });
+    const res = await fetch('/api/profile', { credentials: 'include' });
     if (!res.ok) return;
     const p = await res.json();
     const name = [p.firstName, p.lastName].filter(Boolean).join(' ') || user.name || '';
