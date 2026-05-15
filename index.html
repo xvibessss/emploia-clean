@@ -1099,6 +1099,7 @@
 <div class="emp-mobile-nav" id="empMobileNav">
   <a href="/jobs">📋 Offres d'emploi</a>
   <a href="#features">⚡ Fonctionnalités</a>
+  <a href="/tools">🔗 Outils IA</a>
   <a href="/blog">📝 Blog</a>
   <a href="/interview">🎤 Simulateur entretien</a>
   <a href="#pricing">💳 Tarifs</a>
@@ -1288,7 +1289,7 @@
     <div class="section-header">
       <div class="section-tag">Fonctionnalités</div>
       <h2 class="section-title">Tout ce dont vous avez besoin</h2>
-      <p class="section-sub" style="margin:0 auto">Quatre outils IA + recherche d'offres + dashboard — pensés pour le marché français.</p>
+      <p class="section-sub" style="margin:0 auto">8 outils IA + recherche d'offres + dashboard — pensés pour le marché français.</p>
     </div>
     <div class="feat-grid">
       <div class="feat-card">
@@ -1327,6 +1328,21 @@
         <p>Suivez toutes vos candidatures : vue kanban ou liste, export CSV, deadlines de relance. Organisé comme un pro.</p>
         <span class="feat-badge">Export CSV</span>
       </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔗</div>
+        <h3>Optimisation LinkedIn</h3>
+        <p>Section "À propos", titre et top 10 compétences générés par l'IA. Apparaissez dans les recherches des recruteurs.</p>
+        <span class="feat-badge">Gratuit ✦</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <h3>Négociation Salariale</h3>
+        <p>Email + script d'appel + arguments personnalisés. Négociez avec confiance grâce à un kit complet généré en 30 secondes.</p>
+        <span class="feat-badge pro" style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(59,130,246,.1));color:var(--inb)">Pro</span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:28px">
+      <a href="/tools" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--s2);border:1.5px solid var(--brd);border-radius:11px;font-size:13px;font-weight:700;color:var(--t1);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--brdh)'" onmouseout="this.style.borderColor='var(--brd)'">Voir tous les outils IA →</a>
     </div>
   </div>
 </section>
@@ -1441,6 +1457,8 @@
       <div class="ct-row"><div class="ct-c feat-name">Lettre de motivation IA</div><div class="ct-c hl"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-partial">Partiel</span></div><div class="ct-c"><span class="ct-ok">✓</span></div></div>
       <div class="ct-row"><div class="ct-c feat-name">Recherche offres France Travail</div><div class="ct-c hl"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-no">✗</span></div><div class="ct-c"><span class="ct-no">✗</span></div></div>
       <div class="ct-row"><div class="ct-c feat-name">Simulateur entretien</div><div class="ct-c hl"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-no">✗</span></div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Négociation salariale IA</div><div class="ct-c hl"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-no">✗</span></div><div class="ct-c"><span class="ct-no">✗</span></div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Bilan post-entretien IA</div><div class="ct-c hl"><span class="ct-ok">✓</span></div><div class="ct-c"><span class="ct-no">✗</span></div><div class="ct-c"><span class="ct-no">✗</span></div></div>
       <div class="ct-row">
         <div class="ct-c feat-name">Prix mensuel</div>
         <div class="ct-c hl" style="color:var(--gnb);font-weight:700">9€/mois</div>
@@ -1590,12 +1608,13 @@
         <div class="plan-div"></div>
         <ul class="plan-feats">
           <li><span class="pfc">✓</span> Générations illimitées</li>
-          <li><span class="pfc">✓</span> CV ATS-optimisé</li>
-          <li><span class="pfc">✓</span> Lettre de motivation</li>
+          <li><span class="pfc">✓</span> CV ATS-optimisé + Lettre de motivation</li>
           <li><span class="pfc">✓</span> Score ATS détaillé</li>
           <li><span class="pfc">✓</span> Optimisation LinkedIn</li>
           <li><span class="pfc">✓</span> Simulateur entretien illimité</li>
-          <li><span class="pfc">✓</span> Recherche d'offres premium</li>
+          <li><span class="pfc">✓</span> Négociation salariale IA</li>
+          <li><span class="pfc">✓</span> Bilan post-entretien IA</li>
+          <li><span class="pfc">✓</span> 20 versions de CV sauvegardées</li>
           <li><span class="pfc">✓</span> Dashboard + Export CSV</li>
         </ul>
         <button class="btn-plan bp-primary" onclick="if(window.plausible)plausible('pro_plan_cta');openPayment('pro','9€/mois','Pro')">Démarrer l'essai gratuit →</button>
@@ -1931,7 +1950,9 @@
     pro: [
       'Générations illimitées (CV, lettre, score ATS)',
       'Simulateur d\'entretien IA illimité',
-      'Optimisation LinkedIn',
+      'Négociation salariale IA + Bilan post-entretien',
+      'Optimisation LinkedIn + Email de relance',
+      '20 versions de CV sauvegardées',
       'Dashboard + Export CSV',
     ],
     intensif: [

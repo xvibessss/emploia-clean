@@ -39,11 +39,12 @@ export default async function handler(req) {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       signal: AbortSignal.timeout(40000),
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-beta": "prompt-caching-2024-07-31" },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 4096,
         stream: true,
+        system: [{ type: 'text', text: "Tu es un expert en rédaction de lettres de motivation professionnelles pour le marché français. Tu génères des lettres percutantes, personnalisées et authentiques.", cache_control: { type: 'ephemeral' } }],
         messages: [{
           role: "user",
           content: `Tu es un expert en rédaction de lettres de motivation en France.

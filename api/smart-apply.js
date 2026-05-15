@@ -79,10 +79,11 @@ Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de backtick) :
   try {
     const res = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 2500,
+        system: [{ type: 'text', text: 'Tu es un expert en candidature et rédaction professionnelle pour le marché français. Tu génères des dossiers de candidature complets et percutants. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 35000);

@@ -58,10 +58,11 @@ Règles : score entre 50 et 97. verdict parmi : "Excellent match", "Bon profil",
   try {
     const res = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 300,
+        system: [{ type: 'text', text: 'Tu es un expert ATS et recruteur senior en France. Tu évalues la correspondance entre un profil candidat et une offre d\'emploi. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 20000);
@@ -74,7 +75,7 @@ Règles : score entre 50 et 97. verdict parmi : "Excellent match", "Bon profil",
     let result;
     try { result = JSON.parse(text); }
     catch {
-      const m = text.match(/\{[\s\S]*?\}/);
+      const m = text.match(/\{[\s\S]*\}/);
       if (m) try { result = JSON.parse(m[0]); } catch {}
     }
 

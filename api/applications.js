@@ -29,10 +29,29 @@ export default async function handler(req) {
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
   const key = `apps:${user.email}`;
-  const id = new URL(req.url).searchParams.get('id');
+  const parsedUrl = new URL(req.url);
+  const id = parsedUrl.searchParams.get('id');
 
   if (req.method === 'GET') {
     const apps = await kvGet(key) || [];
+    const statsOnly = parsedUrl.searchParams.get('stats') === '1';
+    if (statsOnly) {
+      const now = Date.now();
+      const week = 7 * 86400000;
+      const stats = {
+        total:     apps.length,
+        wishlist:  apps.filter(a => a.status === 'wishlist').length,
+        applied:   apps.filter(a => a.status === 'applied').length,
+        interview: apps.filter(a => a.status === 'interview').length,
+        offer:     apps.filter(a => a.status === 'offer').length,
+        rejected:  apps.filter(a => a.status === 'rejected').length,
+        thisWeek:  apps.filter(a => (now - (a.createdAt || 0)) < week).length,
+        responseRate: apps.length > 0
+          ? Math.round((apps.filter(a => ['interview','offer'].includes(a.status)).length / Math.max(apps.filter(a => a.status !== 'wishlist').length, 1)) * 100)
+          : 0,
+      };
+      return new Response(JSON.stringify({ stats }), { status: 200, headers: H });
+    }
     return new Response(JSON.stringify({ applications: apps }), { status: 200, headers: H });
   }
 

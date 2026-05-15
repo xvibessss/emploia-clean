@@ -10,7 +10,7 @@ async function fetchAPECRSS(q, type) {
     const query = q || 'ingénieur développeur manager';
     const res = await fetch(
       `https://www.apec.fr/candidat/recherche-emploi.html/emploi?sortsType=SCORE&sortsDirection=DESC&motsCles=${encodeURIComponent(query)}&libelleMetier=&nbParPage=20&page=0&lieu=75%7C1%7CParis%7CParis`,
-      { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
+      { signal: AbortSignal.timeout(8000), headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
     );
     if (!res.ok) return [];
     const data = await res.json();
@@ -41,6 +41,7 @@ async function fetchHelloWork(q, type, location) {
       contract: type === 'stage' ? 'stage' : type === 'alternance' ? 'alternance' : '',
     });
     const res = await fetch(`https://www.hellowork.com/fr-fr/emploi/recherche.html?${params}`, {
+      signal: AbortSignal.timeout(8000),
       headers: {
         Accept: 'application/json',
         'User-Agent': 'Mozilla/5.0',

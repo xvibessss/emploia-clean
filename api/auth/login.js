@@ -42,13 +42,17 @@ export default async function handler(req) {
 
   const user = await kvGet(`user:${email}`);
   // Use same error message for missing user and wrong password to prevent user enumeration
-  if (!user || !user.passwordHash) {
+  if (!user) {
     return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
   }
 
-  // Google-only accounts have no local password
+  // Google-only accounts have no local password — check before the passwordHash guard
   if (user.provider === 'google' && !user.passwordHash) {
     return new Response(JSON.stringify({ error: "Ce compte utilise la connexion Google. Utilisez 'Continuer avec Google'." }), { status: 401, headers: H });
+  }
+
+  if (!user.passwordHash) {
+    return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
   }
 
   const valid = await verifyPassword(password, user.passwordHash, user.passwordSalt);

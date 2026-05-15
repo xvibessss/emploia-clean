@@ -515,6 +515,7 @@
     <div class="emp-nav-links">
       <a href="/jobs" class="emp-nav-a">Offres</a>
       <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/tools" class="emp-nav-a">Outils</a>
       <a href="/interview" class="emp-nav-a active">Entretien IA</a>
       <a href="/dashboard" class="emp-nav-a">Dashboard</a>
       <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
@@ -1068,6 +1069,16 @@
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessions.slice(0, 10)));
     renderSessionHistory();
     empToast('Session sauvegardée !', 'success');
+    // Show a post-session debrief CTA after saving
+    const ctaId = 'debriefCta';
+    if (!document.getElementById(ctaId)) {
+      const cta = document.createElement('div');
+      cta.id = ctaId;
+      cta.style.cssText = 'background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(59,130,246,.05));border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:14px 18px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px';
+      cta.innerHTML = `<div><div style="font-size:13px;font-weight:800;color:var(--t1)">🎤 Faites un bilan post-entretien</div><div style="font-size:11px;color:var(--t2);margin-top:2px">Analysez vos points forts, axes d'amélioration et obtenez un email de remerciement</div></div><a href="/tools" style="padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6366f1,#3b82f6);text-decoration:none;flex-shrink:0">Bilan IA →</a>`;
+      const histContainer = document.getElementById('sessionHistory')?.parentElement;
+      if (histContainer) histContainer.insertBefore(cta, histContainer.firstChild);
+    }
   }
 
   function renderSessionHistory() {

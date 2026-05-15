@@ -12,7 +12,7 @@
       "maxDuration": 60
     },
     "api/generate/ats-score.js": {
-      "maxDuration": 30
+      "maxDuration": 15
     },
     "api/applications.js": {
       "maxDuration": 15
@@ -127,6 +127,18 @@
     },
     "api/cron/send-weekly-digest.js": {
       "maxDuration": 45
+    },
+    "api/generate/linkedin-summary.js": {
+      "maxDuration": 30
+    },
+    "api/generate/salary-negotiation.js": {
+      "maxDuration": 30
+    },
+    "api/cv-versions.js": {
+      "maxDuration": 10
+    },
+    "api/generate/interview-debrief.js": {
+      "maxDuration": 30
     }
   },
   "crons": [
@@ -346,7 +358,12 @@
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },
     { "source": "/api/weekly-report", "destination": "/api/weekly-report" },
-    { "source": "/api/generate/linkedin-outreach", "destination": "/api/generate/linkedin-outreach" }
+    { "source": "/api/generate/linkedin-outreach", "destination": "/api/generate/linkedin-outreach" },
+    { "source": "/api/generate/linkedin-summary", "destination": "/api/generate/linkedin-summary" },
+    { "source": "/api/generate/salary-negotiation", "destination": "/api/generate/salary-negotiation" },
+    { "source": "/api/cv-versions", "destination": "/api/cv-versions" },
+    { "source": "/api/generate/interview-debrief", "destination": "/api/generate/interview-debrief" },
+    { "source": "/tools", "destination": "/tools.html" }
   ],
   "headers": [
     {
@@ -391,7 +408,7 @@
       ]
     },
     {
-      "source": "/(.*\\.html|app|dashboard|jobs|blog|interview|referral|onboarding|cv-builder|/)",
+      "source": "/(.*\\.html|app|dashboard|jobs|blog|interview|tools|referral|onboarding|cv-builder|/)",
       "headers": [
         {
           "key": "Content-Security-Policy",

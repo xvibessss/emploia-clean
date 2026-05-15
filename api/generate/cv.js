@@ -39,29 +39,24 @@ export default async function handler(req) {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       signal: AbortSignal.timeout(40000),
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "prompt-caching-2024-07-31",
+      },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 4096,
         stream: true,
+        system: [{
+          type: "text",
+          text: "Tu es un expert en rédaction de CV professionnels en France. Tu génères des CVs complets et percutants, parfaitement adaptés aux offres d'emploi et optimisés pour les systèmes ATS. Tu utilises les mots-clés exacts de l'offre, des verbes d'action forts, et une structure claire. Format: texte structuré avec des tirets et sections bien délimitées (En-tête, Profil/Résumé, Expériences, Formation, Compétences, Langues).",
+          cache_control: { type: "ephemeral" },
+        }],
         messages: [{
           role: "user",
-          content: `Tu es un expert en rédaction de CV professionnels en France.
-
-OFFRE D'EMPLOI:
-${jobOffer}
-
-PROFIL DU CANDIDAT:
-${profile}
-
-Génère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:
-- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS
-- Mettre en avant les compétences les plus pertinentes pour le poste
-- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues
-- Utiliser des verbes d'action forts
-- Être concis et percutant
-
-Format: texte structuré clair avec des tirets et des sections bien délimitées.`,
+          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}\n\nGénère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:\n- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS\n- Mettre en avant les compétences les plus pertinentes pour le poste\n- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues\n- Utiliser des verbes d'action forts\n- Être concis et percutant`,
         }],
       }),
     });

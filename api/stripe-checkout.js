@@ -57,6 +57,7 @@ export default async function handler(req) {
   try {
     const session = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
+      signal: AbortSignal.timeout(10000),
       headers: {
         Authorization: `Bearer ${STRIPE_SECRET}`,
         'Content-Type': 'application/x-www-form-urlencoded',

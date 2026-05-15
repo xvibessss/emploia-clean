@@ -169,6 +169,7 @@
     <div class="emp-nav-links">
       <a href="/jobs" class="emp-nav-a">Offres</a>
       <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/tools" class="emp-nav-a">Outils</a>
       <a href="/interview" class="emp-nav-a">Entretien</a>
       <a href="/dashboard" class="emp-nav-a">Dashboard</a>
       <a href="/profil" class="emp-nav-a">Profil</a>
@@ -675,6 +676,7 @@
     try {
       const res = await fetch('/api/company-insights', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           company: currentJob.company_name || '',

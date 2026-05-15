@@ -72,20 +72,20 @@ export default async function handler(req) {
     if (!activeAlerts.length) continue;
 
     const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
-    const sections = [];
 
-    for (const alert of activeAlerts) {
-      // TTL: daily/realtime → 22h, weekly → 6d
-      const ttl = alert.frequency === 'weekly' ? 6 * 86400 : 22 * 3600;
-      const sentKey = `alertSent:${email}:${alert.id}`;
-      const alreadySent = await kvGet(sentKey);
-      if (alreadySent) { skipped++; continue; }
+    // Parallel: check all sent-flags at once instead of sequentially
+    const sentChecks = await Promise.all(activeAlerts.map(a => kvGet(`alertSent:${email}:${a.id}`)));
+    const unsentAlerts = activeAlerts.filter((_, i) => !sentChecks[i]);
+    skipped += activeAlerts.length - unsentAlerts.length;
 
-      const jobs = await fetchJobs(alert.keywords, alert.location, alert.type);
-      if (!jobs.length) continue;
+    if (!unsentAlerts.length) continue;
 
-      sections.push({ alert, jobs });
-    }
+    // Parallel: fetch jobs for all unsent alerts at once (each fetch can take up to 8s)
+    const jobsResults = await Promise.allSettled(unsentAlerts.map(a => fetchJobs(a.keywords, a.location, a.type)));
+
+    const sections = unsentAlerts
+      .map((alert, i) => ({ alert, jobs: jobsResults[i].status === 'fulfilled' ? jobsResults[i].value : [] }))
+      .filter(({ jobs }) => jobs.length > 0);
 
     if (!sections.length) continue;
 

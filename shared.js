@@ -584,6 +584,7 @@ async function empAuthInit() {
       const data = await res.json();
       window.empUser = data.user;
       empUpdateNav(data.user);
+      window.dispatchEvent(new CustomEvent('empUserLoaded', { detail: data.user }));
       // Inject auth link in mobile nav
       const mobileNav = document.getElementById('empMobileNav');
       if (mobileNav) {
@@ -654,6 +655,11 @@ async function empAuthInit() {
     { icon:'👤', title:'Mon Profil', sub:'Compétences, expériences', url:'/profil' },
     { icon:'🏗', title:'CV Builder', sub:'Éditeur visuel de CV', url:'/cv-builder' },
     { icon:'📝', title:'Mon Profil de candidat', sub:'Éditer mon profil IA', url:'/app' },
+    { icon:'🔗', title:'Optimiser LinkedIn', sub:'Résumé et compétences IA', url:'/tools' },
+    { icon:'💰', title:'Négociation salariale', sub:'Email + script + arguments Pro', url:'/tools' },
+    { icon:'📧', title:'Email de relance', sub:'Relancer une candidature en 30s', url:'/tools' },
+    { icon:'💬', title:'Message LinkedIn', sub:'Outreach recruteur personnalisé', url:'/tools' },
+    { icon:'🎯', title:'Bilan post-entretien', sub:'Analyse IA après entretien (Pro)', url:'/tools' },
   ];
 
   let activeIdx = -1;

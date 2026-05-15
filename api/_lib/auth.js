@@ -20,6 +20,7 @@ async function upstash(command) {
   try {
     const res = await fetch(UPSTASH_URL, {
       method: "POST",
+      signal: AbortSignal.timeout(5000),
       headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
       body: JSON.stringify(command),
     });
@@ -173,7 +174,7 @@ export async function verifyToken(token) {
 export function setCookieHeader(token) {
   // __Host- prefix: enforces HTTPS + no domain attribute + path=/
   // This prevents cookie hijacking and subdomain attacks
-  return `__Host-emploia-token=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Strict; Secure`;
+  return `__Host-emploia-token=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
 }
 
 function getToken(req) {

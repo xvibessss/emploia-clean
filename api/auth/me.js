@@ -24,10 +24,7 @@ export default async function handler(req) {
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
 
-  // Fetch referral stats alongside user (parallel)
-  const [refCode] = await Promise.all([
-    kvGet(`refcode:${user.id}`),
-  ]);
+  const refCode = await kvGet(`refcode:${user.id}`);
   let referral = null;
   if (refCode) {
     const refData = await kvGet(`ref:${refCode}`) || {};
@@ -137,7 +134,7 @@ export default async function handler(req) {
       if (daysPro >= 0.5 && daysPro < 3) {
         sendDrip('dripPro1Sent', `Bienvenue dans Emploia Pro, ${firstName} ! Voici comment en tirer le max 🚀`, baseHtml(
           `Vous êtes Pro — voici votre guide de démarrage`,
-          `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Bienvenue dans Emploia Pro ! Votre accès illimité est actif. Voici les 3 actions les plus impactantes que nos meilleurs utilisateurs font dans les 48 premières heures :</p>
+          `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Bienvenue dans Emploia Pro ! Votre accès illimité est actif. Voici les 4 actions les plus impactantes que nos meilleurs utilisateurs font dans les 48 premières heures :</p>
 <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px">
   <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
     <span style="font-size:24px;flex-shrink:0">1️⃣</span>
@@ -145,14 +142,18 @@ export default async function handler(req) {
   </div>
   <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
     <span style="font-size:24px;flex-shrink:0">2️⃣</span>
-    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Configurez une alerte emploi</div><div style="font-size:13px;color:#475569">Activez vos alertes pour recevoir les meilleures offres correspondant à votre profil chaque matin directement dans votre boîte mail.</div></div>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Optimisez votre profil LinkedIn</div><div style="font-size:13px;color:#475569">Accédez aux outils Pro : optimisation LinkedIn, négociation salariale, et bilan post-entretien IA — tout sur <a href="https://emploia.fr/tools" style="color:#6366f1">emploia.fr/tools</a>.</div></div>
   </div>
   <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
     <span style="font-size:24px;flex-shrink:0">3️⃣</span>
-    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Testez le simulateur d'entretien</div><div style="font-size:13px;color:#475569">Préparez vos entretiens avec l'IA en mode recruteur — posez-lui votre prochain poste cible et entraînez-vous aux questions les plus probables.</div></div>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Configurez une alerte emploi</div><div style="font-size:13px;color:#475569">Activez vos alertes pour recevoir les meilleures offres correspondant à votre profil chaque matin directement dans votre boîte mail.</div></div>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
+    <span style="font-size:24px;flex-shrink:0">4️⃣</span>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Testez le simulateur d'entretien</div><div style="font-size:13px;color:#475569">Préparez vos entretiens avec l'IA, puis faites un bilan post-entretien pour identifier vos axes d'amélioration et rédiger votre email de remerciement.</div></div>
   </div>
 </div>
-<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer maintenant →</a>`
+<a href="https://emploia.fr/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Découvrir tous mes outils Pro →</a>`
         )).catch(() => {});
       }
 
@@ -184,6 +185,9 @@ export default async function handler(req) {
 </div>
 <p style="color:#475569;line-height:1.6;margin:0 0 20px">Ce double contact augmente le taux de réponse de <strong>3,2×</strong> selon nos données.</p>
 <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+  <a href="https://emploia.fr/tools" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+    <span style="font-size:20px">💬</span><div style="font-size:13px;font-weight:700;color:#0f172a">Générer un message LinkedIn en 10 secondes</div>
+  </a>
   <a href="https://emploia.fr/jobs" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">🔍</span><div style="font-size:13px;font-weight:700;color:#0f172a">Trouver des offres + employés à contacter</div>
   </a>
@@ -191,7 +195,7 @@ export default async function handler(req) {
     <span style="font-size:20px">🎤</span><div style="font-size:13px;font-weight:700;color:#0f172a">Préparer votre prochain entretien</div>
   </a>
 </div>
-<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Ouvrir mon espace →</a>`
+<a href="https://emploia.fr/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Accéder aux outils Pro →</a>`
         )).catch(() => {});
       }
     }
@@ -217,5 +221,5 @@ export default async function handler(req) {
     }
   }
 
-  return new Response(JSON.stringify({ user: safeUser, referral }), { status: 200, headers: H });
+  return new Response(JSON.stringify({ user: safeUser }), { status: 200, headers: H });
 }

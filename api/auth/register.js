@@ -102,11 +102,11 @@ export default async function handler(req) {
     const firstName = htmlEscape(name.split(' ')[0]);
     const refChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     const refSeed = id.slice(-8);
-    let refCode = '';
+    let welcomeRefCode = '';
     for (let i = 0; i < 8; i++) {
-      refCode += refChars[(refSeed.charCodeAt(i % refSeed.length) + i * 7) % refChars.length];
+      welcomeRefCode += refChars[(refSeed.charCodeAt(i % refSeed.length) + i * 7) % refChars.length];
     }
-    const refLink = `https://emploia.fr/?ref=${refCode}`;
+    const refLink = `https://emploia.fr/?ref=${welcomeRefCode}`;
     fetch('https://api.resend.com/emails', {
       method: 'POST',
       signal: AbortSignal.timeout(8000),
@@ -145,7 +145,7 @@ export default async function handler(req) {
       <div style="margin-top:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
         <p style="color:#0f172a;font-size:13px;font-weight:700;margin:0 0 8px">🎁 Votre code de parrainage</p>
         <p style="color:#475569;font-size:12px;margin:0 0 12px;line-height:1.5">Partagez Emploia et gagnez <strong>1 mois Pro offert</strong> par ami inscrit (max 3 mois).</p>
-        <div style="background:#fff;border:1.5px dashed #6366f1;border-radius:10px;padding:10px 16px;text-align:center;font-size:18px;font-weight:900;color:#6366f1;letter-spacing:3px">${refCode}</div>
+        <div style="background:#fff;border:1.5px dashed #6366f1;border-radius:10px;padding:10px 16px;text-align:center;font-size:18px;font-weight:900;color:#6366f1;letter-spacing:3px">${welcomeRefCode}</div>
         <a href="${refLink}" style="display:block;margin-top:10px;text-align:center;font-size:12px;color:#6366f1;text-decoration:none">Ou partagez ce lien →</a>
       </div>
     </div>

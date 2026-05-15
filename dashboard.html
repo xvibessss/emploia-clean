@@ -166,7 +166,7 @@
     /* ── STATS ROW ──────────────────────────── */
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 14px;
       margin-bottom: 24px;
     }
@@ -763,6 +763,7 @@
     <div class="emp-nav-links">
       <a href="/jobs" class="emp-nav-a">Offres</a>
       <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/tools" class="emp-nav-a">Outils</a>
       <a href="/interview" class="emp-nav-a">Entretien</a>
       <a href="/dashboard" class="emp-nav-a active">Dashboard</a>
       <a href="/profil" class="emp-nav-a">Profil</a>
@@ -890,6 +891,12 @@
       <div class="sc-label">En attente de réponse</div>
       <div class="sc-delta" id="statPendingDelta">—</div>
     </div>
+    <div class="stat-card">
+      <div class="sc-icon" style="background:rgba(34,197,94,.1)">📈</div>
+      <div class="sc-value" id="statResponseRate">—</div>
+      <div class="sc-label">Taux de réponse</div>
+      <div class="sc-delta" id="statResponseRateDelta">—</div>
+    </div>
   </div>
 
   <!-- ACTIVITY CHART -->
@@ -985,7 +992,7 @@
 
       <!-- UPGRADE -->
       <div class="upgrade-banner" style="margin-top:16px">
-        <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, des alertes email et l'export CSV complet.</div>
+        <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, la négociation salariale IA, le bilan post-entretien et 20 versions de CV.</div>
         <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
       </div>
 
@@ -1715,11 +1722,14 @@
     const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     const cls = (id, c) => { const el = document.getElementById(id); if (el) el.className = 'sc-delta ' + c; };
 
+    const responseRate = total > 0 ? Math.round((interviewsAndOffers / Math.max(total - wishlist, 1)) * 100) : 0;
+
     s('statTotal', total || '0');
     s('statInterviews', interviewsAndOffers || '0');
     s('statOffers', offers || '0');
     s('statWishlist', wishlist || '0');
     s('statPending', pending || '0');
+    s('statResponseRate', total > 0 ? responseRate + '%' : '—');
     s('wbTotal', total);
     s('wbInterviews', interviewsAndOffers);
 
@@ -1738,6 +1748,12 @@
     if (overdue > 0) { cls('statPendingDelta', 'down'); s('statPendingDelta', `↓ ${overdue} relance${overdue > 1 ? 's' : ''} à faire`); }
     else if (pending > 0) { cls('statPendingDelta', 'up'); s('statPendingDelta', '✓ À jour'); }
     else { cls('statPendingDelta', ''); s('statPendingDelta', '—'); }
+
+    if (total - wishlist > 0) {
+      const rateLabel = responseRate >= 20 ? 'Excellent 🎯' : responseRate >= 10 ? 'Dans la moyenne' : responseRate > 0 ? 'Optimisez votre CV' : 'En attente de retours';
+      cls('statResponseRateDelta', responseRate >= 20 ? 'up' : responseRate >= 10 ? '' : 'down');
+      s('statResponseRateDelta', rateLabel);
+    } else { s('statResponseRateDelta', '—'); }
 
     updateConseilDuJour(apps);
     renderActivityChart(apps);

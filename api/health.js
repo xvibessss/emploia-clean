@@ -7,6 +7,7 @@ async function pingUpstash() {
   try {
     const res = await fetch(url, {
       method: 'POST',
+      signal: AbortSignal.timeout(3000),
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(['PING']),
     });

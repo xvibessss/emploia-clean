@@ -13,6 +13,8 @@
   <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.fr/cv-builder"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -424,6 +426,7 @@
       <button class="ed-tab" onclick="setTab(this,'lang')">🌍 Langues</button>
       <button class="ed-tab" onclick="setTab(this,'design')">🎨 Design</button>
       <button class="ed-tab" onclick="setTab(this,'sections')">☰ Sections</button>
+      <button class="ed-tab" onclick="setTab(this,'versions')">☁ Versions</button>
     </div>
 
     <!-- PERSO -->
@@ -560,6 +563,25 @@
     <div class="ed-section" data-tab="sections">
       <p class="sections-note">Glissez-déposez pour réorganiser. Cliquez sur l'œil pour masquer une section dans votre CV.</p>
       <div class="section-rows" id="sectionRows"></div>
+    </div>
+
+    <!-- VERSIONS -->
+    <div class="ed-section" data-tab="versions">
+      <div class="ai-hint">
+        <span style="font-size:16px">☁️</span>
+        <span>Sauvegardez plusieurs versions de votre CV dans le cloud</span>
+      </div>
+      <div id="versionsLoginBanner" style="display:none;background:var(--ind2);border-radius:10px;padding:14px;font-size:13px;color:var(--inb);margin-bottom:14px">
+        <b>Connexion requise</b> pour sauvegarder vos versions.<br>
+        <button onclick="empShowAuth('login')" style="margin-top:8px;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;color:#fff;background:var(--acc);border:none;cursor:pointer">Se connecter</button>
+      </div>
+      <button onclick="saveVersion()" id="btnSaveVersion" class="btn btn-primary" style="width:100%;margin-bottom:16px;display:none">
+        + Sauvegarder cette version
+      </button>
+      <div id="versionsList" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px" id="versionsEmpty">Aucune version sauvegardée</div>
+      </div>
+      <div id="versionsPlanNote" style="display:none;font-size:11px;color:var(--t3);text-align:center;margin-top:12px"></div>
     </div>
   </div>
 
@@ -1414,14 +1436,98 @@ async function loadFromProfile(user) {
   } catch {}
 }
 
+// ── CV VERSIONS ───────────────────────────────────────────────────
+async function loadVersions() {
+  if (!window.empUser) {
+    document.getElementById('versionsLoginBanner').style.display = 'block';
+    document.getElementById('btnSaveVersion').style.display = 'none';
+    return;
+  }
+  document.getElementById('versionsLoginBanner').style.display = 'none';
+  document.getElementById('btnSaveVersion').style.display = 'block';
+  try {
+    const res = await fetch('/api/cv-versions', { credentials: 'include' });
+    if (!res.ok) return;
+    const { versions, maxVersions, plan } = await res.json();
+    const note = document.getElementById('versionsPlanNote');
+    note.style.display = 'block';
+    note.textContent = `${versions.length} / ${maxVersions} versions${plan === 'free' ? ' (gratuit)' : ' (Pro)'}`;
+    renderVersionsList(versions);
+  } catch {}
+}
+
+function renderVersionsList(versions) {
+  const list = document.getElementById('versionsList');
+  const empty = document.getElementById('versionsEmpty');
+  if (!versions.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = versions.map(v => `
+    <div style="background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(v.name || 'Sans titre')}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${new Date(v.updatedAt || v.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: '2-digit' })}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="loadVersion('${v.id}')" style="padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;color:var(--inb);background:var(--ind2);border:none;cursor:pointer">Charger</button>
+        <button onclick="deleteVersion('${v.id}')" style="padding:5px 8px;border-radius:7px;font-size:11px;color:var(--t3);background:transparent;border:1px solid var(--brd);cursor:pointer">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function saveVersion() {
+  if (!window.empUser) { empShowAuth('login'); return; }
+  const name = prompt('Nom de cette version :', `${cv.name || 'CV'} — ${new Date().toLocaleDateString('fr-FR')}`);
+  if (!name) return;
+  try {
+    const res = await fetch('/api/cv-versions', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.slice(0, 100), content: JSON.stringify(cv) }),
+    });
+    if (res.status === 402) { empToast('Limite de versions atteinte. Passez Pro pour plus de versions.', 'error'); return; }
+    if (!res.ok) { empToast('Erreur lors de la sauvegarde', 'error'); return; }
+    empToast('Version sauvegardée ✓', 'success');
+    loadVersions();
+  } catch { empToast('Erreur réseau', 'error'); }
+}
+
+async function loadVersion(id) {
+  if (!confirm('Charger cette version ? Le CV actuel sera remplacé.')) return;
+  try {
+    const res = await fetch('/api/cv-versions', { credentials: 'include' });
+    if (!res.ok) return;
+    const { versions } = await res.json();
+    const v = versions.find(x => x.id === id);
+    if (!v?.content) return;
+    const loaded = JSON.parse(v.content);
+    Object.assign(cv, loaded);
+    localStorage.setItem('emploia_cv', JSON.stringify(cv));
+    loadFields(); renderCV(); computeATS();
+    empToast('Version chargée ✓', 'success');
+  } catch { empToast('Erreur lors du chargement', 'error'); }
+}
+
+async function deleteVersion(id) {
+  if (!confirm('Supprimer cette version ?')) return;
+  try {
+    const res = await fetch(`/api/cv-versions?id=${encodeURIComponent(id)}`, { method: 'DELETE', credentials: 'include' });
+    if (res.ok) { empToast('Version supprimée', 'success'); loadVersions(); }
+  } catch { empToast('Erreur réseau', 'error'); }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 loadFields();
 renderCV();
 computeATS();
 updateThumbs();
 
-window.addEventListener('empAuthChange', e => { if (e.detail?.user) loadFromProfile(e.detail.user); });
-if (window.empUser) loadFromProfile(window.empUser);
+window.addEventListener('empUserLoaded', e => {
+  if (e.detail) { loadFromProfile(e.detail); loadVersions(); }
+});
+window.addEventListener('empAuthChange', e => {
+  if (e.detail?.user) { loadFromProfile(e.detail.user); loadVersions(); }
+});
+if (window.empUser) { loadFromProfile(window.empUser); loadVersions(); }
 </script>
 
 <style>

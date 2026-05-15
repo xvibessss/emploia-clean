@@ -39,6 +39,7 @@ export default async function handler(req) {
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'Emploia <noreply@emploia.fr>',

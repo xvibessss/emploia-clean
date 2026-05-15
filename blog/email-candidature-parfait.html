@@ -114,6 +114,10 @@
     .share-btn:hover { opacity: .75; }
     .share-btn.linkedin { background: #0077b5; color: #fff; border-color: transparent; }
     .share-btn.twitter { background: #000; color: #fff; border-color: transparent; }
+    .art-cta { margin-top: 48px; padding: 28px 32px; background: linear-gradient(135deg,rgba(99,102,241,.12),rgba(59,130,246,.06)); border: 1px solid rgba(99,102,241,.2); border-radius: 16px; text-align: center; }
+    .art-cta h3 { font-size: 18px; font-weight: 800; color: var(--t1); margin-bottom: 10px; }
+    .art-cta p { font-size: 14px; color: var(--t2); margin-bottom: 20px; }
+    .art-cta a { display: inline-block; padding: 13px 28px; background: linear-gradient(135deg,#3b82f6,#6366f1); color: #fff; border-radius: 11px; font-size: 14px; font-weight: 800; text-decoration: none; }
     .newsletter-widget { background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(59,130,246,.06)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin: 40px 0; }
     .newsletter-widget h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--t1); }
     .newsletter-widget p { font-size: 14px; color: var(--t2); margin-bottom: 20px; }
@@ -459,6 +463,12 @@
       <a class="share-btn linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.fr/blog/email-candidature-parfait" target="_blank" rel="noopener">LinkedIn</a>
       <a class="share-btn twitter" href="https://twitter.com/intent/tweet?url=https://emploia.fr/blog/email-candidature-parfait&text=L%27email+de+candidature+parfait+en+2026" target="_blank" rel="noopener">X / Twitter</a>
       <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);this.textContent='Lien copié !';setTimeout(()=>this.textContent='Copier le lien',2000)">Copier le lien</button>
+    </div>
+
+    <div class="art-cta">
+      <h3>Générez votre email de relance en 30 secondes</h3>
+      <p>Emploia rédige un email de relance personnalisé pour chaque candidature — avec le bon ton, le bon moment et les bons arguments pour rappeler votre valeur.</p>
+      <a href="/tools">Générer mon email de relance →</a>
     </div>
 
     <div class="newsletter-widget">

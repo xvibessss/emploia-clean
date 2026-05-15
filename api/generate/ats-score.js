@@ -39,37 +39,35 @@ export default async function handler(req) {
   try {
     const res = await withTimeout(fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "prompt-caching-2024-07-31",
+      },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 4096,
+        max_tokens: 1200,
+        system: [{ type: "text", text: "Tu es un expert ATS et recruteur senior en France. Tu analyses des CVs par rapport à des offres d'emploi et fournis un score détaillé avec des recommandations actionnables. Réponds uniquement en JSON valide.", cache_control: { type: "ephemeral" } }],
         messages: [{
           role: "user",
-          content: `Tu es un expert ATS (Applicant Tracking System) et en recrutement en France.
+          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nCV DU CANDIDAT:\n${cvText}\n\nAnalyse ce CV par rapport à cette offre. Réponds UNIQUEMENT en JSON valide (sans markdown, sans backtick) :
+{
+  "score": 72,
+  "bars": [
+    {"name": "Mots-clés", "val": 68},
+    {"name": "Format", "val": 90},
+    {"name": "Expérience", "val": 75},
+    {"name": "Compétences", "val": 65},
+    {"name": "Lisibilité", "val": 85}
+  ],
+  "recommendations": "<ul style=\\"margin-left:18px\\"><li>Intégrez les mots-clés exacts de l'offre</li><li>Quantifiez vos résultats avec des chiffres</li></ul>",
+  "keywords": ["mot-clé manquant 1", "mot-clé manquant 2", "mot-clé manquant 3"],
+  "strengths": ["Point fort 1", "Point fort 2"],
+  "improvements": ["Amélioration 1", "Amélioration 2"]
+}
 
-OFFRE D'EMPLOI:
-${jobOffer}
-
-CV DU CANDIDAT:
-${cvText}
-
-Analyse ce CV par rapport à cette offre d'emploi et fournis:
-
-1. **SCORE ATS: XX/100** - Score global de compatibilité
-
-2. **Points forts** (ce qui correspond bien à l'offre):
-   - Liste des éléments positifs
-
-3. **Points à améliorer** (ce qui manque ou est à renforcer):
-   - Liste des lacunes
-
-4. **Mots-clés manquants** (présents dans l'offre, absents du CV):
-   - Liste des mots-clés importants à ajouter
-
-5. **Recommandations concrètes**:
-   - Actions spécifiques pour améliorer le score
-
-Sois précis et actionnable dans tes recommandations.`,
+Règles : score entre 40 et 97. recommendations en HTML (<ul><li>). 3-5 items par liste.`,
         }],
       }),
     }), 30000);
@@ -80,9 +78,16 @@ Sois précis et actionnable dans tes recommandations.`,
     }
 
     const data = await res.json();
-    const result = data.content?.[0]?.type === "text" ? data.content[0].text : "";
+    const text = data.content?.[0]?.type === "text" ? data.content[0].text : "";
+
+    let result;
+    try { result = JSON.parse(text); }
+    catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
+
+    if (!result?.score) return new Response(JSON.stringify({ error: "Réponse invalide" }), { status: 500, headers: H });
+
     await incrementGenerations(user);
-    return new Response(JSON.stringify({ result }), { status: 200, headers: H });
+    return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch (err) {
     console.error("ATS score error:", err);
     return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H });

@@ -23,11 +23,11 @@ async function fetchTrendingJobs() {
 
 // Latest blog articles (static — update when new articles are added)
 const RECENT_ARTICLES = [
-  { slug: 'ia-et-emploi-2026',               title: 'IA et emploi 2026 : ce qui change pour les candidats',     emoji: '🤖' },
-  { slug: 'preparer-entretien-technique',     title: 'Comment préparer un entretien technique en 48h',          emoji: '💻' },
-  { slug: 'email-candidature-parfait',        title: "L'email de candidature parfait — structure + exemples",   emoji: '✉️' },
-  { slug: 'reseaux-sociaux-recherche-emploi', title: 'Réseaux sociaux : comment les utiliser pour trouver un poste', emoji: '📱' },
-  { slug: 'negocier-salaire-entretien',       title: 'Négocier son salaire sans se dévaluer — guide pratique',  emoji: '💰' },
+  { slug: 'teletravail-negocier-2026',        title: 'Négocier le télétravail en 2026 : script + arguments qui marchent', emoji: '🏠' },
+  { slug: 'secteurs-qui-recrutent-2026',      title: 'Les 10 secteurs qui recrutent le plus en 2026',               emoji: '📈' },
+  { slug: 'ia-et-emploi-2026',               title: 'IA et emploi 2026 : ce qui change pour les candidats',          emoji: '🤖' },
+  { slug: 'email-candidature-parfait',        title: "L'email de candidature parfait — structure + exemples",        emoji: '✉️' },
+  { slug: 'negocier-salaire-entretien',       title: 'Négocier son salaire sans se dévaluer — guide pratique',       emoji: '💰' },
 ];
 
 function jobRow(job) {
@@ -83,9 +83,18 @@ export default async function handler(req) {
     ${articles.map(articleRow).join('')}
   </div>`;
 
+  const TIPS = [
+    'Personnalisez le premier paragraphe de chaque lettre de motivation avec un fait précis sur l\'entreprise. Les recruteurs lisent les 3 premières lignes avant de décider de continuer.',
+    'Relancez votre candidature après 10-14 jours sans réponse. 80 % des recruteurs apprécient un suivi professionnel et 30 % y répondent favorablement.',
+    'Ajoutez des chiffres concrets à votre CV : "augmenté le CA de 23 %", "géré 12 projets simultanés". Les CV chiffrés ont 40 % de chances d\'être rappelés en plus.',
+    'Vérifiez le score ATS de votre CV avant d\'envoyer. Un CV sans les bons mots-clés n\'atteint jamais les yeux d\'un recruteur — Emploia le fait en 30 secondes.',
+    'Avant un entretien, préparez 3 questions sur l\'équipe, le poste et les 90 premiers jours. Les candidats qui posent des questions pertinentes sont mémorisés.',
+    'Optimisez votre titre LinkedIn : intégrez le nom exact du poste que vous cherchez. C\'est le premier champ que les recruteurs utilisent pour vous trouver.',
+  ];
+  const tip = TIPS[new Date().getDay() % TIPS.length];
   const tipSection = `<div style="background:#f0f9ff;border-left:4px solid #6366f1;padding:16px;border-radius:0 12px 12px 0;margin-bottom:28px">
     <p style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin:0 0 6px">💡 Conseil de la semaine</p>
-    <p style="font-size:13px;color:#1e293b;line-height:1.6;margin:0">Personnalisez le premier paragraphe de chaque lettre de motivation avec un fait précis sur l'entreprise (actualité, produit, valeur). Les recruteurs lisent en moyenne les 3 premières lignes avant de décider de continuer.</p>
+    <p style="font-size:13px;color:#1e293b;line-height:1.6;margin:0">${tip}</p>
   </div>`;
 
   // Process in batches of 80 to stay within Edge timeout and Resend limits

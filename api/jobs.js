@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, kvGet } from './_lib/auth.js';
+import { checkRateLimit, kvGet, withTimeout } from './_lib/auth.js';
 
 const H = {
   'Access-Control-Allow-Origin': '*',
@@ -29,12 +29,6 @@ function isGermanJob(title, desc) {
   return t.includes('(m/w/d)') || t.includes('(w/m/d)') || t.includes('minijob') ||
          t.includes('werkstudent') || t.includes('nebenjob') ||
          d.startsWith('das ') || d.startsWith('wir ') || d.includes(' deutsch');
-}
-
-function withTimeout(p, ms) {
-  return Promise.race([p, new Promise((_, r) =>
-    setTimeout(() => r(new Error('timeout')), ms)
-  )]);
 }
 
 // ── JSEARCH (Indeed + LinkedIn + Glassdoor) ───────────

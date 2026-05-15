@@ -32,6 +32,7 @@ export default async function handler(req) {
     // Exchange code for access token
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
+      signal: AbortSignal.timeout(10000),
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         code,
@@ -47,6 +48,7 @@ export default async function handler(req) {
 
     // Get user info from Google
     const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
     if (!userRes.ok) throw new Error('Failed to get user info');
@@ -57,6 +59,7 @@ export default async function handler(req) {
 
     // Find or create user
     let user = await kvGet(`user:${email}`);
+    const isNewUser = !user;
     if (!user) {
       const id = `u_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
       user = {
@@ -97,7 +100,7 @@ export default async function handler(req) {
     }
 
     const token = await signToken(user.id);
-    const headers = new Headers({ Location: '/dashboard' });
+    const headers = new Headers({ Location: isNewUser ? '/onboarding' : '/dashboard' });
     headers.append('Set-Cookie', setCookieHeader(token));
     headers.append('Set-Cookie', 'emp_oauth_state=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure');
     return new Response(null, { status: 302, headers });
