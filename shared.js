@@ -166,7 +166,8 @@ if ('serviceWorker' in navigator) {
   const chatPages = ['/app', '/dashboard', '/interview', '/profil', '/onboarding', '/apply-queue', '/alerts', '/cv-builder', '/'];
   if (!chatPages.some(p => path === p || path.startsWith(p + '?'))) return;
   window.$crisp = [];
-  window.CRISP_WEBSITE_ID = 'VOTRE_CRISP_ID';
+  window.CRISP_WEBSITE_ID = 'VOTRE_CRISP_ID'; // Replace with real ID from crisp.chat
+  if (window.CRISP_WEBSITE_ID === 'VOTRE_CRISP_ID') return;
   const s = document.createElement('script');
   s.src = 'https://client.crisp.chat/l.js';
   s.async = true;

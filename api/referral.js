@@ -74,8 +74,12 @@ export default async function handler(req) {
     }
     const normalizedNewEmail = String(newUserEmail).toLowerCase().trim();
 
-    const refData = await kvGet(`ref:${code}`);
+    const [refData, newUser] = await Promise.all([
+      kvGet(`ref:${code}`),
+      kvGet(`user:${normalizedNewEmail}`),
+    ]);
     if (!refData) return new Response(JSON.stringify({ error: 'Code introuvable' }), { status: 404, headers: H });
+    if (!newUser) return new Response(JSON.stringify({ ok: false, reason: 'user_not_found' }), { status: 200, headers: H });
 
     // Don't let the owner refer themselves
     if (refData.email === normalizedNewEmail) return new Response(JSON.stringify({ ok: false, reason: 'self' }), { status: 200, headers: H });
