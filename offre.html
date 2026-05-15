@@ -380,18 +380,18 @@
 
   function renderOffer(job) {
     currentJob = job;
-    document.title = `${job.title || 'Offre'} — ${job.company_name || ''} — Emploia`;
+    document.title = `${job.title || 'Offre'} — ${job.company_name || job.company || ''} — Emploia`;
 
-    document.getElementById('offreLogo').textContent = job.company_logo ? '' : '🏢';
-    if (job.company_logo) {
+    document.getElementById('offreLogo').textContent = (job.company_logo || job.logo) ? '' : '🏢';
+    if (job.company_logo || job.logo) {
       const img = document.createElement('img');
-      img.src = job.company_logo;
+      img.src = job.company_logo || job.logo;
       img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px';
       img.onerror = () => { img.parentElement.textContent = '🏢'; };
       document.getElementById('offreLogo').appendChild(img);
     }
 
-    document.getElementById('offreCompany').textContent = job.company_name || 'Entreprise';
+    document.getElementById('offreCompany').textContent = job.company_name || job.company || 'Entreprise';
     document.getElementById('offreLocation').textContent = job.location || '';
     document.getElementById('offreTitle').textContent = job.title || 'Offre d\'emploi';
 
@@ -417,7 +417,7 @@
       .replace(/\n/g, '<br/>');
     descEl.innerHTML = '<p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:8px">' + descEl.innerHTML + '</p>';
 
-    document.getElementById('metaCompany').textContent = job.company_name || '—';
+    document.getElementById('metaCompany').textContent = job.company_name || job.company || '—';
     document.getElementById('metaLocation').textContent = job.location || '—';
     document.getElementById('metaType').textContent = JOB_TYPES[job.job_type] || job.job_type || '—';
     document.getElementById('metaSalary').textContent = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
@@ -497,8 +497,8 @@
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jobTitle: currentJob.title || currentJob.title,
-          company: currentJob.company_name || '',
+          jobTitle: currentJob.title || '',
+          company: currentJob.company_name || currentJob.company || '',
           jobDescription: (currentJob.description || '').slice(0, 2000),
           userProfile: profile,
         }),
@@ -578,7 +578,7 @@
 
     // Save score snapshot for progression chart
     if (window.saveScoreSnapshot && currentJob) {
-      const label = `${currentJob.title || ''} — ${currentJob.company_name || ''}`;
+      const label = `${currentJob.title || ''} — ${currentJob.company_name || currentJob.company || ''}`;
       window.saveScoreSnapshot('ats', score, label);
     }
   }
@@ -588,7 +588,7 @@
   let liTab = 'direct';
 
   function initLinkedIn(job) {
-    const company = job.company_name || '';
+    const company = job.company_name || job.company || '';
     const title = job.title || '';
     if (!company) return;
     const card = document.getElementById('linkedinCard');
@@ -610,7 +610,7 @@
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          company: currentJob.company_name || '',
+          company: currentJob.company_name || currentJob.company || '',
           jobTitle: currentJob.title || '',
           senderName: window.empUser?.name || '',
           profile,
@@ -647,7 +647,7 @@
     let queue = JSON.parse(localStorage.getItem(queueKey) || '[]');
     const id = String(currentJob.id || currentJob.title);
     if (queue.some(q => q.id === id)) { window.location.href = '/apply-queue'; return; }
-    queue.unshift({ id, title: currentJob.title, company: currentJob.company_name || '', location: currentJob.location || '', url: currentJob.url || '', description: (currentJob.description || '').slice(0, 800), status: 'queued', addedAt: Date.now() });
+    queue.unshift({ id, title: currentJob.title, company: currentJob.company_name || currentJob.company || '', location: currentJob.location || '', url: currentJob.url || '', description: (currentJob.description || '').slice(0, 800), status: 'queued', addedAt: Date.now() });
     localStorage.setItem(queueKey, JSON.stringify(queue.slice(0, 50)));
     document.getElementById('saQueueBtn').textContent = '📬';
     document.getElementById('saQueueBtn').classList.add('queued');
@@ -679,7 +679,7 @@
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          company: currentJob.company_name || '',
+          company: currentJob.company_name || currentJob.company || '',
           jobTitle: currentJob.title || '',
           jobDescription: (currentJob.description || '').slice(0, 2000),
         }),
