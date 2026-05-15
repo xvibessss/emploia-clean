@@ -1617,16 +1617,55 @@
     try {
       const endpoints = { cv: '/api/generate/cv', lettre: '/api/generate/cover-letter', ats: '/api/generate/ats-score' };
       const body = curGenTab === 'ats' ? { jobOffer: offer, cvText: profile } : { jobOffer: offer, profile };
-      const res  = await fetch(endpoints[curGenTab], { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: body }) });
-      const data = await res.json();
-      if (data.result) {
+      const res  = await fetch(endpoints[curGenTab], { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Erreur');
+      }
+
+      if (curGenTab === 'ats') {
+        // ats-score returns regular JSON
+        const d = await res.json();
+        const lines = [
+          `Score ATS : ${d.score}/100`,
+          '',
+          ...(d.strengths || []).map(s => '✅ ' + s),
+          ...(d.improvements || []).map(i => '⚠️ ' + i),
+          ...(d.keywords?.length ? ['', 'Mots-clés manquants : ' + d.keywords.join(', ')] : []),
+        ];
         result.className = 'gen-result has-content';
-        result.textContent = data.result;
-        empToast('Génération réussie !', 'success');
-      } else throw new Error(data.error || 'Erreur');
-    } catch {
-      result.innerHTML = '<div style="color:var(--rnb);font-size:12px">⚠️ Erreur de génération. Réessayez.</div>';
-      empToast('Erreur lors de la génération', 'error');
+        result.textContent = lines.join('\n').trim();
+      } else {
+        // cv & cover-letter are SSE streaming
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '', fullText = '';
+        result.className = 'gen-result has-content';
+        result.textContent = '';
+        outer: while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const evt = JSON.parse(line.slice(6));
+              if (evt.chunk) { fullText += evt.chunk; result.textContent = fullText; }
+              if (evt.done) break outer;
+              if (evt.error) throw new Error(evt.error);
+            } catch {}
+          }
+        }
+        if (!fullText) throw new Error('Réponse vide');
+      }
+
+      empToast('Génération réussie !', 'success');
+    } catch (e) {
+      result.innerHTML = '<div style="color:var(--rnb);font-size:12px">⚠️ ' + (e.message || 'Erreur de génération') + '. Réessayez.</div>';
+      empToast(e.message || 'Erreur lors de la génération', 'error');
     }
     btn.disabled = false; btn.textContent = '✨ Générer avec l\'IA';
   }

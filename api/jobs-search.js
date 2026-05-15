@@ -75,7 +75,7 @@ async function fetchWeLoveDevs(q, type) {
   try {
     const res = await fetch(
       `https://welovedevs.com/app/api/v1/search?search=${encodeURIComponent(q || 'développeur')}&size=10`,
-      { headers: { Accept: 'application/json' } }
+      { signal: AbortSignal.timeout(8000), headers: { Accept: 'application/json' } }
     );
     if (!res.ok) return [];
     const data = await res.json();
