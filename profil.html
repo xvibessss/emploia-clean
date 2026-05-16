@@ -446,8 +446,8 @@
         <div class="avatar">T</div>
         <div class="avatar-edit" title="Modifier la photo">✏️</div>
       </div>
-      <div class="profile-name">Thomas Renard</div>
-      <div class="profile-title">Développeur Full Stack · Paris</div>
+      <div class="profile-name" id="sidebarName">Thomas Renard</div>
+      <div class="profile-title" id="sidebarTitle">Développeur Full Stack · Paris</div>
 
       <div class="profile-completion">
         <div class="pc-label">
@@ -1004,6 +1004,16 @@
     set('prfSummary',   data.summary);
     set('prfLinkedin',  data.linkedin);
     set('prfPortfolio', data.portfolio);
+
+    // Update sidebar display
+    const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ');
+    const sidebarName = document.getElementById('sidebarName');
+    const sidebarTitle = document.getElementById('sidebarTitle');
+    if (fullName && sidebarName) sidebarName.textContent = fullName;
+    if (sidebarTitle) {
+      const parts = [data.title, data.location].filter(Boolean);
+      if (parts.length) sidebarTitle.textContent = parts.join(' · ');
+    }
 
     if (data.skills?.length) {
       const wrap = document.getElementById('skillsWrap');
