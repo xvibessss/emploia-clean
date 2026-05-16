@@ -146,7 +146,7 @@
   function renderJob(job) {
     const card = document.createElement('div');
     card.className = 'job-card reveal';
-    const typeLabel = JOB_TYPES[job.job_type] || job.job_type || '';
+    const typeLabel = JOB_TYPES[job.job_type] || JOB_TYPES[job.type] || job.job_type || job.type || '';
     const companyName = job.company_name || job.company || '';
     const companyLogo = job.company_logo || job.logo || '';
     const encoded = encodeURIComponent((job.title || '') + (companyName ? ' chez ' + companyName : ''));
