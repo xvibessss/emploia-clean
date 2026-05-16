@@ -70,8 +70,10 @@ export default async function handler(req) {
       url:      /^https?:\/\//i.test(rawUrl) ? rawUrl : '',
       location: String(body.location || '').slice(0, 200),
       salary:   String(body.salary   || '').slice(0, 100),
-      status:   STATUSES.includes(body.status) ? body.status : 'wishlist',
-      notes:    String(body.notes    || '').slice(0, 2000),
+      status:        STATUSES.includes(body.status) ? body.status : 'wishlist',
+      notes:         String(body.notes         || '').slice(0, 2000),
+      contact:       String(body.contact       || '').slice(0, 200),
+      interviewDate: body.interviewDate ? String(body.interviewDate).slice(0, 30) : null,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -89,13 +91,15 @@ export default async function handler(req) {
     const idx = apps.findIndex(a => a.id === id);
     if (idx === -1) return new Response(JSON.stringify({ error: 'Introuvable' }), { status: 404, headers: H });
 
-    if (body.status   !== undefined && STATUSES.includes(body.status)) apps[idx].status = body.status;
-    if (body.notes    !== undefined) apps[idx].notes    = String(body.notes).slice(0, 2000);
-    if (body.jobTitle !== undefined) apps[idx].jobTitle = String(body.jobTitle).slice(0, 200);
-    if (body.company  !== undefined) apps[idx].company  = String(body.company).slice(0, 200);
-    if (body.url      !== undefined) { const u = String(body.url).slice(0,500); apps[idx].url = /^https?:\/\//i.test(u) ? u : ''; }
-    if (body.location !== undefined) apps[idx].location = String(body.location).slice(0, 200);
-    if (body.salary   !== undefined) apps[idx].salary   = String(body.salary).slice(0, 100);
+    if (body.status        !== undefined && STATUSES.includes(body.status)) apps[idx].status = body.status;
+    if (body.notes         !== undefined) apps[idx].notes         = String(body.notes).slice(0, 2000);
+    if (body.jobTitle      !== undefined) apps[idx].jobTitle      = String(body.jobTitle).slice(0, 200);
+    if (body.company       !== undefined) apps[idx].company       = String(body.company).slice(0, 200);
+    if (body.url           !== undefined) { const u = String(body.url).slice(0,500); apps[idx].url = /^https?:\/\//i.test(u) ? u : ''; }
+    if (body.location      !== undefined) apps[idx].location      = String(body.location).slice(0, 200);
+    if (body.salary        !== undefined) apps[idx].salary        = String(body.salary).slice(0, 100);
+    if (body.contact       !== undefined) apps[idx].contact       = String(body.contact).slice(0, 200);
+    if (body.interviewDate !== undefined) apps[idx].interviewDate = body.interviewDate ? String(body.interviewDate).slice(0, 30) : null;
     apps[idx].updatedAt = Date.now();
 
     await kvSet(key, apps);
