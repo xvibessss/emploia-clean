@@ -462,11 +462,13 @@ window.empSubmitRegister = async function(e) {
       body: JSON.stringify({
         name: document.getElementById('empRegisterName').value.trim(),
         email: document.getElementById('empRegisterEmail').value.trim(),
-        password: document.getElementById('empRegisterPassword').value
+        password: document.getElementById('empRegisterPassword').value,
+        ref: sessionStorage.getItem('emploia_ref') || undefined,
       })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Erreur d'inscription");
+    sessionStorage.removeItem('emploia_ref');
     if (window.plausible) plausible('signup');
     window.empUser = data.user;
     empUpdateNav(data.user);
