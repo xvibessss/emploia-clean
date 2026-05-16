@@ -347,9 +347,11 @@ Canva, Google Analytics, Semrush, Notion"></textarea>
     const jobOffer = document.getElementById('jobOffer').value.trim();
     const userProfile = document.getElementById('userProfile').value.trim();
     if (!jobOffer || !userProfile) {
-      document.getElementById('step3sub').textContent='⚠️ Veuillez remplir les deux champs.';
-      document.getElementById('step3sub').style.color='#f87171';
-      setTimeout(()=>{document.getElementById('step3sub').textContent='';document.getElementById('step3sub').style.color='';},3000);
+      const emptyEl = !jobOffer ? document.getElementById('jobOffer') : document.getElementById('userProfile');
+      emptyEl.style.borderColor = '#f87171';
+      emptyEl.placeholder = 'Ce champ est requis';
+      emptyEl.focus();
+      setTimeout(() => { emptyEl.style.borderColor = ''; }, 2500);
       return;
     }
     goStep(3);
