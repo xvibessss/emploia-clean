@@ -23,8 +23,10 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`ip:${ip}`, 'contact', 3, 3600);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de messages envoyés. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 5000) return new Response(JSON.stringify({ error: 'Message trop long' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
 
   const name = sanitizeString(body.name, 100);
   const email = (body.email || '').toLowerCase().trim().slice(0, 254);
