@@ -446,8 +446,8 @@
         <div class="avatar">T</div>
         <div class="avatar-edit" title="Modifier la photo">✏️</div>
       </div>
-      <div class="profile-name" id="sidebarName">Thomas Renard</div>
-      <div class="profile-title" id="sidebarTitle">Développeur Full Stack · Paris</div>
+      <div class="profile-name" id="sidebarName">Mon profil</div>
+      <div class="profile-title" id="sidebarTitle">Complétez votre profil →</div>
 
       <div class="profile-completion">
         <div class="pc-label">
@@ -462,20 +462,20 @@
 
       <div class="profile-stats">
         <div class="pstat">
-          <div class="pstat-num">24</div>
+          <div class="pstat-num" id="statTotal">—</div>
           <div class="pstat-label">Candidatures</div>
         </div>
         <div class="pstat">
-          <div class="pstat-num">8</div>
+          <div class="pstat-num" id="statInterview">—</div>
           <div class="pstat-label">Entretiens</div>
         </div>
         <div class="pstat">
-          <div class="pstat-num">5</div>
+          <div class="pstat-num" id="statGens">—</div>
           <div class="pstat-label">CV générés</div>
         </div>
         <div class="pstat">
-          <div class="pstat-num">94</div>
-          <div class="pstat-label">Score ATS max</div>
+          <div class="pstat-num" id="statOffers">—</div>
+          <div class="pstat-label">Offres reçues</div>
         </div>
       </div>
     </div>
@@ -550,45 +550,45 @@
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Prénom</label>
-            <input type="text" class="emp-input" id="prfFirstName" value="Thomas" placeholder="Votre prénom"/>
+            <input type="text" class="emp-input" id="prfFirstName" placeholder="Votre prénom"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Nom</label>
-            <input type="text" class="emp-input" id="prfLastName" value="Renard" placeholder="Votre nom"/>
+            <input type="text" class="emp-input" id="prfLastName" placeholder="Votre nom"/>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Email</label>
-            <input type="email" class="emp-input" id="prfEmail" value="thomas.renard@gmail.com" placeholder="email@exemple.fr"/>
+            <input type="email" class="emp-input" id="prfEmail" placeholder="email@exemple.fr"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Téléphone</label>
-            <input type="tel" class="emp-input" id="prfPhone" value="+33 6 12 34 56 78" placeholder="+33 6 ..."/>
+            <input type="tel" class="emp-input" id="prfPhone" placeholder="+33 6 ..."/>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label">Titre professionnel</label>
-            <input type="text" class="emp-input" id="prfTitle" value="Développeur Full Stack" placeholder="ex. Chef de projet Marketing"/>
+            <input type="text" class="emp-input" id="prfTitle" placeholder="ex. Chef de projet Marketing"/>
           </div>
           <div class="form-group">
             <label class="emp-label">Ville</label>
-            <input type="text" class="emp-input" id="prfLocation" value="Paris, Île-de-France" placeholder="Paris, Lyon..."/>
+            <input type="text" class="emp-input" id="prfLocation" placeholder="Paris, Lyon..."/>
           </div>
         </div>
         <div class="form-group" style="margin-bottom:16px">
           <label class="emp-label">Résumé professionnel</label>
-          <textarea class="emp-input" id="prfSummary" rows="4" placeholder="Décrivez votre parcours en quelques phrases...">Développeur Full Stack passionné avec 3 ans d'expérience en React et Node.js. J'ai travaillé sur des projets à fort trafic et je cherche à rejoindre une équipe innovante en CDI sur Paris ou en remote.</textarea>
+          <textarea class="emp-input" id="prfSummary" rows="4" placeholder="Décrivez votre parcours en quelques phrases..."></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="emp-label" style="display:flex;align-items:center;justify-content:space-between">LinkedIn <a href="/tools" style="font-size:11px;color:var(--inb);font-weight:700;text-decoration:none">✨ Optimiser avec l'IA →</a></label>
-            <input type="url" class="emp-input" id="prfLinkedin" value="https://linkedin.com/in/thomas-renard" placeholder="https://linkedin.com/in/..."/>
+            <input type="url" class="emp-input" id="prfLinkedin" placeholder="https://linkedin.com/in/..."/>
           </div>
           <div class="form-group">
             <label class="emp-label">Portfolio / Site web</label>
-            <input type="url" class="emp-input" id="prfPortfolio" value="https://thomasrenard.dev" placeholder="https://..."/>
+            <input type="url" class="emp-input" id="prfPortfolio" placeholder="https://..."/>
           </div>
         </div>
       </div>
@@ -1087,10 +1087,23 @@
       const res = await fetch('/api/profile', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
-      if (!data || !data.firstName) return;
+      if (!data || typeof data !== 'object') return;
       fillProfileFromCV(data); // reuse same filler
       setTimeout(calculateCompletion, 200);
       empToast('Profil chargé depuis votre compte', 'info');
+    } catch {}
+  }
+
+  async function loadStats() {
+    try {
+      const r = await fetch('/api/applications?stats=1', { credentials: 'include' });
+      if (!r.ok) return;
+      const { stats } = await r.json();
+      if (!stats) return;
+      const el = id => document.getElementById(id);
+      if (el('statTotal'))     el('statTotal').textContent     = stats.total;
+      if (el('statInterview')) el('statInterview').textContent = stats.interview;
+      if (el('statOffers'))    el('statOffers').textContent    = stats.offer;
     } catch {}
   }
 
@@ -1099,10 +1112,16 @@
   });
   setTimeout(async () => {
     loadProfileFromServer();
+    loadStats();
     // Load user for subscription info
     try {
       const r = await fetch('/api/auth/me', { credentials: 'include' });
-      if (r.ok) { const u = await r.json(); showSubscriptionInfo(u); }
+      if (r.ok) {
+        const u = await r.json();
+        showSubscriptionInfo(u);
+        const gensEl = document.getElementById('statGens');
+        if (gensEl) gensEl.textContent = u.generationsUsed || 0;
+      }
     } catch {}
   }, 900);
 
