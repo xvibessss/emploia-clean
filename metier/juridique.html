@@ -145,6 +145,7 @@
     const card = document.createElement('div');
     card.className = 'job-card reveal';
     const typeLabel = JOB_TYPES[job.job_type] || job.type || job.job_type || '';
+    const companyLogo = job.company_logo || job.logo || '';
     const encoded = encodeURIComponent((job.title||'')+(job.company_name||job.company?` chez ${job.company_name||job.company}`:''));
     const logo = companyLogo ? `<img src="${esc(companyLogo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🏢'">` : '🏢';
     const loc = job.location || job.job_city || '';

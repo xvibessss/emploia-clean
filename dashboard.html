@@ -1037,7 +1037,7 @@
       <div class="gen-card">
         <div class="gen-card-header">
           <div class="gen-card-title">✨ Générer</div>
-          <span class="badge badge-blue">3 crédits restants</span>
+          <span class="badge badge-blue" id="genCreditsLabel">— crédits restants</span>
         </div>
         <div class="gen-card-body">
           <div class="gen-tabs">
@@ -1064,12 +1064,12 @@
             <div class="usage-bar">
               <div class="usage-header">
                 <div class="usage-label">Crédits utilisés</div>
-                <div class="usage-count">2 / 5</div>
+                <div class="usage-count" id="genUsageCount">— / 5</div>
               </div>
               <div class="emp-progress-track">
-                <div class="emp-progress-fill" style="width:40%"></div>
+                <div class="emp-progress-fill" id="genUsageFill" style="width:0%"></div>
               </div>
-              <div style="margin-top:8px;font-size:11px;color:var(--t3)">3 générations restantes · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a></div>
+              <div style="margin-top:8px;font-size:11px;color:var(--t3)" id="genUsageFooter">— générations restantes · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a></div>
             </div>
           </div>
         </div>
@@ -1883,9 +1883,26 @@
       const plan = user.plan || 'free';
       const planLabel = plan === 'free' ? 'Gratuit' : plan === 'pro' ? 'Pro' : plan === 'intensif' ? 'Intensif' : plan;
       document.getElementById('wbPlan').textContent = planLabel;
-      const FREE_LIMIT = 3;
-      const credits = plan === 'free' ? Math.max(0, FREE_LIMIT - (user.generationsUsed || 0)) : '∞';
+      const FREE_LIMIT = 5;
+      const used = user.generationsUsed || 0;
+      const credits = plan === 'free' ? Math.max(0, FREE_LIMIT - used) : '∞';
       document.getElementById('wbCredits').textContent = credits;
+      // Update generate panel
+      const lbl = document.getElementById('genCreditsLabel');
+      const cnt = document.getElementById('genUsageCount');
+      const fill = document.getElementById('genUsageFill');
+      const footer = document.getElementById('genUsageFooter');
+      if (plan === 'free') {
+        if (lbl) lbl.textContent = `${credits} crédit${credits !== 1 ? 's' : ''} restant${credits !== 1 ? 's' : ''}`;
+        if (cnt) cnt.textContent = `${used} / ${FREE_LIMIT}`;
+        if (fill) fill.style.width = `${Math.min(100, Math.round(used / FREE_LIMIT * 100))}%`;
+        if (footer) footer.innerHTML = `${credits} génération${credits !== 1 ? 's' : ''} restante${credits !== 1 ? 's' : ''} · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a>`;
+      } else {
+        if (lbl) { lbl.textContent = 'Illimité'; lbl.className = 'badge badge-green'; }
+        if (cnt) cnt.textContent = `${used} / ∞`;
+        if (fill) fill.style.width = '0%';
+        if (footer) footer.innerHTML = 'Générations illimitées avec votre abonnement Pro';
+      }
 
       if (user.cancelAtPeriodEnd && user.cancelAt) {
         const cancelDate = new Date(user.cancelAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
