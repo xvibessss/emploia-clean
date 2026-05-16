@@ -810,19 +810,19 @@
         <div style="display:flex;flex-direction:column;gap:14px">
           <div class="form-group">
             <label class="emp-label">Mot de passe actuel</label>
-            <input type="password" class="emp-input" placeholder="••••••••"/>
+            <input type="password" class="emp-input" id="pwdCurrent" placeholder="••••••••"/>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label class="emp-label">Nouveau mot de passe</label>
-              <input type="password" class="emp-input" placeholder="••••••••"/>
+              <input type="password" class="emp-input" id="pwdNew" placeholder="••••••••"/>
             </div>
             <div class="form-group">
               <label class="emp-label">Confirmer le mot de passe</label>
-              <input type="password" class="emp-input" placeholder="••••••••"/>
+              <input type="password" class="emp-input" id="pwdConfirm" placeholder="••••••••"/>
             </div>
           </div>
-          <button class="btn btn-primary" style="align-self:flex-start" onclick="empToast('Mot de passe mis à jour','success')">Mettre à jour</button>
+          <button class="btn btn-primary" style="align-self:flex-start" id="pwdBtn" onclick="changePassword()">Mettre à jour</button>
 
           <div class="emp-divider" style="margin:8px 0"></div>
 
@@ -1140,6 +1140,32 @@
       document.getElementById('subCancelDate').textContent = d;
       document.getElementById('cancelWarning').style.display = 'block';
     }
+  }
+
+  async function changePassword() {
+    const current = document.getElementById('pwdCurrent')?.value || '';
+    const newPwd   = document.getElementById('pwdNew')?.value     || '';
+    const confirm  = document.getElementById('pwdConfirm')?.value  || '';
+    if (!current || !newPwd || !confirm) { empToast('Remplissez tous les champs', 'error'); return; }
+    if (newPwd !== confirm) { empToast('Les mots de passe ne correspondent pas', 'error'); return; }
+    if (newPwd.length < 8) { empToast('Nouveau mot de passe trop court (8 caractères min)', 'error'); return; }
+    const btn = document.getElementById('pwdBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Mise à jour…'; }
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: current, newPassword: newPwd }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        empToast('Mot de passe mis à jour !', 'success');
+        ['pwdCurrent', 'pwdNew', 'pwdConfirm'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      } else {
+        empToast(data.error || 'Erreur lors de la mise à jour', 'error');
+      }
+    } catch { empToast('Erreur réseau — réessayez', 'error'); }
+    if (btn) { btn.disabled = false; btn.textContent = 'Mettre à jour'; }
   }
 
   async function confirmDeleteAccount() {
