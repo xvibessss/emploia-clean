@@ -402,7 +402,8 @@
       t.textContent = text;
       tags.appendChild(t);
     };
-    if (job.job_type) addTag(JOB_TYPES[job.job_type] || job.job_type, 'type');
+    const jobType = job.job_type || job.type;
+    if (jobType) addTag(JOB_TYPES[jobType] || jobType, 'type');
     if (job.location) addTag('📍 ' + job.location);
     if (job.remote) addTag('🌐 Remote');
     if (job.salary_min || job.salary_max) addTag('💰 ' + formatSalary(job.salary_min, job.salary_max, job.salary_currency));
@@ -419,9 +420,9 @@
 
     document.getElementById('metaCompany').textContent = job.company_name || job.company || '—';
     document.getElementById('metaLocation').textContent = job.location || '—';
-    document.getElementById('metaType').textContent = JOB_TYPES[job.job_type] || job.job_type || '—';
+    document.getElementById('metaType').textContent = JOB_TYPES[job.job_type] || JOB_TYPES[job.type] || job.job_type || job.type || '—';
     document.getElementById('metaSalary').textContent = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
-    document.getElementById('metaDate').textContent = formatDate(job.created_at || job.date_posted);
+    document.getElementById('metaDate').textContent = formatDate(job.created_at || job.date_posted || job.date);
 
     if (job.url) {
       document.getElementById('offreApplyBtn').href = job.url;

@@ -422,12 +422,11 @@
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: job.title,
+          jobTitle: job.title,
           company: job.company,
           location: job.location || '',
           url: job.url || '',
           status: 'applied',
-          coverLetter: job.letter || '',
           notes: job.pitch ? `Pitch : ${job.pitch}` : '',
         }),
       });
