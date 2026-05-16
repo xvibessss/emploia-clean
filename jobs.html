@@ -1064,6 +1064,12 @@
       const data = await res.json();
       persistScore(jobId, data);
       showScore(pillEl, data);
+      try {
+        const KEY = 'emploia_scores_history';
+        const hist = JSON.parse(localStorage.getItem(KEY) || '[]');
+        hist.push({ type: 'match', ts: Date.now(), score: data.score });
+        localStorage.setItem(KEY, JSON.stringify(hist.slice(-50)));
+      } catch {}
     } catch {
       pillEl.textContent = '✨ Score';
       pillEl.style.pointerEvents = '';

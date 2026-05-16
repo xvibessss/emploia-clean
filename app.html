@@ -827,9 +827,16 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     document.getElementById('resultActionsBottom').style.display = 'block';
 
     if (mode === 'ats') {
-      const score = result.score || 78;
+      const score = result.score ?? 0;
       const grade = score >= 85 ? 'Excellent' : score >= 70 ? 'Très bon' : score >= 55 ? 'Correct' : 'À améliorer';
       const color = score >= 70 ? 'var(--gnb)' : score >= 55 ? 'var(--ylb)' : 'var(--rnb)';
+
+      try {
+        const KEY = 'emploia_scores_history';
+        const hist = JSON.parse(localStorage.getItem(KEY) || '[]');
+        hist.push({ type: 'ats', ts: Date.now(), score });
+        localStorage.setItem(KEY, JSON.stringify(hist.slice(-50)));
+      } catch {}
 
       document.getElementById('resultArea').innerHTML = `
         <div class="ats-display">
@@ -837,25 +844,19 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
             <span class="ats-big-num" style="color:${color}">${score}%</span>
           </div>
           <div class="ats-grade" style="color:${color}">${grade}</div>
-          <div class="ats-bars">
-            ${(result.bars || [
-              { name: 'Mots-clés', val: 82 },
-              { name: 'Format', val: 95 },
-              { name: 'Expérience', val: 70 },
-              { name: 'Compétences', val: 75 },
-              { name: 'Lisibilité', val: 88 }
-            ]).map(b => `
+          ${(result.bars || []).length ? `<div class="ats-bars">
+            ${result.bars.map(b => `
               <div class="ats-bar">
                 <div class="ats-bar-name">${b.name}</div>
                 <div class="ats-bar-track"><div class="ats-bar-fill" style="width:${b.val}%;background:${color}"></div></div>
                 <div class="ats-bar-num">${b.val}%</div>
               </div>
             `).join('')}
-          </div>
-          <div style="margin-top:18px;width:100%;background:var(--bg);border:1px solid var(--brd);border-radius:11px;padding:14px">
+          </div>` : ''}
+          ${result.recommendations ? `<div style="margin-top:18px;width:100%;background:var(--bg);border:1px solid var(--brd);border-radius:11px;padding:14px">
             <h4 style="font-size:11px;font-weight:800;color:var(--t1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Recommandations</h4>
-            <div style="font-size:12px;color:var(--t2);line-height:1.7">${result.recommendations || `<ul style="margin-left:18px"><li>Ajoutez plus de mots-clés du domaine</li><li>Quantifiez davantage vos résultats</li><li>Réduisez la longueur des bullets</li></ul>`}</div>
-          </div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.7">${result.recommendations}</div>
+          </div>` : ''}
         </div>`;
     } else {
       const rawText = typeof result === 'string' ? result : (result.result || result.text || JSON.stringify(result));

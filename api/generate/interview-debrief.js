@@ -26,8 +26,10 @@ export default async function handler(req) {
   const userRl = await checkRateLimit(`user:${user.email}`, 'interview-debrief', 10, 3600);
   if (!userRl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 20000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
   const jobTitle       = sanitizeString(body.jobTitle       || '', 300);
   const notes          = sanitizeString(body.notes          || '', 5000);
