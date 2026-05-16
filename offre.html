@@ -433,7 +433,7 @@
     // Interview prep link pre-fill
     const ivParams = new URLSearchParams();
     if (job.title) ivParams.set('role', job.title);
-    if (job.company_name) ivParams.set('company', job.company_name);
+    if (job.company_name || job.company) ivParams.set('company', job.company_name || job.company);
     document.getElementById('interviewPrepLink').href = `/interview?${ivParams}`;
 
     // ATS score after render

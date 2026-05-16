@@ -26,6 +26,14 @@ export default async function handler(req) {
   const profile = sanitizeString(body.profile, 8000);
   if (!jobOffer || !profile) return new Response(JSON.stringify({ error: "Offre et profil requis" }), { status: 400, headers: H_JSON });
 
+  const profileHints = {
+    'jeune-diplome': 'Le candidat est un jeune diplômé. Mets en avant sa formation, ses projets académiques et sa motivation.',
+    'experience': 'Le candidat est en poste et cherche discrètement. Valorise ses réalisations chiffrées et son expertise.',
+    'reconversion': 'Le candidat est en reconversion. Montre les compétences transférables et l\'enthousiasme pour le nouveau domaine.',
+    'recherche': 'Le candidat est en recherche active. Optimise la lettre pour un impact maximum dès la première lecture.',
+  };
+  const profileHint = profileHints[body.profileType] || '';
+
   if (user.plan === "free") {
     const freshCount = await getGenerationsUsed(user.email);
     const used = freshCount !== null ? freshCount : user.generationsUsed;
@@ -53,7 +61,7 @@ OFFRE D'EMPLOI:
 ${jobOffer}
 
 PROFIL DU CANDIDAT:
-${profile}
+${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}
 
 Génère une lettre de motivation professionnelle et personnalisée en français. Elle doit:
 - Commencer par les coordonnées du candidat, la date, les coordonnées de l'entreprise et l'objet

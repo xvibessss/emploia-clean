@@ -560,6 +560,7 @@ footer a:hover{color:var(--t2);}
     try {
       const res = await fetch('/api/employer/post-job', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
