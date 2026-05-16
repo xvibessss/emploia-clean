@@ -26,8 +26,10 @@ export default async function handler(req) {
   const user = await getCurrentUser(req);
   if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 500) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
 
   // Require password confirmation for email/password accounts
   if (user.passwordHash) {
