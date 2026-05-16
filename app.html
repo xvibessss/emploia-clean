@@ -1171,8 +1171,17 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     } catch(e) {}
   }
 
-  // Post-Stripe success banner + plan poll
+  // Pre-fill from ?offre= URL param (city/metier pages link here)
   const urlP = new URLSearchParams(window.location.search);
+  const offreParam = urlP.get('offre');
+  if (offreParam && !prefill) {
+    const jobInput = document.getElementById('jobInput');
+    if (jobInput && !jobInput.value.trim()) {
+      jobInput.value = decodeURIComponent(offreParam);
+      updateLen();
+      history.replaceState(null, '', '/app');
+    }
+  }
   if (urlP.get('success') === '1') {
     history.replaceState(null, '', '/app');
     if (!document.querySelector('style[data-emp-anim]')) {
