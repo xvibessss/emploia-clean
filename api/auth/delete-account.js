@@ -69,6 +69,7 @@ export default async function handler(req) {
     kvDel(`alerts:${user.email}`),
     kvDel(`saved:${user.email}`),
     kvDel(`push:${user.email}`),
+    kvDel(`cvversions:${user.email}`),
     kvDel(`refcode:${user.id}`),
     kvSrem('alert_subscribers', user.email),
     refCode ? kvDel(`ref:${refCode}`) : Promise.resolve(),

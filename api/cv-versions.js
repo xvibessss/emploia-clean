@@ -76,8 +76,10 @@ export default async function handler(req) {
 
   if (req.method === 'PATCH') {
     if (!id) return new Response(JSON.stringify({ error: 'id requis' }), { status: 400, headers: H });
+    const patchText = await req.text();
+    if (patchText.length > CONTENT_MAX + 2000) return new Response(JSON.stringify({ error: 'Contenu trop long' }), { status: 413, headers: H });
     let body;
-    try { body = JSON.parse(await req.text()); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+    try { body = JSON.parse(patchText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
     const versions = await kvGet(kvKey) || [];
     const idx = versions.findIndex(v => v.id === id);
