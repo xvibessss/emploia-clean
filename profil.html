@@ -792,37 +792,11 @@
     <div class="section-card" id="sec-documents" style="display:none">
       <div class="sc-header">
         <div class="sc-title">📄 Mes documents</div>
+        <a href="/cv-builder" class="btn btn-primary btn-sm">+ Nouveau CV</a>
       </div>
       <div class="sc-body">
-        <div class="doc-list">
-          <div class="doc-item">
-            <div class="doc-icon">📄</div>
-            <div class="doc-info">
-              <div class="doc-name">CV_Thomas_Renard_Dev_2024.pdf</div>
-              <div class="doc-meta">PDF · 245 Ko · Mis à jour le 15 jan. 2024</div>
-            </div>
-            <span class="badge badge-green" style="margin-right:4px">Score ATS: 94</span>
-            <div class="exp-actions">
-              <button class="icon-btn" title="Télécharger">⬇️</button>
-              <button class="icon-btn" title="Supprimer">🗑️</button>
-            </div>
-          </div>
-          <div class="doc-item">
-            <div class="doc-icon">✉️</div>
-            <div class="doc-info">
-              <div class="doc-name">Lettre_BNP_Dev_React.pdf</div>
-              <div class="doc-meta">PDF · 118 Ko · Créé le 10 jan. 2024</div>
-            </div>
-            <div class="exp-actions">
-              <button class="icon-btn" title="Télécharger">⬇️</button>
-              <button class="icon-btn" title="Supprimer">🗑️</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="upload-zone" onclick="empToast('Fonctionnalité d\'upload disponible en version Pro','info')">
-          <div class="upload-zone-icon">📂</div>
-          <p><strong>Glissez-déposez vos fichiers ici</strong><br/>ou cliquez pour parcourir · PDF, DOCX · Max 5 Mo</p>
+        <div class="doc-list" id="docList">
+          <div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">Chargement...</div>
         </div>
       </div>
     </div>
@@ -899,6 +873,7 @@
     document.getElementById('sec-' + id).style.display = 'block';
     document.querySelectorAll('.pnav-item').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    if (id === 'documents') loadDocuments();
   }
 
   // Skills
@@ -1105,6 +1080,34 @@
       if (el('statInterview')) el('statInterview').textContent = stats.interview;
       if (el('statOffers'))    el('statOffers').textContent    = stats.offer;
     } catch {}
+  }
+
+  async function loadDocuments() {
+    const list = document.getElementById('docList');
+    if (!list) return;
+    try {
+      const r = await fetch('/api/cv-versions', { credentials: 'include' });
+      if (!r.ok) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">Impossible de charger les documents</div>'; return; }
+      const { versions } = await r.json();
+      if (!versions?.length) {
+        list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">Aucun document sauvegardé.<br/><a href="/cv-builder" style="color:var(--inb);font-weight:700">Créer votre premier CV →</a></div>`;
+        return;
+      }
+      const icons = { cv: '📄', letter: '✉️', other: '📎' };
+      list.innerHTML = versions.map(v => {
+        const date = v.createdAt ? new Date(v.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        return `<div class="doc-item">
+          <div class="doc-icon">${icons[v.type] || '📄'}</div>
+          <div class="doc-info">
+            <div class="doc-name">${esc(v.name || 'Document sans titre')}</div>
+            <div class="doc-meta">${v.type === 'cv' ? 'CV' : v.type === 'letter' ? 'Lettre de motivation' : 'Document'}${date ? ' · ' + date : ''}</div>
+          </div>
+          <a href="/cv-builder" class="icon-btn" title="Ouvrir dans le CV Builder">✏️</a>
+        </div>`;
+      }).join('');
+    } catch {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">Erreur lors du chargement</div>';
+    }
   }
 
   window.addEventListener('empAuthChange', e => {
