@@ -456,13 +456,13 @@ async function generateLinkedin() {
     out.innerHTML = `
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Section "À propos" <button class="copy-btn" onclick="copyText(${JSON.stringify(d.about)})">Copier</button>
+          Section "À propos" <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.about))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.about)}</div>
       </div>
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Titre LinkedIn <button class="copy-btn" onclick="copyText(${JSON.stringify(d.headline)})">Copier</button>
+          Titre LinkedIn <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.headline))})">Copier</button>
         </div>
         <div class="result-block-body" style="font-weight:700">${esc(d.headline)}</div>
       </div>
@@ -511,19 +511,19 @@ async function generateRelance() {
     out.innerHTML = `
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Objet <button class="copy-btn" onclick="copyText(${JSON.stringify(d.subject)})">Copier</button>
+          Objet <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.subject))})">Copier</button>
         </div>
         <div class="result-block-body" style="font-weight:700">${esc(d.subject)}</div>
       </div>
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Version courte <button class="copy-btn" onclick="copyText(${JSON.stringify(d.short)})">Copier</button>
+          Version courte <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.short))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.short)}</div>
       </div>
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Version développée <button class="copy-btn" onclick="copyText(${JSON.stringify(d.long)})">Copier</button>
+          Version développée <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.long))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.long)}</div>
       </div>
@@ -561,14 +561,14 @@ async function generateOutreach() {
     out.innerHTML = `
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Message RH / Recruteur <button class="copy-btn" onclick="copyText(${JSON.stringify(d.direct)})">Copier</button>
+          Message RH / Recruteur <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.direct))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.direct)}</div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px">${(d.direct||'').length}/300 caractères</div>
       </div>
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Message employé du domaine <button class="copy-btn" onclick="copyText(${JSON.stringify(d.indirect)})">Copier</button>
+          Message employé du domaine <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.indirect))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.indirect)}</div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px">${(d.indirect||'').length}/300 caractères</div>
@@ -617,11 +617,11 @@ async function generateNegociation() {
     out.innerHTML = `
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
-          Email de négociation <button class="copy-btn" onclick="copyText(${JSON.stringify(d.email)})">Copier</button>
+          Email de négociation <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.email))})">Copier</button>
         </div>
         <div class="result-block-body">${esc(d.email)}</div>
       </div>
-      ${d.script ? `<div class="result-block"><div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">Script d'appel <button class="copy-btn" onclick="copyText(${JSON.stringify(d.script)})">Copier</button></div><div class="result-block-body">${esc(d.script)}</div></div>` : ''}
+      ${d.script ? `<div class="result-block"><div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">Script d'appel <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.script))})">Copier</button></div><div class="result-block-body">${esc(d.script)}</div></div>` : ''}
       ${d.arguments?.length ? `<div class="result-block"><div class="result-block-title">Vos arguments clés</div>${d.arguments.map(a => `<div class="tip-item">${esc(a)}</div>`).join('')}</div>` : ''}
       ${d.marketContext ? `<div class="result-block"><div class="result-block-title">Contexte marché</div><div class="tip-item" style="background:var(--bld);color:var(--blb)">${esc(d.marketContext)}</div></div>` : ''}
       ${d.counterArguments?.length ? `<div class="result-block"><div class="result-block-title">Objections &amp; réponses</div>${d.counterArguments.map(c => `<div class="counter-item"><div class="counter-obj">❓ ${esc(c.objection)}</div><div class="counter-rep">→ ${esc(c.reponse)}</div></div>`).join('')}</div>` : ''}
@@ -669,7 +669,7 @@ async function generateDebrief() {
       ${d.strengths?.length ? `<div class="result-block"><div class="result-block-title" style="color:#22c55e">✅ Points forts</div>${d.strengths.map(s => `<div class="tip-item" style="background:rgba(34,197,94,.08);color:#22c55e">${esc(s)}</div>`).join('')}</div>` : ''}
       ${d.improvements?.length ? `<div class="result-block"><div class="result-block-title" style="color:#f59e0b">⚠️ Axes d'amélioration</div>${d.improvements.map(i => `<div class="tip-item" style="background:rgba(245,158,11,.08);color:#f59e0b">${esc(i)}</div>`).join('')}</div>` : ''}
       ${d.keyAnswers?.length ? `<div class="result-block"><div class="result-block-title">💡 Ce que vous auriez pu dire</div>${d.keyAnswers.map(k => `<div class="counter-item"><div class="counter-obj">${esc(k.question)}</div><div class="counter-rep">${esc(k.betterAnswer)}</div></div>`).join('')}</div>` : ''}
-      ${d.thankYouEmail ? `<div class="result-block"><div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">Email de remerciement <button class="copy-btn" onclick="copyText(${JSON.stringify(d.thankYouEmail)})">Copier</button></div><div class="result-block-body">${esc(d.thankYouEmail)}</div></div>` : ''}
+      ${d.thankYouEmail ? `<div class="result-block"><div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">Email de remerciement <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.thankYouEmail))})">Copier</button></div><div class="result-block-body">${esc(d.thankYouEmail)}</div></div>` : ''}
       ${d.nextSteps?.length ? `<div class="result-block"><div class="result-block-title">🚀 Prochaines étapes</div>${d.nextSteps.map(s => `<div class="tip-item">${esc(s)}</div>`).join('')}</div>` : ''}
     `;
   } catch { empToast('Erreur réseau', 'error'); }

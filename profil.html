@@ -887,7 +887,7 @@
     if (!val) return;
     const tag = document.createElement('span');
     tag.className = 'skill-tag';
-    tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${val}<span class="remove" onclick="removeSkill(this)">✕</span>`;
+    tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${esc(val)}<span class="remove" onclick="removeSkill(this)">✕</span>`;
     document.getElementById('skillsWrap').appendChild(tag);
     input.value = '';
     empToast('Compétence ajoutée', 'success');

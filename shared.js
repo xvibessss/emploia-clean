@@ -520,15 +520,15 @@ window.empUpdateNav = function(user) {
     authDiv.innerHTML = `<button class="emp-nav-login" onclick="empShowAuth('login')">Se connecter</button>`;
     return;
   }
-  const initials = user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const initials = esc(user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
   const avatarContent = user.avatar
-    ? `<img src="${user.avatar}" alt="" referrerpolicy="no-referrer"/>`
+    ? `<img src="${esc(user.avatar)}" alt="" referrerpolicy="no-referrer"/>`
     : initials;
   authDiv.innerHTML = `
     <div class="emp-user-menu" id="empUserMenu">
       <button class="emp-user-btn" onclick="empToggleUserMenu()">
         <div class="emp-user-avatar">${avatarContent}</div>
-        <span class="emp-user-name">${user.name.split(' ')[0]}</span>
+        <span class="emp-user-name">${esc(user.name.split(' ')[0])}</span>
         <span class="emp-user-chevron">▾</span>
       </button>
       <div class="emp-user-dropdown" id="empUserDropdown">
@@ -705,7 +705,7 @@ async function empAuthInit() {
       html += `<div class="sp-section">Recherche offres</div>
         <a class="sp-result" href="/jobs?q=${encodeURIComponent(lower)}" onclick="closeSpotlight()">
           <div class="sp-result-icon">🔍</div>
-          <div class="sp-result-text"><div class="sp-result-title">Offres "${q}"</div><div class="sp-result-sub">Rechercher sur Emploia</div></div>
+          <div class="sp-result-text"><div class="sp-result-title">Offres "${esc(q)}"</div><div class="sp-result-sub">Rechercher sur Emploia</div></div>
         </a>`;
     }
 
