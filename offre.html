@@ -424,7 +424,7 @@
     document.getElementById('metaSalary').textContent = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
     document.getElementById('metaDate').textContent = formatDate(job.created_at || job.date_posted || job.date);
 
-    if (job.url) {
+    if (job.url && /^https?:\/\//i.test(job.url)) {
       document.getElementById('offreApplyBtn').href = job.url;
     } else {
       document.getElementById('offreApplyBtn').style.opacity = '.4';
@@ -574,7 +574,7 @@
 
     const kw = document.getElementById('atsKeywords');
     kw.innerHTML = top.slice(0, 12).map(k =>
-      `<span class="ats-kw-tag ${matched.includes(k) ? 'match' : 'miss'}">${matched.includes(k) ? '✓ ' : ''}${k}</span>`
+      `<span class="ats-kw-tag ${matched.includes(k) ? 'match' : 'miss'}">${matched.includes(k) ? '✓ ' : ''}${esc(k)}</span>`
     ).join('');
 
     // Save score snapshot for progression chart

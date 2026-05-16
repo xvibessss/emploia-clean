@@ -933,7 +933,7 @@
     emojiEl.className = 'feedback-emoji';
     emojiEl.textContent = emoji;
     const textEl = document.createElement('div');
-    textEl.innerHTML = badges.map(b => `<span class="fb-badge ${b.type}">${b.label}</span>`).join('') + text;
+    textEl.innerHTML = badges.map(b => `<span class="fb-badge ${b.type}">${b.label}</span>`).join('') + esc(text);
     item.append(emojiEl, textEl);
     list.insertBefore(item, list.firstChild);
     if (list.children.length > 8) list.lastChild.remove();

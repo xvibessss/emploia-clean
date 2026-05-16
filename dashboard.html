@@ -1702,12 +1702,12 @@
       document.getElementById('savedJobsList').innerHTML = saved.map(j => `
         <div style="background:var(--s3);border:1px solid var(--brd);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${j.title}</div>
-            <div style="font-size:11px;color:var(--t3)">${j.company || ''}${j.location ? ' · ' + j.location : ''}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(j.title)}</div>
+            <div style="font-size:11px;color:var(--t3)">${esc(j.company || '')}${j.location ? ' · ' + esc(j.location) : ''}</div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            ${j.url ? `<a href="${j.url}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Voir</a>` : ''}
-            <button onclick="unsaveJobDash('${j.id}',this.closest('div[style]'))" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--rnb)">✕</button>
+            ${j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Voir</a>` : ''}
+            <button onclick="unsaveJobDash('${esc(j.id)}',this.closest('div[style]'))" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--rnb)">✕</button>
           </div>
         </div>`).join('');
     } catch {}
