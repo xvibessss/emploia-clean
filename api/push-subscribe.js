@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getAllowedOrigin, getCurrentUser, kvGet, kvSet } from './_lib/auth.js';
+import { getAllowedOrigin, getCurrentUser, kvGet, kvSet, checkRateLimit } from './_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -14,6 +14,10 @@ export default async function handler(req) {
     status: 204,
     headers: { ...H, 'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' },
   });
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'push-sub', 20, 3600);
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
   // GET: return VAPID public key for client subscription
   if (req.method === 'GET') {
