@@ -821,33 +821,34 @@
   <div class="onboarding-card" id="onboardingCard">
     <div class="ob-header">
       <div class="ob-title">🚀 Complétez votre profil pour de meilleures recommandations
-        <span class="badge badge-blue">72% complété</span>
+        <span class="badge badge-blue" id="obProgressBadge">0% complété</span>
       </div>
       <button onclick="document.getElementById('onboardingCard').style.display='none'" style="background:transparent;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:4px">✕</button>
     </div>
     <div class="ob-steps">
-      <a href="/app" class="ob-step done">
+      <a href="/app" class="ob-step" id="ob-1">
         <div class="ob-step-icon">✨</div>
         <div class="ob-step-text">
           <div class="ob-step-label">Premier CV généré</div>
-          <div class="ob-step-sub">Complété</div>
+          <div class="ob-step-sub" id="ob-1-sub">Générez votre premier CV</div>
         </div>
-        <span class="ob-check">✓</span>
+        <span class="ob-check" id="ob-1-check" style="display:none">✓</span>
       </a>
-      <a href="/profil" class="ob-step done">
+      <a href="/profil" class="ob-step" id="ob-2">
         <div class="ob-step-icon">👤</div>
         <div class="ob-step-text">
           <div class="ob-step-label">Profil créé</div>
-          <div class="ob-step-sub">Complété</div>
+          <div class="ob-step-sub" id="ob-2-sub">Complétez votre profil</div>
         </div>
-        <span class="ob-check">✓</span>
+        <span class="ob-check" id="ob-2-check" style="display:none">✓</span>
       </a>
-      <a href="/jobs" class="ob-step">
+      <a href="/jobs" class="ob-step" id="ob-3">
         <div class="ob-step-icon">📋</div>
         <div class="ob-step-text">
           <div class="ob-step-label">Première candidature</div>
-          <div class="ob-step-sub">Postulez à une offre</div>
+          <div class="ob-step-sub" id="ob-3-sub">Postulez à une offre</div>
         </div>
+        <span class="ob-check" id="ob-3-check" style="display:none">✓</span>
       </a>
       <a href="/interview" class="ob-step">
         <div class="ob-step-icon">🎤</div>
@@ -1081,34 +1082,9 @@
           <div class="gen-card-title">⚡ Activité récente</div>
         </div>
         <div class="gen-card-body" style="padding-top:4px">
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon">📄</div>
-              <div class="activity-text">
-                <div class="activity-title">CV généré pour <strong>BNP Paribas</strong> (Score ATS: 94)</div>
-                <div class="activity-time">Il y a 2 heures</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">🎤</div>
-              <div class="activity-text">
-                <div class="activity-title">Entretien simulé — <strong>Développeur Backend</strong></div>
-                <div class="activity-time">Hier à 16h30</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">✉️</div>
-              <div class="activity-text">
-                <div class="activity-title">Lettre générée pour <strong>Capgemini</strong></div>
-                <div class="activity-time">Il y a 2 jours</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon">⭐</div>
-              <div class="activity-text">
-                <div class="activity-title">Offre sauvegardée — <strong>Alan (Full Stack)</strong></div>
-                <div class="activity-time">Il y a 3 jours</div>
-              </div>
+          <div class="activity-list" id="activityList">
+            <div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">
+              Chargement de l'activité…
             </div>
           </div>
         </div>
@@ -1348,6 +1324,8 @@
     renderList(filteredApps());
     updateTabCounts(allApps);
     updateStatsUI(allApps);
+    updateRecentActivity(allApps);
+    updateOnboardingCard(allApps, window.empDashUser || null);
   }
 
   // ── KANBAN ─────────────────────────────────────────────────────────────────
@@ -1747,6 +1725,55 @@
   }
 
   // ── DYNAMIC STATS ──────────────────────────────────────────────────────────
+  function updateRecentActivity(apps) {
+    const el = document.getElementById('activityList');
+    if (!el) return;
+    const recent = [...apps]
+      .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
+      .slice(0, 4);
+    if (!recent.length) {
+      el.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Aucune candidature récente.<br><a href="/jobs" style="color:var(--inb)">Chercher des offres →</a></div>';
+      return;
+    }
+    const STATUS_ICON = { wishlist: '📋', applied: '📤', interview: '🎤', offer: '🎉', rejected: '❌' };
+    el.innerHTML = recent.map(app => {
+      const daysAgo = Math.floor((Date.now() - (app.updatedAt || app.createdAt || Date.now())) / 86400000);
+      const timeStr = daysAgo === 0 ? "Aujourd'hui" : daysAgo === 1 ? "Hier" : `Il y a ${daysAgo}j`;
+      const icon = STATUS_ICON[app.status] || '📄';
+      const label = STATUS_LABEL[app.status] || app.status;
+      return `<div class="activity-item">
+        <div class="activity-icon">${icon}</div>
+        <div class="activity-text">
+          <div class="activity-title">${label} — <strong>${esc(app.jobTitle || 'Candidature')}</strong>${app.company ? ' chez <strong>' + esc(app.company) + '</strong>' : ''}</div>
+          <div class="activity-time">${timeStr}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function updateOnboardingCard(apps, user) {
+    const setDone = (n, done) => {
+      const step = document.getElementById('ob-' + n);
+      const sub  = document.getElementById('ob-' + n + '-sub');
+      const chk  = document.getElementById('ob-' + n + '-check');
+      if (!step) return;
+      step.classList.toggle('done', done);
+      if (sub) sub.textContent = done ? 'Complété' : sub.textContent;
+      if (chk) chk.style.display = done ? '' : 'none';
+    };
+    const cvDone  = user && (user.generationsUsed || 0) > 0;
+    const profDone = !!user;
+    const appDone  = apps.length > 0;
+    setDone(1, cvDone);
+    setDone(2, profDone);
+    setDone(3, appDone);
+    const completed = [cvDone, profDone, appDone, false].filter(Boolean).length;
+    const pct = Math.round((completed / 4) * 100);
+    const badge = document.getElementById('obProgressBadge');
+    if (badge) badge.textContent = `${pct}% complété`;
+    if (pct === 100) document.getElementById('onboardingCard')?.style?.setProperty('display', 'none');
+  }
+
   function updateStatsUI(apps) {
     const total = apps.length;
     const interviews = apps.filter(a => a.status === 'interview').length;
@@ -1876,6 +1903,8 @@
       const res = await fetch('/api/auth/me', { credentials: 'include' });
       if (!res.ok) return;
       const user = await res.json();
+      window.empDashUser = user;
+      updateOnboardingCard(allApps, user);
       if (user.name) {
         const firstName = user.name.split(' ')[0];
         document.getElementById('wbName').textContent = firstName || user.name;
