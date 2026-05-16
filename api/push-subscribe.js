@@ -31,8 +31,10 @@ export default async function handler(req) {
 
   // POST: save push subscription
   if (req.method === 'POST') {
+    const bodyText = await req.text();
+    if (bodyText.length > 2000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
     let body;
-    try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
     const sub = body.subscription;
     // Only accept known Web Push Subscription fields — reject arbitrary keys
     if (!sub?.endpoint || typeof sub.endpoint !== 'string' || !sub.endpoint.startsWith('https://')) {
@@ -52,8 +54,10 @@ export default async function handler(req) {
 
   // DELETE: remove subscription (unsubscribe)
   if (req.method === 'DELETE') {
+    const bodyText = await req.text();
+    if (bodyText.length > 1000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
     let body;
-    try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
     const endpoint = typeof body.endpoint === 'string' ? body.endpoint : '';
     const key = `push:${user.email}`;
     const existing = await kvGet(key) || [];

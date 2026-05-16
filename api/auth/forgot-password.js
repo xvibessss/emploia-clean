@@ -20,8 +20,10 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`ip:${ip}`, 'forgot-password', 3, 3600);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 500) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
 
   const email = (body.email || '').toLowerCase().trim();
   if (!email || !validateEmail(email)) return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers: H });

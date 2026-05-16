@@ -28,8 +28,10 @@ export default async function handler(req) {
     });
   }
 
+  const bodyText = await req.text();
+  if (bodyText.length > 2000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); }
+  try { body = JSON.parse(bodyText); }
   catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
 
   const email = sanitizeString((body.email || ''), 254).toLowerCase();

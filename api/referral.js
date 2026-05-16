@@ -59,8 +59,10 @@ export default async function handler(req) {
 
   // POST /api/referral — track a referral signup (called during register if ?ref= in URL)
   if (req.method === 'POST') {
+    const bodyText = await req.text();
+    if (bodyText.length > 500) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
     let body;
-    try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
+    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
     const { code, newUserEmail } = body;
     if (!code || !newUserEmail) return new Response(JSON.stringify({ error: 'code et newUserEmail requis' }), { status: 400, headers: H });

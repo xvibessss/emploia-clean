@@ -30,8 +30,10 @@ export default async function handler(req) {
     });
   }
 
+  const bodyText = await req.text();
+  if (bodyText.length > 2000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); }
+  try { body = JSON.parse(bodyText); }
   catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
 
   // Sanitize inputs
@@ -84,6 +86,14 @@ export default async function handler(req) {
 
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
+
+  // Store the user's own referral code in KV immediately so friends can use it right away
+  const refCharsMap = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const refSeedMap = id.slice(-8);
+  let ownRefCode = '';
+  for (let i = 0; i < 8; i++) ownRefCode += refCharsMap[(refSeedMap.charCodeAt(i % refSeedMap.length) + i * 7) % refCharsMap.length];
+  kvSet(`ref:${ownRefCode}`, { userId: id, email, signups: [], monthsEarned: 0, createdAt: new Date().toISOString() }).catch(() => {});
+  kvSet(`refcode:${id}`, ownRefCode).catch(() => {});
 
   // Track referral signup if a ref code was provided
   const refCode = typeof body.ref === 'string' ? body.ref.trim().toUpperCase() : null;

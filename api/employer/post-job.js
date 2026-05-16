@@ -20,8 +20,10 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`ip:${ip}`, 'employer_post', 5, 86400);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Limite atteinte. Maximum 5 offres par jour par IP.' }), { status: 429, headers: { ...H, 'Retry-After': '86400' } });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 10000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); }
+  try { body = JSON.parse(bodyText); }
   catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
   const san = (v, max) => String(v || '').trim().slice(0, max);

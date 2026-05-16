@@ -38,8 +38,10 @@ export default async function handler(req) {
   }
 
   if (req.method === 'POST') {
+    const bodyText = await req.text();
+    if (bodyText.length > 2000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
     let body;
-    try { body = await req.json(); } catch { body = {}; }
+    try { body = JSON.parse(bodyText); } catch { body = {}; }
 
     const VALID_TYPES = ['all', 'CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'];
     const VALID_FREQUENCIES = ['daily', 'weekly', 'realtime'];

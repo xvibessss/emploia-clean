@@ -31,8 +31,10 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: 'Ce compte utilise la connexion Google — aucun mot de passe à modifier.' }), { status: 400, headers: H });
   }
 
+  const bodyText = await req.text();
+  if (bodyText.length > 500) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers: H }); }
 
   const currentPassword = body.currentPassword || '';
   const newPassword     = body.newPassword     || '';

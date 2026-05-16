@@ -19,8 +19,10 @@ export default async function handler(req) {
   const userRl = await checkRateLimit(`user:${user.email}`, 'generate-cv', 15, 3600);
   if (!userRl.allowed) return new Response(JSON.stringify({ error: 'Limite de génération atteinte. Réessayez dans 1 heure.' }), { status: 429, headers: { ...H_JSON, 'Retry-After': '3600' } });
 
+  const bodyText = await req.text();
+  if (bodyText.length > 20000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H_JSON });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H_JSON }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H_JSON }); }
 
   const jobOffer = sanitizeString(body.jobOffer, 8000);
   const profile = sanitizeString(body.profile, 8000);

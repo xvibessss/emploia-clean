@@ -79,7 +79,7 @@ Règles : score entre 50 et 97. verdict parmi : "Excellent match", "Bon profil",
       if (m) try { result = JSON.parse(m[0]); } catch {}
     }
 
-    if (!result?.score) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    if (result?.score == null) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
     return new Response(JSON.stringify(result), { status: 200, headers: H });
 
   } catch (err) {
