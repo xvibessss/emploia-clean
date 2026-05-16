@@ -164,7 +164,7 @@
       <div class="job-tags">
         ${typeLabel ? `<span class="job-tag type">${esc(typeLabel)}</span>` : ''}
         ${job.remote ? '<span class="job-tag">🌐 Remote</span>' : ''}
-        ${(job.created_at || job.date_posted) ? `<span class="job-tag">${formatDate(job.created_at || job.date_posted)}</span>` : ''}
+        ${(job.created_at || job.date_posted || job.date) ? `<span class="job-tag">${formatDate(job.created_at || job.date_posted || job.date)}</span>` : ''}
       </div>
       <div class="job-card-footer">
         <a href="/app?offre=${encoded}" class="btn btn-primary">✨ Générer CV</a>
