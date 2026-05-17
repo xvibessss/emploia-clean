@@ -28,7 +28,7 @@ async function fetchJobs(keywords, location, type) {
       title: j.title || '',
       company: j.company_name || '',
       location: j.location || '',
-      url: j.url || `${BASE_URL}/jobs`,
+      url: (j.url && /^https?:\/\//i.test(j.url)) ? j.url : `${BASE_URL}/jobs`,
       remote: !!j.remote,
     }));
   } catch { return []; }

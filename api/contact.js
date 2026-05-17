@@ -51,7 +51,7 @@ export default async function handler(req) {
       from: 'Emploia Contact <noreply@emploia.fr>',
       to: ['contact@emploia.fr'],
       reply_to: email,
-      subject: `[${subjectLabel}] Message de ${name}`,
+      subject: `[${subjectLabel}] Message de ${name.replace(/[\r\n]/g, ' ')}`,
       html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#1e293b">Nouveau message — Emploia</h2><table style="width:100%;border-collapse:collapse"><tr><td style="padding:8px;color:#64748b;font-weight:600;width:120px">De</td><td style="padding:8px">${safeName} &lt;${safeEmail}&gt;</td></tr><tr style="background:#f8fafc"><td style="padding:8px;color:#64748b;font-weight:600">Sujet</td><td style="padding:8px">${safeSubject}</td></tr><tr><td style="padding:8px;color:#64748b;font-weight:600">Message</td><td style="padding:8px;white-space:pre-line">${safeMessage}</td></tr></table><p style="color:#94a3b8;font-size:12px;margin-top:20px">Répondre directement à cet email pour contacter ${safeName}.</p></div>`,
     });
 

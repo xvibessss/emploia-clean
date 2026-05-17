@@ -15,7 +15,7 @@ async function fetchTrendingJobs() {
       title: j.title || '',
       company: j.company_name || '',
       location: j.location || 'France',
-      url: j.url || `${BASE_URL}/jobs`,
+      url: (j.url && /^https?:\/\//i.test(j.url)) ? j.url : `${BASE_URL}/jobs`,
       remote: !!j.remote,
     }));
   } catch { return []; }
