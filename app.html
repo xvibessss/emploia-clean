@@ -845,17 +845,19 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
           </div>
           <div class="ats-grade" style="color:${color}">${grade}</div>
           ${(result.bars || []).length ? `<div class="ats-bars">
-            ${result.bars.map(b => `
+            ${result.bars.map(b => {
+              const bv = Math.min(100, Math.max(0, Number(b.val) || 0));
+              return `
               <div class="ats-bar">
-                <div class="ats-bar-name">${b.name}</div>
-                <div class="ats-bar-track"><div class="ats-bar-fill" style="width:${b.val}%;background:${color}"></div></div>
-                <div class="ats-bar-num">${b.val}%</div>
-              </div>
-            `).join('')}
+                <div class="ats-bar-name">${esc(String(b.name || ''))}</div>
+                <div class="ats-bar-track"><div class="ats-bar-fill" style="width:${bv}%;background:${color}"></div></div>
+                <div class="ats-bar-num">${bv}%</div>
+              </div>`;
+            }).join('')}
           </div>` : ''}
           ${result.recommendations ? `<div style="margin-top:18px;width:100%;background:var(--bg);border:1px solid var(--brd);border-radius:11px;padding:14px">
             <h4 style="font-size:11px;font-weight:800;color:var(--t1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Recommandations</h4>
-            <div style="font-size:12px;color:var(--t2);line-height:1.7">${result.recommendations}</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.7">${esc(String(result.recommendations))}</div>
           </div>` : ''}
         </div>`;
     } else {
@@ -872,7 +874,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       <div class="result-empty" style="color:var(--rnb)">
         <div class="result-empty-emoji">⚠️</div>
         <h3 style="color:var(--rnb)">Erreur de génération</h3>
-        <p>${msg}</p>
+        <p>${esc(String(msg))}</p>
         <button class="btn btn-secondary btn-sm" onclick="generate()" style="margin-top:14px">Réessayer</button>
       </div>`;
   }

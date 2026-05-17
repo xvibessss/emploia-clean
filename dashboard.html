@@ -1967,7 +1967,7 @@
             <div style="font-size:11px;color:var(--t3)">${esc(j.company)}${j.location ? ' · ' + esc(j.location) : ''} · ${dateStr}</div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            ${j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="font-size:11px;padding:5px 10px">Voir →</a>` : ''}
+            ${j.url && /^https?:\/\//i.test(j.url) ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="font-size:11px;padding:5px 10px">Voir →</a>` : ''}
           </div>
         </div>`;
       }).join('');

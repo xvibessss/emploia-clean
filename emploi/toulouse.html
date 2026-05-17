@@ -168,7 +168,7 @@
       </div>
       <div class="job-card-footer">
         <a href="/app?offre=${encoded}" class="btn btn-primary">✨ Générer CV</a>
-        ${job.url ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>` : ''}
+        ${job.url && /^https?:\/\//i.test(job.url) ? `<a href="${esc(job.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>` : ''}
       </div>`;
     return card;
   }

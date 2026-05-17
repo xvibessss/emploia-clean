@@ -105,7 +105,7 @@
     const logo=j.company_logo?`<img src="${esc(j.company_logo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🏢'">`:'🏢';
     card.innerHTML=`<div class="job-card-top"><div class="job-logo">${logo}</div><div><div class="job-title">${esc(j.title||'Poste')}</div><div class="job-company">${esc(j.company_name||j.company||'')}</div></div></div>
     <div class="job-tags">${type?`<span class="job-tag type">${esc(type)}</span>`:''}${j.remote?'<span class="job-tag">🌐 Remote</span>':''}</div>
-    <div class="job-card-footer"><a href="/app?offre=${enc}" class="btn btn-primary">✨ Générer CV</a>${j.url?`<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
+    <div class="job-card-footer"><a href="/app?offre=${enc}" class="btn btn-primary">✨ Générer CV</a>${j.url&&/^https?:\/\//i.test(j.url)?`<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
     return card;
   }
   function refineSearch(){window.location.href='/recherche?q='+encodeURIComponent(document.getElementById('queryInput').value.trim()||DEFAULT_QUERY);}

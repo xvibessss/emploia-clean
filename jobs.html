@@ -1426,9 +1426,10 @@
     document.getElementById('drawerTitle').textContent = job.title;
     document.getElementById('drawerCompany').textContent = [job.company, job.location].filter(Boolean).join(' · ');
     const link = document.getElementById('drawerJobLink');
-    link.href = job.url || '#';
+    const safeUrl = (job.url && /^https?:\/\//i.test(job.url)) ? job.url : '#';
+    link.href = safeUrl;
     link.style.opacity = job.url ? '' : '.4';
-    document.getElementById('drawerApplyLink').href = job.url || '#';
+    document.getElementById('drawerApplyLink').href = safeUrl;
 
     const trackBtn = document.getElementById('drawerTrackBtn');
     const isTracked = tracked.has(String(jobId));

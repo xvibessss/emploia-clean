@@ -115,7 +115,7 @@
     const loc=job.location||job.job_city||'';
     card.innerHTML=`<div class="job-card-top"><div class="job-logo">${logo}</div><div><div class="job-title">${esc(job.title||'Poste')}</div><div class="job-company">${esc(job.company_name||job.company||'')} ${loc?'· '+esc(loc):''}</div></div></div>
     <div class="job-tags">${typeLabel?`<span class="job-tag type">${esc(typeLabel)}</span>`:''}${job.remote?'<span class="job-tag">🌐 Remote</span>':''}</div>
-    <div class="job-card-footer"><a href="/app?offre=${encoded}" class="btn btn-primary">✨ Générer CV</a>${job.url||job.job_apply_link?`<a href="${esc(job.url||job.job_apply_link)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
+    <div class="job-card-footer"><a href="/app?offre=${encoded}" class="btn btn-primary">✨ Générer CV</a>${(job.url||job.job_apply_link)&&/^https?:\/\//i.test(job.url||job.job_apply_link)?`<a href="${esc(job.url||job.job_apply_link)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
     return card;
   }
   function refineSearch(){const q=document.getElementById('queryInput').value.trim()||DEFAULT_QUERY;window.location.href=`/recherche?q=${encodeURIComponent(q)}&location=${encodeURIComponent(DEFAULT_LOCATION)}`;}
