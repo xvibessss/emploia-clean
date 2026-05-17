@@ -258,8 +258,9 @@
 
   function renderQCard(job) {
     const statusLabels = { queued: 'En attente', generating: 'Génération…', ready: 'Prêt', applied: 'Envoyé', error: 'Erreur' };
+    const sid = esc(job.id);
     const letterPreview = job.letter
-      ? `<div class="qcard-letter" id="letter-${job.id}" onclick="toggleLetter('${job.id}')">${esc(job.letter.slice(0, 600))}</div>`
+      ? `<div class="qcard-letter" id="letter-${sid}" onclick="toggleLetter('${sid}')">${esc(job.letter.slice(0, 600))}</div>`
       : '';
     const skillPills = (job.skills || []).slice(0, 5).map(s => `<span class="qcard-pill">${esc(s)}</span>`).join('');
     const atsPills = (job.atsKeywords || []).slice(0, 6).map(k => `<span class="qcard-keyword">${esc(k)}</span>`).join('');
@@ -274,7 +275,7 @@
     const canApply = job.status === 'ready';
     const isApplied = job.status === 'applied';
 
-    return `<div class="qcard status-${job.status}" id="qcard-${job.id}">
+    return `<div class="qcard status-${job.status}" id="qcard-${sid}">
       <div class="qcard-top">
         <div class="qcard-logo">🏢</div>
         <div class="qcard-info">
@@ -289,13 +290,13 @@
       ${emailSubjectLine}
       ${questionsSection}
       <div class="qcard-actions">
-        ${canApply ? `<button class="btn-qapply" onclick="applyJob('${job.id}')">🚀 Postuler maintenant</button>` : ''}
-        ${canApply ? `<button class="btn-qcopy" onclick="copyLetter('${job.id}')">📋 Copier la lettre</button>` : ''}
-        ${canApply && job.emailSubject ? `<button class="btn-qcopy" onclick="copyEmailSubject('${job.id}')">✉️ Copier l'objet</button>` : ''}
-        ${canGenerate ? `<button class="btn-qcopy" onclick="prepareSingle('${job.id}')">✨ Préparer</button>` : ''}
+        ${canApply ? `<button class="btn-qapply" onclick="applyJob('${sid}')">🚀 Postuler maintenant</button>` : ''}
+        ${canApply ? `<button class="btn-qcopy" onclick="copyLetter('${sid}')">📋 Copier la lettre</button>` : ''}
+        ${canApply && job.emailSubject ? `<button class="btn-qcopy" onclick="copyEmailSubject('${sid}')">✉️ Copier l'objet</button>` : ''}
+        ${canGenerate ? `<button class="btn-qcopy" onclick="prepareSingle('${sid}')">✨ Préparer</button>` : ''}
         ${isApplied ? `<span style="font-size:13px;color:#22c55e;font-weight:600;">✅ Candidature envoyée</span>` : ''}
-        ${!isApplied ? `<button class="btn-qmark" onclick="markApplied('${job.id}')">✓ Marquer envoyé</button>` : ''}
-        <button class="btn-qremove" onclick="removeJob('${job.id}')">✕</button>
+        ${!isApplied ? `<button class="btn-qmark" onclick="markApplied('${sid}')">✓ Marquer envoyé</button>` : ''}
+        <button class="btn-qremove" onclick="removeJob('${sid}')">✕</button>
       </div>
     </div>`;
   }

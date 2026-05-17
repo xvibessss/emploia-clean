@@ -408,7 +408,7 @@
       ]
     },
     {
-      "source": "/(.*\\.html|app|dashboard|jobs|blog|interview|tools|referral|onboarding|cv-builder|/)",
+      "source": "/((?!api/).*)",
       "headers": [
         {
           "key": "Content-Security-Policy",
