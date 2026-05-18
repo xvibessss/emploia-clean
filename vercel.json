@@ -145,6 +145,15 @@
     },
     "api/cron/send-weekly-user-report.js": {
       "maxDuration": 45
+    },
+    "api/cron/send-nurture.js": {
+      "maxDuration": 45
+    },
+    "api/cron/send-reactivation.js": {
+      "maxDuration": 45
+    },
+    "api/admin.js": {
+      "maxDuration": 15
     }
   },
   "crons": [
@@ -163,6 +172,14 @@
     {
       "path": "/api/cron/send-weekly-user-report",
       "schedule": "0 8 * * 0"
+    },
+    {
+      "path": "/api/cron/send-nurture",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/send-reactivation",
+      "schedule": "0 12 * * *"
     }
   ],
   "rewrites": [

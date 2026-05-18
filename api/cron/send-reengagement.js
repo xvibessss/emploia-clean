@@ -33,6 +33,9 @@ export default async function handler(req) {
   let skipped = 0;
 
   for (const email of batch) {
+    const optedOut = await kvGet(`optout:${email}`);
+    if (optedOut) { skipped++; continue; }
+
     // Already sent re-engagement to this user
     const alreadySent = await kvGet(`reeng:${email}`);
     if (alreadySent) { skipped++; continue; }

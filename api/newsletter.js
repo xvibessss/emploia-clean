@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, checkRateLimit, getAllowedOrigin, validateEmail, htmlEscape } from './_lib/auth.js';
+import { kvGet, kvSet, kvSadd, checkRateLimit, getAllowedOrigin, validateEmail, htmlEscape } from './_lib/auth.js';
 
 const DISPOSABLE = ['mailinator', 'guerrillamail', 'tempmail', 'yopmail', '10minutemail', 'throwam'];
 
@@ -28,7 +28,10 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers: H });
     const existing = await kvGet('newsletter_subscribers') || [];
     const updated = Array.isArray(existing) ? existing.filter(s => s.email !== email) : [];
-    await kvSet('newsletter_subscribers', updated);
+    await Promise.all([
+      kvSet('newsletter_subscribers', updated),
+      kvSet(`optout:${email}`, true),
+    ]);
     // Return an HTML confirmation page — browser clicks from emails expect HTML, not JSON
     return new Response(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Désabonnement confirmé — Emploia</title><style>body{margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}.box{background:#fff;border-radius:20px;border:1px solid #e2e8f0;padding:48px 40px;max-width:480px;text-align:center}.logo{background:linear-gradient(135deg,#6366f1,#3b82f6);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;margin-bottom:28px}.icon{font-size:48px;margin-bottom:16px}h1{font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px}p{color:#475569;line-height:1.6;margin:0 0 28px;font-size:15px}a{display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none}</style></head><body><div class="box"><div class="logo">Emploia</div><div class="icon">✅</div><h1>Désabonnement confirmé</h1><p>Votre adresse a bien été retirée de la liste. Vous ne recevrez plus d'emails de notre part.</p><a href="https://emploia.fr">Retour sur Emploia</a></div></body></html>`, {
       status: 200,

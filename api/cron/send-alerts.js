@@ -71,11 +71,12 @@ export default async function handler(req) {
   await kvSet('alert_cursor', nextCursor, 86400 * 7);
 
   for (const email of batch) {
-    const [alerts, user] = await Promise.all([
+    const [optedOut, alerts, user] = await Promise.all([
+      kvGet(`optout:${email}`),
       kvGet(`alerts:${email}`),
       kvGet(`user:${email}`),
     ]);
-    if (!user || !alerts?.length) continue;
+    if (optedOut || !user || !alerts?.length) continue;
 
     const activeAlerts = alerts.filter(a => a.active);
     if (!activeAlerts.length) continue;

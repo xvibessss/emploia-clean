@@ -35,6 +35,9 @@ export default async function handler(req) {
   let skipped = 0;
 
   for (const email of batch) {
+    const optedOut = await kvGet(`optout:${email}`);
+    if (optedOut) { skipped++; continue; }
+
     const alreadySent = await kvGet(`wreport:${email}:${today.slice(0, 7)}`);
     if (alreadySent) { skipped++; continue; }
 
