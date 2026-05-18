@@ -855,9 +855,11 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               </div>`;
             }).join('')}
           </div>` : ''}
-          ${result.recommendations ? `<div style="margin-top:18px;width:100%;background:var(--bg);border:1px solid var(--brd);border-radius:11px;padding:14px">
+          ${Array.isArray(result.recommendations) && result.recommendations.length ? `<div style="margin-top:18px;width:100%;background:var(--bg);border:1px solid var(--brd);border-radius:11px;padding:14px">
             <h4 style="font-size:11px;font-weight:800;color:var(--t1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">💡 Recommandations</h4>
-            <div style="font-size:12px;color:var(--t2);line-height:1.7">${esc(String(result.recommendations))}</div>
+            <ul style="margin:0 0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px">
+              ${result.recommendations.map(r => `<li style="font-size:12px;color:var(--t2);line-height:1.7">${esc(String(r))}</li>`).join('')}
+            </ul>
           </div>` : ''}
         </div>`;
     } else {
@@ -1074,12 +1076,12 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         { name: 'Compétences', val: 75 },
         { name: 'Lisibilité', val: 88 }
       ],
-      recommendations: `<ul style="margin-left:18px;display:flex;flex-direction:column;gap:6px">
-        <li><strong>Ajoutez 3 mots-clés manquants</strong> de l'offre : "GraphQL", "microservices", "agile/scrum"</li>
-        <li><strong>Quantifiez 2 expériences</strong> de plus avec des chiffres précis</li>
-        <li><strong>Section compétences</strong> : passez de 8 à 12 compétences pour mieux scorer</li>
-        <li><strong>Format</strong> : tout est nickel, garde tel quel ✅</li>
-      </ul>`
+      recommendations: [
+        'Ajoutez 3 mots-clés manquants de l\'offre : "GraphQL", "microservices", "agile/scrum"',
+        'Quantifiez 2 expériences de plus avec des chiffres précis',
+        'Section compétences : passez de 8 à 12 compétences pour mieux scorer',
+        'Format : tout est nickel, garde tel quel ✅',
+      ]
     };
   }
 

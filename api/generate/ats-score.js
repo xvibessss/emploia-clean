@@ -63,13 +63,13 @@ export default async function handler(req) {
     {"name": "Compétences", "val": 65},
     {"name": "Lisibilité", "val": 85}
   ],
-  "recommendations": "<ul style=\\"margin-left:18px\\"><li>Intégrez les mots-clés exacts de l'offre</li><li>Quantifiez vos résultats avec des chiffres</li></ul>",
+  "recommendations": ["Intégrez les mots-clés exacts de l'offre", "Quantifiez vos résultats avec des chiffres", "Ajoutez des verbes d'action forts"],
   "keywords": ["mot-clé manquant 1", "mot-clé manquant 2", "mot-clé manquant 3"],
   "strengths": ["Point fort 1", "Point fort 2"],
   "improvements": ["Amélioration 1", "Amélioration 2"]
 }
 
-Règles : score entre 40 et 97. recommendations en HTML (<ul><li>). 3-5 items par liste.`,
+Règles : score entre 40 et 97. recommendations: tableau de 3-5 strings en texte simple (sans HTML). 3-5 items par liste.`,
         }],
       }),
     }), 30000);
