@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Comment faire un CV en 2026 : guide complet pas à pas</title>
+<meta name="description" content="Guide complet pour faire un CV qui décroche des entretiens en 2026 : structure, sections, mise en forme, mots-clés ATS, exemples concrets. De zéro à un CV parfait."/>
+<link rel="canonical" href="https://emploia.fr/blog/comment-faire-un-cv"/>
+<meta property="og:title" content="Comment faire un CV en 2026 : guide complet pas à pas"/>
+<meta property="og:description" content="Structure, sections, mise en forme, ATS, exemples — tout pour créer un CV qui décroche des entretiens en 2026."/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://emploia.fr/blog/comment-faire-un-cv"/>
+<meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Comment faire un CV en 2026",
+  "description": "Guide complet pas à pas pour créer un CV efficace qui passe les filtres ATS et convainc les recruteurs.",
+  "step": [
+    { "@type": "HowToStep", "name": "Choisir le bon format", "text": "1 page pour moins de 10 ans d'expérience, 2 pages maximum pour les profils senior." },
+    { "@type": "HowToStep", "name": "Rédiger l'en-tête", "text": "Nom, titre ciblé, coordonnées professionnelles, LinkedIn si pertinent." },
+    { "@type": "HowToStep", "name": "Écrire l'accroche", "text": "3 lignes max : titre + expérience + valeur ajoutée." },
+    { "@type": "HowToStep", "name": "Lister les expériences", "text": "Ordre chronologique inversé, verbes d'action, résultats chiffrés." },
+    { "@type": "HowToStep", "name": "Indiquer la formation", "text": "Diplômes par ordre chronologique inversé, mentions si bonnes." },
+    { "@type": "HowToStep", "name": "Lister les compétences", "text": "Outils, langues, certifications avec niveaux de maîtrise." },
+    { "@type": "HowToStep", "name": "Optimiser pour les ATS", "text": "Intégrer les mots-clés de l'offre, éviter les tableaux complexes, exporter en PDF." }
+  ],
+  "author": { "@type": "Organization", "name": "Emploia" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quel logiciel utiliser pour faire un CV ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Word et Google Docs sont les plus accessibles. Canva offre des designs attractifs mais attention à la compatibilité ATS. Les meilleurs résultats viennent des outils spécialisés comme l'outil CV d'Emploia qui génère un PDF ATS-compatible automatiquement." }
+    },
+    {
+      "@type": "Question",
+      "name": "Combien de pages doit faire un CV ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "1 page pour moins de 10 ans d'expérience (étudiants, juniors, reconversions). 2 pages maximum pour les profils senior avec beaucoup d'expériences pertinentes. Jamais 3 pages — écrêtez sans pitié." }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle est la différence entre un CV chronologique et fonctionnel ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Le CV chronologique (expériences de la plus récente à la plus ancienne) est le standard en France pour 95% des cas. Le CV fonctionnel (organisé par compétences) est utile pour les reconversions ou les trous dans le parcours, mais peut sembler suspect aux recruteurs." }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il mettre sa photo sur son CV ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Non obligatoire en France. La photo peut introduire des biais de sélection. Si vous en mettez une : fond neutre, tenue professionnelle, photo récente. Jamais une photo de vacances ou de soirée." }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment rendre un CV compatible ATS ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Utilisez une mise en page simple (pas de tableau complexe ni de colonnes imbriquées), intégrez les mots-clés de l'offre naturellement dans vos expériences, évitez les images dans les zones de texte, et exportez en PDF (pas en docx ou image)." }
+    }
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04080f;--s1:#0d1424;--s2:#111827;--s3:#1a2236;
+  --brd:rgba(255,255,255,.07);--brdh:rgba(255,255,255,.13);
+  --blue:#3b82f6;--blb:#60a5fa;--bld:rgba(59,130,246,.12);
+  --ind:#6366f1;--inb:#818cf8;--ind2:rgba(99,102,241,.1);
+  --grn:#10b981;--gnb:#34d399;--gnd:rgba(16,185,129,.1);
+  --ylw:#f59e0b;--ylb:#fbbf24;--yld:rgba(245,158,11,.1);
+  --red:#ef4444;--rnb:#f87171;--rnd:rgba(239,68,68,.1);
+  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 35% at 15% 5%,rgba(99,102,241,.09) 0%,transparent 60%)}
+nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:0 24px}
+.nav-inner{max-width:1100px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:16px;font-weight:800;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo-m{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-a{font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .15s}
+.nav-a:hover{background:var(--s3);color:var(--t1)}
+.btn-nav{font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;padding:7px 16px;border-radius:8px;text-decoration:none}
+.wrap{max-width:780px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.breadcrumb{padding:20px 0 0;font-size:12px;color:var(--t3)}
+.breadcrumb a{color:var(--t3);text-decoration:none}
+.breadcrumb a:hover{color:var(--t2)}
+.article-hero{padding:36px 0 32px;border-bottom:1px solid var(--brd);margin-bottom:40px}
+.art-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:4px 12px;border-radius:6px;background:var(--bld);color:var(--blb);margin-bottom:16px}
+.article-hero h1{font-size:clamp(24px,3.5vw,38px);font-weight:900;letter-spacing:-1.2px;line-height:1.12;margin-bottom:14px}
+.art-meta{display:flex;align-items:center;gap:16px;font-size:12px;color:var(--t3);flex-wrap:wrap}
+h2{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:40px 0 16px;color:var(--t1)}
+h3{font-size:17px;font-weight:700;margin:28px 0 12px;color:var(--t1)}
+p{font-size:15px;line-height:1.8;color:var(--t2);margin-bottom:16px}
+ul,ol{padding-left:20px;margin-bottom:16px}
+li{font-size:15px;line-height:1.8;color:var(--t2);margin-bottom:6px}
+li strong{color:var(--t1)}
+strong{color:var(--t1)}
+.highlight-box{background:var(--s2);border:1px solid var(--brdh);border-radius:14px;padding:24px 28px;margin:28px 0}
+.highlight-box.green{border-color:rgba(16,185,129,.25);background:var(--gnd)}
+.highlight-box.blue{border-color:rgba(59,130,246,.25);background:var(--bld)}
+.highlight-box.yellow{border-color:rgba(245,158,11,.25);background:var(--yld)}
+.highlight-box.red{border-color:rgba(239,68,68,.25);background:var(--rnd)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+.stat-box{background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:20px;text-align:center}
+.stat-num{font-size:28px;font-weight:900;color:var(--blb);letter-spacing:-1px;display:block}
+.stat-lbl{font-size:12px;color:var(--t3);margin-top:4px}
+.step-card{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:24px;margin:16px 0;display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start}
+.step-num{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
+.step-body h3{margin-top:0;margin-bottom:8px;font-size:16px}
+.step-body p{margin-bottom:8px;font-size:14px}
+.step-body ul{margin-bottom:0}
+.step-body li{font-size:14px}
+table{width:100%;border-collapse:collapse;margin:24px 0;font-size:14px}
+th{background:var(--s3);color:var(--t2);font-weight:700;text-align:left;padding:10px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:12px 14px;border-bottom:1px solid var(--brd);color:var(--t2);vertical-align:top}
+td:first-child{color:var(--t1);font-weight:600}
+tr:last-child td{border-bottom:none}
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.before,.after{background:var(--s2);border-radius:12px;padding:18px}
+.before{border:1px solid rgba(239,68,68,.25)}
+.after{border:1px solid rgba(16,185,129,.25)}
+.before h4{color:var(--rnb);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.after h4{color:var(--gnb);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.before p,.after p{font-size:13px;line-height:1.7;margin:0;color:var(--t2)}
+.section-preview{background:var(--s3);border-radius:10px;padding:16px;margin:12px 0;font-size:13px;color:var(--t2);line-height:1.7;font-family:monospace}
+.format-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+.format-card{background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:18px}
+.format-card h4{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.format-card p{font-size:13px;color:var(--t2);margin:0}
+.ats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}
+.ats-do,.ats-dont{background:var(--s2);border-radius:12px;padding:18px}
+.ats-do{border:1px solid rgba(16,185,129,.25)}
+.ats-dont{border:1px solid rgba(239,68,68,.25)}
+.ats-do h4{color:var(--gnb);font-size:13px;font-weight:700;margin-bottom:10px}
+.ats-dont h4{color:var(--rnb);font-size:13px;font-weight:700;margin-bottom:10px}
+.ats-do li,.ats-dont li{font-size:13px;margin-bottom:7px}
+.cta-box{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--brdh);border-radius:16px;padding:32px;text-align:center;margin:48px 0}
+.cta-box h3{font-size:20px;font-weight:800;margin-bottom:8px;color:var(--t1)}
+.cta-box p{color:var(--t2);margin-bottom:20px;font-size:14px}
+.btn-cta{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;text-decoration:none;transition:opacity .15s}
+.btn-cta:hover{opacity:.9}
+.faq-item{border:1px solid var(--brd);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.faq-q{padding:16px 20px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;color:var(--t1)}
+.faq-a{padding:0 20px 16px;font-size:14px;color:var(--t2);line-height:1.75}
+footer{border-top:1px solid var(--brd);padding:32px 24px;text-align:center;color:var(--t3);font-size:13px;margin-top:80px}
+footer a{color:var(--t3);text-decoration:none}
+footer a:hover{color:var(--t2)}
+@media(max-width:640px){
+  .stat-row{grid-template-columns:1fr 1fr}
+  .before-after,.ats-grid,.format-grid{grid-template-columns:1fr}
+  .step-card{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo"><div class="logo-m">E</div>Emploia</a>
+    <div class="nav-links">
+      <a href="/jobs" class="nav-a">Offres</a>
+      <a href="/blog" class="nav-a active">Blog</a>
+      <a href="/tools" class="nav-a">Outils</a>
+      <a href="/cv-builder" class="btn-nav">Créer mon CV →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Comment faire un CV</div>
+
+  <article>
+    <div class="article-hero">
+      <div class="art-tag">📄 CV & ATS</div>
+      <h1>Comment faire un CV en 2026 : guide complet pas à pas</h1>
+      <div class="art-meta">
+        <span>📅 21 mai 2026</span>
+        <span>⏱ 13 min de lecture</span>
+        <span>👁 Emploia Editorial</span>
+      </div>
+    </div>
+
+    <p>Un recruteur passe en moyenne <strong>30 secondes</strong> sur un CV avant de décider si vous passez à l'étape suivante. Et avant même d'arriver sur son bureau, votre CV doit passer les filtres automatiques ATS — qui rejettent 78% des candidatures.</p>
+
+    <p>Ce guide vous donne exactement ce qu'il faut : la structure, les formulations, la mise en forme et les mots-clés qui font la différence en 2026. De zéro à un CV envoyable.</p>
+
+    <div class="stat-row">
+      <div class="stat-box"><span class="stat-num">30s</span><div class="stat-lbl">Temps de lecture d'un recruteur</div></div>
+      <div class="stat-box"><span class="stat-num">78%</span><div class="stat-lbl">Des CVs rejetés par les ATS</div></div>
+      <div class="stat-box"><span class="stat-num">3×</span><div class="stat-lbl">Plus de chances avec un CV optimisé</div></div>
+    </div>
+
+    <h2>Les 7 étapes pour faire un bon CV</h2>
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Choisir le bon format</h3>
+        <p>En France, le CV chronologique inversé est la norme (expériences de la plus récente à la plus ancienne). Le CV fonctionnel (par compétences) est réservé aux reconversions ou aux parcours atypiques.</p>
+        <ul>
+          <li><strong>1 page</strong> : moins de 10 ans d'expérience, étudiants, reconversion</li>
+          <li><strong>2 pages max</strong> : profils senior avec nombreuses expériences pertinentes</li>
+          <li>Jamais 3 pages — écrêtez sans pitié</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Rédiger un en-tête percutant</h3>
+        <p>L'en-tête est la première chose lue. Il doit être clair et professionnel :</p>
+        <ul>
+          <li><strong>Nom complet</strong> en grand (pas besoin de "Curriculum Vitae" en titre)</li>
+          <li><strong>Titre ciblé</strong> : "Développeur Full-Stack React/Node.js" — pas "Cherche emploi"</li>
+          <li><strong>Email professionnel</strong> : prénom.nom@gmail.com</li>
+          <li><strong>Téléphone</strong>, <strong>ville</strong> (pas l'adresse complète), <strong>LinkedIn</strong> si à jour</li>
+          <li><strong>GitHub/Portfolio</strong> si pertinent pour le poste</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Écrire une accroche (optionnel mais efficace)</h3>
+        <p>3 lignes maximum. Elle répond à : qui êtes-vous, ce que vous savez faire, ce que vous apportez.</p>
+        <div class="section-preview">Développeur Full-Stack avec 6 ans d'expérience en React et Node.js, spécialisé en performance et scalabilité. Habitué aux environnements agiles (Scrum, squads produit) et aux architectures microservices. Recherche un poste technique où faire grandir une équipe junior.</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Lister vos expériences avec impact</h3>
+        <p>C'est la section la plus importante. Pour chaque poste :</p>
+        <ul>
+          <li>Intitulé du poste | Entreprise | Ville | Dates</li>
+          <li>2 à 4 bullet points avec verbe d'action + résultat chiffré si possible</li>
+          <li>Focus sur ce que vous avez <strong>produit</strong>, pas sur ce que vous avez <strong>fait</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Indiquer votre formation</h3>
+        <ul>
+          <li>Diplômes du plus récent au plus ancien</li>
+          <li>Mention, distinction ou projets notables si valorisants</li>
+          <li>Pour les profils expérimentés (5+ ans) : formation courte, en bas du CV</li>
+          <li>Pour les étudiants : formation en haut, développée avec cours et projets</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>Lister vos compétences avec niveaux</h3>
+        <ul>
+          <li><strong>Compétences techniques</strong> : outils, logiciels, langages — avec niveau (Notions / Intermédiaire / Avancé / Expert)</li>
+          <li><strong>Langues</strong> : niveau certifié si possible (TOEIC, DELF, Cambridge)</li>
+          <li><strong>Certifications</strong> : AWS, Google, PMP, CFA, etc.</li>
+          <li>Évitez les soft skills génériques ("esprit d'équipe") sans contexte</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h3>Optimiser pour les ATS et exporter</h3>
+        <ul>
+          <li>Intégrez les mots-clés de l'offre naturellement dans vos expériences</li>
+          <li>Évitez les tableaux complexes et les colonnes imbriquées</li>
+          <li>Exportez en <strong>PDF</strong> nommé "Prénom-Nom-CV-Poste.pdf"</li>
+          <li>Adaptez chaque CV à l'offre (20 minutes suffisent)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>La formule gagnante pour les bullet points d'expérience</h2>
+
+    <p>La règle d'or : <strong>verbe d'action + contexte + résultat chiffré</strong>. Voyez la différence :</p>
+
+    <div class="before-after">
+      <div class="before">
+        <h4>❌ Avant (médiocre)</h4>
+        <p>Responsable de la gestion des réseaux sociaux de l'entreprise</p>
+      </div>
+      <div class="after">
+        <h4>✅ Après (impactant)</h4>
+        <p>Développé la présence LinkedIn de la marque de 0 à 12k abonnés en 8 mois — taux d'engagement 4,2% (vs 1,1% industrie)</p>
+      </div>
+    </div>
+
+    <div class="before-after">
+      <div class="before">
+        <h4>❌ Avant (médiocre)</h4>
+        <p>Participation aux développements de nouvelles fonctionnalités</p>
+      </div>
+      <div class="after">
+        <h4>✅ Après (impactant)</h4>
+        <p>Développé le module de paiement (Stripe + webhooks) — réduit les échecs de paiement de 23%, livré en 2 sprints</p>
+      </div>
+    </div>
+
+    <div class="before-after">
+      <div class="before">
+        <h4>❌ Avant (médiocre)</h4>
+        <p>Gestion d'une équipe commerciale</p>
+      </div>
+      <div class="after">
+        <h4>✅ Après (impactant)</h4>
+        <p>Managé une équipe de 6 commerciaux — CA passé de 2,1M€ à 3,4M€ en 18 mois (+62%), sans recrutement supplémentaire</p>
+      </div>
+    </div>
+
+    <h2>Mise en forme : ce qui fonctionne vraiment</h2>
+
+    <table>
+      <tr><th>Élément</th><th>Ce qui fonctionne</th><th>Ce qui bloque</th></tr>
+      <tr><td>Police</td><td>Calibri, Arial, Lato, Georgia (10-12px corps)</td><td>Comic Sans, polices fantaisie, taille &lt; 9px</td></tr>
+      <tr><td>Couleur</td><td>1 couleur d'accent sobre (bleu, vert foncé, gris)</td><td>Fond de couleur sur tout le CV, 4+ couleurs</td></tr>
+      <tr><td>Marges</td><td>1,5-2cm côtés, 1-1,5cm haut/bas</td><td>Marges &lt; 1cm — CV trop dense, illisible</td></tr>
+      <tr><td>Structure</td><td>Hiérarchie claire, sections séparées visuellement</td><td>Blocs de texte, pas de séparation, tout à la même taille</td></tr>
+      <tr><td>Format de sortie</td><td>PDF nommé intelligemment</td><td>Word (.docx), image, Pages Mac</td></tr>
+      <tr><td>Photo</td><td>Facultative — professionnelle si présente</td><td>Photo de soirée, selfie, photo floue</td></tr>
+    </table>
+
+    <h2>Optimisation ATS : les règles techniques</h2>
+
+    <p>Un ATS (Applicant Tracking System) lit votre CV comme du texte brut. Si votre mise en forme est trop complexe, il ne lit rien — et vous êtes automatiquement rejeté.</p>
+
+    <div class="ats-grid">
+      <div class="ats-do">
+        <h4>✅ Compatible ATS</h4>
+        <ul>
+          <li>Mise en page simple, linéaire</li>
+          <li>Titres de sections standards ("Expériences", "Formation")</li>
+          <li>Mots-clés de l'offre intégrés dans le texte</li>
+          <li>Dates au format standard (05/2023 ou Mai 2023)</li>
+          <li>Export PDF (texte sélectionnable)</li>
+          <li>Nom de fichier clair</li>
+        </ul>
+      </div>
+      <div class="ats-dont">
+        <h4>❌ Bloque les ATS</h4>
+        <ul>
+          <li>Tableaux imbriqués pour la mise en page</li>
+          <li>En-tête/pied de page pour les coordonnées</li>
+          <li>Texte dans des images ou formes</li>
+          <li>Colonnes multiples avec texte séparé</li>
+          <li>PDF scanné (image non sélectionnable)</li>
+          <li>Graphiques et jauges de compétences</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Adapter son CV à chaque offre</h2>
+
+    <p>Un CV générique obtient en moyenne 8% de taux de réponse. Un CV adapté obtient 25-30%. La différence ne prend que 20 minutes :</p>
+
+    <ol>
+      <li><strong>Notez les 5-7 mots-clés principaux de l'offre</strong> (compétences, outils, secteur)</li>
+      <li><strong>Vérifiez que votre titre correspond exactement</strong> au poste proposé</li>
+      <li><strong>Réordonnez vos compétences</strong> pour mettre en avant celles de l'offre</li>
+      <li><strong>Modifiez 1-2 bullet points</strong> pour utiliser le vocabulaire exact de l'offre</li>
+      <li><strong>Nommez votre fichier</strong> : "Sophie-Marchand-CV-Chef-Projet-Digital.pdf"</li>
+    </ol>
+
+    <h2>Les erreurs qui font rejeter un CV immédiatement</h2>
+
+    <ul>
+      <li><strong>Fautes d'orthographe</strong> — rédhibitoire pour 92% des recruteurs</li>
+      <li><strong>Email non professionnel</strong> : "bigmac74@hotmail.fr" détruit toute crédibilité</li>
+      <li><strong>Titre générique</strong> : "Je cherche un emploi" ou "Candidature"</li>
+      <li><strong>Trous inexpliqués</strong> dans le parcours sans mention (année sabatique, projet perso, etc.)</li>
+      <li><strong>Mensonges sur les diplômes ou expériences</strong> — vérifiables et éliminatoires</li>
+      <li><strong>Longueur excessive</strong> : 4 pages pour 3 ans d'expérience</li>
+      <li><strong>Informations obsolètes</strong> : stages de 2010 listés en détail pour un profil de 15 ans</li>
+      <li><strong>Même CV pour tous les postes</strong> sans adaptation</li>
+    </ul>
+
+    <div class="highlight-box yellow">
+      <h3 style="margin-top:0">Les types de CV selon votre profil</h3>
+      <ul style="margin-bottom:0">
+        <li><strong>Étudiant / 0 expérience</strong> → Formation en premier, projets académiques valorisés → <a href="/blog/cv-etudiant" style="color:var(--blb)">guide CV étudiant</a></li>
+        <li><strong>Reconversion</strong> → CV fonctionnel par compétences → <a href="/blog/cv-par-competences-2026" style="color:var(--blb)">guide CV par compétences</a></li>
+        <li><strong>International</strong> → CV en anglais avec différences → <a href="/blog/cv-en-anglais" style="color:var(--blb)">guide CV en anglais</a></li>
+        <li><strong>Optimisation ATS</strong> → Score et correction → <a href="/blog/score-ats-cv-optimisation" style="color:var(--blb)">guide score ATS</a></li>
+      </ul>
+    </div>
+
+    <div class="cta-box">
+      <h3>Créez votre CV en 5 minutes avec l'IA</h3>
+      <p>Notre outil analyse votre profil, intègre les mots-clés de l'offre et génère un CV PDF ATS-compatible. Gratuit, sans inscription.</p>
+      <a href="/cv-builder" class="btn-cta">Créer mon CV gratuitement →</a>
+    </div>
+
+    <h2>Questions fréquentes</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Quel logiciel utiliser pour faire un CV ?</div>
+      <div class="faq-a">Word et Google Docs sont les plus accessibles. Canva offre des designs attractifs mais attention à la compatibilité ATS. Les meilleurs résultats viennent des outils spécialisés comme le CV builder d'Emploia qui génère un PDF ATS-compatible automatiquement.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Combien de pages doit faire un CV ?</div>
+      <div class="faq-a">1 page pour moins de 10 ans d'expérience (étudiants, juniors, reconversions). 2 pages maximum pour les profils senior avec beaucoup d'expériences pertinentes. Jamais 3 pages — écrêtez sans pitié.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Quelle est la différence entre un CV chronologique et fonctionnel ?</div>
+      <div class="faq-a">Le CV chronologique (expériences de la plus récente à la plus ancienne) est le standard en France pour 95% des cas. Le CV fonctionnel (organisé par compétences) est utile pour les reconversions ou les trous dans le parcours, mais peut sembler suspect aux recruteurs non avertis.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Faut-il mettre sa photo sur son CV ?</div>
+      <div class="faq-a">Non obligatoire en France. La photo peut introduire des biais de sélection. Si vous en mettez une : fond neutre, tenue professionnelle, photo récente et de qualité. Jamais une photo de vacances ou de soirée.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Comment rendre un CV compatible ATS ?</div>
+      <div class="faq-a">Utilisez une mise en page simple (pas de tableau complexe ni de colonnes imbriquées), intégrez les mots-clés de l'offre naturellement dans vos expériences, évitez les images dans les zones de texte, et exportez en PDF avec texte sélectionnable (pas en image).</div>
+    </div>
+
+  </article>
+</div>
+
+<footer>
+  <p>© 2026 Emploia · <a href="/legal">Mentions légales</a> · <a href="/legal/privacy">Confidentialité</a> · <a href="/blog">Blog</a></p>
+</footer>
+</body>
+</html>

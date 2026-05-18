@@ -402,6 +402,8 @@
     { "source": "/blog/cv-etudiant", "destination": "/blog/cv-etudiant.html" },
     { "source": "/blog/bilan-de-competences", "destination": "/blog/bilan-de-competences.html" },
     { "source": "/blog/periode-essai-droits", "destination": "/blog/periode-essai-droits.html" },
+    { "source": "/blog/comment-faire-un-cv", "destination": "/blog/comment-faire-un-cv.html" },
+    { "source": "/blog/questions-a-poser-en-entretien", "destination": "/blog/questions-a-poser-en-entretien.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

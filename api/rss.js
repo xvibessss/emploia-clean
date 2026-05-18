@@ -282,6 +282,20 @@ export default function handler(req, res) {
       pubDate: 'Thu, 21 May 2026 10:00:00 +0200',
       category: 'Salaire',
     },
+    {
+      title: "Comment faire un CV en 2026 : guide complet pas à pas",
+      link: `${base}/blog/comment-faire-un-cv`,
+      description: "Guide complet pour créer un CV qui passe les filtres ATS et convainc les recruteurs : 7 étapes, formule des bullet points, mise en forme, optimisation ATS, adaptation par offre.",
+      pubDate: 'Thu, 21 May 2026 11:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Questions à poser en entretien 2026 : les 25 meilleures + celles à éviter",
+      link: `${base}/blog/questions-a-poser-en-entretien`,
+      description: "25 questions à poser au recruteur en fin d'entretien, classées par catégorie (poste, équipe, entreprise, progression), + les questions qui plombent votre candidature.",
+      pubDate: 'Thu, 21 May 2026 12:00:00 +0200',
+      category: 'Entretien',
+    },
   ];
 
   const items = articles.map(a => `
