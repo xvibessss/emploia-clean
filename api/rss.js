@@ -178,6 +178,13 @@ export default function handler(req, res) {
       category: 'CV & ATS',
     },
     {
+      title: "Score ATS : comment analyser et optimiser son CV pour les filtres ATS",
+      link: `${base}/blog/score-ats-cv-optimisation`,
+      description: "78% des CVs échouent sur le score ATS. Guide complet : facteurs de scoring (mots-clés 40%, format 25%), avant/après 38→91/100, 5 étapes d'optimisation, erreurs à éviter.",
+      pubDate: 'Mon, 18 May 2026 11:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
       title: "Simulation d'entretien d'embauche en ligne (IA) 2026 : s'entraîner gratuitement",
       link: `${base}/blog/simulation-entretien-embauche`,
       description: "Comment s'entraîner à un entretien avec l'IA en 2026. Questions personnalisées par poste, feedback instantané, méthode STAR, plan 48h. Simulateur gratuit.",

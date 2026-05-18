@@ -74,6 +74,7 @@ export default function handler(req, res) {
     { loc: `${base}/blog/cv-gratuit-en-ligne-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
     { loc: `${base}/blog/simulation-entretien-embauche`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
     { loc: `${base}/blog/generateur-lettre-motivation-gratuit`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
+    { loc: `${base}/blog/score-ats-cv-optimisation`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
