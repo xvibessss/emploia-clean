@@ -546,7 +546,7 @@
   function applyWithSA() {
     if (saData?.coverLetter) navigator.clipboard.writeText(saData.coverLetter).catch(() => {});
     const applyUrl = currentJob?.url;
-    if (applyUrl) { setTimeout(() => window.open(applyUrl, '_blank'), 300); }
+    if (applyUrl && /^https?:\/\//i.test(applyUrl)) { setTimeout(() => window.open(applyUrl, '_blank'), 300); }
     empToast('Lettre copiée — postulez !', 'success');
   }
 

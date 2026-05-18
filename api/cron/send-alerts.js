@@ -71,7 +71,7 @@ export default async function handler(req) {
     const activeAlerts = alerts.filter(a => a.active);
     if (!activeAlerts.length) continue;
 
-    const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
+    const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
 
     // Parallel: check all sent-flags at once instead of sequentially
     const sentChecks = await Promise.all(activeAlerts.map(a => kvGet(`alertSent:${email}:${a.id}`)));
