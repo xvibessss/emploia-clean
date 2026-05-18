@@ -164,6 +164,13 @@ export default function handler(req, res) {
       category: 'Recherche',
     },
     {
+      title: "Générateur de lettre de motivation gratuit en ligne 2026",
+      link: `${base}/blog/generateur-lettre-motivation-gratuit`,
+      description: "Générez une lettre de motivation personnalisée gratuitement en ligne. Structure, exemples, erreurs à éviter — outil IA adapté à chaque offre en 30 secondes.",
+      pubDate: 'Sun, 18 May 2026 10:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
       title: "CV gratuit en ligne 2026 : créez un CV ATS en 5 minutes",
       link: `${base}/blog/cv-gratuit-en-ligne-2026`,
       description: "Comparatif des 5 meilleurs outils pour créer un CV gratuit en ligne en 2026. Optimisation ATS, personnalisation IA, téléchargement PDF — guide complet.",
