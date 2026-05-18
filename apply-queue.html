@@ -400,7 +400,7 @@
       navigator.clipboard.writeText(job.letter).catch(() => {});
       empToast('Lettre copiée ! Collez-la dans le formulaire.', 'success');
     }
-    if (job.url) {
+    if (job.url && /^https?:\/\//i.test(job.url)) {
       setTimeout(() => window.open(job.url, '_blank'), 400);
     } else {
       empToast('Pas d\'URL pour cette offre', 'error');

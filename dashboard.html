@@ -1406,7 +1406,7 @@
         </div>
         <span class="badge ${STATUS_BADGE[app.status] || 'badge-gray'}">${STATUS_LABEL[app.status] || app.status}</span>
         <div class="li-actions">
-          ${app.url ? `<a href="${esc(app.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir l'offre →</a>` : ''}
+          ${app.url && /^https?:\/\//i.test(app.url) ? `<a href="${esc(app.url)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Voir l'offre →</a>` : ''}
           <button class="btn btn-primary btn-sm" onclick="openDetailModal('${esc(app.id)}')">Modifier</button>
         </div>
       </div>`;
@@ -1706,7 +1706,7 @@
             <div style="font-size:11px;color:var(--t3)">${esc(j.company || '')}${j.location ? ' · ' + esc(j.location) : ''}</div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
-            ${j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Voir</a>` : ''}
+            ${j.url && /^https?:\/\//i.test(j.url) ? `<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Voir</a>` : ''}
             <button onclick="unsaveJobDash('${esc(j.id)}',this.closest('div[style]'))" class="btn btn-ghost" style="font-size:11px;padding:5px 10px;color:var(--rnb)">✕</button>
           </div>
         </div>`).join('');

@@ -116,7 +116,7 @@ export default async function handler(req) {
     fetch('https://api.resend.com/emails', {
       method: 'POST', signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: ['chapellecorsica@gmail.com'], subject: `[Emploia RH] ${title} — ${company}`, html: adminHtml }),
+      body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: ['chapellecorsica@gmail.com'], subject: `[Emploia RH] ${title.replace(/[\r\n]/g, ' ')} — ${company.replace(/[\r\n]/g, ' ')}`, html: adminHtml }),
     }).catch(() => {});
 
     if (contactEmail) {
@@ -127,7 +127,7 @@ export default async function handler(req) {
         body: JSON.stringify({
           from: 'Emploia <noreply@emploia.fr>',
           to: [contactEmail],
-          subject: `Votre offre "${title}" est en ligne sur Emploia ✅`,
+          subject: `Votre offre "${title.replace(/[\r\n]/g, ' ')}" est en ligne sur Emploia ✅`,
           html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Votre offre est en ligne ✅</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">L'offre <strong>&ldquo;${eTitle}&rdquo;</strong> pour <strong>${eCompany}</strong> est maintenant visible par les candidats sur Emploia.</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Poste :</strong> ${eTitle}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Lieu :</strong> ${eLocation}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Type :</strong> ${eType}</p>${salary ? `<p style="font-size:13px;color:#475569;margin:0"><strong>Salaire :</strong> ${eSalary}</p>` : ''}</div><a href="https://emploia.fr/jobs" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir mon offre →</a><p style="margin-top:24px;font-size:13px;color:#94a3b8">Des questions ? Répondez à cet email ou écrivez à <a href="mailto:contact@emploia.fr" style="color:#6366f1">contact@emploia.fr</a></p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${year} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p></div></body></html>`,
         }),
       }).catch(() => {});
