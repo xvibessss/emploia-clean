@@ -139,6 +139,12 @@
     },
     "api/generate/interview-debrief.js": {
       "maxDuration": 30
+    },
+    "api/cron/send-reengagement.js": {
+      "maxDuration": 45
+    },
+    "api/cron/send-weekly-user-report.js": {
+      "maxDuration": 45
     }
   },
   "crons": [
@@ -149,6 +155,14 @@
     {
       "path": "/api/cron/send-weekly-digest",
       "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/send-reengagement",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/send-weekly-user-report",
+      "schedule": "0 8 * * 0"
     }
   ],
   "rewrites": [

@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, signToken, setCookieHeader, htmlEscape } from '../../_lib/auth.js';
+import { kvGet, kvSet, kvSadd, signToken, setCookieHeader, htmlEscape } from '../../_lib/auth.js';
 
 export default async function handler(req) {
   const url = new URL(req.url);
@@ -77,6 +77,7 @@ export default async function handler(req) {
       };
       await kvSet(`user:${email}`, user);
       await kvSet(`userid:${id}`, email);
+      kvSadd('all_users', email).catch(() => {});
 
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {

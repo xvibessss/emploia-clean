@@ -1,6 +1,6 @@
 export const config = { runtime: 'edge' };
 import {
-  kvGet, kvSet, signToken, setCookieHeader, checkRateLimit,
+  kvGet, kvSet, kvSadd, signToken, setCookieHeader, checkRateLimit,
   hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape
 } from "../_lib/auth.js";
 
@@ -86,6 +86,7 @@ export default async function handler(req) {
 
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
+  kvSadd('all_users', email).catch(() => {});
 
   // Store the user's own referral code in KV immediately so friends can use it right away
   const refCharsMap = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
