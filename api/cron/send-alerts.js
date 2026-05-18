@@ -98,7 +98,7 @@ export default async function handler(req) {
 
     if (!sections.length) continue;
 
-    const firstKeywords = htmlEscape(sections[0].alert.keywords);
+    const firstKeywords = sections[0].alert.keywords.replace(/[\r\n]/g, ' ');
     const bodyHtml = sections.map(({ alert, jobs }) => `
       <div style="margin-bottom:24px">
         <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">

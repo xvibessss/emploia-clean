@@ -109,7 +109,8 @@ export default async function handler(req) {
 
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
-    const firstName = htmlEscape(name.split(' ')[0]);
+    const firstNameRaw = name.replace(/[\r\n]/g, ' ').split(' ')[0];
+    const firstName = htmlEscape(firstNameRaw);
     const refChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     const refSeed = id.slice(-8);
     let welcomeRefCode = '';
@@ -124,7 +125,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         from: 'Emploia <noreply@emploia.fr>',
         to: [email],
-        subject: `Bienvenue sur Emploia, ${firstName} ! Voici vos 5 générations gratuites 🎉`,
+        subject: `Bienvenue sur Emploia, ${firstNameRaw} ! Voici vos 5 générations gratuites 🎉`,
         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:520px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
