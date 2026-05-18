@@ -94,6 +94,7 @@ export default function handler(req, res) {
     { loc: `${base}/blog/lettre-motivation-reconversion`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
     { loc: `${base}/blog/cv-commercial`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
     { loc: `${base}/blog/lettre-demission`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
+    { loc: `${base}/blog/preparer-entretien-embauche`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

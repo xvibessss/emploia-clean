@@ -324,6 +324,13 @@ export default function handler(req, res) {
       pubDate: 'Fri, 22 May 2026 11:00:00 +0200',
       category: 'Salaire',
     },
+    {
+      title: "Préparer un entretien d'embauche 2026 : méthode complète en 48h",
+      link: `${base}/blog/preparer-entretien-embauche`,
+      description: "Plan de préparation en 48h (recherches entreprise, STAR, questions types, checklist), posture le jour J, email de remerciement et relance. Le guide général de préparation entretien.",
+      pubDate: 'Fri, 22 May 2026 12:00:00 +0200',
+      category: 'Entretien',
+    },
   ];
 
   const items = articles.map(a => `
