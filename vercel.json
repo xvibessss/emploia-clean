@@ -393,6 +393,8 @@
     { "source": "/blog/entretien-telephonique", "destination": "/blog/entretien-telephonique.html" },
     { "source": "/blog/cv-en-anglais", "destination": "/blog/cv-en-anglais.html" },
     { "source": "/blog/trouver-emploi-rapidement", "destination": "/blog/trouver-emploi-rapidement.html" },
+    { "source": "/blog/comment-se-presenter-entretien", "destination": "/blog/comment-se-presenter-entretien.html" },
+    { "source": "/blog/lettre-motivation-alternance", "destination": "/blog/lettre-motivation-alternance.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

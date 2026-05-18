@@ -178,6 +178,20 @@ export default function handler(req, res) {
       category: 'CV & ATS',
     },
     {
+      title: "Comment se présenter en entretien 2026 — Pitch 90 secondes",
+      link: `${base}/blog/comment-se-presenter-entretien`,
+      description: "Structure du pitch de présentation, 3 exemples complets (expérimenté, débutant, reconversion), erreurs éliminatoires et formules qui font la différence en entretien.",
+      pubDate: 'Tue, 20 May 2026 08:00:00 +0200',
+      category: 'Entretien',
+    },
+    {
+      title: "Lettre de motivation alternance 2026 — Exemples complets + Guide",
+      link: `${base}/blog/lettre-motivation-alternance`,
+      description: "Structure, 2 exemples complets (développement web + marketing) et erreurs à éviter pour rédiger une lettre de motivation d'alternance qui décroche des entretiens.",
+      pubDate: 'Tue, 20 May 2026 09:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
       title: "CV en anglais 2026 — Modèle, traduction et différences clés",
       link: `${base}/blog/cv-en-anglais`,
       description: "Rédiger un CV en anglais : CV vs Resume, différences avec le CV français (photo, longueur, format), vocabulaire RH, verbes d'action, erreurs de traduction à éviter.",
