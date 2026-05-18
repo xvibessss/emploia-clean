@@ -310,6 +310,20 @@ export default function handler(req, res) {
       pubDate: 'Fri, 22 May 2026 09:00:00 +0200',
       category: 'CV & ATS',
     },
+    {
+      title: "CV commercial 2026 : modèle complet + conseils pour décrocher des entretiens",
+      link: `${base}/blog/cv-commercial`,
+      description: "Comment faire un CV commercial percutant : les KPIs à mettre, modèle annoté B2B, différences selon le profil (terrain, sédentaire, comptes clés, manager). Le guide pour se démarquer.",
+      pubDate: 'Fri, 22 May 2026 10:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Lettre de démission 2026 : modèles gratuits + guide complet",
+      link: `${base}/blog/lettre-demission`,
+      description: "3 modèles prêts à l'emploi (CDI avec préavis, dispense de préavis, période d'essai), délais de préavis par catégorie, droit au chômage et alternative rupture conventionnelle.",
+      pubDate: 'Fri, 22 May 2026 11:00:00 +0200',
+      category: 'Salaire',
+    },
   ];
 
   const items = articles.map(a => `
