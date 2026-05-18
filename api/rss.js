@@ -170,6 +170,13 @@ export default function handler(req, res) {
       pubDate: 'Sun, 18 May 2026 08:00:00 +0200',
       category: 'CV & ATS',
     },
+    {
+      title: "Simulation d'entretien d'embauche en ligne (IA) 2026 : s'entraîner gratuitement",
+      link: `${base}/blog/simulation-entretien-embauche`,
+      description: "Comment s'entraîner à un entretien avec l'IA en 2026. Questions personnalisées par poste, feedback instantané, méthode STAR, plan 48h. Simulateur gratuit.",
+      pubDate: 'Sun, 18 May 2026 09:00:00 +0200',
+      category: 'Entretien',
+    },
   ];
 
   const items = articles.map(a => `

@@ -386,6 +386,7 @@
     { "source": "/blog/email-candidature-parfait", "destination": "/blog/email-candidature-parfait.html" },
     { "source": "/blog/reseaux-sociaux-recherche-emploi", "destination": "/blog/reseaux-sociaux-recherche-emploi.html" },
     { "source": "/blog/cv-gratuit-en-ligne-2026", "destination": "/blog/cv-gratuit-en-ligne-2026.html" },
+    { "source": "/blog/simulation-entretien-embauche", "destination": "/blog/simulation-entretien-embauche.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },
