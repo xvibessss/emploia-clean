@@ -391,6 +391,8 @@
     { "source": "/blog/score-ats-cv-optimisation", "destination": "/blog/score-ats-cv-optimisation.html" },
     { "source": "/blog/lettre-motivation-stage", "destination": "/blog/lettre-motivation-stage.html" },
     { "source": "/blog/entretien-telephonique", "destination": "/blog/entretien-telephonique.html" },
+    { "source": "/blog/cv-en-anglais", "destination": "/blog/cv-en-anglais.html" },
+    { "source": "/blog/trouver-emploi-rapidement", "destination": "/blog/trouver-emploi-rapidement.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

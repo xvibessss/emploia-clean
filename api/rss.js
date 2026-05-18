@@ -178,6 +178,20 @@ export default function handler(req, res) {
       category: 'CV & ATS',
     },
     {
+      title: "CV en anglais 2026 — Modèle, traduction et différences clés",
+      link: `${base}/blog/cv-en-anglais`,
+      description: "Rédiger un CV en anglais : CV vs Resume, différences avec le CV français (photo, longueur, format), vocabulaire RH, verbes d'action, erreurs de traduction à éviter.",
+      pubDate: 'Mon, 19 May 2026 10:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Comment trouver un emploi rapidement en 2026 — 7 stratégies",
+      link: `${base}/blog/trouver-emploi-rapidement`,
+      description: "Plan d'action semaine par semaine pour décrocher un emploi en 2-8 semaines : réseau, candidatures directes, plateformes à cibler, suivi et erreurs à éviter.",
+      pubDate: 'Mon, 19 May 2026 11:00:00 +0200',
+      category: 'Recherche',
+    },
+    {
       title: "Lettre de motivation stage 2026 — Exemples complets + Guide",
       link: `${base}/blog/lettre-motivation-stage`,
       description: "Rédiger une lettre de motivation pour un stage : structure en 4 blocs, 2 exemples complets (tech + marketing), phrases à bannir, erreurs éliminatoires. Modèle gratuit.",
