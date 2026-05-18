@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, kvGet, withTimeout } from './_lib/auth.js';
+import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 
 const H = {
   'Access-Control-Allow-Origin': '*',
@@ -435,6 +435,20 @@ export default async function handler(req) {
   const remoteOnly = url.searchParams.get('remote') === 'true';
   const page       = Math.max(0, Math.min(10, parseInt(url.searchParams.get('page') || '0')));
 
+  // 5-minute KV cache — key combines all search params (already bounded above)
+  const cacheKey = `jobs:${q}|${type}|${location}|${page}`;
+  try {
+    const cached = await kvGet(cacheKey);
+    if (cached?.jobs?.length) {
+      let final = cached.jobs;
+      if (remoteOnly) final = final.filter(j => j.remote === true);
+      return new Response(
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, cached: true }),
+        { status: 200, headers: H }
+      );
+    }
+  } catch {}
+
   try {
     const [jsRes, fmRes, intRes, rmRes, abRes, azRes, empRes, ftRes] = await Promise.allSettled([
       fetchJSearch(q, type, location, page),
@@ -461,8 +475,10 @@ export default async function handler(req) {
 
     if (allJobs.length > 0) {
       let final = prioritize(deduplicate(allJobs));
-      if (remoteOnly) final = final.filter(j => j.remote === true);
       const sources = [...new Set(final.map(j => j.source))];
+      // Store in cache before applying remoteOnly so we can serve both variants from same entry
+      kvSet(cacheKey, { jobs: final, sources }, 300).catch(() => {});
+      if (remoteOnly) final = final.filter(j => j.remote === true);
       return new Response(
         JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources }),
         { status: 200, headers: H }

@@ -58,8 +58,17 @@ export default async function handler(req) {
   let sent = 0;
   let skipped = 0;
 
-  // Process up to 60 subscribers per run to stay within Edge timeout
-  const batch = subscribers.slice(0, 60);
+  // Cursor-based pagination: rotate through all subscribers across cron runs
+  // so no subscriber is permanently skipped when total > 60.
+  const BATCH_SIZE = 60;
+  const total = subscribers.length;
+  const rawCursor = await kvGet('alert_cursor') || 0;
+  const cursor = typeof rawCursor === 'number' ? rawCursor : 0;
+  const start = cursor % Math.max(total, 1);
+  const batch = subscribers.slice(start, start + BATCH_SIZE);
+  // Advance cursor — wrap to 0 when we've covered all subscribers
+  const nextCursor = (start + BATCH_SIZE >= total) ? 0 : start + BATCH_SIZE;
+  await kvSet('alert_cursor', nextCursor, 86400 * 7);
 
   for (const email of batch) {
     const [alerts, user] = await Promise.all([
@@ -141,7 +150,7 @@ export default async function handler(req) {
     } catch { /* continue to next subscriber */ }
   }
 
-  return new Response(JSON.stringify({ ok: true, sent, skipped, total: batch.length, remaining: Math.max(0, subscribers.length - 60) }), {
+  return new Response(JSON.stringify({ ok: true, sent, skipped, processed: batch.length, totalSubscribers: total, nextCursor }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });

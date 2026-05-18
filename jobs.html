@@ -1048,8 +1048,11 @@
     try { localStorage.setItem(SCORE_CACHE_KEY, JSON.stringify(scoreCache)); } catch {}
   }
 
-  async function analyzeScore(jobId, jobTitle, jobDescription, pillEl) {
+  async function analyzeScore(jobId, pillEl) {
     if (scoreCache[jobId]) { showScore(pillEl, scoreCache[jobId]); return; }
+    const _j = allJobs.find(j => String(j.id) === String(jobId));
+    const jobTitle = _j?.title || '';
+    const jobDescription = (_j?.description || '').slice(0, 800);
     pillEl.textContent = '⏳';
     pillEl.style.pointerEvents = 'none';
     try {
@@ -1058,7 +1061,7 @@
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobTitle, jobDescription: jobDescription.slice(0, 800), userProfile }),
+        body: JSON.stringify({ jobTitle, jobDescription, userProfile }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -1150,7 +1153,7 @@
               <div class="jc-company">${esc(job.company)}</div>
             </div>
           </div>
-          <span class="match-pill" id="pill-${esc(job.id)}" title="Cliquer pour analyser la compatibilité IA" onclick="analyzeScore('${esc(job.id)}','${esc(job.title)}','${esc((job.description||'').slice(0,400))}',this)">✨ Score IA</span>
+          <span class="match-pill" id="pill-${esc(job.id)}" title="Cliquer pour analyser la compatibilité IA" onclick="analyzeScore('${esc(job.id)}',this)">✨ Score IA</span>
         </div>
         <div class="jc-badges">
           <span class="badge ${typeClass(job.type)}">${typeEmoji(job.type)} ${esc(job.type)}</span>
@@ -1167,8 +1170,8 @@
             ${job.source ? `<span class="jc-source" style="${sourceStyle}">${esc(job.source)}</span>` : ''}
           </div>
           <div class="jc-actions">
-            <button class="btn-gen-cv" onclick="genCV('${esc(job.title)}','${esc(job.company)}','${esc((job.description||'').slice(0,200))}')">✨ CV en 30s</button>
-            <button class="btn-track${isTracked?' tracked':''}" id="track-${esc(job.id)}" onclick="trackJob('${esc(job.id)}','${esc(job.title)}','${esc(job.company)}','${esc(job.url||'')}','${esc(job.location||'')}',this)">${isTracked?'✅ Suivi':'📋 Suivre'}</button>
+            <button class="btn-gen-cv" onclick="genCV('${esc(job.id)}')">✨ CV en 30s</button>
+            <button class="btn-track${isTracked?' tracked':''}" id="track-${esc(job.id)}" onclick="trackJob('${esc(job.id)}',this)">${isTracked?'✅ Suivi':'📋 Suivre'}</button>
             <button class="btn-queue${isQueued?' queued':''}" id="queue-${esc(job.id)}" onclick="addToQueue('${esc(job.id)}',this)">📬${isQueued?' En file':' File'}</button>
             <button class="btn-apply" onclick="openApplyDrawer('${esc(job.id)}')">Postuler →</button>
             <button class="btn-save-job${isSaved?' saved':''}" id="save-${esc(job.id)}" onclick="toggleSave('${esc(job.id)}',this)">${isSaved?'⭐':'☆'}</button>
@@ -1281,8 +1284,9 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function genCV(title, company, desc) {
-    sessionStorage.setItem('emp_prefill', JSON.stringify({ title, company, desc }));
+  function genCV(jobId) {
+    const _j = allJobs.find(j => String(j.id) === String(jobId));
+    sessionStorage.setItem('emp_prefill', JSON.stringify({ title: _j?.title || '', company: _j?.company || '', desc: (_j?.description || '').slice(0, 200) }));
     empToast('Redirection vers le générateur...', 'success');
     setTimeout(() => window.location.href = '/app', 800);
   }
@@ -1335,11 +1339,16 @@
     }
   }
 
-  async function trackJob(id, jobTitle, company, url, location, btn) {
+  async function trackJob(id, btn) {
     if (tracked.has(id)) {
       empToast('Déjà dans votre dashboard', 'info');
       return;
     }
+    const _j = allJobs.find(j => String(j.id) === String(id));
+    const jobTitle  = _j?.title    || '';
+    const company   = _j?.company  || '';
+    const url       = _j?.url      || '';
+    const location  = _j?.location || '';
     btn.disabled = true;
     try {
       const res = await fetch('/api/applications', {
@@ -1451,7 +1460,7 @@
     } else {
       pillEl.textContent = '⏳ Analyse...';
       verdictEl.textContent = '';
-      analyzeScore(String(job.id), job.title, (job.description || '').slice(0, 800), pillEl).then(() => {
+      analyzeScore(String(job.id), pillEl).then(() => {
         const c = scoreCache[String(job.id)];
         if (c) verdictEl.textContent = c.verdict || '';
       });
@@ -1563,7 +1572,7 @@
   async function addToTrackerDrawer() {
     if (!currentDrawerJob) return;
     const id = String(currentDrawerJob.id);
-    await trackJob(id, currentDrawerJob.title, currentDrawerJob.company || '', currentDrawerJob.url || '', currentDrawerJob.location || '', document.getElementById('drawerTrackBtn'));
+    await trackJob(id, document.getElementById('drawerTrackBtn'));
   }
 
   // ── CO-PILOT ────────────────────────────────────────────────────────────────
