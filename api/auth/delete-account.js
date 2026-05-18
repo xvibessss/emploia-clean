@@ -4,6 +4,7 @@ import {
   getAllowedOrigin, checkRateLimit, COOKIE_NAME, kvSrem,
 } from '../_lib/auth.js';
 
+
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
   const H = {
@@ -72,6 +73,8 @@ export default async function handler(req) {
     kvDel(`cvversions:${user.email}`),
     kvDel(`refcode:${user.id}`),
     kvSrem('alert_subscribers', user.email),
+    kvSrem('all_users', user.email),
+    kvSet(`optout:${user.email}`, true),
     refCode ? kvDel(`ref:${refCode}`) : Promise.resolve(),
     user.stripeCustomerId ? kvDel(`stripe:${user.stripeCustomerId}`) : Promise.resolve(),
   ]);
