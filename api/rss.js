@@ -296,6 +296,20 @@ export default function handler(req, res) {
       pubDate: 'Thu, 21 May 2026 12:00:00 +0200',
       category: 'Entretien',
     },
+    {
+      title: "Rupture conventionnelle 2026 : guide complet, indemnités et procédure",
+      link: `${base}/blog/rupture-conventionnelle`,
+      description: "Tout sur la rupture conventionnelle : conditions, procédure en 5 étapes, calcul des indemnités (1/4 par an), délai carence chômage, fiscalité et pièges à éviter.",
+      pubDate: 'Fri, 22 May 2026 08:00:00 +0200',
+      category: 'Salaire',
+    },
+    {
+      title: "Lettre de motivation reconversion professionnelle 2026 — Exemples complets",
+      link: `${base}/blog/lettre-motivation-reconversion`,
+      description: "Structure en 4 blocs, 3 exemples complets annotés (comptable→dev, commercial→RH, enseignant→marketing) et erreurs à éviter pour convaincre malgré un profil atypique.",
+      pubDate: 'Fri, 22 May 2026 09:00:00 +0200',
+      category: 'CV & ATS',
+    },
   ];
 
   const items = articles.map(a => `

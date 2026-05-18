@@ -404,6 +404,8 @@
     { "source": "/blog/periode-essai-droits", "destination": "/blog/periode-essai-droits.html" },
     { "source": "/blog/comment-faire-un-cv", "destination": "/blog/comment-faire-un-cv.html" },
     { "source": "/blog/questions-a-poser-en-entretien", "destination": "/blog/questions-a-poser-en-entretien.html" },
+    { "source": "/blog/rupture-conventionnelle", "destination": "/blog/rupture-conventionnelle.html" },
+    { "source": "/blog/lettre-motivation-reconversion", "destination": "/blog/lettre-motivation-reconversion.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

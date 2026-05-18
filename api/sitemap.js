@@ -90,6 +90,8 @@ export default function handler(req, res) {
     { loc: `${base}/blog/periode-essai-droits`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
     { loc: `${base}/blog/comment-faire-un-cv`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
     { loc: `${base}/blog/questions-a-poser-en-entretien`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
+    { loc: `${base}/blog/rupture-conventionnelle`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
+    { loc: `${base}/blog/lettre-motivation-reconversion`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
