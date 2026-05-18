@@ -178,6 +178,20 @@ export default function handler(req, res) {
       category: 'CV & ATS',
     },
     {
+      title: "Défauts en entretien 2026 — Les meilleures réponses (exemples)",
+      link: `${base}/blog/defauts-entretien`,
+      description: "Comment répondre à 'Quels sont vos défauts ?' : structure DAP, 8 exemples concrets par profil, pièges à éviter. La question la plus piège de tout entretien.",
+      pubDate: 'Wed, 20 May 2026 10:00:00 +0200',
+      category: 'Entretien',
+    },
+    {
+      title: "Accroche CV 2026 — Exemples complets + Comment rédiger son profil",
+      link: `${base}/blog/accroche-cv`,
+      description: "Rédiger l'accroche de son CV en 2026 : formule en 3 lignes, 6 exemples complets (avant/après) par profil, check-list et erreurs à éviter. Section la plus lue par les ATS.",
+      pubDate: 'Wed, 20 May 2026 11:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
       title: "Comment se présenter en entretien 2026 — Pitch 90 secondes",
       link: `${base}/blog/comment-se-presenter-entretien`,
       description: "Structure du pitch de présentation, 3 exemples complets (expérimenté, débutant, reconversion), erreurs éliminatoires et formules qui font la différence en entretien.",
