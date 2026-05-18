@@ -106,7 +106,7 @@ export default async function handler(req) {
                 if (user.plan === 'free' && newCount === FREE_LIMIT) {
                   const resendKey = process.env.RESEND_API_KEY;
                   if (resendKey) {
-                    const firstName = htmlEscape((user.name || '').split(' ')[0] || '');
+                    const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '');
                     const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
                     fetch('https://api.resend.com/emails', {
                       method: 'POST',

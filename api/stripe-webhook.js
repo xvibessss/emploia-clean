@@ -65,7 +65,7 @@ export default async function handler(req) {
           const user = await kvGet(`user:${normalizedEmail}`);
           if (user) {
             const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
-            const firstName = htmlEscape((user.name || '').split(' ')[0] || '');
+            const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '');
             await Promise.all([
               kvSet(`user:${normalizedEmail}`, {
                 ...user,
@@ -111,7 +111,7 @@ export default async function handler(req) {
         const email = invoice.customer_email?.toLowerCase() || await kvGet(`stripe:${customerId}`);
         if (email && resendKey) {
           const user = await kvGet(`user:${email}`);
-          const firstName = htmlEscape((user?.name || '').split(' ')[0] || 'là');
+          const firstName = htmlEscape((user?.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
           const attemptCount = invoice.attempt_count || 1;
           const nextAttempt = invoice.next_payment_attempt
             ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('fr-FR')
@@ -192,7 +192,7 @@ export default async function handler(req) {
 
             // Send retention email only the first time cancel_at_period_end becomes true
             if (!wasScheduledForCancellation && isNowScheduledForCancellation && resendKey) {
-              const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
+              const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
               const cancelDate = sub.cancel_at
                 ? new Date(sub.cancel_at * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
                 : 'en fin de période';

@@ -64,7 +64,7 @@ export default async function handler(req) {
       const id = `u_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
       user = {
         id,
-        name: googleUser.name || email.split('@')[0],
+        name: (googleUser.name || email.split('@')[0]).replace(/[\r\n]/g, ' ').trim().slice(0, 100),
         email,
         passwordHash: null,
         passwordSalt: null,
@@ -80,7 +80,7 @@ export default async function handler(req) {
 
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {
-        const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
+        const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
         fetch('https://api.resend.com/emails', {
           method: 'POST',
           signal: AbortSignal.timeout(8000),

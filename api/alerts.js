@@ -46,8 +46,8 @@ export default async function handler(req) {
     const VALID_TYPES = ['all', 'CDI', 'CDD', 'Stage', 'Alternance', 'Freelance'];
     const VALID_FREQUENCIES = ['daily', 'weekly', 'realtime'];
 
-    const rawKeywords  = String(body.keywords  || '').trim();
-    const rawLocation  = String(body.location  || '').trim();
+    const rawKeywords  = String(body.keywords  || '').replace(/[\r\n]/g, ' ').trim();
+    const rawLocation  = String(body.location  || '').replace(/[\r\n]/g, ' ').trim();
     const rawType      = String(body.type      || 'all');
     const rawFrequency = String(body.frequency || 'daily');
 

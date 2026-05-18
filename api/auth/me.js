@@ -52,7 +52,7 @@ export default async function handler(req) {
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey && user.createdAt && user.email) {
     const daysSince = (Date.now() - new Date(user.createdAt).getTime()) / 86400000;
-    const firstName = htmlEscape((user.name || '').split(' ')[0] || 'là');
+    const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
     const sendDrip = async (key, subject, html) => {
       const fullUser = await kvGet(`user:${user.email}`);
       if (fullUser?.[key]) return;

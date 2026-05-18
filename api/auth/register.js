@@ -37,7 +37,7 @@ export default async function handler(req) {
   catch { return new Response(JSON.stringify({ error: "Corps invalide" }), { status: 400, headers: H }); }
 
   // Sanitize inputs
-  const name = sanitizeString(body.name, 100);
+  const name = sanitizeString(body.name, 100).replace(/[\r\n]/g, ' ').trim();
   const email = (body.email || '').toLowerCase().trim().slice(0, 254);
   const password = body.password || '';
 
