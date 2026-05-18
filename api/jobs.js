@@ -294,26 +294,36 @@ async function fetchAdzuna(q, type, location, page) {
 }
 
 // ── FRANCE TRAVAIL (OAuth2 + Offres API) ─────────────
+async function getFranceTravailToken(clientId, clientSecret) {
+  // Cache token for 55 min — FT tokens are valid for 3600s
+  const cached = await kvGet('ft_token');
+  if (cached) return cached;
+  const tokenRes = await withTimeout(
+    fetch('https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+        scope: 'api_offresdemploiv2 o2dsoffre',
+      }).toString(),
+    }), 7000
+  );
+  if (!tokenRes.ok) return null;
+  const { access_token } = await tokenRes.json();
+  if (!access_token) return null;
+  kvSet('ft_token', access_token, 3300).catch(() => {});
+  return access_token;
+}
+
 async function fetchFranceTravail(q, type, location, page) {
   const clientId = process.env.FRANCE_TRAVAIL_CLIENT_ID;
   const clientSecret = process.env.FRANCE_TRAVAIL_CLIENT_SECRET;
   if (!clientId || !clientSecret) return [];
   if (type === 'stage') return []; // stages not well represented
   try {
-    const tokenRes = await withTimeout(
-      fetch('https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          grant_type: 'client_credentials',
-          client_id: clientId,
-          client_secret: clientSecret,
-          scope: 'api_offresdemploiv2 o2dsoffre',
-        }).toString(),
-      }), 7000
-    );
-    if (!tokenRes.ok) return [];
-    const { access_token } = await tokenRes.json();
+    const access_token = await getFranceTravailToken(clientId, clientSecret);
     if (!access_token) return [];
 
     const typeMap = { cdi: 'CDI', cdd: 'CDD', alternance: 'CA,CP', freelance: 'LIB' };
