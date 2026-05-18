@@ -1,7 +1,7 @@
 // Additional search endpoint that aggregates more sources
 // Used for real-time search suggestions and extended results
 export const config = { runtime: 'edge' };
-import { getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
+import { getAllowedOrigin, checkRateLimit, kvGet, kvSet } from './_lib/auth.js';
 
 // Scrape-free APEC via their public RSS feed
 async function fetchAPECRSS(q, type) {
@@ -120,6 +120,14 @@ export default async function handler(req) {
   const type = (url.searchParams.get('type') || '').toLowerCase().slice(0, 20);
   const location = (url.searchParams.get('location') || '').slice(0, 100);
 
+  const cacheKey = `jsearch:${q}|${type}|${location}`;
+  try {
+    const cached = await kvGet(cacheKey);
+    if (cached?.jobs?.length) {
+      return new Response(JSON.stringify({ jobs: cached.jobs, total: cached.jobs.length, cached: true }), { status: 200, headers: H });
+    }
+  } catch {}
+
   const [apecJobs, helloWorkJobs, wldJobs] = await Promise.allSettled([
     fetchAPECRSS(q, type),
     fetchHelloWork(q, type, location),
@@ -131,6 +139,8 @@ export default async function handler(req) {
     ...(helloWorkJobs.status === 'fulfilled' ? helloWorkJobs.value : []),
     ...(wldJobs.status === 'fulfilled' ? wldJobs.value : []),
   ];
+
+  if (jobs.length) kvSet(cacheKey, { jobs }, 300).catch(() => {});
 
   return new Response(JSON.stringify({ jobs, total: jobs.length }), { status: 200, headers: H });
 }

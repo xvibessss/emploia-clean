@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, htmlEscape } from '../_lib/auth.js';
+import { kvGet, kvSet, htmlEscape } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
 
@@ -97,16 +97,26 @@ export default async function handler(req) {
     <p style="font-size:13px;color:#1e293b;line-height:1.6;margin:0">${tip}</p>
   </div>`;
 
-  // Process in batches of 80 to stay within Edge timeout and Resend limits
-  const batch = subscribers.slice(0, 80);
+  // Cursor-based pagination: rotate through all subscribers across weekly cron runs
+  const BATCH_SIZE = 80;
+  const total = subscribers.length;
+  const rawCursor = await kvGet('digest_cursor') || 0;
+  const cursor = typeof rawCursor === 'number' ? rawCursor : 0;
+  const start = cursor % Math.max(total, 1);
+  const batch = subscribers.slice(start, start + BATCH_SIZE);
+  const nextCursor = (start + BATCH_SIZE >= total) ? 0 : start + BATCH_SIZE;
+  await kvSet('digest_cursor', nextCursor, 86400 * 14);
+
   let sent = 0;
 
-  for (const sub of batch) {
-    const email = sub.email;
-    if (!email) continue;
-
-    try {
-      await fetch('https://api.resend.com/emails', {
+  // Send in parallel groups of 10 to stay within Resend rate limits and Edge timeout
+  const CHUNK = 10;
+  for (let i = 0; i < batch.length; i += CHUNK) {
+    const chunk = batch.slice(i, i + CHUNK);
+    const results = await Promise.allSettled(chunk.map(sub => {
+      const email = sub.email;
+      if (!email) return Promise.resolve();
+      return fetch('https://api.resend.com/emails', {
         method: 'POST',
         signal: AbortSignal.timeout(6000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -140,14 +150,15 @@ export default async function handler(req) {
 </body></html>`,
         }),
       });
-      sent++;
-    } catch { /* continue */ }
+    }));
+    sent += results.filter(r => r.status === 'fulfilled' && r.value).length;
   }
 
   return new Response(JSON.stringify({
     ok: true,
     sent,
-    total: batch.length,
-    remaining: Math.max(0, subscribers.length - 80),
+    processed: batch.length,
+    totalSubscribers: total,
+    nextCursor,
   }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
