@@ -75,6 +75,8 @@ export default function handler(req, res) {
     { loc: `${base}/blog/simulation-entretien-embauche`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
     { loc: `${base}/blog/generateur-lettre-motivation-gratuit`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
     { loc: `${base}/blog/score-ats-cv-optimisation`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-18' },
+    { loc: `${base}/blog/lettre-motivation-stage`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-19' },
+    { loc: `${base}/blog/entretien-telephonique`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-19' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

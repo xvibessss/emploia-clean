@@ -178,6 +178,20 @@ export default function handler(req, res) {
       category: 'CV & ATS',
     },
     {
+      title: "Lettre de motivation stage 2026 — Exemples complets + Guide",
+      link: `${base}/blog/lettre-motivation-stage`,
+      description: "Rédiger une lettre de motivation pour un stage : structure en 4 blocs, 2 exemples complets (tech + marketing), phrases à bannir, erreurs éliminatoires. Modèle gratuit.",
+      pubDate: 'Mon, 19 May 2026 08:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Entretien téléphonique 2026 : réussir le premier filtre RH",
+      link: `${base}/blog/entretien-telephonique`,
+      description: "L'entretien téléphonique élimine 60% des candidats en 15-20 minutes. Questions types, réponses exemples, check-list de préparation, email de remerciement — guide complet.",
+      pubDate: 'Mon, 19 May 2026 09:00:00 +0200',
+      category: 'Entretien',
+    },
+    {
       title: "Score ATS : comment analyser et optimiser son CV pour les filtres ATS",
       link: `${base}/blog/score-ats-cv-optimisation`,
       description: "78% des CVs échouent sur le score ATS. Guide complet : facteurs de scoring (mots-clés 40%, format 25%), avant/après 38→91/100, 5 étapes d'optimisation, erreurs à éviter.",
