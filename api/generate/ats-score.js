@@ -88,7 +88,7 @@ Règles : score entre 40 et 97. recommendations: tableau de 3-5 strings en texte
 
     if (result?.score == null) return new Response(JSON.stringify({ error: "Réponse invalide" }), { status: 500, headers: H });
 
-    await incrementGenerations(user);
+    if (user.plan === 'free') await incrementGenerations(user);
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch (err) {
     console.error("ATS score error:", err);

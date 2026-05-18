@@ -100,7 +100,7 @@ export default async function handler(req) {
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`));
               }
               if (parsed.type === 'message_stop') {
-                const newCount = await incrementGenerations(user);
+                const newCount = user.plan === 'free' ? await incrementGenerations(user) : null;
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                 // Send upgrade nudge when free user reaches their last generation
                 if (user.plan === 'free' && newCount === FREE_LIMIT) {

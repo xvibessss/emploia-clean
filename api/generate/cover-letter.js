@@ -109,7 +109,7 @@ Commence directement par la lettre, sans commentaires.`,
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`));
               }
               if (parsed.type === 'message_stop') {
-                await incrementGenerations(user);
+                if (user.plan === 'free') await incrementGenerations(user);
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
               }
             } catch {}
