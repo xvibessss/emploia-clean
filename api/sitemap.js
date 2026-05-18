@@ -83,6 +83,8 @@ export default function handler(req, res) {
     { loc: `${base}/blog/lettre-motivation-alternance`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
     { loc: `${base}/blog/defauts-entretien`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
     { loc: `${base}/blog/accroche-cv`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
+    { loc: `${base}/blog/salaire-brut-net`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
+    { loc: `${base}/blog/competences-cv`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

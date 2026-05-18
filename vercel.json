@@ -397,6 +397,8 @@
     { "source": "/blog/lettre-motivation-alternance", "destination": "/blog/lettre-motivation-alternance.html" },
     { "source": "/blog/defauts-entretien", "destination": "/blog/defauts-entretien.html" },
     { "source": "/blog/accroche-cv", "destination": "/blog/accroche-cv.html" },
+    { "source": "/blog/salaire-brut-net", "destination": "/blog/salaire-brut-net.html" },
+    { "source": "/blog/competences-cv", "destination": "/blog/competences-cv.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

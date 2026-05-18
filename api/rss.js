@@ -247,6 +247,20 @@ export default function handler(req, res) {
       pubDate: 'Sun, 18 May 2026 09:00:00 +0200',
       category: 'Entretien',
     },
+    {
+      title: "Salaire brut net 2026 : calcul, simulateur et différences cadre/non-cadre",
+      link: `${base}/blog/salaire-brut-net`,
+      description: "Convertir un salaire brut en net en France : taux de cotisation, simulateur interactif, tableau SMIC→100k€, différences cadre/non-cadre, formule de négociation.",
+      pubDate: 'Wed, 20 May 2026 12:00:00 +0200',
+      category: 'Salaire',
+    },
+    {
+      title: "Compétences CV 2026 : hard skills, soft skills et mots-clés ATS par secteur",
+      link: `${base}/blog/competences-cv`,
+      description: "Quelles compétences mettre sur son CV pour passer les filtres ATS : grilles par secteur (tech, data, marketing, finance), niveaux, erreurs à éviter.",
+      pubDate: 'Wed, 20 May 2026 13:00:00 +0200',
+      category: 'CV & ATS',
+    },
   ];
 
   const items = articles.map(a => `
