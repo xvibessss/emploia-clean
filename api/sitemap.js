@@ -85,6 +85,9 @@ export default function handler(req, res) {
     { loc: `${base}/blog/accroche-cv`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
     { loc: `${base}/blog/salaire-brut-net`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
     { loc: `${base}/blog/competences-cv`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-20' },
+    { loc: `${base}/blog/cv-etudiant`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
+    { loc: `${base}/blog/bilan-de-competences`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
+    { loc: `${base}/blog/periode-essai-droits`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-21' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -261,6 +261,27 @@ export default function handler(req, res) {
       pubDate: 'Wed, 20 May 2026 13:00:00 +0200',
       category: 'CV & ATS',
     },
+    {
+      title: "CV étudiant 2026 : modèle complet + guide pas à pas",
+      link: `${base}/blog/cv-etudiant`,
+      description: "Comment faire un CV étudiant sans expérience professionnelle : modèle complet, structure, sections clés, erreurs à éviter — pour stages, alternances et premier emploi.",
+      pubDate: 'Thu, 21 May 2026 08:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Bilan de compétences 2026 : guide complet, financement CPF et démarches",
+      link: `${base}/blog/bilan-de-competences`,
+      description: "Tout sur le bilan de compétences en 2026 : CPF, durée légale (24h max), 3 phases, choisir son organisme, ce que ça produit et comment l'utiliser pour changer de voie.",
+      pubDate: 'Thu, 21 May 2026 09:00:00 +0200',
+      category: 'Reconversion',
+    },
+    {
+      title: "Période d'essai 2026 : durée légale, droits et rupture — Guide complet",
+      link: `${base}/blog/periode-essai-droits`,
+      description: "Durée légale par contrat (CDI 2-4 mois, CDD), droits pendant la période d'essai, conditions de rupture, délais de prévenance, chômage et recours en cas d'abus.",
+      pubDate: 'Thu, 21 May 2026 10:00:00 +0200',
+      category: 'Salaire',
+    },
   ];
 
   const items = articles.map(a => `
