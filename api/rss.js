@@ -331,6 +331,62 @@ export default function handler(req, res) {
       pubDate: 'Fri, 22 May 2026 12:00:00 +0200',
       category: 'Entretien',
     },
+    {
+      title: "CV développeur 2026 : guide complet + modèle annoté senior Full-Stack",
+      link: `${base}/blog/cv-developpeur`,
+      description: "Ce que les tech leads regardent en 30 secondes, modèle annoté React/Node/TypeScript, tableau séniorité Junior→Tech Lead, barres de compétences à éviter, formules bullet points avec impact mesurable.",
+      pubDate: 'Sat, 23 May 2026 08:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Trouver un emploi après 50 ans : stratégies anti-âgisme et plan 90 jours",
+      link: `${base}/blog/trouver-emploi-apres-50-ans`,
+      description: "Reconversion, CV senior, réseau, secteurs qui recrutent les +50 ans, dispositifs CPF et ARE. Un plan d'action concret pour retrouver un emploi après 50 ans en 2026.",
+      pubDate: 'Sat, 23 May 2026 09:00:00 +0200',
+      category: 'Recherche',
+    },
+    {
+      title: "Modèle CV Word 2026 : personnaliser sans se planter",
+      link: `${base}/blog/modele-cv-word`,
+      description: "Les 5 erreurs des modèles CV Word gratuits, quand Word est acceptable vs quand il coule votre candidature, et comment adapter un template Word pour passer les ATS.",
+      pubDate: 'Sat, 23 May 2026 10:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "Portage salarial 2026 : comment ça marche, avantages et pièges à éviter",
+      link: `${base}/blog/portage-salarial`,
+      description: "Fonctionnement du portage salarial, calcul du salaire net, comparaison freelance vs portage, les meilleures sociétés de portage en 2026 et les cas où c'est déconseillé.",
+      pubDate: 'Sat, 23 May 2026 11:00:00 +0200',
+      category: 'Salaires & statuts',
+    },
+    {
+      title: "Contrat de professionnalisation 2026 : conditions, salaire et différence avec l'apprentissage",
+      link: `${base}/blog/contrat-de-professionnalisation`,
+      description: "Qui peut en bénéficier, quel salaire, comment trouver un contrat pro, différences avec le contrat d'apprentissage et les pièges à éviter en 2026.",
+      pubDate: 'Sun, 24 May 2026 08:00:00 +0200',
+      category: 'Recherche',
+    },
+    {
+      title: "CV Manager 2026 : guide complet + modèle annoté pour cadres et directeurs",
+      link: `${base}/blog/cv-manager`,
+      description: "Ce que les DRH regardent en 30 secondes dans un CV manager. Modèle annoté, formules bullet points avec impact chiffré, niveaux de management, règles ATS pour postes de direction.",
+      pubDate: 'Sun, 24 May 2026 09:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: "13e mois 2026 : obligatoire ou non, comment le négocier et le calculer",
+      link: `${base}/blog/13eme-mois`,
+      description: "Le 13e mois est-il obligatoire en France ? Comment le calculer, le négocier à l'embauche, quand il est prévu par convention collective et ce qui se passe en cas de départ.",
+      pubDate: 'Sun, 24 May 2026 10:00:00 +0200',
+      category: 'Salaires & avantages',
+    },
+    {
+      title: "Prime d'activité 2026 : conditions, montant, simulation et comment faire la demande",
+      link: `${base}/blog/prime-activite`,
+      description: "Comment calculer votre prime d'activité en 2026, les conditions de ressources, le montant maximum, la simulation CAF et comment faire votre demande en ligne étape par étape.",
+      pubDate: 'Sun, 24 May 2026 11:00:00 +0200',
+      category: 'Aides & revenus',
+    },
   ];
 
   const items = articles.map(a => `

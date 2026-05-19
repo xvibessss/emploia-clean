@@ -95,6 +95,14 @@ export default function handler(req, res) {
     { loc: `${base}/blog/cv-commercial`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
     { loc: `${base}/blog/lettre-demission`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
     { loc: `${base}/blog/preparer-entretien-embauche`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-22' },
+    { loc: `${base}/blog/cv-developpeur`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-23' },
+    { loc: `${base}/blog/trouver-emploi-apres-50-ans`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-23' },
+    { loc: `${base}/blog/modele-cv-word`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-23' },
+    { loc: `${base}/blog/portage-salarial`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-23' },
+    { loc: `${base}/blog/contrat-de-professionnalisation`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
+    { loc: `${base}/blog/cv-manager`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
+    { loc: `${base}/blog/13eme-mois`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
+    { loc: `${base}/blog/prime-activite`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
