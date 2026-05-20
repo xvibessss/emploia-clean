@@ -34,6 +34,9 @@ export default async function handler(req) {
   let sent = 0;
   let skipped = 0;
 
+  // Phase 1: gather eligible users with their email payload (sequential KV reads)
+  const eligible = [];
+
   for (const email of batch) {
     const optedOut = await kvGet(`optout:${email}`);
     if (optedOut) { skipped++; continue; }
@@ -61,7 +64,6 @@ export default async function handler(req) {
     const firstNameRaw = (user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '';
     const firstName = htmlEscape(firstNameRaw || 'là');
 
-    // Build stat rows
     const statRows = [
       appList.length > 0 ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Candidatures totales</td><td style="padding:8px 0;font-size:14px;font-weight:700;color:#0f172a;text-align:right">${appList.length}</td></tr>` : '',
       thisWeekApps.length > 0 ? `<tr><td style="padding:8px 0;color:#64748b;font-size:13px">Envoyées cette semaine</td><td style="padding:8px 0;font-size:14px;font-weight:700;color:#6366f1;text-align:right">+${thisWeekApps.length}</td></tr>` : '',
@@ -86,16 +88,10 @@ export default async function handler(req) {
       ? `📊 +${thisWeekApps.length} candidature${thisWeekApps.length > 1 ? 's' : ''} cette semaine`
       : `📊 Votre bilan de la semaine`;
 
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        signal: AbortSignal.timeout(8000),
-        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: 'Emploia <noreply@emploia.fr>',
-          to: [email],
-          subject: `${headline} — Bilan Emploia`,
-          html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+    eligible.push({
+      email,
+      subject: `${headline} — Bilan Emploia`,
+      html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:520px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
     <div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px">
@@ -120,13 +116,27 @@ export default async function handler(req) {
   </p>
 </div>
 </body></html>`,
-        }),
-      });
+    });
+  }
 
-      // One report per user per month — key by year-month
-      await kvSet(`wreport:${email}:${today.slice(0, 7)}`, true, 86400 * 35);
-      sent++;
-    } catch { /* continue */ }
+  // Phase 2: send in parallel chunks of 10 to stay within Edge timeout
+  const CHUNK = 10;
+  for (let i = 0; i < eligible.length; i += CHUNK) {
+    const chunk = eligible.slice(i, i + CHUNK);
+    const results = await Promise.allSettled(chunk.map(({ email, subject, html }) =>
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        signal: AbortSignal.timeout(8000),
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: [email], subject, html }),
+      }).then(r => ({ ok: r.ok, email }))
+    ));
+    for (const r of results) {
+      if (r.status === 'fulfilled' && r.value.ok) {
+        await kvSet(`wreport:${r.value.email}:${today.slice(0, 7)}`, true, 86400 * 35);
+        sent++;
+      }
+    }
   }
 
   return new Response(JSON.stringify({ ok: true, sent, skipped, processed: batch.length, totalUsers: total, nextCursor }), {

@@ -23,11 +23,11 @@ async function fetchTrendingJobs() {
 
 // Latest blog articles (static — update when new articles are added)
 const RECENT_ARTICLES = [
-  { slug: 'reseaux-sociaux-recherche-emploi', title: 'Réseaux sociaux et recherche d\'emploi : guide 2026',           emoji: '🌐' },
-  { slug: 'preparer-entretien-technique',     title: 'Préparer un entretien technique en 48h',                        emoji: '💻' },
-  { slug: 'email-candidature-parfait',        title: "L'email de candidature parfait — structure + exemples",         emoji: '✉️' },
-  { slug: 'secteurs-qui-recrutent-2026',      title: 'Les 10 secteurs qui recrutent le plus en 2026',                emoji: '📈' },
-  { slug: 'ia-et-emploi-2026',               title: 'IA et emploi 2026 : ce qui change pour les candidats',          emoji: '🤖' },
+  { slug: 'prime-activite',                   title: 'Prime d\'activité 2026 : simulation et démarches CAF',          emoji: '🏦' },
+  { slug: '13eme-mois',                       title: '13e mois : obligatoire ou non, comment le négocier',            emoji: '💰' },
+  { slug: 'cv-manager',                       title: 'CV Manager 2026 : guide complet + modèle annoté',               emoji: '👔' },
+  { slug: 'cv-developpeur',                   title: 'CV développeur 2026 : guide complet + modèle senior',           emoji: '💻' },
+  { slug: 'preparer-entretien-embauche',      title: 'Préparer un entretien d\'embauche : méthode complète en 48h',  emoji: '🧠' },
 ];
 
 function jobRow(job) {
