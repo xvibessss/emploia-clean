@@ -12,7 +12,7 @@
       "maxDuration": 60
     },
     "api/generate/ats-score.js": {
-      "maxDuration": 30
+      "maxDuration": 15
     },
     "api/applications.js": {
       "maxDuration": 15
@@ -111,10 +111,10 @@
       "maxDuration": 30
     },
     "api/generate/follow-up.js": {
-      "maxDuration": 35
+      "maxDuration": 20
     },
     "api/generate/linkedin-outreach.js": {
-      "maxDuration": 30
+      "maxDuration": 20
     },
     "api/push-subscribe.js": {
       "maxDuration": 10
@@ -129,16 +129,16 @@
       "maxDuration": 45
     },
     "api/generate/linkedin-summary.js": {
-      "maxDuration": 45
+      "maxDuration": 30
     },
     "api/generate/salary-negotiation.js": {
-      "maxDuration": 50
+      "maxDuration": 30
     },
     "api/cv-versions.js": {
       "maxDuration": 10
     },
     "api/generate/interview-debrief.js": {
-      "maxDuration": 50
+      "maxDuration": 30
     },
     "api/cron/send-reengagement.js": {
       "maxDuration": 45
@@ -154,21 +154,6 @@
     },
     "api/admin.js": {
       "maxDuration": 15
-    },
-    "api/share-score.js": {
-      "maxDuration": 10
-    },
-    "api/trial-reminder.js": {
-      "maxDuration": 30
-    },
-    "api/admin/stats.js": {
-      "maxDuration": 10
-    },
-    "api/track.js": {
-      "maxDuration": 5
-    },
-    "api/nps.js": {
-      "maxDuration": 5
     }
   },
   "crons": [
@@ -195,10 +180,6 @@
     {
       "path": "/api/cron/send-reactivation",
       "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/trial-reminder",
-      "schedule": "0 9 * * *"
     }
   ],
   "rewrites": [
@@ -445,13 +426,7 @@
     { "source": "/api/generate/salary-negotiation", "destination": "/api/generate/salary-negotiation" },
     { "source": "/api/cv-versions", "destination": "/api/cv-versions" },
     { "source": "/api/generate/interview-debrief", "destination": "/api/generate/interview-debrief" },
-    { "source": "/tools", "destination": "/tools.html" },
-    { "source": "/score/:token", "destination": "/score.html" },
-    { "source": "/nps", "destination": "/nps.html" },
-    { "source": "/admin/stats", "destination": "/api/admin/stats" },
-    { "source": "/api/track", "destination": "/api/track" },
-    { "source": "/api/nps", "destination": "/api/nps" },
-    { "source": "/api/share-score", "destination": "/api/share-score" }
+    { "source": "/tools", "destination": "/tools.html" }
   ],
   "headers": [
     {
@@ -630,15 +605,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=1800, stale-while-revalidate=86400"
-        }
-      ]
-    },
-    {
-      "source": "/score/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, stale-while-revalidate=86400"
         }
       ]
     }
