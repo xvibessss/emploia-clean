@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emploia — Ton avis compte</title>
+  <meta name="description" content="Donne ton avis sur Emploia en 30 secondes — ton feedback améliore l'outil pour tous les chercheurs d'emploi."/>
+  <link rel="canonical" href="https://emploia.fr/nps"/>
+  <meta name="robots" content="noindex"/>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg3, #f8fafc);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text, #1e293b);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Logo */
+    .logo {
+      margin: 40px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg1, #ffffff);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px 36px;
+      max-width: 560px;
+      width: calc(100% - 32px);
+      margin: 36px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text, #1e293b);
+      text-align: center;
+    }
+
+    /* Score grid */
+    .score-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .score-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 2px solid var(--border, #e2e8f0);
+      background: var(--bg2, #f1f5f9);
+      color: var(--text, #1e293b);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+      outline: none;
+    }
+
+    .score-btn:hover {
+      border-color: #6366f1;
+      background: #eef2ff;
+      transform: scale(1.08);
+    }
+
+    .score-btn.selected {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: #ffffff;
+      transform: scale(1.12);
+    }
+
+    /* Labels */
+    .score-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted, #94a3b8);
+      margin-top: -12px;
+    }
+
+    /* Comment section */
+    .comment-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .comment-section label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text, #1e293b);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 2px solid var(--border, #e2e8f0);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text, #1e293b);
+      background: var(--bg2, #f8fafc);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus {
+      border-color: #6366f1;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* Thank-you / Already answered states */
+    .message-box {
+      text-align: center;
+      padding: 16px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message-box .emoji {
+      font-size: 40px;
+    }
+
+    .message-box p {
+      font-size: 16px;
+      color: var(--text, #1e293b);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      padding: 24px 16px;
+      text-align: center;
+    }
+
+    footer a {
+      font-size: 13px;
+      color: var(--text-muted, #94a3b8);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="logo" aria-label="Emploia">
+    <div class="logo-icon">E</div>
+    <span class="logo-text">Emploia</span>
+  </a>
+
+  <main class="card" id="app">
+    <!-- Content injected by JS -->
+  </main>
+
+  <footer>
+    <a href="/legal">Mentions légales &amp; Politique de confidentialité</a>
+  </footer>
+
+  <script>
+    (function () {
+      const app = document.getElementById('app');
+
+      // --- Helpers ---
+      function getParam(name) {
+        return new URLSearchParams(window.location.search).get(name);
+      }
+
+      function showMessage(emoji, text) {
+        app.innerHTML = `
+          <div class="message-box">
+            <div class="emoji">${emoji}</div>
+            <p>${text}</p>
+          </div>
+        `;
+      }
+
+      function thankYouMessage(score) {
+        if (score <= 6) return { emoji: '🙏', text: 'Merci pour ton honnêteté. On va s\'améliorer.' };
+        if (score <= 8) return { emoji: '😊', text: 'Merci ! On est curieux de savoir ce qu\'on pourrait améliorer.' };
+        return { emoji: '🎉', text: 'Merci ! Ça fait vraiment plaisir.' };
+      }
+
+      // --- State ---
+      const userId = getParam('uid');
+      let selectedScore = null;
+
+      // --- Render NPS form ---
+      function renderForm() {
+        app.innerHTML = `
+          <h1>De 0 à 10, recommanderais-tu Emploia à un ami en recherche d'emploi&nbsp;?</h1>
+
+          <div>
+            <div class="score-grid" id="score-grid">
+              ${Array.from({ length: 11 }, (_, i) =>
+                `<button class="score-btn" data-score="${i}" aria-label="Note ${i}">${i}</button>`
+              ).join('')}
+            </div>
+            <div class="score-labels">
+              <span>Pas du tout probable</span>
+              <span>Très probable</span>
+            </div>
+          </div>
+
+          <div class="comment-section" id="comment-section" style="display:none;">
+            <label for="comment">Tu peux nous en dire plus&nbsp;? <span style="font-weight:400;color:var(--text-muted,#94a3b8)">(optionnel)</span></label>
+            <textarea id="comment" placeholder="Ton retour nous aide à nous améliorer…"></textarea>
+            <button class="btn-submit" id="btn-submit">Envoyer mon avis</button>
+          </div>
+        `;
+
+        // Score buttons
+        document.getElementById('score-grid').addEventListener('click', function (e) {
+          const btn = e.target.closest('.score-btn');
+          if (!btn) return;
+          selectedScore = parseInt(btn.dataset.score, 10);
+
+          document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+
+          document.getElementById('comment-section').style.display = 'flex';
+        });
+
+        // Submit
+        document.getElementById('btn-submit').addEventListener('click', async function () {
+          if (selectedScore === null) return;
+          const comment = document.getElementById('comment').value.trim();
+          const submitBtn = document.getElementById('btn-submit');
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Envoi…';
+
+          try {
+            const res = await fetch('/api/nps', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: userId || 'anonymous', score: selectedScore, comment }),
+            });
+
+            if (res.ok) {
+              const msg = thankYouMessage(selectedScore);
+              showMessage(msg.emoji, msg.text);
+            } else {
+              const data = await res.json().catch(() => ({}));
+              if (res.status === 409) {
+                showMessage('✅', 'Tu as déjà répondu, merci&nbsp;!');
+              } else {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer mon avis';
+                alert(data.error || 'Une erreur est survenue. Réessaie dans un moment.');
+              }
+            }
+          } catch {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Envoyer mon avis';
+            alert('Erreur réseau. Vérifie ta connexion et réessaie.');
+          }
+        });
+      }
+
+      // --- Init ---
+      async function init() {
+        // Show a minimal loading state
+        app.innerHTML = '<p style="text-align:center;color:var(--text-muted,#94a3b8);padding:16px 0;">Chargement…</p>';
+
+        if (userId) {
+          try {
+            const res = await fetch(`/api/nps?uid=${encodeURIComponent(userId)}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.alreadyAnswered) {
+                showMessage('✅', 'Tu as déjà répondu, merci&nbsp;!');
+                return;
+              }
+            }
+          } catch {
+            // Network issue — show form anyway
+          }
+        }
+
+        renderForm();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

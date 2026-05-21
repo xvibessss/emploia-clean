@@ -270,6 +270,29 @@ export async function kvSmembers(key) {
   return result || [];
 }
 
+export async function kvZadd(key, score, member) {
+  return upstash(["ZADD", key, score, member]);
+}
+
+export async function kvZcard(key) {
+  const { result } = await upstash(["ZCARD", key]);
+  return typeof result === 'number' ? result : 0;
+}
+
+export async function kvZremrangebyrank(key, start, stop) {
+  return upstash(["ZREMRANGEBYRANK", key, start, stop]);
+}
+
+export async function kvScard(key) {
+  const { result } = await upstash(["SCARD", key]);
+  return typeof result === 'number' ? result : 0;
+}
+
+export async function kvLlen(key) {
+  const { result } = await upstash(["LLEN", key]);
+  return typeof result === 'number' ? result : 0;
+}
+
 // ── ALLOWED ORIGINS ────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://emploia.fr',
