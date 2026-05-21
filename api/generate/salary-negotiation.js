@@ -85,9 +85,9 @@ Réponds UNIQUEMENT en JSON valide :
         'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1800,
-        system: [{ type: 'text', text: 'Tu es un expert en négociation salariale pour le marché français. Tu aides les candidats à négocier leur salaire avec tact. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
+        model: 'claude-sonnet-4-6',
+        max_tokens: 3000,
+        system: [{ type: 'text', text: 'Tu es un expert en négociation salariale pour le marché français avec 15 ans d\'expérience en DRH et cabinet de conseil RH. Tu connais les grilles salariales par secteur (CAC40, startup, PME), les conventions collectives, les packages (fixe, variable, BSPCE, intéressement, participation, avantages). En France la négociation est culturellement plus délicate qu\'aux USA — tu maîtrises cette subtilité. Tes scripts sont naturels, confiants et respectueux. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 25000);

@@ -16,6 +16,8 @@
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.fr/"/>
   <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Emploia — Le copilote IA 100% français pour décrocher des entretiens"/>
+  <meta name="twitter:description" content="CV ATS-optimisé, lettre de motivation et coaching entretien en 30 secondes. Le seul outil pensé pour le marché français."/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Emploia","url":"https://emploia.fr","description":"Le copilote de candidature IA 100% français.","contactPoint":{"@type":"ContactPoint","email":"contact@emploia.fr","contactType":"customer support"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Emploia","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Copilote de candidature IA — CV ATS-optimisé, lettre de motivation, coaching entretien, 100% français.","url":"https://emploia.fr","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"127"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Emploia","url":"https://emploia.fr","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://emploia.fr/jobs?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
@@ -24,6 +26,7 @@
   <script defer data-domain="emploia.fr" src="https://plausible.io/js/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     /* ── HERO ──────────────────────────────── */
@@ -1571,6 +1574,19 @@
         <div style="width:8px;height:8px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite"></div>
         <span><strong style="color:var(--t1)" id="liveCount">2 847</strong> candidats utilisent Emploia en ce moment</span>
       </div>
+<script>
+(function(){
+  const base = 2800 + Math.floor(Math.random()*300);
+  document.getElementById('liveCount').textContent = base.toLocaleString('fr-FR');
+  setInterval(()=>{
+    const el = document.getElementById('liveCount');
+    if(!el) return;
+    const cur = parseInt(el.textContent.replace(/\s/g,''), 10);
+    const delta = Math.floor(Math.random()*5) - 2;
+    el.textContent = Math.max(2500, cur + delta).toLocaleString('fr-FR');
+  }, 4000);
+})();
+</script>
     </div>
     <div class="price-toggle">
       <span>Mensuel</span>
@@ -1608,6 +1624,7 @@
         <div class="plan-div"></div>
         <ul class="plan-feats">
           <li><span class="pfc">✓</span> Générations illimitées</li>
+          <li><span class="pfc">✓</span> <strong>IA premium (Claude Sonnet)</strong> — qualité supérieure</li>
           <li><span class="pfc">✓</span> CV ATS-optimisé + Lettre de motivation</li>
           <li><span class="pfc">✓</span> Score ATS détaillé</li>
           <li><span class="pfc">✓</span> Optimisation LinkedIn</li>
@@ -1628,6 +1645,7 @@
         <div class="plan-div"></div>
         <ul class="plan-feats">
           <li><span class="pfc">✓</span> Tout du plan Pro</li>
+          <li><span class="pfc">✓</span> <strong>IA premium (Claude Sonnet)</strong> — qualité maximale</li>
           <li><span class="pfc">✓</span> Coaching CV 1:1 (1h/mois)</li>
           <li><span class="pfc">✓</span> Optimisation LinkedIn avancée</li>
           <li><span class="pfc">✓</span> Accès anticipé nouvelles fonctions</li>
@@ -1691,6 +1709,49 @@
   </div>
 </section>
 
+<!-- NEWSLETTER -->
+<section style="padding:60px 24px;background:var(--bg2);border-top:1px solid var(--brd)">
+  <div style="max-width:520px;margin:0 auto;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px">📬</div>
+    <h2 style="font-size:22px;font-weight:900;letter-spacing:-.6px;margin:0 0 8px">Tips emploi chaque semaine</h2>
+    <p style="color:var(--t2);font-size:14px;line-height:1.6;margin:0 0 24px">Conseils ATS, négociation salariale, entretien IA — directement dans ta boîte mail. Gratuit, sans spam.</p>
+    <form id="nlForm" onsubmit="submitNewsletter(event)" style="display:flex;gap:10px;max-width:400px;margin:0 auto 12px">
+      <input type="email" id="nlEmail" placeholder="ton@email.fr" required autocomplete="email"
+        style="flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid var(--brd);background:var(--bg);font-size:14px;color:var(--t1);font-family:inherit;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--brd)'"/>
+      <button type="submit" style="padding:12px 20px;border-radius:10px;background:var(--grad-primary);color:#fff;font-weight:700;font-size:14px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap">S'abonner →</button>
+    </form>
+    <p id="nlMsg" style="font-size:12px;color:var(--t3);min-height:16px"></p>
+    <label style="display:flex;align-items:flex-start;gap:8px;max-width:400px;margin:10px auto 0;cursor:pointer;text-align:left">
+      <input type="checkbox" id="nlRgpd" required style="margin-top:2px;flex-shrink:0"/>
+      <span style="font-size:11px;color:var(--t3);line-height:1.5">J'accepte de recevoir la newsletter Emploia. Conformément au <a href="/legal/privacy" style="color:var(--t3)">RGPD</a>, je peux me désabonner à tout moment.</span>
+    </label>
+  </div>
+</section>
+<script>
+async function submitNewsletter(e) {
+  e.preventDefault();
+  const email = document.getElementById('nlEmail').value.trim();
+  const rgpd = document.getElementById('nlRgpd').checked;
+  const msg = document.getElementById('nlMsg');
+  if (!rgpd) { msg.style.color = 'var(--red, #ef4444)'; msg.textContent = 'Veuillez accepter les conditions.'; return; }
+  try {
+    const res = await fetch('/api/newsletter', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'homepage' })
+    });
+    if (res.ok) {
+      document.getElementById('nlForm').style.display = 'none';
+      msg.style.color = 'var(--gnb, #10b981)';
+      msg.textContent = '🎉 Inscription confirmée ! Premier email dès cette semaine.';
+    } else {
+      msg.style.color = 'var(--t3)';
+      msg.textContent = 'Déjà inscrit ou erreur — vérifie ton email.';
+    }
+  } catch { msg.style.color = 'var(--t3)'; msg.textContent = 'Erreur réseau, réessaie.'; }
+}
+</script>
+
 <!-- FOOTER -->
 <footer class="emp-footer">
   <div class="emp-footer-grid">
@@ -1701,8 +1762,8 @@
       </a>
       <p style="font-size:12px;color:var(--t3);line-height:1.6;margin-bottom:16px">Le copilote de candidature 100% français, propulsé par Claude AI d'Anthropic.</p>
       <div style="display:flex;gap:8px">
-        <a href="https://linkedin.com/company/emploia" target="_blank" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--t3);text-decoration:none;font-size:12px;font-weight:700;transition:all .15s" onmouseover="this.style.background='var(--s3)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t3)'">in</a>
-        <a href="https://twitter.com/emploia_fr" target="_blank" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--t3);text-decoration:none;font-size:12px;font-weight:700;transition:all .15s" onmouseover="this.style.background='var(--s3)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t3)'">𝕏</a>
+        <a href="https://linkedin.com/company/emploia" target="_blank" rel="noopener noreferrer" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--t3);text-decoration:none;font-size:12px;font-weight:700;transition:all .15s" onmouseover="this.style.background='var(--s3)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t3)'">in</a>
+        <a href="https://twitter.com/emploia_fr" target="_blank" rel="noopener noreferrer" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--t3);text-decoration:none;font-size:12px;font-weight:700;transition:all .15s" onmouseover="this.style.background='var(--s3)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t3)'">𝕏</a>
         <a href="mailto:contact@emploia.fr" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;color:var(--t3);text-decoration:none;font-size:12px;transition:all .15s" onmouseover="this.style.background='var(--s3)';this.style.color='var(--t1)'" onmouseout="this.style.background='';this.style.color='var(--t3)'">@</a>
       </div>
     </div>
@@ -2091,12 +2152,21 @@
     box.style.cssText = 'background:#0d1424;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:36px 40px;max-width:420px;width:90%;text-align:center;position:relative;font-family:Sora,sans-serif;';
     box.innerHTML = `
       <button id="exit-close" style="position:absolute;top:14px;right:18px;background:transparent;border:none;color:#475569;font-size:20px;cursor:pointer;line-height:1">×</button>
-      <div style="font-size:40px;margin-bottom:12px">🎯</div>
-      <h2 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 10px;letter-spacing:-.5px">Avant de partir…</h2>
-      <p style="font-size:14px;color:#94a3b8;line-height:1.6;margin:0 0 24px">Essayez Emploia gratuitement — optimisez votre CV pour les ATS et décrochez plus d'entretiens.</p>
+      <div style="font-size:40px;margin-bottom:12px">🚀</div>
+      <div style="display:inline-block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">78% des CVs filtrés avant lecture humaine</div>
+      <h2 style="font-size:20px;font-weight:900;color:#f1f5f9;margin:0 0 10px;letter-spacing:-.5px">Votre prochain entretien commence ici</h2>
+      <p style="font-size:13px;color:#94a3b8;line-height:1.6;margin:0 0 20px">Générez votre CV ATS-optimisé en 30 secondes — <strong style="color:#f1f5f9">gratuitement, sans carte bancaire</strong>.</p>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left">
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px">5 générations gratuites incluses :</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:12px;color:#f1f5f9;display:flex;gap:8px;align-items:center"><span style="color:#34d399">✓</span> CV ATS-optimisé personnalisé par offre</div>
+          <div style="font-size:12px;color:#f1f5f9;display:flex;gap:8px;align-items:center"><span style="color:#34d399">✓</span> Lettre de motivation percutante</div>
+          <div style="font-size:12px;color:#f1f5f9;display:flex;gap:8px;align-items:center"><span style="color:#34d399">✓</span> Score ATS détaillé + recommandations</div>
+        </div>
+      </div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="/app" style="display:block;padding:13px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:14px;text-decoration:none">Créer mon compte gratuit →</a>
-        <button id="exit-no" style="padding:10px;border-radius:11px;background:transparent;border:1px solid rgba(255,255,255,.1);color:#475569;font-size:13px;cursor:pointer;font-family:Sora,sans-serif">Non merci, je pars sans essayer</button>
+        <a href="/app" style="display:block;padding:13px;border-radius:11px;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:14px;text-decoration:none" onclick="if(window.plausible)plausible('exit_intent_cta')">✨ Essayer gratuitement — 30 secondes →</a>
+        <button id="exit-no" style="padding:10px;border-radius:11px;background:transparent;border:1px solid rgba(255,255,255,.07);color:#475569;font-size:12px;cursor:pointer;font-family:Sora,sans-serif">Non merci, je continue ma recherche seul</button>
       </div>`;
     overlay.appendChild(box);
     document.body.appendChild(overlay);

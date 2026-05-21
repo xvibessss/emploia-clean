@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin } from './_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from './_lib/auth.js';
 
 const SYSTEM = `Tu es Orion, le copilote IA d'Emploia — le seul assistant de candidature 100% spécialisé sur le marché français.
 
@@ -57,6 +57,10 @@ export default async function handler(req) {
     content: sanitizeString(String(m.content || ''), 4000),
   })).filter(m => m.content);
 
+  // Optional auth — Pro/Intensif users get Sonnet, free/anonymous get Haiku
+  const chatUser = await getCurrentUser(req).catch(() => null);
+  const isPremium = chatUser?.plan && chatUser.plan !== 'free';
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service temporairement indisponible' }), { status: 500, headers: H_JSON });
 
@@ -71,8 +75,8 @@ export default async function handler(req) {
         'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
+        model: isPremium ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
+        max_tokens: isPremium ? 2048 : 1024,
         stream: true,
         system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages,

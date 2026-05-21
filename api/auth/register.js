@@ -87,6 +87,9 @@ export default async function handler(req) {
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
   kvSadd('all_users', email).catch(() => {});
+  // Track registration (fire and forget)
+  const trackBase = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+  fetch(`${trackBase}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'user_registered' }) }).catch(() => {});
 
   // Store the user's own referral code in KV immediately so friends can use it right away
   const refCharsMap = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -126,7 +129,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         from: 'Emploia <noreply@emploia.fr>',
         to: [email],
-        subject: `Bienvenue sur Emploia, ${firstNameRaw} ! Voici vos 5 générations gratuites 🎉`,
+        subject: `🎉 Bienvenue ${firstNameRaw} — ton CV ATS est à 30 secondes`,
         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:520px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
@@ -136,9 +139,12 @@ export default async function handler(req) {
     <div style="padding:32px">
       <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Bienvenue, ${firstName} ! 🎉</h1>
       <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez <strong style="color:#0f172a">5 générations gratuites</strong> prêtes à l'emploi — votre copilote de candidature IA 100% français.</p>
-      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Générer mon premier CV →</a>
-      <div style="margin-top:28px;padding-top:24px;border-top:1px solid #e2e8f0">
-        <p style="color:#64748b;font-size:13px;margin:0 0 14px;font-weight:700">Commencez par ça :</p>
+      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Créer mon CV maintenant →</a>
+      <div style="margin-top:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
+        <p style="color:#166534;font-size:12px;line-height:1.6;margin:0"><strong>💡 Pourquoi ça marche ?</strong> 75% des CV sont filtrés automatiquement avant d'être lus par un humain. Emploia optimise ton CV pour passer ces filtres ATS — mots-clés, format, structure — en 30 secondes.</p>
+      </div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0">
+        <p style="color:#64748b;font-size:13px;margin:0 0 14px;font-weight:700">3 premières actions à faire :</p>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;align-items:flex-start;gap:12px">
             <div style="min-width:28px;height:28px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:14px">1️⃣</div>

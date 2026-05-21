@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser, getGenerationsUsed, incrementGenerations, FREE_LIMIT } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -37,6 +37,12 @@ export default async function handler(req) {
 
   if (!company) return new Response(JSON.stringify({ error: 'Entreprise requise' }), { status: 400, headers: H });
 
+  if (user.plan === 'free') {
+    const freshCount = await getGenerationsUsed(user.email);
+    const used = freshCount !== null ? freshCount : user.generationsUsed;
+    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
 
@@ -67,9 +73,9 @@ Réponds UNIQUEMENT en JSON valide :
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
-        system: [{ type: 'text', text: 'Tu es un expert en networking professionnel sur le marché français. Tu génères des messages LinkedIn courts et percutants (≤300 caractères). Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 500 : 800,
+        system: [{ type: 'text', text: 'Tu es un expert en networking professionnel et personal branding sur le marché français. Tu génères des messages LinkedIn ultra-personnalisés qui provoquent une réponse — naturels, humains, jamais "vendeur". Contrainte absolue : ≤300 caractères par message. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 15000);
@@ -82,6 +88,7 @@ Réponds UNIQUEMENT en JSON valide :
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
     if (!result?.direct) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    if (user.plan === 'free') incrementGenerations(user).catch(() => {});
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });

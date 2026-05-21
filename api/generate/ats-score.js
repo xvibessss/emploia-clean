@@ -48,12 +48,13 @@ export default async function handler(req) {
         "anthropic-beta": "prompt-caching-2024-07-31",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1200,
-        system: [{ type: "text", text: "Tu es un expert ATS et recruteur senior en France. Tu analyses des CVs par rapport à des offres d'emploi et fournis un score détaillé avec des recommandations actionnables. Réponds uniquement en JSON valide.", cache_control: { type: "ephemeral" } }],
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 1200 : 2500,
+        system: [{ type: "text", text: "Tu es un expert ATS certifié et recruteur senior avec 15 ans d'expérience dans les grandes entreprises françaises. Tu maîtrises SAP SuccessFactors, Talentsoft, Workday, iCIMS et Greenhouse. Tu analyses en profondeur la compatibilité CV/offre selon 5 axes : correspondance mots-clés (orthographe exacte), structure et format ATS-friendly, pertinence des expériences, formation et certifications, softs skills implicites. Tes recommandations sont chirurgicales et actionnables en moins de 10 minutes. Réponds uniquement en JSON valide.", cache_control: { type: "ephemeral" } }],
         messages: [{
           role: "user",
-          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nCV DU CANDIDAT:\n${cvText}\n\nAnalyse ce CV par rapport à cette offre. Réponds UNIQUEMENT en JSON valide (sans markdown, sans backtick) :
+          content: user.plan === 'free'
+            ? `OFFRE D'EMPLOI:\n${jobOffer}\n\nCV DU CANDIDAT:\n${cvText}\n\nAnalyse ce CV par rapport à cette offre. Réponds UNIQUEMENT en JSON valide (sans markdown, sans backtick) :
 {
   "score": 72,
   "bars": [
@@ -69,7 +70,27 @@ export default async function handler(req) {
   "improvements": ["Amélioration 1", "Amélioration 2"]
 }
 
-Règles : score entre 40 et 97. recommendations: tableau de 3-5 strings en texte simple (sans HTML). 3-5 items par liste.`,
+Règles : score entre 40 et 97. recommendations: tableau de 3-5 strings en texte simple (sans HTML). 3-5 items par liste.`
+            : `OFFRE D'EMPLOI:\n${jobOffer}\n\nCV DU CANDIDAT:\n${cvText}\n\nAnalyse approfondie de ce CV par rapport à cette offre. Réponds UNIQUEMENT en JSON valide (sans markdown, sans backtick) :
+{
+  "score": 72,
+  "bars": [
+    {"name": "Mots-clés", "val": 68},
+    {"name": "Format ATS", "val": 90},
+    {"name": "Expérience", "val": 75},
+    {"name": "Compétences", "val": 65},
+    {"name": "Lisibilité", "val": 85}
+  ],
+  "recommendations": ["Action précise et immédiate à faire — avec le mot-clé exact à ajouter ou la reformulation à effectuer", "Recommandation 2", "Recommandation 3", "Recommandation 4"],
+  "keywords": ["mot-clé de l'offre absent du CV 1", "mot-clé 2", "mot-clé 3", "mot-clé 4", "mot-clé 5"],
+  "keywordsPresent": ["mot-clé de l'offre présent dans le CV 1", "mot-clé présent 2"],
+  "strengths": ["Point fort spécifique 1 — ce qui est bien dans CE CV pour CE poste", "Point fort 2", "Point fort 3"],
+  "improvements": ["Amélioration concrète 1 avec exemple de formulation", "Amélioration 2", "Amélioration 3"],
+  "atsRisk": ["Risque ATS détecté 1 (ex: tableau, colonne, image)", "Risque 2"],
+  "verdict": "Verdict expert en 2 phrases sur les chances réelles de passer le filtre ATS pour ce poste"
+}
+
+Règles : score entre 40 et 97. Tous les champs en texte simple sans HTML. Sois chirurgical et spécifique — pas de généralités.`,
         }],
       }),
     }), 30000);

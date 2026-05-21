@@ -56,17 +56,19 @@ export default async function handler(req) {
         "anthropic-beta": "prompt-caching-2024-07-31",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 4096,
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 4096 : 8192,
         stream: true,
         system: [{
           type: "text",
-          text: "Tu es un expert en rédaction de CV professionnels en France. Tu génères des CVs complets et percutants, parfaitement adaptés aux offres d'emploi et optimisés pour les systèmes ATS. Tu utilises les mots-clés exacts de l'offre, des verbes d'action forts, et une structure claire. Format: texte structuré avec des tirets et sections bien délimitées (En-tête, Profil/Résumé, Expériences, Formation, Compétences, Langues).",
+          text: "Tu es un expert senior en rédaction de CV pour le marché français avec 15 ans d'expérience RH. Tu maîtrises parfaitement les ATS (SAP SuccessFactors, Talentsoft, Workday, Greenhouse) utilisés par les grandes entreprises françaises. Tu génères des CVs percutants et 100% ATS-optimisés qui passent les filtres automatiques ET convainquent les recruteurs humains. Standards français : une page max pour les juniors (< 3 ans exp), deux pages pour les seniors, format chronologique inversé, pas de photo sauf spécifié. Tu utilises les mots-clés EXACTS de l'offre (orthographe identique), des verbes d'action forts au passé (développé, géré, mis en place, piloté, optimisé, réduit, augmenté, lancé), et des réalisations chiffrées (pourcentages, volumes, durées, économies). Chaque point d'expérience suit la structure STAR : Situation/Action/Résultat. Format : texte structuré avec sections clairement délimitées (EN-TÊTE, PROFIL, EXPÉRIENCES, FORMATION, COMPÉTENCES, LANGUES).",
           cache_control: { type: "ephemeral" },
         }],
         messages: [{
           role: "user",
-          content: `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:\n- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS\n- Mettre en avant les compétences les plus pertinentes pour le poste\n- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues\n- Utiliser des verbes d'action forts\n- Être concis et percutant`,
+          content: user.plan === 'free'
+            ? `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère un CV complet et professionnel en français, parfaitement adapté à cette offre. Le CV doit:\n- Utiliser les mots-clés exacts de l'offre pour passer les filtres ATS\n- Mettre en avant les compétences les plus pertinentes pour le poste\n- Être structuré avec ces sections: En-tête (nom, email, téléphone, LinkedIn), Profil/Résumé (3-4 lignes), Expériences professionnelles, Formation, Compétences, Langues\n- Utiliser des verbes d'action forts\n- Être concis et percutant`
+            : `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère un CV PREMIUM complet pour le marché français, 100% optimisé ATS ET humain. Exigences strictes :\n\n1. MOTS-CLÉS : Extrais les 8-12 mots-clés les plus critiques de l'offre et assure-toi qu'ils apparaissent verbatim dans le CV (même orthographe, même casse si nécessaire)\n2. PROFIL (4 lignes max) : Accroche percutante qui reprend les 3 compétences phares de l'offre + valeur ajoutée chiffrée + ambition alignée avec le poste\n3. EXPÉRIENCES : Chaque bullet point = Verbe d'action fort (passé) + Contexte + Action concrète + Résultat chiffré (%, €, volume, durée). Minimum 3 bullets par poste.\n4. COMPÉTENCES : Catégorisées (Techniques / Métier / Soft skills) — utilise exactement les libellés de l'offre\n5. FORMAT : Sections clairement délimitées, hiérarchie visuelle avec majuscules pour les headers, tirets pour les bullets\n6. LONGUEUR : Adapter selon l'expérience (1 page si < 3 ans, 2 pages si + de 3 ans d'exp)\n\nDémarre directement par le CV, sans commentaire ni explication.`,
         }],
       }),
     });
@@ -101,6 +103,9 @@ export default async function handler(req) {
               }
               if (parsed.type === 'message_stop') {
                 const newCount = user.plan === 'free' ? await incrementGenerations(user) : null;
+                // Track event (fire and forget)
+                const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+                fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'cv_generated', props: { plan: user.plan } }) }).catch(() => {});
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                 // Send upgrade nudge when free user reaches their last generation
                 if (user.plan === 'free' && newCount === FREE_LIMIT) {

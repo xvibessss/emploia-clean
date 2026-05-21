@@ -16,6 +16,7 @@
   <meta property="og:url" content="https://emploia.fr/interview"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     body { background: var(--bg3); height: 100vh; overflow: hidden; }
@@ -859,6 +860,7 @@
     if (!startTime) {
       startTime = Date.now();
       timerInterval = setInterval(updateTimer, 1000);
+      if (window.trackEvent) trackEvent('interview_started', { role: currentRole });
     }
 
     updateStats();

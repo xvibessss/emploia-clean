@@ -15,6 +15,7 @@
   <meta property="og:url" content="https://emploia.fr/app"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
     body { background: var(--bg3); }
@@ -778,6 +779,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               if (parsed.done) {
                 lastResult = fullText;
                 if (window.plausible) plausible('generation_complete', { props: { type: mode } });
+                if (window.trackEvent) trackEvent(mode === 'cv' ? 'cv_generated' : mode === 'letter' ? 'letter_generated' : 'ats_checked', { mode });
                 setTimeout(showFloatingNudge, 2000);
               }
             } catch (e) {
@@ -789,6 +791,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         const data = await res.json();
         const result = data.result || data;
         if (window.plausible) plausible('generation_complete', { props: { type: mode } });
+        if (window.trackEvent) trackEvent(mode === 'cv' ? 'cv_generated' : mode === 'letter' ? 'letter_generated' : 'ats_checked', { mode });
         showResult(result);
       }
     } catch (e) {
@@ -818,6 +821,24 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       if (el) el.textContent = steps[i];
     }, 700);
     window._loadIntv = intv;
+  }
+
+  async function shareAtsScore(score) {
+    const user = window.empUser;
+    try {
+      const res = await fetch('/api/share-score', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, jobTitle: '', userId: user?.id || '' }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(data.url).catch(() => {});
+        }
+        window.open(data.url, '_blank', 'noopener');
+      }
+    } catch { /* silent */ }
   }
 
   function showResult(result) {
@@ -861,6 +882,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               ${result.recommendations.map(r => `<li style="font-size:12px;color:var(--t2);line-height:1.7">${esc(String(r))}</li>`).join('')}
             </ul>
           </div>` : ''}
+          ${score >= 75 ? `<button onclick="shareAtsScore(${score})" style="margin-top:14px;padding:9px 18px;border-radius:9px;border:1.5px solid var(--brdh);background:var(--s2);color:var(--t1);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--brdh)'">🔗 Partager mon score</button>` : ''}
         </div>`;
     } else {
       const rawText = typeof result === 'string' ? result : (result.result || result.text || JSON.stringify(result));
@@ -923,6 +945,9 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
             <span style="font-size:11px;color:var(--t3)">🔒 Stripe PCI</span>
             <span style="font-size:11px;color:var(--t3)">✓ Annulation en 1 clic</span>
             <span style="font-size:11px;color:var(--t3)">🇫🇷 Données FR</span>
+          </div>
+          <div style="text-align:center;margin-top:12px">
+            <button onclick="document.getElementById('upgradeModal').remove()" style="background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px;padding:4px 8px">Continuer avec le plan gratuit</button>
           </div>
         </div>`;
       document.body.appendChild(modal);
@@ -1128,7 +1153,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       const limit = 5;
       const remaining = limit - used;
       if (user.plan !== 'free') {
-        el.closest('.usage-pill').innerHTML = `⭐ Plan ${user.plan === 'intensif' ? 'Intensif' : 'Pro'} · générations illimitées`;
+        el.closest('.usage-pill').innerHTML = `⭐ Plan ${user.plan === 'intensif' ? 'Intensif' : 'Pro'} · générations illimitées · <span style="color:var(--inb);font-weight:700">IA Sonnet</span>`;
         // Show trial countdown banner if in first 7 days
         if (user.planActivatedAt) {
           const daysPro = (Date.now() - new Date(user.planActivatedAt).getTime()) / 86400000;

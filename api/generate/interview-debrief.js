@@ -93,9 +93,9 @@ Réponds UNIQUEMENT en JSON valide :
         'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2000,
-        system: [{ type: 'text', text: 'Tu es un coach en recrutement expert du marché français. Tu fournis des bilans d\'entretien constructifs et actionnables. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
+        model: 'claude-sonnet-4-6',
+        max_tokens: 3500,
+        system: [{ type: 'text', text: 'Tu es un coach en recrutement certifié avec 12 ans d\'expérience en France — ex-recruteur CAC40, certifié coach professionnel ICF. Tu analyses les entretiens avec la rigueur d\'un expert et la bienveillance d\'un mentor. Tu maîtrises la méthode STAR, les biais cognitifs des recruteurs français, et les questions pièges courants. Tes retours sont précis, constructifs et immédiatement actionnables. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 28000);

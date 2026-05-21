@@ -76,9 +76,9 @@ Réponds UNIQUEMENT en JSON valide :
         'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
-        system: [{ type: 'text', text: 'Tu es un expert LinkedIn et personal branding pour le marché français. Tu génères des profils LinkedIn qui attirent les recruteurs. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 1500 : 3000,
+        system: [{ type: 'text', text: 'Tu es un expert LinkedIn et personal branding avec 10 ans d\'expérience sur le marché français. Tu maîtrises l\'algorithme LinkedIn et les comportements des recruteurs français. Tu génères des profils qui maximisent l\'index de recherche SSI, attirent les InMails et provoquent des clics. Accroche "À propos" mémorable, titre optimisé pour les recherches booléennes, compétences top 10 validées par le marché. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 25000);

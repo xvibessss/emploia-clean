@@ -868,6 +868,20 @@ window.empSubmitChangePwd = async function(e) {
   }
 };
 
+// ── INTERNAL EVENT TRACKING ───────────────────────────────────────────────────
+// Lightweight wrapper — fires to /api/track (Redis counters) + Plausible
+window.trackEvent = function(event, props) {
+  // Plausible
+  if (window.plausible) plausible(event, props ? { props } : undefined);
+  // Internal Redis counter (fire and forget)
+  fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, props: props || {} }),
+    keepalive: true,
+  }).catch(() => {});
+};
+
 // ── NATIVE IMAGE LAZY LOADING ─────────────────────────────────────────────────
 // Applies loading="lazy" to all below-fold <img> that don't have an explicit attribute
 (function () {

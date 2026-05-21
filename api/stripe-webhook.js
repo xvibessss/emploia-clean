@@ -60,6 +60,8 @@ export default async function handler(req) {
         const session = event.data.object;
         const email = session.customer_email || session.customer_details?.email;
         const plan = session.metadata?.plan || 'pro';
+        const planLabel = plan === 'intensif' ? 'Intensif' : 'Pro';
+        const planPrice = plan === 'intensif' ? '19€/mois' : '9€/mois';
         if (email) {
           const normalizedEmail = email.toLowerCase();
           const user = await kvGet(`user:${normalizedEmail}`);
@@ -79,11 +81,13 @@ export default async function handler(req) {
               }),
               kvSet(`stripe:${session.customer}`, normalizedEmail),
               kvSet(`gen:${normalizedEmail}`, 0),
+              // Track upgrade (fire and forget)
+              fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan } }) }).catch(() => {}),
               resendKey ? sendEmail(resendKey, {
                 from: 'Emploia <noreply@emploia.fr>',
                 to: [normalizedEmail],
-                subject: `${firstName ? firstName + ', b' : 'B'}ienvenue dans Emploia Pro ! 🎉`,
-                html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 8px">Bienvenue dans Pro, ${firstName || 'là'} ! 🚀</h1><p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre accès Pro est activé. Voici ce que vous pouvez faire maintenant :</p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px"><span style="font-size:20px">♾️</span><div><div style="font-weight:700;color:#0f172a;font-size:13px">Générations illimitées</div><div style="font-size:12px;color:#64748b">CV, lettre de motivation, score ATS sans limite</div></div></div><div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px"><span style="font-size:20px">💰</span><div><div style="font-weight:700;color:#0f172a;font-size:13px">Négociation salariale IA</div><div style="font-size:12px;color:#64748b">Email + script + arguments personnalisés</div></div></div><div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px"><span style="font-size:20px">🎤</span><div><div style="font-weight:700;color:#0f172a;font-size:13px">Bilan post-entretien</div><div style="font-size:12px;color:#64748b">Analyse structurée + email de remerciement</div></div></div><div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px"><span style="font-size:20px">☁️</span><div><div style="font-weight:700;color:#0f172a;font-size:13px">20 versions de CV sauvegardées</div><div style="font-size:12px;color:#64748b">Adaptez votre CV à chaque offre et sauvegardez</div></div></div></div><a href="${baseUrl}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer à postuler →</a></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}/api/stripe-portal" style="color:#94a3b8">Gérer mon abonnement</a></p></div></body></html>`,
+                subject: `🎉 ${firstName || 'Bienvenue'}, ton accès ${planLabel} est activé !`,
+                html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 8px;letter-spacing:-.5px">Ton abonnement ${planLabel} est actif 🚀</h1><p style="color:#475569;line-height:1.6;margin:0 0 6px">Bienvenue${firstName ? ` ${firstName}` : ''} ! Pour ${planPrice}, tu as accès à l'IA la plus complète de France pour ta recherche d'emploi.</p><p style="color:#475569;line-height:1.6;margin:0 0 24px">Voilà par où commencer :</p><div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px"><a href="${baseUrl}/app" style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none;border:1px solid #e2e8f0"><span style="font-size:20px;line-height:1;flex-shrink:0">1️⃣</span><div><div style="font-weight:700;color:#0f172a;font-size:14px;margin-bottom:2px">Génère ton CV ATS-optimisé</div><div style="font-size:12px;color:#64748b">Adapté à chaque offre, boosté pour passer les filtres automatiques</div></div></a><a href="${baseUrl}/app" style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none;border:1px solid #e2e8f0"><span style="font-size:20px;line-height:1;flex-shrink:0">2️⃣</span><div><div style="font-weight:700;color:#0f172a;font-size:14px;margin-bottom:2px">Vérifie ton score ATS sur une vraie offre</div><div style="font-size:12px;color:#64748b">Colle une offre d'emploi et vois instantanément ton taux de match</div></div></a><a href="${baseUrl}/interview" style="display:flex;align-items:flex-start;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none;border:1px solid #e2e8f0"><span style="font-size:20px;line-height:1;flex-shrink:0">3️⃣</span><div><div style="font-weight:700;color:#0f172a;font-size:14px;margin-bottom:2px">Lance une simulation d'entretien IA</div><div style="font-size:12px;color:#64748b">Prépare-toi avec un coach IA qui simule le recruteur</div></div></a></div><a href="${baseUrl}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">C'est parti →</a><p style="color:#94a3b8;font-size:12px;margin:24px 0 0;line-height:1.6">Des questions ? Réponds directement à cet email, on te répond sous 24h.</p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}/api/stripe-portal" style="color:#94a3b8">Gérer mon abonnement</a> · <a href="${baseUrl}/api/stripe-portal" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`,
               }) : Promise.resolve(),
             ]);
           }
@@ -111,16 +115,18 @@ export default async function handler(req) {
         const email = invoice.customer_email?.toLowerCase() || await kvGet(`stripe:${customerId}`);
         if (email && resendKey) {
           const user = await kvGet(`user:${email}`);
+          await kvSet(`user:${email}`, { ...user, subscriptionStatus: 'past_due' });
           const firstName = htmlEscape((user?.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
           const attemptCount = invoice.attempt_count || 1;
           const nextAttempt = invoice.next_payment_attempt
             ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('fr-FR')
             : null;
 
-          sendEmail(resendKey, {
+          console.error('invoice.payment_failed', email, attemptCount);
+          await sendEmail(resendKey, {
             from: 'Emploia <noreply@emploia.fr>',
             to: [email],
-            subject: 'Problème de paiement sur votre abonnement Emploia',
+            subject: '⚠️ Problème de paiement — ton accès Emploia Pro',
             html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:520px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">

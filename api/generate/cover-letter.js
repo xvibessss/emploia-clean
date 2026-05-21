@@ -51,31 +51,15 @@ export default async function handler(req) {
       signal: AbortSignal.timeout(40000),
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-beta": "prompt-caching-2024-07-31" },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 4096,
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 4096 : 8192,
         stream: true,
-        system: [{ type: 'text', text: "Tu es un expert en rédaction de lettres de motivation professionnelles pour le marché français. Tu génères des lettres percutantes, personnalisées et authentiques.", cache_control: { type: 'ephemeral' } }],
+        system: [{ type: 'text', text: "Tu es un expert senior en rédaction de lettres de motivation pour le marché français avec 15 ans d'expérience RH et cabinet de recrutement. Tu crées des lettres de motivation qui se distinguent : accroche mémorable (jamais générique), démonstration de valeur concrète avec chiffres, connaissance fine de l'entreprise, alignement parfait avec les termes exacts de l'offre. Règles absolues : entre 300 et 420 mots, vouvoiement, 3 paragraphes de fond (accroche/compétences alignées/motivation projet d'entreprise), formule de politesse professionnelle française. La lettre doit donner l'impression d'avoir été écrite spécifiquement pour CE recruteur et CE poste — jamais copier-coller.", cache_control: { type: 'ephemeral' } }],
         messages: [{
           role: "user",
-          content: `Tu es un expert en rédaction de lettres de motivation en France.
-
-OFFRE D'EMPLOI:
-${jobOffer}
-
-PROFIL DU CANDIDAT:
-${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}
-
-Génère une lettre de motivation professionnelle et personnalisée en français. Elle doit:
-- Commencer par les coordonnées du candidat, la date, les coordonnées de l'entreprise et l'objet
-- Avoir une accroche percutante qui montre que tu connais l'entreprise
-- Développer 3 arguments forts qui montrent pourquoi le candidat est parfait pour CE poste
-- Utiliser les termes exacts de l'offre d'emploi
-- Être authentique et ne pas ressembler à une lettre générique
-- Se terminer par une phrase de conclusion professionnelle et une signature
-- Faire entre 300 et 400 mots
-- Utiliser le vouvoiement
-
-Commence directement par la lettre, sans commentaires.`,
+          content: user.plan === 'free'
+            ? `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère une lettre de motivation professionnelle et personnalisée en français. Elle doit:\n- Commencer par les coordonnées du candidat, la date, les coordonnées de l'entreprise et l'objet\n- Avoir une accroche percutante qui montre que tu connais l'entreprise\n- Développer 3 arguments forts qui montrent pourquoi le candidat est parfait pour CE poste\n- Utiliser les termes exacts de l'offre d'emploi\n- Être authentique et ne pas ressembler à une lettre générique\n- Se terminer par une phrase de conclusion professionnelle et une signature\n- Faire entre 300 et 400 mots\n- Utiliser le vouvoiement\n\nCommence directement par la lettre, sans commentaires.`
+            : `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère une lettre de motivation PREMIUM en français. Structure obligatoire :\n\n**EN-TÊTE** : Coordonnées candidat (prénom nom, ville, email, téléphone) | Date | Coordonnées entreprise | Objet percutant (pas "Candidature au poste de" — trouve quelque chose d'original)\n\n**ACCROCHE** (1 paragraphe, 2-3 phrases) : Commence par un fait, chiffre ou observation sur l'entreprise/secteur qui prouve que tu la connais. Pas "Je me permets de vous adresser". Incite à lire la suite.\n\n**CORPS** (2-3 paragraphes) : \n- Paragraphe 1 : Ta valeur ajoutée principale pour CE poste, avec réalisation chiffrée\n- Paragraphe 2 : Compétences clés alignées avec les 3 mots-clés critiques de l'offre\n- Paragraphe 3 : Motivation pour CETTE entreprise spécifiquement (culture, projet, ambition)\n\n**CONCLUSION** : Proposition d'entretien avec disponibilité, remerciement, formule de politesse complète\n\nContraintes : 320-400 mots. Vouvoiement. Aucun cliché ("dynamique", "motivé", "rigoureux"). Chaque phrase apporte de la valeur. Commence directement par la lettre.`,
         }],
       }),
     });

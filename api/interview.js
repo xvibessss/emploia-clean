@@ -106,8 +106,8 @@ export default async function handler(req) {
         'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 512,
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 512 : 1024,
         stream: true,
         system: [{ type: 'text', text: buildSystem(role, company, level), cache_control: { type: 'ephemeral' } }],
         messages,

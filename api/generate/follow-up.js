@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, getGenerationsUsed, incrementGenerations, FREE_LIMIT } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -39,6 +39,12 @@ export default async function handler(req) {
 
   if (!company && !jobTitle) return new Response(JSON.stringify({ error: 'Entreprise ou poste requis' }), { status: 400, headers: H });
 
+  if (user.plan === 'free') {
+    const freshCount = await getGenerationsUsed(user.email);
+    const used = freshCount !== null ? freshCount : user.generationsUsed;
+    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
 
@@ -69,9 +75,9 @@ Réponds UNIQUEMENT en JSON valide :
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
-        system: [{ type: 'text', text: 'Tu es un expert en candidature sur le marché français. Tu génères des emails de relance professionnels et percutants. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
+        model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
+        max_tokens: user.plan === 'free' ? 1000 : 1800,
+        system: [{ type: 'text', text: 'Tu es un expert en candidature et communication professionnelle pour le marché français. Tu maîtrises les codes de relance en France (plus délicats qu\'aux US). Tes emails de relance rouvrent la conversation sans paraître insistants — ils apportent de la valeur et rappellent discrètement la candidature. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
     }), 20000);
@@ -85,6 +91,7 @@ Réponds UNIQUEMENT en JSON valide :
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
     if (!result?.short) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    if (user.plan === 'free') incrementGenerations(user).catch(() => {});
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });
