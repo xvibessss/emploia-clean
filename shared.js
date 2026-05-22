@@ -520,7 +520,8 @@ window.empUpdateNav = function(user) {
     authDiv.innerHTML = `<button class="emp-nav-login" onclick="empShowAuth('login')">Se connecter</button>`;
     return;
   }
-  const initials = esc(user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
+  const displayName = user.name || user.email?.split('@')[0] || 'Compte';
+  const initials = esc(displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase());
   const avatarContent = user.avatar
     ? `<img src="${esc(user.avatar)}" alt="" referrerpolicy="no-referrer"/>`
     : initials;
@@ -528,7 +529,7 @@ window.empUpdateNav = function(user) {
     <div class="emp-user-menu" id="empUserMenu">
       <button class="emp-user-btn" onclick="empToggleUserMenu()">
         <div class="emp-user-avatar">${avatarContent}</div>
-        <span class="emp-user-name">${esc(user.name.split(' ')[0])}</span>
+        <span class="emp-user-name">${esc(displayName.split(' ')[0])}</span>
         <span class="emp-user-chevron">▾</span>
       </button>
       <div class="emp-user-dropdown" id="empUserDropdown">

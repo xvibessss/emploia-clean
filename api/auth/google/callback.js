@@ -100,8 +100,10 @@ export default async function handler(req) {
       if (!user.googleId) {
         updates.googleId = googleUser.id;
         updates.avatar = googleUser.picture || user.avatar;
+        await kvSet(`user:${email}`, { ...user, ...updates });
+      } else {
+        kvSet(`user:${email}`, { ...user, ...updates }).catch(() => {});
       }
-      kvSet(`user:${email}`, { ...user, ...updates }).catch(() => {});
     }
 
     const token = await signToken(user.id);
