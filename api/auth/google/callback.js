@@ -95,10 +95,13 @@ export default async function handler(req) {
           }),
         }).catch(() => {});
       }
-    } else if (!user.googleId) {
-      user.googleId = googleUser.id;
-      user.avatar = googleUser.picture || user.avatar;
-      await kvSet(`user:${email}`, user);
+    } else {
+      const updates = { lastLoginAt: new Date().toISOString() };
+      if (!user.googleId) {
+        updates.googleId = googleUser.id;
+        updates.avatar = googleUser.picture || user.avatar;
+      }
+      kvSet(`user:${email}`, { ...user, ...updates }).catch(() => {});
     }
 
     const token = await signToken(user.id);

@@ -1,6 +1,6 @@
 export const config = { runtime: 'edge' };
 import {
-  kvGet, signToken, setCookieHeader, checkRateLimit,
+  kvGet, kvSet, signToken, setCookieHeader, checkRateLimit,
   verifyPassword, getAllowedOrigin, validateEmail, sanitizeString, COOKIE_NAME
 } from "../_lib/auth.js";
 
@@ -61,6 +61,9 @@ export default async function handler(req) {
   if (!valid) {
     return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
   }
+
+  const lastLoginAt = new Date().toISOString();
+  kvSet(`user:${email}`, { ...user, lastLoginAt }).catch(() => {});
 
   const token = await signToken(user.id);
   const safeUser = {

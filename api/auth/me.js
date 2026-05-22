@@ -45,6 +45,8 @@ export default async function handler(req) {
     stripeCustomerId: user.stripeCustomerId || null,
     cancelAtPeriodEnd: user.cancelAtPeriodEnd || false,
     cancelAt: user.cancelAt || null,
+    planActivatedAt: user.planActivatedAt || null,
+    lastLoginAt: user.lastLoginAt || null,
     referral,
   };
 
