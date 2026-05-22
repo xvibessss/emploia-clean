@@ -504,6 +504,7 @@ async function generateRelance() {
     const d = await res.json();
     if (!res.ok) {
       if (res.status === 401) return empRedirectToAuth();
+      if (res.status === 402) return empShowUpgrade();
       return empToast(d.error || 'Erreur', 'error');
     }
     document.getElementById('rel-placeholder').style.display = 'none';
@@ -554,6 +555,7 @@ async function generateOutreach() {
     const d = await res.json();
     if (!res.ok) {
       if (res.status === 401) return empRedirectToAuth();
+      if (res.status === 402) return empShowUpgrade();
       return empToast(d.error || 'Erreur', 'error');
     }
     document.getElementById('out-placeholder').style.display = 'none';
