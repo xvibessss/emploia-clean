@@ -76,7 +76,7 @@ export default async function handler(req) {
       kvGet(`alerts:${email}`),
       kvGet(`user:${email}`),
     ]);
-    if (optedOut || !user || !alerts?.length) continue;
+    if (optedOut || !user || !Array.isArray(alerts) || !alerts.length) continue;
 
     const activeAlerts = alerts.filter(a => a.active);
     if (!activeAlerts.length) continue;
