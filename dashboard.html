@@ -2065,7 +2065,11 @@
           tone: 'professional',
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        if (res.status === 401) { closeRelanceModal(); empShowAuth?.('login'); return; }
+        if (res.status === 402) { closeRelanceModal(); empShowUpgrade?.(); return; }
+        throw new Error();
+      }
       relanceData = await res.json();
       document.getElementById('relanceSubjectBox').style.display = 'block';
       document.getElementById('relanceSubjectText').textContent = relanceData.subject || '';

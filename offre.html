@@ -504,7 +504,11 @@
           userProfile: profile,
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        if (res.status === 401) { empShowAuth('login'); btn.disabled = false; btn.textContent = '✨ Regénérer'; return; }
+        if (res.status === 403) { empToast('Fonctionnalité réservée aux abonnés Pro', 'error'); btn.disabled = false; btn.textContent = '✨ Regénérer'; return; }
+        throw new Error();
+      }
       saData = await res.json();
       renderSAResult();
       empToast('Pack candidature généré !', 'success');
@@ -617,7 +621,11 @@
           profile,
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        if (res.status === 401) { empShowAuth('login'); btn.disabled = false; btn.textContent = '✉️ Regénérer'; return; }
+        if (res.status === 402) { empShowUpgrade?.() || empToast('Limite gratuite atteinte — passez Pro', 'error'); btn.disabled = false; btn.textContent = '✉️ Regénérer'; return; }
+        throw new Error();
+      }
       liData = await res.json();
       document.getElementById('liResult').style.display = 'block';
       setLiTab('direct', document.querySelector('#liResult .sa-tab'));
@@ -685,7 +693,10 @@
           jobDescription: (currentJob.description || '').slice(0, 2000),
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        if (res.status === 401) { empShowAuth?.('login'); document.getElementById('insightsSection').style.display = 'none'; return; }
+        throw new Error();
+      }
       const d = await res.json();
       insightsLoaded = true;
 
