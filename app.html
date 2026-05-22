@@ -709,6 +709,12 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     if (mode === 'ats' && !cvText) return empToast('Veuillez coller votre CV', 'error');
     if (mode !== 'ats' && !profile) return empToast('Veuillez décrire votre profil', 'error');
 
+    // Pre-check free limit to avoid showing loading spinner needlessly
+    if (window.empUser?.plan === 'free') {
+      const used = window.empUser.generationsUsed || 0;
+      if (used >= 5) { showUpgradeModal(); return; }
+    }
+
     document.getElementById('genBtn').disabled = true;
     showLoading();
 
@@ -873,7 +879,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
             <span class="ats-big-num" style="color:${color}">${score}%</span>
           </div>
           <div class="ats-grade" style="color:${color}">${grade}</div>
-          ${(result.bars || []).length ? `<div class="ats-bars">
+          ${Array.isArray(result.bars) && result.bars.length ? `<div class="ats-bars">
             ${result.bars.map(b => {
               const bv = Math.min(100, Math.max(0, Number(b.val) || 0));
               return `
@@ -992,6 +998,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   }
 
   function resetResult() {
+    lastResult = null;
     document.getElementById('resultArea').innerHTML = `
       <div class="result-empty">
         <div class="result-empty-emoji">✨</div>
@@ -1078,7 +1085,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         }
         if (!rawLine.trim()) y += 1;
       }
-      const label = mode === 'cv' ? 'CV' : mode === 'cover' ? 'Lettre-Motivation' : mode;
+      const label = mode === 'cv' ? 'CV' : mode === 'letter' ? 'Lettre-Motivation' : mode;
       doc.save(`Emploia-${label}-${Date.now()}.pdf`);
       empToast('PDF téléchargé !', 'success');
     } catch {
@@ -1193,7 +1200,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       }
     }
   }
-  window.addEventListener('empAuthChange', e => syncUsagePill(e.detail.user));
+  window.addEventListener('empAuthChange', e => { if (e.detail?.user) syncUsagePill(e.detail.user); });
   // Delay to let empAuthInit finish
   setTimeout(() => syncUsagePill(window.empUser), 800);
 
