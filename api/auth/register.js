@@ -176,7 +176,23 @@ export default async function handler(req) {
   }
 
   const token = await signToken(id);
-  const safeUser = { id, name, email, plan: "free" };
+  const safeUser = {
+    id,
+    name,
+    email,
+    plan: 'free',
+    generationsUsed: 0,
+    createdAt: user.createdAt,
+    avatar: null,
+    provider: 'email',
+    subscriptionId: null,
+    stripeCustomerId: null,
+    cancelAtPeriodEnd: false,
+    cancelAt: null,
+    planActivatedAt: null,
+    lastLoginAt: null,
+    referral: null,
+  };
 
   return new Response(JSON.stringify({ success: true, user: safeUser }), {
     status: 201,

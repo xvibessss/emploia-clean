@@ -778,6 +778,10 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               }
               if (parsed.done) {
                 lastResult = fullText;
+                if (window.empUser?.plan === 'free') {
+                  window.empUser.generationsUsed = (window.empUser.generationsUsed || 0) + 1;
+                  syncUsagePill(window.empUser);
+                }
                 if (window.plausible) plausible('generation_complete', { props: { type: mode } });
                 if (window.trackEvent) trackEvent(mode === 'cv' ? 'cv_generated' : mode === 'letter' ? 'letter_generated' : 'ats_checked', { mode });
                 setTimeout(showFloatingNudge, 2000);
@@ -790,6 +794,10 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       } else {
         const data = await res.json();
         const result = data.result || data;
+        if (window.empUser?.plan === 'free') {
+          window.empUser.generationsUsed = (window.empUser.generationsUsed || 0) + 1;
+          syncUsagePill(window.empUser);
+        }
         if (window.plausible) plausible('generation_complete', { props: { type: mode } });
         if (window.trackEvent) trackEvent(mode === 'cv' ? 'cv_generated' : mode === 'letter' ? 'letter_generated' : 'ats_checked', { mode });
         showResult(result);

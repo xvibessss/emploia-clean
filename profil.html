@@ -1121,7 +1121,8 @@
     try {
       const r = await fetch('/api/auth/me', { credentials: 'include' });
       if (r.ok) {
-        const u = await r.json();
+        const data = await r.json();
+        const u = data.user || data;
         showSubscriptionInfo(u);
         const gensEl = document.getElementById('statGens');
         if (gensEl) gensEl.textContent = u.generationsUsed || 0;

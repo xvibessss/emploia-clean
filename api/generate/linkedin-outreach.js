@@ -88,7 +88,7 @@ Réponds UNIQUEMENT en JSON valide :
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
     if (!result?.direct) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
-    if (user.plan === 'free') incrementGenerations(user).catch(() => {});
+    if (user.plan === 'free') await incrementGenerations(user).catch(() => {});
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });

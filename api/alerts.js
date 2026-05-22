@@ -32,7 +32,8 @@ export default async function handler(req) {
   const kvKey = `alerts:${user.email}`;
 
   if (req.method === 'GET') {
-    const alerts = await kvGet(kvKey) || [];
+    const raw = await kvGet(kvKey);
+    const alerts = Array.isArray(raw) ? raw : [];
     const maxAlerts = (user.plan === 'pro' || user.plan === 'intensif') ? 50 : 10;
     return new Response(JSON.stringify({ alerts, maxAlerts, plan: user.plan || 'free' }), { status: 200, headers: H });
   }
@@ -55,7 +56,8 @@ export default async function handler(req) {
     if (!VALID_TYPES.includes(rawType)) return new Response(JSON.stringify({ error: 'Type invalide' }), { status: 400, headers: H });
     if (!VALID_FREQUENCIES.includes(rawFrequency)) return new Response(JSON.stringify({ error: 'Fréquence invalide' }), { status: 400, headers: H });
 
-    const alerts = await kvGet(kvKey) || [];
+    const rawPost = await kvGet(kvKey);
+    const alerts = Array.isArray(rawPost) ? rawPost : [];
     const maxAlerts = (user.plan === 'pro' || user.plan === 'intensif') ? 50 : 10;
     if (alerts.length >= maxAlerts) return new Response(JSON.stringify({ error: `Maximum ${maxAlerts} alertes${maxAlerts === 10 ? ' (passez Pro pour 50 alertes)' : ''}` }), { status: 400, headers: H });
 
@@ -81,7 +83,8 @@ export default async function handler(req) {
     const id = new URL(req.url).searchParams.get('id');
     if (!id) return new Response(JSON.stringify({ error: 'id requis' }), { status: 400, headers: H });
 
-    const alerts = await kvGet(kvKey) || [];
+    const rawDel = await kvGet(kvKey);
+    const alerts = Array.isArray(rawDel) ? rawDel : [];
     const filtered = alerts.filter(a => a.id !== id);
     const ops = [kvSet(kvKey, filtered, 86400 * 365)];
     if (!filtered.some(a => a.active)) ops.push(kvSrem('alert_subscribers', user.email));

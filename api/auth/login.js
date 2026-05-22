@@ -72,6 +72,16 @@ export default async function handler(req) {
     email: user.email,
     plan: user.plan || 'free',
     generationsUsed: user.generationsUsed || 0,
+    createdAt: user.createdAt || null,
+    avatar: user.avatar || null,
+    provider: user.provider || 'email',
+    subscriptionId: user.subscriptionId || null,
+    stripeCustomerId: user.stripeCustomerId || null,
+    cancelAtPeriodEnd: user.cancelAtPeriodEnd || false,
+    cancelAt: user.cancelAt || null,
+    planActivatedAt: user.planActivatedAt || null,
+    lastLoginAt,
+    referral: null,
   };
 
   return new Response(JSON.stringify({ success: true, user: safeUser }), {
