@@ -1599,6 +1599,8 @@
       const res  = await fetch(endpoints[curGenTab], { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 
       if (!res.ok) {
+        if (res.status === 401) { empShowAuth('login'); btn.disabled = false; btn.textContent = '✨ Générer avec l\'IA'; return; }
+        if (res.status === 402) { window.location.href = '/app'; return; }
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error || 'Erreur');
       }

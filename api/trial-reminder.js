@@ -10,7 +10,7 @@ const BATCH_SIZE = 100;
 // ── Email helpers ──────────────────────────────────────────────────────────────
 
 function unsubscribeLink(email) {
-  return `${BASE_URL}/api/newsletter?action=unsubscribe&email=${encodeURIComponent(email)}`;
+  return `${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}`;
 }
 
 function emailWrapper({ firstName, subject, headerGradient = 'linear-gradient(135deg,#6366f1,#3b82f6)', body, email }) {
