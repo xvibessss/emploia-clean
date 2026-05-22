@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, getGenerationsUsed, incrementGenerations, FREE_LIMIT } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, incrementGenerations, FREE_LIMIT } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -40,9 +40,10 @@ export default async function handler(req) {
   if (!company && !jobTitle) return new Response(JSON.stringify({ error: 'Entreprise ou poste requis' }), { status: 400, headers: H });
 
   if (user.plan === 'free') {
-    const freshCount = await getGenerationsUsed(user.email);
-    const used = freshCount !== null ? freshCount : user.generationsUsed;
-    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
+    const newCount = await incrementGenerations(user);
+    if (newCount !== null && newCount > FREE_LIMIT) {
+      return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
+    }
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -91,7 +92,6 @@ Réponds UNIQUEMENT en JSON valide :
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
     if (!result?.short) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
-    if (user.plan === 'free') await incrementGenerations(user).catch(() => {});
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });

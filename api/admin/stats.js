@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvGet, kvSmembers, kvMget, kvZcard, kvScard, kvLlen } from '../_lib/auth.js';
+import { kvGet, kvSmembers, kvMget, kvZcard, kvScard } from '../_lib/auth.js';
 
 const PRO_PRICE = 9;
 const INTENSIF_PRICE = 19;
@@ -36,8 +36,8 @@ export default async function handler(req, res) {
 
     const npsEntries = await kvZcard('nps:scores');
     const alertSubscribers = await kvScard('alert_subscribers');
-    let newsletterSubscribers = await kvScard('newsletter_subscribers');
-    if (newsletterSubscribers === 0) newsletterSubscribers = await kvLlen('newsletter_subscribers');
+    const newsletterRaw = await kvGet('newsletter_subscribers');
+    const newsletterSubscribers = Array.isArray(newsletterRaw) ? newsletterRaw.length : 0;
 
     const SAMPLE_MAX = 200;
     const sample = allUsers.slice(0, SAMPLE_MAX);

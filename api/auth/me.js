@@ -69,6 +69,7 @@ export default async function handler(req) {
           headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: [user.email], subject, html }),
         });
+        if (!fullUser) return;
         await kvSet(`user:${user.email}`, { ...fullUser, [key]: true });
       } catch { /* fire-and-forget */ }
     };

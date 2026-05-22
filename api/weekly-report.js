@@ -22,7 +22,8 @@ export default async function handler(req) {
   const rl = await checkRateLimit(`user:${user.email}`, 'weekly-report', 5, 3600);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
-  const apps = await kvGet(`apps:${user.email}`) || [];
+  const rawApps = await kvGet(`apps:${user.email}`);
+  const apps = Array.isArray(rawApps) ? rawApps : [];
 
   const now = Date.now();
   const oneWeek = 7 * 86400000;

@@ -151,13 +151,12 @@
 
 <nav class="emp-nav" id="empNav">
   <a href="/" class="emp-logo">Emploia<span class="emp-logo-dot">.</span></a>
-  <div class="nav-links">
-    <a href="/jobs">Offres</a>
-    <a href="/dashboard">Dashboard</a>
-    <a href="/alerts">Alertes</a>
-    <a href="/app" class="nav-cta">Outils IA</a>
+  <div class="emp-nav-links">
+    <a href="/jobs" class="emp-nav-a">Offres</a>
+    <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+    <a href="/alerts" class="emp-nav-a">Alertes</a>
+    <a href="/app" class="emp-nav-cta">Outils IA</a>
   </div>
-  <div class="nav-auth" id="navAuth"></div>
 </nav>
 
 <div class="queue-page">
@@ -326,7 +325,7 @@
           userProfile: profile,
         }),
       });
-      if (res.status === 401) { window.location.href = '/app'; return; }
+      if (res.status === 401) { empShowAuth('login'); return; }
       if (!res.ok) { const e = new Error('API error'); e.status = res.status; throw e; }
       const data = await res.json();
       job.letter = data.coverLetter || '';

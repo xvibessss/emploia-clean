@@ -1014,7 +1014,7 @@
   }
 
   function collectProfile() {
-    const skills = [...document.querySelectorAll('.skill-tag')].map(t => t.firstChild.textContent.trim()).filter(Boolean);
+    const skills = [...document.querySelectorAll('.skill-tag')].map(t => (t.querySelector('.skill-name') || t.childNodes[1])?.textContent.trim()).filter(Boolean);
     return {
       firstName: document.getElementById('prfFirstName')?.value.trim() || '',
       lastName:  document.getElementById('prfLastName')?.value.trim() || '',

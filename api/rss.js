@@ -1,4 +1,5 @@
 export default function handler(req, res) {
+  if (req.method !== 'GET') { res.status(405).end(); return; }
   const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
 
   const articles = [

@@ -474,7 +474,7 @@
         <button onclick="empShowAuth('login')" class="btn btn-ghost btn-sm">Se connecter</button>
       </div>
     </div>`;
-    window.addEventListener('empAuthChange', e => { if (e.detail.user) loadAlerts(); }, { once: true });
+    window.addEventListener('empAuthChange', e => { if (e.detail?.user) loadAlerts(); }, { once: true });
   }
 
   // ── PUSH NOTIFICATIONS ────────────────────────────────────────────────────

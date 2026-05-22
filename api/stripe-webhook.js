@@ -115,6 +115,7 @@ export default async function handler(req) {
         const email = invoice.customer_email?.toLowerCase() || await kvGet(`stripe:${customerId}`);
         if (email && resendKey) {
           const user = await kvGet(`user:${email}`);
+          if (!user) break;
           await kvSet(`user:${email}`, { ...user, subscriptionStatus: 'past_due' });
           const firstName = htmlEscape((user?.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
           const attemptCount = invoice.attempt_count || 1;

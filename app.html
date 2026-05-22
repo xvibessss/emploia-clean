@@ -1047,8 +1047,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   function copyResult() {
     if (!lastResult) return;
     const txt = typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult, null, 2);
-    navigator.clipboard.writeText(txt);
-    empToast('Copié dans le presse-papier !', 'success');
+    navigator.clipboard.writeText(txt).then(() => empToast('Copié dans le presse-papier !', 'success')).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
 
   async function downloadResult() {

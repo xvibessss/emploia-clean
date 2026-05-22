@@ -387,6 +387,26 @@ window.empShowAuth = function(tab) {
   empOpenModal('empAuthModal');
 };
 
+window.empShowUpgrade = function() {
+  const existing = document.getElementById('empUpgradeModal');
+  if (existing) { empOpenModal('empUpgradeModal'); return; }
+  const m = document.createElement('div');
+  m.id = 'empUpgradeModal';
+  m.className = 'emp-modal-backdrop';
+  m.innerHTML = `
+    <div class="emp-auth-modal" style="text-align:center;max-width:400px">
+      <button class="emp-modal-close" onclick="empCloseModal('empUpgradeModal')" aria-label="Fermer">✕</button>
+      <div style="font-size:36px;margin-bottom:8px">🚀</div>
+      <h2 style="font-size:20px;font-weight:800;margin:0 0 8px">Limite gratuite atteinte</h2>
+      <p style="color:var(--t2);font-size:14px;line-height:1.6;margin:0 0 20px">Vous avez utilisé vos 5 générations gratuites. Passez Pro pour des générations illimitées.</p>
+      <a href="/#pricing" onclick="empCloseModal('empUpgradeModal')" style="display:block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 24px;border-radius:12px;text-decoration:none;margin-bottom:10px">Voir les offres Pro →</a>
+      <button onclick="empCloseModal('empUpgradeModal')" style="background:none;border:none;color:var(--t3);font-size:13px;cursor:pointer">Plus tard</button>
+    </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m) empCloseModal('empUpgradeModal'); });
+  empOpenModal('empUpgradeModal');
+};
+
 window.empShowMain = function() {
   document.getElementById('empAuthMain').style.display = '';
   document.getElementById('empAuthForgot').style.display = 'none';

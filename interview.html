@@ -624,7 +624,7 @@
     <div class="iv-input-area">
       <div class="iv-input-wrap">
         <button class="iv-mic-btn" id="micBtn" onclick="toggleMic()" title="Micro">🎤</button>
-        <textarea class="iv-textarea" id="ivInput" placeholder="Tapez votre réponse... (Maj+Entrée pour saut de ligne)" rows="1" oninput="autoResize(this);countWords()"></textarea>
+        <textarea class="iv-textarea" id="ivInput" placeholder="Tapez votre réponse... (Maj+Entrée pour saut de ligne)" rows="1" oninput="autoResize(this)"></textarea>
         <button id="ivSendBtn" onclick="sendMsg()" title="Envoyer">↑</button>
       </div>
       <div class="iv-input-hint">Entrée pour envoyer · Maj+Entrée pour saut de ligne · 🎤 pour parler</div>
@@ -710,7 +710,6 @@
     document.getElementById('ivSendBtn').disabled = !t.value.trim() || isStreaming;
   }
 
-  function countWords() {}
 
   function pushMsg(role, text) {
     const ts = Date.now();

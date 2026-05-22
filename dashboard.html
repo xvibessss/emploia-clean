@@ -1685,9 +1685,8 @@
     const val = document.getElementById('refLinkInput').value;
     navigator.clipboard.writeText(val).then(() => {
       const btn = document.querySelector('.referral-copy-btn');
-      btn.textContent = '✓ Copié !';
-      setTimeout(() => { btn.textContent = '🔗 Copier'; }, 2000);
-    });
+      if (btn) { btn.textContent = '✓ Copié !'; setTimeout(() => { btn.textContent = '🔗 Copier'; }, 2000); }
+    }).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
 
   // ── SAVED JOBS ─────────────────────────────────────────────────────────────
@@ -1956,7 +1955,7 @@
     document.getElementById('jobsForYouSection').style.display = 'block';
 
     try {
-      const res = await fetch(`/api/jobs?q=${encodeURIComponent(query)}&page=0`);
+      const res = await fetch(`/api/jobs?q=${encodeURIComponent(query)}&page=0`, { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       const jobs = (data.jobs || []).slice(0, 4);
@@ -1977,20 +1976,6 @@
       }).join('');
     } catch {}
   }
-
-  // ── KANBAN CARD + interview date highlight ──────────────────────────────────
-  // Patch renderCard to show interview date if present
-  const _origRenderCard = renderCard;
-  window.renderCard = function(app) {
-    const html = _origRenderCard(app);
-    if (!app.interviewDate) return html;
-    const d = new Date(app.interviewDate);
-    const now = new Date();
-    const diff = Math.ceil((d - now) / 86400000);
-    const label = diff === 0 ? 'Entretien aujourd\'hui !' : diff === 1 ? 'Entretien demain' : diff > 0 ? `Entretien dans ${diff}j` : null;
-    if (!label) return html;
-    return html.replace('</div>', `<div style="font-size:10px;color:var(--ylb);font-weight:700;margin-top:4px">🗓 ${label}</div></div>`);
-  };
 
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();

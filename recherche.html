@@ -267,7 +267,7 @@
       if (loc) params.set('location', loc);
       if (activeType) params.set('type', activeType);
 
-      const r = await fetch(`/api/jobs-search?${params}`);
+      const r = await fetch(`/api/jobs-search?${params}`, { credentials: 'include' });
       const data = await r.json();
       const jobs = data.jobs || data.results || [];
 

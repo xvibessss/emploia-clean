@@ -1212,7 +1212,7 @@
       const remoteEl = document.getElementById('rem1');
       if (remoteEl?.checked || document.getElementById('remoteToggle')?.dataset.remote === '1') params.set('remote', 'true');
 
-      const res = await fetch(`/api/jobs?${params}`);
+      const res = await fetch(`/api/jobs?${params}`, { credentials: 'include' });
       const data = await res.json();
       const isDemo = data.demo !== false;
 
@@ -1428,7 +1428,7 @@
 
   function openApplyDrawer(jobId) {
     const job = allJobs.find(j => String(j.id) === String(jobId));
-    if (!job) { window.open(job?.url || '#', '_blank'); return; }
+    if (!job) return;
     currentDrawerJob = job;
     applyData = null;
     copilotContextAdded = false;

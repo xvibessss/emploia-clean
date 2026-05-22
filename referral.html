@@ -335,9 +335,7 @@
 
   function copyLink() {
     const val = document.getElementById('refLink').value;
-    navigator.clipboard.writeText(val).then(() => {
-      empToast('Lien copié !', 'success');
-    });
+    navigator.clipboard.writeText(val).then(() => empToast('Lien copié !', 'success')).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
 
   // Check URL ref param (when landing via a referral link)

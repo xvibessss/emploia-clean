@@ -680,11 +680,7 @@ async function generateDebrief() {
 }
 
 function empRedirectToAuth() {
-  empToast('Connectez-vous pour utiliser cet outil', 'error');
-  setTimeout(() => window.location.href = '/?login=1', 1200);
-}
-function empShowUpgrade() {
-  empToast('Limite gratuite atteinte — <a href="/#pricing" style="color:inherit;text-decoration:underline;font-weight:700">Passer Pro →</a>', 'error');
+  empShowAuth('login');
 }
 
 // Check auth + show Pro gates

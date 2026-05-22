@@ -45,7 +45,8 @@ export default async function handler(req) {
     const sanitizedSub = { endpoint: sub.endpoint.slice(0, 500), keys: { auth: authKey, p256dh: p256dhKey }, createdAt: Date.now() };
 
     const key = `push:${user.email}`;
-    const existing = await kvGet(key) || [];
+    const rawPost = await kvGet(key);
+    const existing = Array.isArray(rawPost) ? rawPost : [];
     const filtered = existing.filter(s => s.endpoint !== sanitizedSub.endpoint);
     filtered.push(sanitizedSub);
     await kvSet(key, filtered.slice(-5));
@@ -60,7 +61,8 @@ export default async function handler(req) {
     try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
     const endpoint = typeof body.endpoint === 'string' ? body.endpoint : '';
     const key = `push:${user.email}`;
-    const existing = await kvGet(key) || [];
+    const rawDel = await kvGet(key);
+    const existing = Array.isArray(rawDel) ? rawDel : [];
     await kvSet(key, existing.filter(s => s.endpoint !== endpoint));
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: H });
   }

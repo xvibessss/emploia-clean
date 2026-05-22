@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, incrementGenerations, getGenerationsUsed, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, htmlEscape } from "../_lib/auth.js";
+import { getCurrentUser, incrementGenerations, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -36,10 +36,12 @@ export default async function handler(req) {
   };
   const profileHint = profileHints[body.profileType] || '';
 
+  let freeNewCount = null;
   if (user.plan === "free") {
-    const freshCount = await getGenerationsUsed(user.email);
-    const used = freshCount !== null ? freshCount : user.generationsUsed;
-    if (used >= FREE_LIMIT) return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H_JSON });
+    freeNewCount = await incrementGenerations(user);
+    if (freeNewCount !== null && freeNewCount > FREE_LIMIT) {
+      return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H_JSON });
+    }
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -102,13 +104,12 @@ export default async function handler(req) {
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`));
               }
               if (parsed.type === 'message_stop') {
-                const newCount = user.plan === 'free' ? await incrementGenerations(user) : null;
                 // Track event (fire and forget)
                 const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
                 fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'cv_generated', props: { plan: user.plan } }) }).catch(() => {});
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                 // Send upgrade nudge when free user reaches their last generation
-                if (user.plan === 'free' && newCount === FREE_LIMIT) {
+                if (user.plan === 'free' && freeNewCount === FREE_LIMIT) {
                   const resendKey = process.env.RESEND_API_KEY;
                   if (resendKey) {
                     const firstNameRaw = (user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '';
