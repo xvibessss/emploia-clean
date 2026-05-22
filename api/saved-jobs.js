@@ -31,7 +31,8 @@ export default async function handler(req) {
   const jobId = url.searchParams.get('id');
 
   if (req.method === 'GET') {
-    const saved = await kvGet(key) || [];
+    const raw = await kvGet(key);
+    const saved = Array.isArray(raw) ? raw : [];
     return new Response(JSON.stringify({ saved, total: saved.length }), { status: 200, headers });
   }
 
@@ -40,7 +41,8 @@ export default async function handler(req) {
     try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
     if (!body.id || !body.title) return new Response(JSON.stringify({ error: 'id et title requis' }), { status: 400, headers });
 
-    const saved = await kvGet(key) || [];
+    const raw = await kvGet(key);
+    const saved = Array.isArray(raw) ? raw : [];
     if (saved.find(j => j.id === body.id)) {
       return new Response(JSON.stringify({ saved, already: true }), { status: 200, headers });
     }
@@ -64,7 +66,8 @@ export default async function handler(req) {
 
   if (req.method === 'DELETE') {
     if (!jobId) return new Response(JSON.stringify({ error: 'id requis' }), { status: 400, headers });
-    const saved = (await kvGet(key) || []).filter(j => j.id !== jobId);
+    const rawDel = await kvGet(key);
+    const saved = (Array.isArray(rawDel) ? rawDel : []).filter(j => j.id !== jobId);
     await kvSet(key, saved);
     return new Response(JSON.stringify({ saved, removed: true }), { status: 200, headers });
   }

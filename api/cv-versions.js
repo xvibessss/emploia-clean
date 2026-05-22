@@ -37,7 +37,8 @@ export default async function handler(req) {
   const id = url.searchParams.get('id');
 
   if (req.method === 'GET') {
-    const versions = await kvGet(kvKey) || [];
+    const rawGet = await kvGet(kvKey);
+    const versions = Array.isArray(rawGet) ? rawGet : [];
     return new Response(JSON.stringify({ versions, maxVersions, plan: user.plan || 'free' }), { status: 200, headers: H });
   }
 
@@ -53,7 +54,8 @@ export default async function handler(req) {
 
     if (!content) return new Response(JSON.stringify({ error: 'Contenu requis' }), { status: 400, headers: H });
 
-    const versions = await kvGet(kvKey) || [];
+    const rawPost = await kvGet(kvKey);
+    const versions = Array.isArray(rawPost) ? rawPost : [];
     if (versions.length >= maxVersions) {
       return new Response(JSON.stringify({
         error: `Maximum ${maxVersions} version${maxVersions > 1 ? 's' : ''}${!isPro ? ' (passez Pro pour 20 versions)' : ''}`,
@@ -81,7 +83,8 @@ export default async function handler(req) {
     let body;
     try { body = JSON.parse(patchText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
-    const versions = await kvGet(kvKey) || [];
+    const rawPatch = await kvGet(kvKey);
+    const versions = Array.isArray(rawPatch) ? rawPatch : [];
     const idx = versions.findIndex(v => v.id === id);
     if (idx === -1) return new Response(JSON.stringify({ error: 'Version introuvable' }), { status: 404, headers: H });
 
@@ -98,7 +101,8 @@ export default async function handler(req) {
 
   if (req.method === 'DELETE') {
     if (!id) return new Response(JSON.stringify({ error: 'id requis' }), { status: 400, headers: H });
-    const versions = await kvGet(kvKey) || [];
+    const rawDel = await kvGet(kvKey);
+    const versions = Array.isArray(rawDel) ? rawDel : [];
     const filtered = versions.filter(v => v.id !== id);
     if (filtered.length === versions.length) return new Response(JSON.stringify({ error: 'Version introuvable' }), { status: 404, headers: H });
     await kvSet(kvKey, filtered, 86400 * 365);

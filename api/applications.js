@@ -33,7 +33,8 @@ export default async function handler(req) {
   const id = parsedUrl.searchParams.get('id');
 
   if (req.method === 'GET') {
-    const apps = await kvGet(key) || [];
+    const rawGet = await kvGet(key);
+    const apps = Array.isArray(rawGet) ? rawGet : [];
     const statsOnly = parsedUrl.searchParams.get('stats') === '1';
     if (statsOnly) {
       const now = Date.now();
@@ -62,7 +63,8 @@ export default async function handler(req) {
     try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
     const rawUrl = String(body.url || '').slice(0, 500);
-    const apps = await kvGet(key) || [];
+    const rawPost = await kvGet(key);
+    const apps = Array.isArray(rawPost) ? rawPost : [];
     const app = {
       id: crypto.randomUUID(),
       jobTitle: String(body.jobTitle || '').slice(0, 200),
@@ -87,7 +89,8 @@ export default async function handler(req) {
     let body;
     try { body = JSON.parse(await req.text()); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
-    const apps = await kvGet(key) || [];
+    const rawPatch = await kvGet(key);
+    const apps = Array.isArray(rawPatch) ? rawPatch : [];
     const idx = apps.findIndex(a => a.id === id);
     if (idx === -1) return new Response(JSON.stringify({ error: 'Introuvable' }), { status: 404, headers: H });
 
@@ -108,7 +111,8 @@ export default async function handler(req) {
 
   if (req.method === 'DELETE') {
     if (!id) return new Response(JSON.stringify({ error: 'id requis' }), { status: 400, headers: H });
-    const apps = await kvGet(key) || [];
+    const rawDel = await kvGet(key);
+    const apps = Array.isArray(rawDel) ? rawDel : [];
     await kvSet(key, apps.filter(a => a.id !== id));
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: H });
   }

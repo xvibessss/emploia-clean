@@ -441,7 +441,7 @@ window.empSubmitLogin = async function(e) {
     empCloseModal('empAuthModal');
     window.empUser = data.user;
     empUpdateNav(data.user);
-    empToast('Bienvenue ' + data.user.name.split(' ')[0] + ' !', 'success');
+    empToast('Bienvenue ' + ((data.user.name || data.user.email || '').split(' ')[0] || 'vous') + ' !', 'success');
     window.dispatchEvent(new CustomEvent('empAuthChange', { detail: { user: data.user } }));
   } catch (err) {
     errEl.textContent = err.message; errEl.style.display = 'block';
