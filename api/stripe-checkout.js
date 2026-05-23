@@ -42,8 +42,10 @@ export default async function handler(req) {
     }), { status: 200, headers });
   }
 
+  const bodyText = await req.text();
+  if (bodyText.length > 2000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers });
   let body;
-  try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
+  try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
 
   const { plan } = body;
   if (!plan || !(plan in PRICE_IDS)) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
