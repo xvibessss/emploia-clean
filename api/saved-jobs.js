@@ -37,8 +37,10 @@ export default async function handler(req) {
   }
 
   if (req.method === 'POST') {
+    const bodyText = await req.text();
+    if (bodyText.length > 4000) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers });
     let body;
-    try { body = await req.json(); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
+    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
     if (!body.id || !body.title) return new Response(JSON.stringify({ error: 'id et title requis' }), { status: 400, headers });
 
     const raw = await kvGet(key);
