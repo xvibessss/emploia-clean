@@ -1,4 +1,3 @@
-export const config = { runtime: 'edge' };
 import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 
 const H = {
