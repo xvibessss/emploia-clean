@@ -195,11 +195,20 @@ export async function getCurrentUser(req) {
   if (!email) return null;
   const user = await kvGet(`user:${email}`);
   if (!user) return null;
+  // Reject tokens issued before a password change (session invalidation)
+  if (user.passwordChangedAt && payload.iat) {
+    const changedAtSec = Math.floor(new Date(user.passwordChangedAt).getTime() / 1000);
+    if (payload.iat < changedAtSec) return null;
+  }
   // Merge the atomic counter (source of truth) into the user object.
   // Falls back to user.generationsUsed for legacy accounts with no gen: key.
   const atomicCount = await kvGet(`gen:${email}`);
   if (typeof atomicCount === 'number') user.generationsUsed = atomicCount;
   return user;
+}
+
+export async function kvDecr(key) {
+  return upstash(['DECR', key]);
 }
 
 export async function incrementGenerations(user) {
@@ -216,6 +225,19 @@ export async function incrementGenerations(user) {
 export async function getGenerationsUsed(email) {
   const count = await kvGet(`gen:${email}`);
   return typeof count === 'number' ? count : null;
+}
+
+// Atomic pre-increment to prevent concurrent requests from bypassing the
+// free tier limit. Increments BEFORE the API call; refunds if over limit.
+// Returns { allowed: true, count } or { allowed: false, count: FREE_LIMIT }.
+export async function claimFreeGeneration(user) {
+  if (user.plan !== 'free') return { allowed: true, count: null };
+  const { result: newCount } = await kvIncr(`gen:${user.email}`);
+  if (typeof newCount !== 'number' || newCount > FREE_LIMIT) {
+    await kvDecr(`gen:${user.email}`);
+    return { allowed: false, count: FREE_LIMIT };
+  }
+  return { allowed: true, count: newCount };
 }
 
 // ── INPUT VALIDATION ────────────────────────────────────────────────────────

@@ -36,6 +36,15 @@ export default async function handler(req) {
   if (!/^[A-Za-z0-9+/=\r\n]+$/.test(body.pdfBase64)) {
     return new Response(JSON.stringify({ error: 'Format PDF invalide' }), { status: 400, headers: H });
   }
+  // Verify PDF magic bytes (%PDF) to prevent non-PDF payloads
+  try {
+    const header = atob(body.pdfBase64.replace(/[\r\n]/g, '').slice(0, 8));
+    if (!header.startsWith('%PDF')) {
+      return new Response(JSON.stringify({ error: 'Le fichier doit être un PDF' }), { status: 400, headers: H });
+    }
+  } catch {
+    return new Response(JSON.stringify({ error: 'Format PDF invalide' }), { status: 400, headers: H });
+  }
 
   try {
     const res = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {

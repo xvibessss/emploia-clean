@@ -3,8 +3,8 @@ import { checkRateLimit, getAllowedOrigin, validateEmail, getCurrentUser } from 
 
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
 const PRICE_IDS = {
-  pro:             process.env.STRIPE_PRICE_PRO             || 'price_pro_monthly',
-  intensif:        process.env.STRIPE_PRICE_INTENSIF        || 'price_intensif_monthly',
+  pro:             process.env.STRIPE_PRICE_PRO             || null,
+  intensif:        process.env.STRIPE_PRICE_INTENSIF        || null,
   pro_annual:      process.env.STRIPE_PRICE_PRO_ANNUAL      || null,
   intensif_annual: process.env.STRIPE_PRICE_INTENSIF_ANNUAL || null,
 };
@@ -34,12 +34,7 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 1 heure.' }), { status: 429, headers: { ...headers, 'Retry-After': '3600' } });
 
   if (!STRIPE_SECRET) {
-    // Demo mode — return a mock checkout URL
-    return new Response(JSON.stringify({
-      url: 'https://emploia.fr/app?plan=demo',
-      demo: true,
-      message: 'Stripe non configuré — contactez contact@emploia.fr pour souscrire'
-    }), { status: 200, headers });
+    return new Response(JSON.stringify({ error: 'Paiement temporairement indisponible' }), { status: 503, headers });
   }
 
   const bodyText = await req.text();

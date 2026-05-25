@@ -28,6 +28,9 @@ export default async function handler(req) {
   const email = (body.email || '').toLowerCase().trim();
   if (!email || !validateEmail(email)) return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers: H });
 
+  // Minimum response time (200ms) to prevent timing-based email enumeration
+  const minDelay = new Promise(resolve => setTimeout(resolve, 200));
+
   // Always return success — never reveal if email exists
   const user = await kvGet(`user:${email}`);
   const resendKey = process.env.RESEND_API_KEY;
@@ -39,7 +42,8 @@ export default async function handler(req) {
     const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
-    await fetch('https://api.resend.com/emails', {
+    // Fire-and-forget: don't await email send to prevent timing oracle
+    fetch('https://api.resend.com/emails', {
       method: 'POST',
       signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -64,8 +68,9 @@ export default async function handler(req) {
 </div>
 </body></html>`,
       }),
-    });
+    }).catch(() => {});
   }
 
+  await minDelay;
   return new Response(JSON.stringify({ success: true }), { status: 200, headers: H });
 }

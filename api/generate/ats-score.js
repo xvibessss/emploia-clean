@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, incrementGenerations, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout, htmlEscape } from "../_lib/auth.js";
+import { getCurrentUser, claimFreeGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -29,13 +29,8 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: "CV et offre requis" }), { status: 400, headers: H });
   }
 
-  let freeNewCount = null;
-  if (user.plan === "free") {
-    freeNewCount = await incrementGenerations(user);
-    if (freeNewCount !== null && freeNewCount > FREE_LIMIT) {
-      return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
-    }
-  }
+  const gen = await claimFreeGeneration(user);
+  if (!gen.allowed) return new Response(JSON.stringify({ error: "Limite gratuite atteinte" }), { status: 402, headers: H });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: "Service temporairement indisponible" }), { status: 500, headers: H });
@@ -111,7 +106,7 @@ Règles : score entre 40 et 97. Tous les champs en texte simple sans HTML. Sois 
 
     if (result?.score == null) return new Response(JSON.stringify({ error: "Réponse invalide" }), { status: 500, headers: H });
 
-    if (user.plan === 'free' && freeNewCount === FREE_LIMIT) {
+    if (gen.count === FREE_LIMIT) {
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {
         const firstNameRaw = (user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '';

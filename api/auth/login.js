@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import {
   kvGet, kvSet, signToken, setCookieHeader, checkRateLimit,
-  verifyPassword, getAllowedOrigin, validateEmail, sanitizeString, COOKIE_NAME
+  verifyPassword, hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, COOKIE_NAME
 } from "../_lib/auth.js";
 
 export default async function handler(req) {
@@ -43,8 +43,9 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: "Mot de passe requis" }), { status: 400, headers: H });
 
   const user = await kvGet(`user:${email}`);
-  // Use same error message for missing user and wrong password to prevent user enumeration
   if (!user) {
+    // Run dummy hash to prevent timing-based email enumeration (PBKDF2 ≈ 100ms)
+    await hashPassword(password, 'dummy-anti-timing-salt-do-not-use');
     return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
   }
 
@@ -60,6 +61,16 @@ export default async function handler(req) {
   const valid = await verifyPassword(password, user.passwordHash, user.passwordSalt);
   if (!valid) {
     return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
+  }
+
+  // Upgrade legacy HMAC hashes (no passwordSalt) to PBKDF2 on successful login
+  if (!user.passwordSalt) {
+    try {
+      const newSalt = await generateSalt();
+      const newHash = await hashPassword(password, newSalt);
+      const fullUser = await kvGet(`user:${email}`);
+      if (fullUser) await kvSet(`user:${email}`, { ...fullUser, passwordHash: newHash, passwordSalt: newSalt });
+    } catch {} // non-blocking
   }
 
   const lastLoginAt = new Date().toISOString();

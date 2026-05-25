@@ -91,11 +91,11 @@ export default async function handler(req) {
   const trackBase = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
   fetch(`${trackBase}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'user_registered' }) }).catch(() => {});
 
-  // Store the user's own referral code in KV immediately so friends can use it right away
+  // Generate a cryptographically random referral code (not derived from userId)
   const refCharsMap = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const refSeedMap = id.slice(-8);
-  let ownRefCode = '';
-  for (let i = 0; i < 8; i++) ownRefCode += refCharsMap[(refSeedMap.charCodeAt(i % refSeedMap.length) + i * 7) % refCharsMap.length];
+  const refBytes = new Uint8Array(8);
+  crypto.getRandomValues(refBytes);
+  const ownRefCode = Array.from(refBytes).map(b => refCharsMap[b % refCharsMap.length]).join('');
   kvSet(`ref:${ownRefCode}`, { userId: id, email, signups: [], monthsEarned: 0, createdAt: new Date().toISOString() }).catch(() => {});
   kvSet(`refcode:${id}`, ownRefCode).catch(() => {});
 
@@ -115,12 +115,8 @@ export default async function handler(req) {
   if (resendKey) {
     const firstNameRaw = name.replace(/[\r\n]/g, ' ').split(' ')[0];
     const firstName = htmlEscape(firstNameRaw);
-    const refChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const refSeed = id.slice(-8);
-    let welcomeRefCode = '';
-    for (let i = 0; i < 8; i++) {
-      welcomeRefCode += refChars[(refSeed.charCodeAt(i % refSeed.length) + i * 7) % refChars.length];
-    }
+    // Reuse the already-generated random code (stored above in ownRefCode)
+    const welcomeRefCode = ownRefCode;
     const refLink = `https://emploia.fr/?ref=${welcomeRefCode}`;
     fetch('https://api.resend.com/emails', {
       method: 'POST',

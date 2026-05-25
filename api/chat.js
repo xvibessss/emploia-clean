@@ -84,8 +84,8 @@ export default async function handler(req) {
     });
 
     if (!res.ok) {
-      const err = await res.text();
-      return new Response(JSON.stringify({ error: 'Erreur API', details: err.slice(0, 200) }), { status: 502, headers: H_JSON });
+      console.error('Chat API error:', res.status, await res.text().catch(() => ''));
+      return new Response(JSON.stringify({ error: 'Service temporairement indisponible' }), { status: 502, headers: H_JSON });
     }
 
     const { readable, writable } = new TransformStream();
@@ -126,6 +126,7 @@ export default async function handler(req) {
 
     return new Response(readable, { status: 200, headers: H_STREAM });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur réseau', details: String(err).slice(0, 200) }), { status: 500, headers: H_JSON });
+    console.error('Chat handler error:', err);
+    return new Response(JSON.stringify({ error: 'Service temporairement indisponible' }), { status: 500, headers: H_JSON });
   }
 }

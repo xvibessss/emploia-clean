@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, htmlEscape } from './_lib/auth.js';
+import { kvGet, kvSet, kvSetNX, htmlEscape } from './_lib/auth.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -51,6 +51,17 @@ export default async function handler(req) {
   let event;
   try { event = JSON.parse(body); }
   catch { return new Response('Invalid JSON', { status: 400 }); }
+
+  // Idempotency: reject duplicate events (Stripe retries webhooks on 5xx)
+  if (event.id) {
+    const isNew = await kvSetNX(`webhook:${event.id}`, '1', 86400);
+    if (!isNew) {
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
 
   const resendKey = process.env.RESEND_API_KEY;
 

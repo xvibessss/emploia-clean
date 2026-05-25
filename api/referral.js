@@ -81,7 +81,8 @@ export default async function handler(req) {
       kvGet(`user:${normalizedNewEmail}`),
     ]);
     if (!refData) return new Response(JSON.stringify({ error: 'Code introuvable' }), { status: 404, headers: H });
-    if (!newUser) return new Response(JSON.stringify({ ok: false, reason: 'user_not_found' }), { status: 200, headers: H });
+    // Don't reveal whether the email exists in the system
+    if (!newUser) return new Response(JSON.stringify({ ok: false }), { status: 200, headers: H });
 
     // Don't let the owner refer themselves
     if (refData.email === normalizedNewEmail) return new Response(JSON.stringify({ ok: false, reason: 'self' }), { status: 200, headers: H });

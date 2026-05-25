@@ -116,7 +116,7 @@ export default async function handler(req) {
     fetch('https://api.resend.com/emails', {
       method: 'POST', signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: ['chapellecorsica@gmail.com'], subject: `[Emploia RH] ${title.replace(/[\r\n]/g, ' ')} — ${company.replace(/[\r\n]/g, ' ')}`, html: adminHtml }),
+      body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: [process.env.ADMIN_EMAIL || 'contact@emploia.fr'], subject: `[Emploia RH] ${title.replace(/[\r\n]/g, ' ')} — ${company.replace(/[\r\n]/g, ' ')}`, html: adminHtml }),
     }).catch(() => {});
 
     if (contactEmail) {

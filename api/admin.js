@@ -1,11 +1,21 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSmembers } from './_lib/auth.js';
+import { kvGet, kvSmembers, checkRateLimit } from './_lib/auth.js';
 
 // Admin-only stats endpoint — requires ADMIN_SECRET header.
 // Never exposed to regular users; returns aggregate metrics.
 
 export default async function handler(req) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 });
+
+  // Rate limit: 10 req/hour per IP to prevent brute-force of ADMIN_SECRET
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'admin', 10, 3600);
+  if (!rl.allowed) {
+    return new Response(JSON.stringify({ error: 'Trop de requêtes' }), {
+      status: 429,
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' },
+    });
+  }
 
   const secret = process.env.ADMIN_SECRET;
   if (!secret || req.headers.get('x-admin-secret') !== secret) {
