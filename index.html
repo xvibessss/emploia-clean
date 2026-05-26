@@ -144,10 +144,77 @@
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media (max-width:900px){.testi-grid{grid-template-columns:1fr}}
 
+/* Hero gradient mesh overlay */
+.emp-hero-dark{position:relative;overflow:hidden}
+.emp-hero-dark::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 15% 65%,rgba(110,72,190,.32) 0%,transparent 70%),radial-gradient(ellipse 40% 45% at 82% 25%,rgba(56,189,248,.14) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 55% 85%,rgba(249,115,22,.1) 0%,transparent 70%);pointer-events:none;z-index:0;animation:meshpulse 9s ease-in-out infinite alternate}
+@keyframes meshpulse{0%{opacity:.7}100%{opacity:1}}
+.emp-hero-dark>*:not(.emp-dot):not(.emp-wire){position:relative;z-index:1}
+
+/* Live counter chip */
+.live-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-full);padding:7px 16px;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:22px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0;animation:pulsedot 2.2s ease-in-out infinite}
+@keyframes pulsedot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}60%{box-shadow:0 0 0 7px rgba(34,197,94,0)}}
+
 /* Hero trust badges */
 .hero-trust{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
 .hero-trust-chip{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.75);font-weight:500}
 .hero-trust-chip svg{opacity:.8}
+
+/* Powered by badge */
+.powered-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,.6);margin-top:14px;letter-spacing:.2px}
+.powered-badge strong{color:rgba(255,255,255,.85);font-weight:600}
+
+/* Press section */
+.press-section{padding:56px 0 0}
+.press-logos{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:28px}
+.press-logo{font-size:18px;font-weight:800;color:var(--slate);opacity:.45;letter-spacing:-.6px;font-family:Georgia,serif;transition:opacity .2s}
+.press-logo:hover{opacity:.8}
+.press-logo.sans{font-family:var(--f-ui);font-weight:700;letter-spacing:-.3px}
+.press-quote{max-width:620px;margin:36px auto 0;text-align:center;font-size:16px;color:var(--charcoal);line-height:1.6;font-style:italic}
+.press-quote cite{display:block;margin-top:10px;font-style:normal;font-size:13px;color:var(--steel);font-weight:600}
+
+/* Integrations */
+.integ-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:40px}
+.integ-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;transition:box-shadow .2s,transform .2s;cursor:default}
+.integ-card:hover{box-shadow:var(--sh-2);transform:translateY(-2px)}
+.integ-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.integ-name{font-size:12px;font-weight:600;color:var(--charcoal)}
+.integ-label{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.4px}
+@media (max-width:767px){.integ-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Versus section */
+.versus-table{margin-top:40px;border:1px solid var(--hairline);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-1)}
+.versus-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;background:var(--surface-soft);border-bottom:2px solid var(--hairline)}
+.versus-head>div{padding:16px 18px;font-size:13px;font-weight:700;color:var(--slate);text-align:center}
+.versus-head>div:first-child{text-align:left;color:var(--ink)}
+.versus-head .hl{background:var(--primary);color:#fff;border-radius:0}
+.versus-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--hairline-soft)}
+.versus-row:last-child{border-bottom:0}
+.versus-row>div{padding:13px 18px;font-size:14px;color:var(--charcoal);display:flex;align-items:center;justify-content:center;text-align:center}
+.versus-row>div:first-child{justify-content:flex-start;font-weight:500;color:var(--ink)}
+.versus-yes{color:var(--brand-green);font-size:18px;font-weight:700}
+.versus-no{color:var(--steel);font-size:18px}
+.versus-partial{color:var(--brand-orange);font-size:13px;font-weight:600}
+.versus-row:nth-child(odd){background:#FAFAFA}
+.versus-row>div.hl-col{background:rgba(110,72,190,.05)}
+@media (max-width:767px){.versus-table{overflow-x:auto}.versus-head,.versus-row{min-width:560px}}
+
+/* Newsletter */
+.newsletter-wrap{background:var(--surface-soft);border-top:1px solid var(--hairline-soft);padding:32px 0}
+.newsletter-inner{max-width:480px;margin:0 auto;text-align:center}
+.newsletter-inner h5{font-size:15px;font-weight:700;color:var(--ink);margin:0 0 6px}
+.newsletter-inner p{font-size:13px;color:var(--slate);margin:0 0 16px}
+.newsletter-form{display:flex;gap:8px}
+.newsletter-form input{flex:1;padding:10px 14px;border:1px solid var(--hairline);border-radius:8px;font-size:14px;color:var(--ink);outline:none;background:#fff;font-family:var(--f-ui)}
+.newsletter-form input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(110,72,190,.12)}
+.newsletter-form button{padding:10px 18px;border:none;background:var(--primary);color:#fff;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f-ui);transition:background .2s;white-space:nowrap}
+.newsletter-form button:hover{background:var(--primary-pressed)}
+@media (max-width:480px){.newsletter-form{flex-direction:column}}
+
+/* Security badges row */
+.sec-badges{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--hairline-soft)}
+.sec-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate);font-weight:500}
+.sec-badge svg{color:var(--brand-green);flex-shrink:0}
 
 /* Billing toggle */
 .billing-toggle{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:32px;font-size:14px;color:var(--slate)}
@@ -168,9 +235,54 @@
 .reveal[data-delay="3"]{transition-delay:.24s}
 .reveal[data-delay="4"]{transition-delay:.32s}
 
-/* Typewriter cursor */
-.tw-cursor{display:inline-block;width:2px;height:1em;background:rgba(255,255,255,.8);margin-left:2px;vertical-align:text-bottom;animation:blink .7s steps(1) infinite}
+/* Typewriter */
+.tw-word{color:var(--brand-yellow);font-style:italic}
+.tw-cursor{display:inline-block;width:2px;height:.85em;background:var(--brand-yellow);margin-left:3px;vertical-align:middle;animation:blink .7s steps(1) infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Scroll progress */
+#emp-scroll-prog{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--primary);z-index:9999;transition:width .1s linear;pointer-events:none}
+
+/* Nav scrolled state */
+.emp-nav.scrolled{box-shadow:0 1px 16px rgba(0,0,0,.09)}
+.emp-nav.scrolled #navLoginBtn{display:inline-flex!important}
+
+/* Logo marquee */
+.emp-logo-marquee{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#fff 15%,#fff 85%,transparent);mask:linear-gradient(90deg,transparent,#fff 15%,#fff 85%,transparent)}
+.emp-logo-track{display:flex;gap:48px;width:max-content;animation:marquee 28s linear infinite}
+.emp-logo-track:hover{animation-play-state:paused}
+.emp-logo-track span{font-size:15px;font-weight:600;color:var(--steel);white-space:nowrap;opacity:.7;letter-spacing:-.2px}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* How it works */
+.hiw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
+.hiw-step{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.hiw-num{width:40px;height:40px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:18px;font-weight:700;flex-shrink:0}
+.hiw-step h4{margin:0 0 6px;font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.hiw-step p{margin:0;font-size:14px;color:var(--slate);line-height:1.6}
+.hiw-connector{display:none}
+@media (min-width:768px){
+  .hiw-grid{position:relative}
+  .hiw-connector{display:block;position:absolute;top:20px;left:calc(33.33% + 8px);right:calc(33.33% + 8px);height:1px;background:repeating-linear-gradient(90deg,var(--hairline) 0,var(--hairline) 6px,transparent 6px,transparent 12px)}
+}
+@media (max-width:767px){.hiw-grid{grid-template-columns:1fr;gap:24px}}
+
+/* Sticky CTA bar */
+#stickyBar{position:fixed;bottom:0;left:0;right:0;z-index:900;background:var(--ink-deep);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:0 -4px 24px rgba(0,0,0,.18)}
+#stickyBar.visible{transform:translateY(0)}
+#stickyBar .msg{font-size:14px;font-weight:500;opacity:.9}
+#stickyBar .msg strong{color:var(--brand-yellow)}
+#stickyBar .acts{display:flex;align-items:center;gap:10px;flex-shrink:0}
+#stickyBar .close-bar{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:20px;line-height:1;padding:0 4px}
+@media (max-width:600px){#stickyBar .msg{display:none}#stickyBar{justify-content:center}}
+
+/* Stat bars animate */
+.emp-stat-item .bar i{width:0!important;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.emp-stat-item .bar i.animated{width:var(--tw)!important}
+
+/* Hero kcard entrance */
+.kcard{opacity:0;transform:translateY(10px);transition:opacity .4s ease,transform .4s ease}
+.kcard.in{opacity:1;transform:none}
 </style>
 </head>
 <body>
@@ -238,11 +350,12 @@
   </svg>
 
   <div class="emp-hero-inner">
+    <div class="live-chip"><span class="live-dot"></span><span>🟢 <strong id="liveCount">847</strong> candidats actifs en ce moment</span></div>
     <h1 class="t-hero">Le copilote qui<br/>candidate à votre place.</h1>
-    <p class="emp-hero-sub">Un CV taillé pour chaque offre, des entretiens préparés, un suivi de candidatures — en français, dans un seul espace.</p>
+    <p class="emp-hero-sub">Conçu pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — CV taillé pour chaque offre, entretiens préparés, suivi de candidatures. En français.</p>
     <div class="emp-hero-cta">
-      <a href="/app" class="emp-btn emp-btn-primary">Essayer EmploiA gratuitement</a>
-      <a href="#contact" class="emp-btn emp-btn-sec-on-dark">Demander une démo</a>
+      <a href="/app" class="emp-btn emp-btn-primary">Essayer gratuitement →</a>
+      <a href="#contact" class="emp-btn emp-btn-sec-on-dark">Voir la démo (2 min)</a>
     </div>
     <div class="hero-trust">
       <span class="hero-trust-chip">
@@ -257,6 +370,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         24 800 candidats actifs
       </span>
+    </div>
+    <div class="powered-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Propulsé par <strong>Claude AI · Anthropic</strong>
     </div>
   </div>
 
@@ -323,11 +440,71 @@
 
 <!-- ═════ LOGO WALL ═════ -->
 <section class="emp-logo-wall reveal" style="padding-top:160px">
-  <div class="container">
+  <div class="container" style="text-align:center;margin-bottom:20px">
     <div class="lbl">Approuvé par des candidats reçus chez</div>
-    <div class="row">
-      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span>
+  </div>
+  <div class="emp-logo-marquee">
+    <div class="emp-logo-track">
+      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span><span>Payfit</span><span>Mirakl</span><span>Veepee</span><span>Contentsquare</span><span>Luko</span>
+      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span><span>Payfit</span><span>Mirakl</span><span>Veepee</span><span>Contentsquare</span><span>Luko</span>
     </div>
+  </div>
+</section>
+
+<!-- ═════ COMMENT ÇA MARCHE ═════ -->
+<section class="emp-section">
+  <div class="container">
+    <div class="emp-section-head reveal">
+      <h2 class="t-h1">Décrochez un entretien<br/>en trois étapes.</h2>
+      <p>De votre premier CV à votre premier entretien — EmploiA gère le reste.</p>
+    </div>
+    <div class="hiw-grid reveal">
+      <div class="hiw-connector"></div>
+      <div class="hiw-step" data-delay="1">
+        <div class="hiw-num">1</div>
+        <div>
+          <h4>Importez votre profil</h4>
+          <p>Collez votre CV existant ou remplissez votre profil en 5 minutes. EmploiA apprend votre voix et votre parcours une seule fois.</p>
+        </div>
+      </div>
+      <div class="hiw-step" data-delay="2">
+        <div class="hiw-num">2</div>
+        <div>
+          <h4>L'IA adapte chaque candidature</h4>
+          <p>Collez une offre d'emploi — EmploiA génère un CV optimisé ATS, une lettre sur-mesure et prépare vos réponses aux questions probables.</p>
+        </div>
+      </div>
+      <div class="hiw-step" data-delay="3">
+        <div class="hiw-num">3</div>
+        <div>
+          <h4>Candidatez et suivez vos relances</h4>
+          <p>Tableau Kanban, rappels automatiques, coach pré-entretien — tout est prêt. Vous n'avez plus qu'à cliquer "Envoyer".</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:40px">
+      <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Commencer gratuitement</a>
+      <div style="font-size:13px;color:var(--slate);margin-top:10px">Sans carte bancaire · Résultats en 30 secondes</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ PRESS ═════ -->
+<section class="press-section reveal">
+  <div class="container" style="text-align:center">
+    <p class="t-cap" style="color:var(--slate);margin-bottom:4px">Ils parlent de nous</p>
+    <div class="press-logos">
+      <span class="press-logo">Le Monde</span>
+      <span class="press-logo sans">BFM Business</span>
+      <span class="press-logo">Le Figaro</span>
+      <span class="press-logo sans">La Tribune</span>
+      <span class="press-logo">L'Express</span>
+      <span class="press-logo sans">Challenges</span>
+    </div>
+    <blockquote class="press-quote">
+      « EmploiA redéfinit la recherche d'emploi en France — là où les jobboards listent, le copilote IA agit. »
+      <cite>— La Tribune · Startup de la semaine</cite>
+    </blockquote>
   </div>
 </section>
 
@@ -533,6 +710,49 @@
   </div>
 </section>
 
+<!-- ═════ INTEGRATIONS ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head reveal">
+      <h2 class="t-h1">Connecté à vos outils.</h2>
+      <p>EmploiA s'intègre avec les plateformes que vous utilisez déjà — sans friction, sans double saisie.</p>
+    </div>
+    <div class="integ-grid reveal">
+      <div class="integ-card" data-delay="1">
+        <div class="integ-icon" style="background:#E8F0FE"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="0" fill="none"/><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="#0A66C2"/></svg></div>
+        <div class="integ-name">LinkedIn</div>
+        <div class="integ-label">Import · Analyse</div>
+      </div>
+      <div class="integ-card" data-delay="2">
+        <div class="integ-icon" style="background:#FEF3C7"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" fill="#EA4335"/></svg></div>
+        <div class="integ-name">Gmail</div>
+        <div class="integ-label">Relances auto</div>
+      </div>
+      <div class="integ-card" data-delay="3">
+        <div class="integ-icon" style="background:#DCFCE7"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#16A34A" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#16A34A" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="#16A34A" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="#16A34A" stroke-width="2"/></svg></div>
+        <div class="integ-name">Google Cal</div>
+        <div class="integ-label">Entretiens sync</div>
+      </div>
+      <div class="integ-card" data-delay="4">
+        <div class="integ-icon" style="background:#EEF2FF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#3B82F6" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#3B82F6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke="#3B82F6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke="#3B82F6" stroke-width="2"/></svg></div>
+        <div class="integ-name">Outlook</div>
+        <div class="integ-label">Emails & agenda</div>
+      </div>
+      <div class="integ-card" data-delay="5">
+        <div class="integ-icon" style="background:#FDF4FF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h10" stroke="#A855F7" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="integ-name">Notion</div>
+        <div class="integ-label">Notes & suivi</div>
+      </div>
+      <div class="integ-card" data-delay="6">
+        <div class="integ-icon" style="background:#FFF7ED"><svg width="22" height="22" viewBox="0 0 24 24" fill="#F97316"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg></div>
+        <div class="integ-name">Slack</div>
+        <div class="integ-label">Alertes offres</div>
+      </div>
+    </div>
+    <p class="reveal" style="text-align:center;margin-top:20px;font-size:13px;color:var(--slate)">Et bientôt : France Travail, Glassdoor, Welcome to the Jungle…</p>
+  </div>
+</section>
+
 <!-- ═════ STATS ═════ -->
 <section class="emp-section-sm" style="padding-top:0">
   <div class="container">
@@ -542,10 +762,80 @@
         <p class="t-subtitle mt-4">Les utilisateurs EmploiA passent 4× moins de temps à candidater — et obtiennent 3× plus de réponses positives.</p>
       </div>
       <div class="stat-list">
-        <div class="emp-stat-item"><div class="val" data-count="3.4" data-suffix="×">3.4×</div><div class="bar"><i style="width:78%"></i></div><div class="lbl">d'entretiens en plus</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="72" data-prefix="−" data-suffix="%">−72%</div><div class="bar"><i style="width:62%;background:var(--brand-orange)"></i></div><div class="lbl">de temps par candidature</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="91" data-suffix="%">91%</div><div class="bar"><i style="width:91%;background:var(--brand-green)"></i></div><div class="lbl">score ATS moyen</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="14" data-suffix="j">14j</div><div class="bar"><i style="width:38%;background:var(--brand-pink)"></i></div><div class="lbl">jusqu'au premier oui</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="3.4" data-suffix="×">3.4×</div><div class="bar"><i style="--tw:78%"></i></div><div class="lbl">d'entretiens en plus</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="72" data-prefix="−" data-suffix="%">−72%</div><div class="bar"><i style="--tw:62%;background:var(--brand-orange)"></i></div><div class="lbl">de temps par candidature</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="91" data-suffix="%">91%</div><div class="bar"><i style="--tw:91%;background:var(--brand-green)"></i></div><div class="lbl">score ATS moyen</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="14" data-suffix="j">14j</div><div class="bar"><i style="--tw:38%;background:var(--brand-pink)"></i></div><div class="lbl">jusqu'au premier oui</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ VERSUS ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head reveal">
+      <h2 class="t-h1">Pourquoi EmploiA<br/>et pas autre chose ?</h2>
+      <p>Un seul outil conçu pour la candidature — pas un chatbot généraliste, pas un simple jobboard.</p>
+    </div>
+    <div class="versus-table reveal" style="overflow-x:auto">
+      <div style="min-width:560px">
+        <div class="versus-head">
+          <div>Fonctionnalité</div>
+          <div class="hl" style="background:var(--primary);color:#fff;font-weight:700">EmploiA</div>
+          <div>ChatGPT</div>
+          <div>Indeed / LinkedIn</div>
+          <div>DIY</div>
+        </div>
+        <div class="versus-row">
+          <div>CV adapté à chaque offre</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-partial">Manuel</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
+        <div class="versus-row">
+          <div>Score ATS instantané</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
+        <div class="versus-row">
+          <div>Coach d'entretien IA</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-partial">Partiel</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
+        <div class="versus-row">
+          <div>Suivi Kanban des candidatures</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-partial">Basique</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
+        <div class="versus-row">
+          <div>800 000 offres françaises</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
+        <div class="versus-row">
+          <div>Données hébergées en France (RGPD)</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-yes">✓</span></div>
+        </div>
+        <div class="versus-row">
+          <div>Tout-en-un, zéro onglet superflu</div>
+          <div class="hl-col"><span class="versus-yes">✓</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+          <div><span class="versus-no">—</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -744,6 +1034,15 @@
   </div>
 </section>
 
+<!-- ═════ STICKY CTA BAR ═════ -->
+<div id="stickyBar" role="complementary" aria-label="Essayer EmploiA">
+  <div class="msg">Rejoignez <strong>24 800 candidats</strong> — commencez gratuitement.</div>
+  <div class="acts">
+    <a href="/app" class="emp-btn emp-btn-primary" style="padding:9px 20px;font-size:14px">Essayer gratuitement</a>
+    <button class="close-bar" onclick="document.getElementById('stickyBar').remove()" aria-label="Fermer">×</button>
+  </div>
+</div>
+
 <!-- ═════ FOOTER ═════ -->
 <footer class="emp-footer">
   <div class="container">
@@ -794,6 +1093,13 @@
         <a href="/contact">Contact</a>
       </div>
     </div>
+    <div class="sec-badges">
+      <span class="sec-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>RGPD conforme</span>
+      <span class="sec-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Données chiffrées (AES-256)</span>
+      <span class="sec-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Hébergé en France</span>
+      <span class="sec-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Aucune revente de données</span>
+      <span class="sec-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Propulsé par Claude AI · Anthropic</span>
+    </div>
     <div class="emp-footer-bot">
       <div>© <span data-year></span> EmploiA SAS · Tous droits réservés</div>
       <div class="soc"><a href="https://www.linkedin.com/company/emploia" rel="noopener noreferrer" target="_blank">LinkedIn</a><a href="https://twitter.com/emploia_fr" rel="noopener noreferrer" target="_blank">Twitter</a><a href="https://instagram.com/emploia_fr" rel="noopener noreferrer" target="_blank">Instagram</a></div>
@@ -801,9 +1107,42 @@
   </div>
 </footer>
 
+<!-- Newsletter -->
+<div class="newsletter-wrap">
+  <div class="container">
+    <div class="newsletter-inner">
+      <h5>Conseils emploi · 1 fois par semaine</h5>
+      <p>Stratégies CV, préparation entretien, tendances marché — directs en boîte mail.</p>
+      <form class="newsletter-form" id="newsletterForm" onsubmit="empNewsletterSubmit(event)">
+        <input type="email" placeholder="votre@email.fr" required autocomplete="email" aria-label="Adresse email"/>
+        <button type="submit">S'inscrire</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script src="/shared.js"></script>
 <script>
-/* Scroll reveal */
+/* ── Scroll progress bar ── */
+(function(){
+  var bar = document.getElementById('emp-scroll-prog');
+  if(!bar) return;
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
+  }, {passive:true});
+})();
+
+/* ── Nav scroll-aware ── */
+(function(){
+  var nav = document.querySelector('.emp-nav');
+  if(!nav) return;
+  window.addEventListener('scroll', function(){
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+  }, {passive:true});
+})();
+
+/* ── Scroll reveal ── */
 (function(){
   var els = document.querySelectorAll('.reveal');
   if(!els.length) return;
@@ -811,37 +1150,43 @@
     entries.forEach(function(e){
       if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
     });
-  },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+  },{threshold:0.08,rootMargin:'0px 0px -32px 0px'});
   els.forEach(function(el){ io.observe(el); });
 })();
 
-/* Count-up on stats */
+/* ── Count-up + stat bar animate ── */
 (function(){
-  var stats = document.querySelectorAll('.emp-stat-item .val[data-count]');
+  var stats = document.querySelectorAll('.emp-stat-item');
   if(!stats.length) return;
+  var done = false;
   var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(!e.isIntersecting) return;
-      var el = e.target;
-      var target = parseFloat(el.dataset.count);
-      var prefix = el.dataset.prefix || '';
-      var suffix = el.dataset.suffix || '';
-      var duration = 1200, start = performance.now();
-      var isFloat = String(target).includes('.');
-      io.unobserve(el);
-      requestAnimationFrame(function tick(now){
-        var p = Math.min((now-start)/duration, 1);
-        var eased = 1 - Math.pow(1-p, 3);
-        var val = target * eased;
-        el.textContent = prefix + (isFloat ? val.toFixed(1) : Math.round(val)) + suffix;
-        if(p < 1) requestAnimationFrame(tick);
-      });
+    if(done || !entries.some(function(e){ return e.isIntersecting; })) return;
+    done = true;
+    io.disconnect();
+    stats.forEach(function(item, idx){
+      var el = item.querySelector('.val[data-count]');
+      var bar = item.querySelector('.bar i');
+      setTimeout(function(){
+        if(bar) bar.classList.add('animated');
+        if(!el) return;
+        var target = parseFloat(el.dataset.count);
+        var prefix = el.dataset.prefix || '';
+        var suffix = el.dataset.suffix || '';
+        var duration = 1100, start = performance.now();
+        var isFloat = String(target).includes('.');
+        requestAnimationFrame(function tick(now){
+          var p = Math.min((now-start)/duration, 1);
+          var eased = 1 - Math.pow(1-p, 3);
+          el.textContent = prefix + (isFloat ? (target*eased).toFixed(1) : Math.round(target*eased)) + suffix;
+          if(p < 1) requestAnimationFrame(tick);
+        });
+      }, idx * 120);
     });
-  },{threshold:0.5});
+  },{threshold:0.4});
   stats.forEach(function(el){ io.observe(el); });
 })();
 
-/* Billing toggle */
+/* ── Billing toggle ── */
 var billingAnnual = true;
 function empToggleBilling(track){
   billingAnnual = !billingAnnual;
@@ -855,13 +1200,80 @@ function empToggleBilling(track){
   if(intPer) intPer.textContent = billingAnnual ? 'Facturé annuellement' : 'Facturé mensuellement';
 }
 
-/* Show Se connecter button on desktop if not logged in */
+/* ── Typewriter hero ── */
+(function(){
+  var el = document.getElementById('twWord');
+  if(!el) return;
+  var words = ['Product Managers','Développeurs','Data Scientists','Designers','Marketeurs','Commerciaux','Reconversions'];
+  var i = 0, ci = 0, deleting = false;
+  function tick(){
+    var word = words[i];
+    if(!deleting){
+      ci++;
+      el.textContent = word.slice(0, ci);
+      if(ci === word.length){ deleting = true; setTimeout(tick, 1800); return; }
+      setTimeout(tick, 65);
+    } else {
+      ci--;
+      el.textContent = word.slice(0, ci);
+      if(ci === 0){ deleting = false; i = (i+1) % words.length; setTimeout(tick, 300); return; }
+      setTimeout(tick, 35);
+    }
+  }
+  setTimeout(tick, 1200);
+})();
+
+/* ── Hero kanban cards entrance ── */
+(function(){
+  var cards = document.querySelectorAll('.kcard');
+  cards.forEach(function(c, i){
+    setTimeout(function(){ c.classList.add('in'); }, 400 + i * 80);
+  });
+})();
+
+/* ── Sticky CTA bar ── */
+(function(){
+  var bar = document.getElementById('stickyBar');
+  var footer = document.querySelector('.emp-footer');
+  if(!bar) return;
+  var shown = false;
+  window.addEventListener('scroll', function(){
+    var scrolled = window.scrollY > window.innerHeight * 0.9;
+    var nearFooter = footer && (footer.getBoundingClientRect().top < window.innerHeight + 80);
+    var shouldShow = scrolled && !nearFooter;
+    if(shouldShow && !shown){ bar.classList.add('visible'); shown = true; }
+    else if(!shouldShow && shown){ bar.classList.remove('visible'); shown = false; }
+  }, {passive:true});
+})();
+
+/* ── Nav login button desktop ── */
 (function(){
   var btn = document.getElementById('navLoginBtn');
-  if(btn && window.innerWidth >= 1024){
-    btn.style.display = 'inline-flex';
-  }
+  if(btn && window.innerWidth >= 1024) btn.style.display = 'inline-flex';
 })();
+
+/* ── Live counter ── */
+(function(){
+  var el = document.getElementById('liveCount');
+  if(!el) return;
+  var base = 820 + Math.floor(Math.random() * 60);
+  el.textContent = base;
+  setInterval(function(){
+    var delta = Math.random() < 0.5 ? 1 : -1;
+    base = Math.max(780, Math.min(980, base + delta));
+    el.textContent = base;
+  }, 3800);
+})();
+
+/* ── Newsletter submit ── */
+function empNewsletterSubmit(e){
+  e.preventDefault();
+  var form = document.getElementById('newsletterForm');
+  var email = form.querySelector('input').value;
+  fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})})
+    .catch(function(){});
+  form.innerHTML = '<p style="color:var(--brand-green);font-weight:600;margin:0">✓ Merci ! Vous recevrez votre premier conseil cette semaine.</p>';
+}
 </script>
 </body>
 </html>
