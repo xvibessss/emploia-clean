@@ -1,162 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA" />
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>À propos — Emploia, le copilote candidature 100% français</title>
-<meta name="description" content="Découvrez Emploia : qui nous sommes, pourquoi nous avons créé le premier copilote de candidature IA 100% français, et notre mission pour révolutionner la recherche d'emploi en France."/>
+<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA"/>
+<title>À propos — EmploiA, le copilote de candidature 100% français</title>
+<meta name="description" content="Découvrez EmploiA : qui nous sommes, pourquoi nous avons créé le premier copilote de candidature IA 100% français, et notre mission pour révolutionner la recherche d'emploi en France."/>
 <link rel="canonical" href="https://emploia.fr/about"/>
-<link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#6E48BE"/>
-<meta property="og:title" content="À propos — Emploia"/>
-<meta property="og:description" content="Le premier copilote IA de recherche d'emploi 100% français. Notre histoire, notre mission."/>
+<link rel="icon" href="/favicon.svg"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/brand/png/app-icon-1024.png"/>
+<meta name="theme-color" content="#0E1830"/>
+<meta property="og:title" content="À propos — EmploiA"/>
+<meta property="og:description" content="Le premier copilote IA de candidature 100% français. Notre histoire, notre mission, nos valeurs."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://emploia.fr/about"/>
-<meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
+<meta property="og:image" content="https://emploia.fr/og-image.svg"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  
-  <link rel="stylesheet" href="/shared.css"/>
+<link rel="stylesheet" href="/shared.css"/>
 <style>
-.about-hero { padding: 80px 24px 56px; text-align: center; max-width: 760px; margin: 0 auto; }
-.about-hero h1 { font-size: clamp(32px,5vw,52px); font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
-.about-hero p { font-size: 17px; color: var(--slate); line-height: 1.75; max-width: 580px; margin: 0 auto; }
+/* Hero dark */
+.about-hero{background:#0E1830;color:#fff;padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.about-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 30% 60%,rgba(110,72,190,.3) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 75% 30%,rgba(56,189,248,.12) 0%,transparent 70%);pointer-events:none}
+.about-hero-inner{position:relative;z-index:1;max-width:760px;margin:0 auto}
+.about-hero .tag{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-full);padding:6px 16px;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:24px;letter-spacing:.5px;text-transform:uppercase}
+.about-hero h1{font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-2px;line-height:1.08;margin-bottom:20px;color:#fff}
+.about-hero p{font-size:17px;color:rgba(255,255,255,.75);line-height:1.7;max-width:580px;margin:0 auto 32px}
+.hero-trust-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.hero-trust-pill{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.7);font-weight:500}
 
-.about-body { max-width: 820px; margin: 0 auto; padding: 0 24px 100px; display: flex; flex-direction: column; gap: 24px; }
+/* Page body */
+.about-body{max-width:860px;margin:0 auto;padding:64px 24px 100px;display:flex;flex-direction:column;gap:28px}
 
-.about-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 20px; padding: 36px 40px; }
-.about-card h2 { font-size: 22px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 14px; }
-.about-card p { font-size: 14px; color: var(--slate); line-height: 1.8; margin-bottom: 14px; }
-.about-card p:last-child { margin-bottom: 0; }
+/* Cards */
+.about-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--r-xl);padding:44px 48px;box-shadow:var(--sh-1)}
+.about-card h2{font-size:24px;font-weight:700;letter-spacing:-.6px;margin-bottom:16px;color:var(--ink)}
+.about-card p{font-size:15px;color:var(--slate);line-height:1.8;margin-bottom:14px}
+.about-card p:last-child{margin-bottom:0}
+@media(max-width:640px){.about-card{padding:28px 24px}}
 
-.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
-.stat-item { background: var(--tint-gray); border-radius: 14px; padding: 20px; text-align: center; }
-.stat-num { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
-.stat-label { font-size: 12px; color: var(--steel); margin-top: 4px; }
+/* Stats */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.stat-item{background:var(--surface-soft);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:24px 20px;text-align:center}
+.stat-num{font-size:32px;font-weight:700;color:var(--primary);letter-spacing:-1.5px;line-height:1}
+.stat-label{font-size:12px;color:var(--steel);margin-top:6px;font-weight:500}
+@media(max-width:640px){.stat-row{grid-template-columns:1fr 1fr}}
 
-.value-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
-.value-item { background: var(--tint-gray); border-radius: 14px; padding: 20px; }
-.value-icon { font-size: 24px; margin-bottom: 10px; }
-.value-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-.value-desc { font-size: 12px; color: var(--slate); line-height: 1.65; }
+/* Values */
+.value-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.value-item{background:var(--surface-soft);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:22px}
+.value-icon{font-size:26px;margin-bottom:10px}
+.value-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.value-desc{font-size:13px;color:var(--slate);line-height:1.65}
+@media(max-width:640px){.value-grid{grid-template-columns:1fr}}
 
-.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 8px; }
-.team-card { background: var(--tint-gray); border-radius: 14px; padding: 20px; text-align: center; }
-.team-av { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg,var(--primary),var(--brand-purple)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; margin: 0 auto 12px; }
-.team-name { font-size: 13px; font-weight: 700; }
-.team-role { font-size: 11px; color: var(--steel); margin-top: 3px; }
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:16px;position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--hairline)}
+.tl-item{position:relative;padding:0 0 28px 24px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-21px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--primary);border:2px solid var(--canvas);box-shadow:0 0 0 2px var(--primary)}
+.tl-date{font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.tl-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.tl-desc{font-size:13px;color:var(--slate);line-height:1.6}
 
-.cta-section { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px 40px; text-align: center; }
-.cta-section h2 { font-size: 24px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 12px; }
-.cta-section p { font-size: 14px; color: var(--slate); margin-bottom: 24px; }
+/* Team */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:16px}
+.team-card{background:var(--surface-soft);border:1px solid var(--hairline-soft);border-radius:var(--r-lg);padding:24px 20px;text-align:center;transition:box-shadow .2s,transform .2s}
+.team-card:hover{box-shadow:var(--sh-2);transform:translateY(-2px)}
+.team-av{width:52px;height:52px;border-radius:50%;background:var(--primary);display:grid;place-items:center;font-size:20px;font-weight:700;color:#fff;margin:0 auto 12px}
+.team-name{font-size:14px;font-weight:700;color:var(--ink)}
+.team-role{font-size:12px;color:var(--steel);margin-top:3px}
 
-@media (max-width: 640px) {
-  .about-card { padding: 24px; }
-  .stat-row { grid-template-columns: 1fr 1fr; }
-  .value-grid { grid-template-columns: 1fr; }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
-}
+/* Tech stack */
+.stack-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.stack-tag{background:var(--surface-soft);border:1px solid var(--hairline);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--charcoal)}
+
+/* Mission banner */
+.mission-banner{background:var(--primary);color:#fff;border-radius:var(--r-xl);padding:48px;text-align:center}
+.mission-banner h2{font-size:28px;font-weight:700;letter-spacing:-.8px;margin-bottom:12px;color:#fff}
+.mission-banner p{font-size:15px;color:rgba(255,255,255,.85);line-height:1.7;max-width:560px;margin:0 auto 28px}
+
+/* CTA section */
+.cta-card{background:linear-gradient(135deg,#0E1830,#1a2a52);border-radius:var(--r-xl);padding:56px 48px;text-align:center;color:#fff}
+.cta-card h2{font-size:32px;font-weight:700;letter-spacing:-1px;margin-bottom:12px;color:#fff}
+.cta-card p{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:28px}
+
+/* Security row */
+.sec-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--hairline-soft)}
+.sec-chip{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate);font-weight:500}
+.sec-chip svg{color:var(--brand-green);flex-shrink:0}
 </style>
 </head>
 <body>
-
-<div id="emp-scroll-prog"></div>
 <div id="empToasts" class="emp-toast-container"></div>
 
-<nav class="emp-nav">
+<header class="emp-nav">
   <div class="container emp-nav-inner">
-    <a href="/" class="emp-brand">
-      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
-      Emploia
-    </a>
-    <div class="emp-nav-links">
-      <a href="/jobs">Offres</a>
-      <a href="/app">Générer</a>
-      <a href="/blog">Blog</a>
-      <a href="/#pricing">Tarifs</a>
+    <div style="display:flex;align-items:center;gap:36px">
+      <a href="/" class="emp-brand">
+        <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+        EmploiA
+      </a>
+      <nav class="emp-nav-links">
+        <a href="/jobs">Offres</a>
+        <a href="/app">Générateur CV</a>
+        <a href="/interview">Coach IA</a>
+        <a href="/blog">Blog</a>
+        <a href="/#pricing">Tarifs</a>
+      </nav>
     </div>
     <div class="emp-nav-right">
       <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
-</nav>
-<div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">Offres d'emploi</a>
-  <a href="/app">Générer un CV</a>
+</header>
+<nav class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres</a>
+  <a href="/app">Générateur CV</a>
+  <a href="/interview">Coach IA</a>
   <a href="/blog">Blog</a>
   <a href="/#pricing">Tarifs</a>
-</div>
-  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
-</div>
+</nav>
 
-<!-- HERO -->
+<!-- Hero -->
 <section class="about-hero">
-  <div class="section-tag" style="display:inline-block;margin-bottom:20px">Notre histoire</div>
-  <h1>Nous avons vécu la galère de la recherche d'emploi.<br/>Alors on l'a réparée.</h1>
-  <p>Emploia est né d'une frustration simple : envoyer 50 CVs génériques, ne recevoir aucune réponse, et ne pas comprendre pourquoi. On a construit l'outil qu'on aurait voulu avoir.</p>
+  <div class="about-hero-inner">
+    <div class="tag">Notre histoire</div>
+    <h1>Nous avons vécu la galère.<br/>Alors on l'a réparée.</h1>
+    <p>EmploiA est né d'une frustration simple : envoyer 50 CVs génériques, ne recevoir aucune réponse, et ne pas comprendre pourquoi. On a construit l'outil qu'on aurait voulu avoir.</p>
+    <div class="hero-trust-row">
+      <span class="hero-trust-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>🇫🇷 100% français</span>
+      <span class="hero-trust-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>24 800 candidats</span>
+      <span class="hero-trust-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Propulsé par Claude AI</span>
+    </div>
+  </div>
 </section>
 
 <div class="about-body">
 
-  <!-- Genèse -->
-  <div class="about-card">
-    <h2>🇫🇷 Pourquoi un outil 100% français ?</h2>
-    <p>Les outils de recherche d'emploi IA existants — Jobright, Teal, Resume.io — sont pensés pour le marché américain. Ils ne comprennent pas les spécificités françaises : les conventions de stage, les codes RH des grandes entreprises françaises, les attentes des recruteurs en CDI, les alternances...</p>
-    <p>Emploia est le premier copilote de candidature conçu nativement pour la France. Notre IA est entraînée sur des milliers d'offres françaises et calibrée pour les attentes des recruteurs hexagonaux — qu'il s'agisse d'une grande entreprise du CAC 40 ou d'une startup parisienne.</p>
-    <p>On est construits en France, hébergés en Europe, RGPD natif. Vos données restent ici.</p>
-  </div>
-
   <!-- Stats -->
-  <div class="about-card">
-    <h2>📊 Emploia en chiffres</h2>
-    <p>Depuis notre lancement, des milliers de candidats ont utilisé Emploia pour décrocher leur prochain poste.</p>
+  <div class="about-card reveal">
+    <h2>EmploiA en chiffres</h2>
+    <p>Depuis notre lancement, des milliers de candidats ont utilisé EmploiA pour décrocher leur prochain poste — en France et à l'international.</p>
     <div class="stat-row">
-      <div class="stat-item">
-        <div class="stat-num">+2 800</div>
+      <div class="stat-item reveal" data-delay="1">
+        <div class="stat-num">24 800</div>
         <div class="stat-label">Candidats actifs</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">94%</div>
+      <div class="stat-item reveal" data-delay="2">
+        <div class="stat-num">91%</div>
         <div class="stat-label">Score ATS moyen atteint</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">2,4×</div>
+      <div class="stat-item reveal" data-delay="3">
+        <div class="stat-num">3,4×</div>
         <div class="stat-label">Plus d'entretiens obtenus</div>
       </div>
     </div>
   </div>
 
-  <!-- Mission -->
-  <div class="about-card">
-    <h2>🎯 Notre mission</h2>
-    <p>Le marché de l'emploi est fondamentalement injuste. Un candidat qualifié peut voir son CV rejeté automatiquement par un ATS avant qu'un humain ne le lise — non pas parce qu'il ne convient pas au poste, mais parce qu'il n'a pas utilisé les bons mots-clés au bon endroit.</p>
-    <p>Notre mission : <strong style="color:var(--ink)">rendre les outils des grands cabinets de recrutement accessibles à tous les candidats</strong>, pas seulement à ceux qui peuvent se payer un coach carrière à 200€/h.</p>
-    <p>9€/mois pour avoir les mêmes armes que n'importe quel candidat qui paie un recruteur. C'est ça, Emploia.</p>
+  <!-- Mission banner -->
+  <div class="mission-banner reveal">
+    <h2>Rendre les outils des grands recruteurs accessibles à tous.</h2>
+    <p>Un candidat qualifié peut voir son CV rejeté automatiquement par un ATS avant qu'un humain ne le lise — non pas parce qu'il ne convient pas, mais parce qu'il n'a pas utilisé les bons mots-clés. Notre mission : rééquilibrer ce terrain de jeu.</p>
+    <a href="/app" class="emp-btn emp-btn-light emp-btn-lg">Essayer EmploiA gratuitement →</a>
+  </div>
+
+  <!-- Histoire -->
+  <div class="about-card reveal">
+    <h2>🇫🇷 Pourquoi un outil 100% français ?</h2>
+    <p>Les outils de recherche d'emploi IA existants — Jobright, Teal, Resume.io — sont pensés pour le marché américain. Ils ne comprennent pas les spécificités françaises : les conventions de stage, les codes RH des grands groupes, les attentes des recruteurs en CDI, les alternances, les formats CV européens.</p>
+    <p>EmploiA est le premier copilote de candidature conçu nativement pour la France. Notre IA est calibrée pour les attentes des recruteurs hexagonaux — qu'il s'agisse d'une grande entreprise du CAC 40 ou d'une startup parisienne.</p>
+    <p>Construit en France, hébergé en Europe, RGPD natif. Vos données restent ici.</p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="about-card reveal">
+    <h2>Notre parcours</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">Janvier 2024</div>
+        <div class="tl-title">L'idée</div>
+        <div class="tl-desc">Après 80 candidatures sans réponse, le fondateur décide de construire l'outil qu'il aurait voulu avoir — un copilote IA pour la recherche d'emploi française.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">Juin 2024</div>
+        <div class="tl-title">Premier prototype</div>
+        <div class="tl-desc">Lancement en beta privée. Les 200 premiers utilisateurs obtiennent 3× plus d'entretiens. La validation est là.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">Novembre 2024</div>
+        <div class="tl-title">Lancement public</div>
+        <div class="tl-desc">EmploiA ouvre ses portes. Score ATS, générateur de lettres, coach d'entretien — tout en un, en français.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">2025</div>
+        <div class="tl-title">24 800 candidats actifs</div>
+        <div class="tl-desc">Integration Claude AI (Anthropic), 800k offres françaises, suivi Kanban, extension LinkedIn. L'ambition : devenir le standard de la candidature en France.</div>
+      </div>
+    </div>
   </div>
 
   <!-- Valeurs -->
-  <div class="about-card">
-    <h2>💎 Nos valeurs</h2>
+  <div class="about-card reveal">
+    <h2>Nos valeurs</h2>
     <div class="value-grid">
-      <div class="value-item">
+      <div class="value-item reveal" data-delay="1">
         <div class="value-icon">🔒</div>
         <div class="value-title">Transparence totale</div>
-        <div class="value-desc">On ne vend jamais vos données. Pas de tracking intrusif. RGPD natif. Vous pouvez supprimer votre compte à tout moment.</div>
+        <div class="value-desc">On ne vend jamais vos données. Pas de tracking intrusif. RGPD natif. Suppression de compte en un clic.</div>
       </div>
-      <div class="value-item">
+      <div class="value-item reveal" data-delay="2">
         <div class="value-icon">🇫🇷</div>
         <div class="value-title">French-first</div>
         <div class="value-desc">Conçu pour le marché français, en français, par des Français. Chaque feature est pensée pour les codes RH hexagonaux.</div>
       </div>
-      <div class="value-item">
+      <div class="value-item reveal" data-delay="3">
         <div class="value-icon">⚡</div>
         <div class="value-title">Accessibilité</div>
-        <div class="value-desc">5 générations gratuites sans carte bancaire. Pas de freemium agressif. Payer seulement si ça vous aide vraiment.</div>
+        <div class="value-desc">5 générations gratuites sans carte bancaire. Payer seulement si ça vous aide vraiment.</div>
       </div>
-      <div class="value-item">
+      <div class="value-item reveal" data-delay="4">
         <div class="value-icon">🤖</div>
         <div class="value-title">IA éthique</div>
         <div class="value-desc">Propulsé par Claude d'Anthropic — l'IA la plus sûre du marché. Vos données ne servent jamais à entraîner des modèles.</div>
@@ -165,34 +234,61 @@
   </div>
 
   <!-- Stack tech -->
-  <div class="about-card">
+  <div class="about-card reveal">
     <h2>⚙️ Comment c'est construit</h2>
-    <p>Emploia tourne sur une stack 100% Edge — rapide, scalable, sans serveur à gérer. Voici les briques principales :</p>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Claude AI (Anthropic)</span>
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Vercel Edge Functions</span>
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Upstash KV</span>
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Stripe</span>
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">API France Travail</span>
-      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Resend</span>
+    <p>EmploiA tourne sur une stack 100% Edge — rapide, scalable, zéro serveur à gérer. Des choix techniques pensés pour la performance et la sécurité.</p>
+    <div class="stack-tags">
+      <span class="stack-tag">Claude AI · Anthropic</span>
+      <span class="stack-tag">Vercel Edge Functions</span>
+      <span class="stack-tag">Upstash KV (Redis)</span>
+      <span class="stack-tag">Stripe Payments</span>
+      <span class="stack-tag">API France Travail</span>
+      <span class="stack-tag">Resend (emails)</span>
+      <span class="stack-tag">PBKDF2 auth</span>
+      <span class="stack-tag">AES-256 storage</span>
+    </div>
+    <div class="sec-row">
+      <span class="sec-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>RGPD conforme</span>
+      <span class="sec-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Données chiffrées AES-256</span>
+      <span class="sec-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>Hébergé en Europe</span>
+      <span class="sec-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Aucune revente de données</span>
     </div>
   </div>
 
   <!-- CTA -->
-  <div class="cta-section">
+  <div class="cta-card reveal">
     <h2>Prêt à décrocher votre prochain entretien ?</h2>
-    <p>Rejoignez 2 800+ candidats qui ont transformé leur recherche d'emploi avec Emploia.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/app" class="btn btn-primary btn-lg">✨ Essayer gratuitement</a>
-      <a href="/contact" class="btn btn-ghost btn-lg">Nous contacter →</a>
+    <p>Rejoignez 24 800 candidats qui ont transformé leur recherche d'emploi avec EmploiA.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
+      <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Essayer gratuitement →</a>
+      <a href="/contact" class="emp-btn emp-btn-sec-on-dark emp-btn-lg">Nous contacter</a>
     </div>
-    <p style="font-size:12px;color:var(--steel);margin-top:12px">5 générations gratuites · Sans carte bancaire</p>
+    <p style="font-size:13px;color:rgba(255,255,255,.5)">Sans carte bancaire · Sans engagement · RGPD</p>
   </div>
 
 </div>
 
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div>
+        <div class="emp-brand" style="margin-bottom:14px">
+          <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+          EmploiA
+        </div>
+        <div class="emp-footer-tagline">Le copilote de candidature 100% français.<br/>Fait à Paris · Hébergé en France.</div>
+      </div>
+      <div class="emp-footer-col"><h5>Produit</h5><a href="/app">Générateur de CV</a><a href="/interview">Coach d'entretien</a><a href="/dashboard">Tableau de bord</a><a href="/jobs">Offres d'emploi</a></div>
+      <div class="emp-footer-col"><h5>Entreprise</h5><a href="/about">À propos</a><a href="/contact">Contact</a><a href="/blog">Blog</a><a href="/employeurs">Employeurs</a></div>
+      <div class="emp-footer-col"><h5>Légal</h5><a href="/legal">Confidentialité</a><a href="/legal">CGU</a><a href="/legal">RGPD</a></div>
+    </div>
+    <div class="emp-footer-bot">
+      <div>© <span data-year></span> EmploiA SAS · Tous droits réservés</div>
+      <div class="soc"><a href="https://www.linkedin.com/company/emploia" rel="noopener" target="_blank">LinkedIn</a><a href="https://twitter.com/emploia_fr" rel="noopener" target="_blank">Twitter</a></div>
+    </div>
+  </div>
+</footer>
 
-
-<script src="shared.js"></script>
+<script src="/shared.js"></script>
 </body>
 </html>

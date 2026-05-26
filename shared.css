@@ -474,3 +474,15 @@ input,textarea,select{font:inherit;color:inherit}
 .text-left{text-align:left}
 .gap-1{gap:4px}
 .mt-16{margin-top:64px}
+
+/* ── GLOBAL POLISH (scroll progress, nav, reveals) ───── */
+#emp-scroll-prog{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--primary);z-index:9999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
+.emp-nav.scrolled{box-shadow:0 1px 18px rgba(0,0,0,.09)}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}
+.reveal.visible{opacity:1;transform:none}
+.reveal[data-delay="1"]{transition-delay:.08s}
+.reveal[data-delay="2"]{transition-delay:.16s}
+.reveal[data-delay="3"]{transition-delay:.24s}
+.reveal[data-delay="4"]{transition-delay:.32s}
+.reveal[data-delay="5"]{transition-delay:.40s}
+.reveal[data-delay="6"]{transition-delay:.48s}

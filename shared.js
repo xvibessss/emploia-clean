@@ -2,6 +2,34 @@
    EMPLOIA — Notion-Style · Shared JS
 ═══════════════════════════════════════════════════════════════════ */
 
+/* ── Global polish: scroll progress + nav scroll-aware + reveals ── */
+(function(){
+  // Inject scroll progress bar if not already present
+  if(!document.getElementById('emp-scroll-prog')){
+    const b=document.createElement('div');b.id='emp-scroll-prog';
+    document.body.insertBefore(b,document.body.firstChild);
+  }
+  // Scroll progress
+  window.addEventListener('scroll',function(){
+    const h=document.documentElement.scrollHeight-window.innerHeight;
+    const bar=document.getElementById('emp-scroll-prog');
+    if(bar) bar.style.width=(h>0?window.scrollY/h*100:0)+'%';
+    const nav=document.querySelector('.emp-nav');
+    if(nav) nav.classList.toggle('scrolled',window.scrollY>80);
+  },{passive:true});
+  // Scroll reveal
+  document.addEventListener('DOMContentLoaded',function(){
+    const els=document.querySelectorAll('.reveal');
+    if(!els.length) return;
+    const io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+      });
+    },{threshold:0.08,rootMargin:'0px 0px -32px 0px'});
+    els.forEach(function(el){io.observe(el);});
+  });
+})();
+
 // ── HTML ESCAPE ─────────────────────────────────────────────────────
 function esc(s) {
   return (s == null ? '' : String(s))

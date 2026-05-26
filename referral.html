@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Parrainage — Gagnez des mois gratuits avec Emploia</title>
-  <meta name="description" content="Parrainez vos amis sur Emploia et gagnez 1 mois gratuit par filleul. Programme de parrainage 100% transparent."/>
+  <meta name="description" content="Parrainez vos amis sur Emploia et gagnez 1 mois gratuit par filleul. Programme de parrainage 100% transparent, jusqu'à 6 mois offerts."/>
   <link rel="canonical" href="https://emploia.fr/referral"/>
   <meta property="og:title" content="Parrainage Emploia — Gagnez 1 mois Pro gratuit"/>
   <meta property="og:description" content="Parrainez vos amis sur Emploia et gagnez 1 mois Pro gratuit par filleul. Programme de parrainage 100% transparent."/>
@@ -19,93 +19,375 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
-    .ref-layout {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 100px 24px 80px;
-    }
-    .ref-hero {
+    /* ── HERO DARK ── */
+    .ref-hero-section {
+      background: var(--brand-navy);
+      color: #fff;
+      padding: 96px 24px 80px;
       text-align: center;
-      margin-bottom: 60px;
+      position: relative;
+      overflow: hidden;
     }
-    .ref-hero-badge {
+    .ref-hero-section::before {
+      content: "";
+      position: absolute;
+      top: -160px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(110,72,190,.35) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .ref-hero-section::after {
+      content: "";
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 48px;
+      background: var(--canvas);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+    .ref-hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .ref-hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(16,185,129,.08);
-      border: 1px solid rgba(16,185,129,.2);
-      color: var(--brand-green);
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
       font-size: 12px;
       font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
       padding: 6px 14px;
       border-radius: 100px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
-    .ref-hero h1 {
-      font-size: clamp(32px, 5vw, 52px);
+    .ref-hero-eyebrow .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--brand-green);
+      box-shadow: 0 0 0 3px rgba(88,160,90,.35);
+      animation: ref-pulse 1.6s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes ref-pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(88,160,90,.55); }
+      50%      { box-shadow: 0 0 0 7px rgba(88,160,90,0); }
+    }
+    .ref-hero-h1 {
+      font-size: clamp(36px, 6vw, 64px);
       font-weight: 700;
-      line-height: 1.1;
+      line-height: 1.05;
       letter-spacing: -2px;
-      margin-bottom: 16px;
+      color: #fff;
+      margin: 0 0 20px;
     }
-    .ref-hero p {
-      font-size: 16px;
-      color: var(--slate);
-      max-width: 500px;
-      margin: 0 auto;
+    .ref-hero-h1 .accent {
+      background: linear-gradient(135deg, #C5AEEC 0%, #A07BE0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .ref-hero-sub {
+      font-size: 17px;
+      color: rgba(255,255,255,.70);
       line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 32px;
+    }
+    .ref-hero-sub strong {
+      color: #fff;
+    }
+    .ref-counter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 100px;
+      padding: 10px 20px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      color: rgba(255,255,255,.85);
+      font-weight: 500;
+    }
+    .ref-counter-chip .val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+    .ref-counter-chip .sep {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,.2);
+    }
+    .ref-trust-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .ref-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: rgba(255,255,255,.60);
+      font-weight: 500;
+    }
+    .ref-trust-item svg {
+      width: 15px; height: 15px;
+      opacity: .7;
+      flex-shrink: 0;
+    }
+
+    /* ── LAYOUT ── */
+    .ref-layout {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 64px 24px 80px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .ref-how-wrap {
+      position: relative;
+      margin-bottom: 64px;
+    }
+    .ref-how-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 28px;
     }
     .ref-how {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 48px 0;
+      gap: 0;
+      position: relative;
     }
-    @media (max-width: 600px) { .ref-how { grid-template-columns: 1fr; } }
+    /* connecting line on desktop */
+    .ref-how::before {
+      content: "";
+      position: absolute;
+      top: 28px; left: calc(16.66% + 20px);
+      right: calc(16.66% + 20px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--tint-lavender), var(--primary), var(--tint-lavender));
+      z-index: 0;
+    }
+    @media (max-width: 600px) {
+      .ref-how { grid-template-columns: 1fr; gap: 12px; }
+      .ref-how::before { display: none; }
+    }
     .ref-step {
       background: var(--surface);
       border: 1px solid var(--hairline);
       border-radius: var(--r-xxl);
-      padding: 28px 24px;
+      padding: 28px 24px 26px;
       text-align: center;
+      margin: 0 8px;
+      position: relative;
+      z-index: 1;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
     }
-    .ref-step-num {
-      width: 40px; height: 40px;
+    .ref-step:hover {
+      border-color: rgba(110,72,190,.25);
+      box-shadow: 0 8px 24px rgba(110,72,190,.08);
+      transform: translateY(-3px);
+    }
+    .ref-step-icon {
+      width: 56px; height: 56px;
       border-radius: 50%;
       background: var(--tint-lavender);
-      border: 1px solid rgba(99,102,241,.2);
-      color: var(--primary);
-      font-size: 18px;
-      font-weight: 700;
+      border: 2px solid rgba(110,72,190,.18);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 16px;
+      font-size: 22px;
+      position: relative;
     }
-    .ref-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .ref-step-num {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--canvas);
+    }
+    .ref-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
     .ref-step p { font-size: 13px; color: var(--slate); line-height: 1.6; margin: 0; }
+
+    /* ── REWARD TRACKER ── */
+    .ref-tracker {
+      background: linear-gradient(135deg, var(--tint-lavender) 0%, #F3EEF9 100%);
+      border: 1px solid rgba(110,72,190,.15);
+      border-radius: var(--r-xxl);
+      padding: 32px;
+      margin-bottom: 28px;
+    }
+    .ref-tracker-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .ref-tracker-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ref-tracker-max {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      background: rgba(110,72,190,.12);
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .ref-tracker-bar-wrap {
+      background: rgba(110,72,190,.12);
+      border-radius: 100px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .ref-tracker-bar {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--primary), var(--brand-purple-300));
+      transition: width .6s var(--ease-out);
+      width: 0%;
+    }
+    .ref-tracker-milestones {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .ref-tracker-ms {
+      font-size: 11px;
+      color: var(--slate);
+      font-weight: 600;
+    }
+    .ref-tracker-reward-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 540px) {
+      .ref-tracker-reward-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .ref-tracker-slot {
+      aspect-ratio: 1;
+      border-radius: var(--r-lg);
+      background: rgba(255,255,255,.6);
+      border: 1.5px solid rgba(110,72,190,.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--slate);
+      transition: background .3s, border-color .3s;
+    }
+    .ref-tracker-slot.earned {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .ref-tracker-slot .icon { font-size: 18px; }
+    .ref-tracker-slot.earned .icon { filter: brightness(0) invert(1); }
+
+    /* ── MAIN CARD ── */
     .ref-card {
-      background: var(--surface);
+      background: var(--canvas);
       border: 1px solid var(--hairline);
       border-radius: var(--r-xxl);
       padding: 36px;
       margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(15,15,15,.04);
     }
     .ref-card-title {
-      font-size: 18px; font-weight: 700; margin-bottom: 24px;
-      display: flex; align-items: center; gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
     }
     .ref-link-row {
-      display: flex; gap: 10px; align-items: center;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
     .ref-link-input {
       flex: 1;
-      background: var(--surface-soft);
+      background: var(--surface);
       border: 1px solid var(--hairline);
       border-radius: var(--r-lg);
       padding: 12px 16px;
       color: var(--ink);
       font-size: 13px;
-      
+      font-family: "SF Mono", ui-monospace, monospace;
+      letter-spacing: .01em;
+      min-width: 0;
     }
+    .ref-share-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .ref-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: var(--r-md);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--hairline-strong);
+      background: var(--canvas);
+      color: var(--charcoal);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, border-color .15s, transform .12s;
+    }
+    .ref-share-btn:hover {
+      background: var(--surface);
+      border-color: var(--charcoal);
+      transform: translateY(-1px);
+    }
+    .ref-share-btn:active { transform: translateY(0); }
+    .ref-share-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .ref-share-btn.wa { border-color: rgba(37,211,102,.3); }
+    .ref-share-btn.wa:hover { background: rgba(37,211,102,.06); border-color: rgba(37,211,102,.5); }
+    .ref-share-btn.li { border-color: rgba(10,102,194,.3); }
+    .ref-share-btn.li:hover { background: rgba(10,102,194,.06); border-color: rgba(10,102,194,.5); }
+
+    /* ── STATS ── */
     .ref-stats {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -113,47 +395,113 @@
       margin-top: 24px;
     }
     .ref-stat-box {
-      background: var(--surface-soft);
+      background: var(--surface);
       border: 1px solid var(--hairline);
       border-radius: var(--r-xl);
       padding: 20px;
       text-align: center;
     }
     .ref-stat-num {
-      font-size: 36px; font-weight: 700;
-      background: linear-gradient(135deg,var(--brand-purple-300),var(--primary));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--brand-purple-300), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-variant-numeric: tabular-nums;
     }
     .ref-stat-label { font-size: 12px; color: var(--steel); margin-top: 4px; }
+
+    /* ── NOT LOGGED IN ── */
     .ref-login-prompt {
       text-align: center;
       padding: 60px 24px;
-      background: var(--surface);
+      background: var(--canvas);
       border: 1px solid var(--hairline);
       border-radius: var(--r-xxl);
+      box-shadow: 0 2px 8px rgba(15,15,15,.04);
     }
-    .ref-login-prompt h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-    .ref-login-prompt p { font-size: 14px; color: var(--slate); margin-bottom: 24px; }
-    .ref-faq { margin-top: 48px; }
-    .ref-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+    .ref-login-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--tint-lavender);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+    .ref-login-prompt h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; color: var(--ink); }
+    .ref-login-prompt p { font-size: 14px; color: var(--slate); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+
+    /* ── FAQ ── */
+    .ref-faq { margin-top: 56px; }
+    .ref-faq-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .ref-faq h2 { font-size: 22px; font-weight: 700; color: var(--ink); }
     .ref-faq-item {
       border-bottom: 1px solid var(--hairline);
-      padding: 16px 0;
     }
     .ref-faq-q {
-      font-size: 15px; font-weight: 600; color: var(--ink);
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 4px;
+      gap: 12px;
+      transition: color .15s;
     }
+    .ref-faq-q:hover { color: var(--primary); }
     .ref-faq-a {
-      font-size: 13px; color: var(--slate); line-height: 1.7;
-      margin-top: 12px; display: none;
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.7;
+      padding: 0 4px 18px;
+      display: none;
     }
     .ref-faq-item.open .ref-faq-a { display: block; }
-    .ref-faq-item.open .ref-faq-icon { transform: rotate(45deg); }
-    .ref-faq-icon { transition: transform .2s; font-size: 20px; color: var(--steel); }
+    .ref-faq-item.open .ref-faq-icon { transform: rotate(45deg); color: var(--primary); }
+    .ref-faq-icon { transition: transform .2s, color .2s; font-size: 20px; color: var(--steel); flex-shrink: 0; }
+
+    /* ── TRUST FOOTER ROW ── */
+    .ref-trust-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 28px 0;
+      border-top: 1px solid var(--hairline);
+      margin-top: 56px;
+    }
+    .ref-trust-footer-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--steel);
+      font-weight: 500;
+    }
+    .ref-trust-footer-item svg {
+      width: 14px; height: 14px;
+      color: var(--brand-green);
+      flex-shrink: 0;
+    }
+    .ref-trust-footer-item a { color: var(--link-blue); }
   </style>
 </head>
 <body>
+
+<div id="emp-scroll-prog"></div>
+
 <nav class="emp-nav">
   <div class="container emp-nav-inner">
     <a href="/" class="emp-brand">
@@ -176,49 +524,152 @@
   <a href="/app">Générer un CV</a>
   <a href="/referral">Parrainage</a>
   <a href="/#pricing">Tarifs</a>
-</div>
-  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+  <a href="/app" class="mn-cta" style="margin-top:8px;display:block;padding:14px 16px;background:var(--primary);color:#fff;border-radius:var(--r-md);text-align:center;font-weight:600">Commencer gratuitement →</a>
 </div>
 
-<div class="ref-layout page-enter">
-  <div class="ref-hero">
-    <div class="ref-hero-badge">🎁 Programme de parrainage</div>
-    <h1>Parrainez, <span style="background:linear-gradient(135deg,var(--brand-purple-300),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent">gagnez</span></h1>
-    <p>Pour chaque ami qui s'inscrit via votre lien, vous gagnez <strong style="color:var(--brand-green)">1 mois gratuit</strong> sur votre abonnement Emploia.</p>
+<!-- HERO -->
+<section class="ref-hero-section">
+  <div class="ref-hero-inner">
+    <div class="ref-hero-eyebrow">
+      <span class="dot"></span>
+      Programme de parrainage actif
+    </div>
+    <h1 class="ref-hero-h1">Parrainez <span class="accent">·</span> Gagnez</h1>
+    <p class="ref-hero-sub">
+      Pour chaque ami qui s'inscrit via votre lien, vous gagnez <strong>1 mois Pro offert</strong>.<br/>
+      Cumulez jusqu'à <strong>6 mois gratuits</strong> — sans effort.
+    </p>
+    <div class="ref-counter-chip" id="heroCounter" style="display:none">
+      <div>
+        <div class="val" id="heroSignups">0</div>
+        <div style="font-size:11px;opacity:.7">filleuls</div>
+      </div>
+      <div class="sep"></div>
+      <div>
+        <div class="val" id="heroMonths">0</div>
+        <div style="font-size:11px;opacity:.7">mois gagnés</div>
+      </div>
+      <div class="sep"></div>
+      <div style="font-size:12px">
+        <div style="color:#fff;font-weight:700">Max 6 mois</div>
+        <div style="opacity:.6">accumulables</div>
+      </div>
+    </div>
+    <div class="ref-trust-badges">
+      <div class="ref-trust-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 14S3 11 3 6.5A5 5 0 0 1 8 2a5 5 0 0 1 5 4.5C13 11 8 14 8 14z"/></svg>
+        Gratuit, sans engagement
+      </div>
+      <div class="ref-trust-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="m5.5 8 1.5 1.5L10.5 6"/></svg>
+        Crédité instantanément
+      </div>
+      <div class="ref-trust-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="10" height="8" rx="1.5"/><path d="M6 5V4a2 2 0 1 1 4 0v1"/></svg>
+        100% transparent
+      </div>
+      <div class="ref-trust-item">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5"/><path d="M8 6v2l1.5 1.5"/></svg>
+        Mois sans expiration
+      </div>
+    </div>
   </div>
+</section>
+
+<div class="ref-layout">
 
   <!-- HOW IT WORKS -->
-  <div class="ref-how">
-    <div class="ref-step">
-      <div class="ref-step-num">1</div>
-      <h3>Copiez votre lien</h3>
-      <p>Votre lien unique est généré automatiquement. Partagez-le où vous voulez.</p>
+  <section class="reveal">
+    <div class="ref-how-wrap">
+      <div class="ref-how-label">Comment ça marche</div>
+      <div class="ref-how">
+        <div class="ref-step reveal" data-delay="1">
+          <div class="ref-step-icon">
+            <span>🔗</span>
+            <span class="ref-step-num">1</span>
+          </div>
+          <h3>Copiez votre lien</h3>
+          <p>Votre lien unique est généré automatiquement. Partagez-le par email, WhatsApp ou LinkedIn en un clic.</p>
+        </div>
+        <div class="ref-step reveal" data-delay="2">
+          <div class="ref-step-icon">
+            <span>👤</span>
+            <span class="ref-step-num">2</span>
+          </div>
+          <h3>Votre ami s'inscrit</h3>
+          <p>Il crée un compte Emploia gratuitement via votre lien. Aucun abonnement requis de sa part.</p>
+        </div>
+        <div class="ref-step reveal" data-delay="3">
+          <div class="ref-step-icon">
+            <span>🎁</span>
+            <span class="ref-step-num">3</span>
+          </div>
+          <h3>Vous gagnez 1 mois</h3>
+          <p>Dès son inscription, 1 mois Pro est crédité automatiquement sur votre compte. Cumulez jusqu'à 6 mois.</p>
+        </div>
+      </div>
     </div>
-    <div class="ref-step">
-      <div class="ref-step-num">2</div>
-      <h3>Vos amis s'inscrivent</h3>
-      <p>Ils créent un compte Emploia via votre lien. C'est gratuit et sans engagement.</p>
+  </section>
+
+  <!-- REWARD TRACKER (always visible, updates when logged in) -->
+  <section class="reveal" data-delay="1">
+    <div class="ref-tracker">
+      <div class="ref-tracker-head">
+        <div class="ref-tracker-title">
+          <span>🏆</span> Votre progression de récompenses
+        </div>
+        <span class="ref-tracker-max">Max 6 mois offerts</span>
+      </div>
+      <div class="ref-tracker-bar-wrap">
+        <div class="ref-tracker-bar" id="trackerBar"></div>
+      </div>
+      <div class="ref-tracker-milestones">
+        <span class="ref-tracker-ms">0</span>
+        <span class="ref-tracker-ms">1</span>
+        <span class="ref-tracker-ms">2</span>
+        <span class="ref-tracker-ms">3</span>
+        <span class="ref-tracker-ms">4</span>
+        <span class="ref-tracker-ms">5</span>
+        <span class="ref-tracker-ms">6 mois</span>
+      </div>
+      <div class="ref-tracker-reward-grid" id="trackerSlots">
+        <!-- filled by JS -->
+      </div>
     </div>
-    <div class="ref-step">
-      <div class="ref-step-num">3</div>
-      <h3>Vous gagnez un mois</h3>
-      <p>Dès leur inscription, 1 mois gratuit est crédité sur votre abonnement Pro ou Intensif.</p>
-    </div>
-  </div>
+  </section>
 
   <!-- USER SECTION (logged in) -->
   <div id="refLoggedIn" style="display:none">
-    <div class="ref-card">
-      <div class="ref-card-title">🔗 Votre lien de parrainage</div>
+    <div class="ref-card reveal">
+      <div class="ref-card-title">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M13.3 2.5C12.4 1.9 11.2 2 10.4 2.8L2.9 10.3c-.4.4-.4 1 0 1.4l5.4 5.4c.4.4 1 .4 1.4 0l7.5-7.5c.8-.8.9-2 .3-2.9L13.3 2.5z" stroke="var(--primary)" stroke-width="1.5"/><circle cx="14.5" cy="5.5" r="1.5" fill="var(--primary)"/></svg>
+        Votre lien de parrainage
+      </div>
       <div class="ref-link-row">
         <input class="ref-link-input" id="refLink" readonly value="https://emploia.fr/?ref=..."/>
         <button class="emp-btn emp-btn-primary" onclick="copyLink()">Copier</button>
       </div>
-      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-        <a id="shareWA" href="#" target="_blank" rel="noopener noreferrer" class="emp-btn emp-btn-ghost emp-btn-sm">💬 WhatsApp</a>
-        <a id="shareLI" href="#" target="_blank" rel="noopener noreferrer" class="emp-btn emp-btn-ghost emp-btn-sm">in LinkedIn</a>
-        <a id="shareEmail" href="#" class="emp-btn emp-btn-ghost emp-btn-sm">📧 Email</a>
+
+      <!-- Social sharing -->
+      <div class="ref-share-row">
+        <a id="shareWA" href="#" target="_blank" rel="noopener noreferrer" class="ref-share-btn wa">
+          <svg viewBox="0 0 24 24" fill="#25D166"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 1.5C6.201 1.5 1.5 6.201 1.5 12c0 1.86.487 3.607 1.34 5.126L1.5 22.5l5.527-1.316A10.456 10.456 0 0 0 12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5zm0 19.5a9 9 0 0 1-4.59-1.258l-.329-.197-3.28.781.817-3.188-.214-.343A9 9 0 1 1 12 21z"/></svg>
+          WhatsApp
+        </a>
+        <a id="shareLI" href="#" target="_blank" rel="noopener noreferrer" class="ref-share-btn li">
+          <svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452H17.1V14.88c0-1.328-.024-3.037-1.851-3.037-1.852 0-2.136 1.445-2.136 2.939v5.67H9.767V9.5h3.211v1.561h.046c.447-.847 1.539-1.74 3.168-1.74 3.389 0 4.014 2.23 4.014 5.13v6.001h-.759zM5.337 7.433a1.872 1.872 0 0 1-1.876-1.872c0-1.033.84-1.872 1.876-1.872 1.034 0 1.871.839 1.871 1.872 0 1.034-.837 1.872-1.871 1.872zm1.608 13.019H3.73V9.5h3.215v10.952zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a id="shareEmail" href="#" class="ref-share-btn">
+          <svg viewBox="0 0 20 20" fill="none" stroke="var(--charcoal)" stroke-width="1.5"><rect x="3" y="5" width="14" height="10" rx="1.5"/><path d="m3 5 7 6 7-6"/></svg>
+          Email
+        </a>
+        <button class="ref-share-btn" onclick="copyLink()">
+          <svg viewBox="0 0 20 20" fill="none" stroke="var(--charcoal)" stroke-width="1.5"><rect x="5" y="7" width="10" height="10" rx="1.5"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2"/></svg>
+          Copier
+        </button>
       </div>
+
       <div class="ref-stats">
         <div class="ref-stat-box">
           <div class="ref-stat-num" id="refSignups">0</div>
@@ -234,41 +685,86 @@
 
   <!-- NOT LOGGED IN -->
   <div id="refNotLogged">
-    <div class="ref-login-prompt">
-      <div style="font-size:48px;margin-bottom:16px">🎁</div>
+    <div class="ref-login-prompt reveal">
+      <div class="ref-login-icon">🎁</div>
       <h2>Connectez-vous pour parrainer</h2>
-      <p>Créez un compte ou connectez-vous pour obtenir votre lien de parrainage unique.</p>
+      <p>Créez un compte ou connectez-vous pour obtenir votre lien de parrainage unique et commencer à gagner des mois gratuits.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="/app" class="emp-btn emp-btn-primary">Créer un compte gratuit</a>
-        <a href="/app" class="emp-btn emp-btn-ghost">Se connecter</a>
+        <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Créer un compte gratuit</a>
+        <a href="/app" class="emp-btn emp-btn-secondary">Se connecter</a>
       </div>
     </div>
   </div>
 
   <!-- FAQ -->
-  <div class="ref-faq">
-    <h2>Questions fréquentes</h2>
-    <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Combien de parrainages puis-je faire ? <span class="ref-faq-icon">+</span></div>
-      <div class="ref-faq-a">Il n'y a pas de limite ! Vous pouvez parrainer autant d'amis que vous le souhaitez et cumuler les mois gratuits.</div>
+  <div class="ref-faq reveal">
+    <div class="ref-faq-head-row">
+      <h2>Questions fréquentes</h2>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Quand est crédité le mois gratuit ? <span class="ref-faq-icon">+</span></div>
-      <div class="ref-faq-a">Le mois gratuit est crédité immédiatement après l'inscription de votre filleul. Il sera appliqué lors de votre prochain renouvellement.</div>
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Combien de parrainages puis-je faire ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Vous pouvez parrainer autant d'amis que vous le souhaitez. En revanche, le plafond de récompense est fixé à <strong>6 mois gratuits</strong> cumulés. Au-delà, les parrainages supplémentaires ne génèrent plus de mois.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Mon filleul a-t-il besoin de s'abonner ? <span class="ref-faq-icon">+</span></div>
-      <div class="ref-faq-a">Non ! Il suffit qu'il crée un compte gratuit via votre lien. Vous gagnez un mois dès son inscription.</div>
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Quand est crédité le mois gratuit ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Le mois gratuit est crédité automatiquement dès l'inscription de votre filleul. Il sera appliqué lors de votre prochain cycle de facturation ou renouvellement.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Les mois gratuits expirent-ils ? <span class="ref-faq-icon">+</span></div>
-      <div class="ref-faq-a">Non, les mois gratuits gagnés sont cumulables et n'expirent pas tant que vous avez un abonnement actif.</div>
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Mon filleul a-t-il besoin de s'abonner ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Non, il suffit qu'il crée un compte gratuit sur Emploia via votre lien. Vous gagnez votre mois dès son inscription, indépendamment de son abonnement.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">Je suis sur le plan gratuit, puis-je parrainer ? <span class="ref-faq-icon">+</span></div>
-      <div class="ref-faq-a">Oui ! Les mois gratuits seront crédités et appliqués si vous souscrivez un abonnement payant. Ils ne se perdent pas.</div>
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Les mois gratuits expirent-ils ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Non, les mois gratuits gagnés sont cumulables et n'expirent pas tant que votre compte est actif. Ils s'appliquent automatiquement à votre prochain renouvellement.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Je suis sur le plan gratuit, puis-je parrainer ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Oui ! Les mois gratuits accumulés ne sont pas perdus. Ils seront appliqués dès que vous souscrivez un abonnement payant.</div>
+    </div>
+    <div class="ref-faq-item">
+      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+        Le programme est-il limité dans le temps ?
+        <span class="ref-faq-icon">+</span>
+      </div>
+      <div class="ref-faq-a">Le programme de parrainage est permanent. Nous nous réservons le droit de le modifier avec un préavis de 30 jours. Les récompenses déjà accumulées restent acquises.</div>
     </div>
   </div>
+
+  <!-- TRUST FOOTER ROW -->
+  <div class="ref-trust-footer reveal">
+    <div class="ref-trust-footer-item">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 14S3 11 3 6.5A5 5 0 0 1 8 2a5 5 0 0 1 5 4.5C13 11 8 14 8 14z"/></svg>
+      Hébergement 100% français
+    </div>
+    <div class="ref-trust-footer-item">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="10" height="8" rx="1.5"/><path d="M6 5V4a2 2 0 1 1 4 0v1"/></svg>
+      Données chiffrées (RGPD)
+    </div>
+    <div class="ref-trust-footer-item">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="m5.5 8 1.5 1.5L10.5 6"/></svg>
+      Aucune donnée vendue à des tiers
+    </div>
+    <div class="ref-trust-footer-item">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2 L14 5 V9 C14 12 11 14.5 8 15 C5 14.5 2 12 2 9 V5 Z"/></svg>
+      <a href="/legal">Voir notre politique de confidentialité</a>
+    </div>
+  </div>
+
 </div>
 
 <footer class="emp-footer">
@@ -311,12 +807,31 @@
 
 <script src="/shared.js"></script>
 <script>
-  document.getElementById('yr').textContent = new Date().getFullYear();
+  // Year
+  document.querySelectorAll('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
 
+  // FAQ accordion
   function faqToggle(item) {
     item.classList.toggle('open');
   }
 
+  // Reward tracker rendering
+  function renderTracker(months) {
+    const slots = document.getElementById('trackerSlots');
+    if (!slots) return;
+    slots.innerHTML = '';
+    for (let i = 1; i <= 6; i++) {
+      const div = document.createElement('div');
+      div.className = 'ref-tracker-slot' + (i <= months ? ' earned' : '');
+      div.innerHTML = `<span class="icon">🎁</span><span>${i} mois</span>`;
+      slots.appendChild(div);
+    }
+    const bar = document.getElementById('trackerBar');
+    if (bar) bar.style.width = Math.min(months / 6 * 100, 100) + '%';
+  }
+  renderTracker(0); // initial empty state
+
+  // Load referral data
   async function loadReferral() {
     try {
       const r = await fetch('/api/auth/me', { credentials: 'include' });
@@ -333,19 +848,32 @@
 
       const link = ref.link || `https://emploia.fr/?ref=${ref.code}`;
       document.getElementById('refLink').value = link;
-      document.getElementById('refSignups').textContent = ref.signups || 0;
-      document.getElementById('refMonths').textContent = ref.monthsEarned || 0;
+
+      const signups = ref.signups || 0;
+      const months = ref.monthsEarned || 0;
+      document.getElementById('refSignups').textContent = signups;
+      document.getElementById('refMonths').textContent = months;
+
+      // Update hero counter
+      document.getElementById('heroSignups').textContent = signups;
+      document.getElementById('heroMonths').textContent = months;
+      if (signups > 0) document.getElementById('heroCounter').style.display = 'inline-flex';
+
+      // Update tracker
+      renderTracker(months);
 
       const msg = encodeURIComponent(`Essaie Emploia — le copilote IA pour décrocher des entretiens 🚀 : ${link}`);
       document.getElementById('shareWA').href = `https://wa.me/?text=${msg}`;
       document.getElementById('shareLI').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`;
       document.getElementById('shareEmail').href = `mailto:?subject=Je%20te%20recommande%20Emploia&body=${msg}`;
-    } catch {}
+    } catch (e) {}
   }
 
   function copyLink() {
     const val = document.getElementById('refLink').value;
-    navigator.clipboard.writeText(val).then(() => empToast('Lien copié !', 'success')).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
+    navigator.clipboard.writeText(val)
+      .then(() => empToast('Lien copié !', 'success'))
+      .catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
 
   // Check URL ref param (when landing via a referral link)
