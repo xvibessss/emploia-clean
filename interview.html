@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://emploia.fr/interview"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <meta property="og:title" content="Entretien IA — Simulateur d'entretien · Emploia"/>
   <meta property="og:description" content="Simulez votre entretien d'embauche avec une IA. Questions personnalisées, feedback en temps réel."/>
   <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
@@ -16,10 +16,12 @@
   <meta property="og:url" content="https://emploia.fr/interview"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+    
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
   <style>
-    body { background: var(--bg3); height: 100vh; overflow: hidden; }
+    body { background: var(--surface); height: 100vh; overflow: hidden; }
 
     .iv-page {
       padding-top: 64px;
@@ -30,8 +32,8 @@
 
     /* ── SIDEBAR LEFT ───────────────────── */
     .iv-sidebar {
-      background: var(--bg);
-      border-right: 1px solid var(--brd);
+      background: var(--canvas);
+      border-right: 1px solid var(--hairline);
       padding: 20px;
       overflow-y: auto;
       display: flex;
@@ -42,15 +44,15 @@
     .iv-sidebar h3 {
       font-size: 11px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       text-transform: uppercase;
       letter-spacing: .8px;
       margin-bottom: 8px;
     }
 
     .iv-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px;
     }
@@ -59,17 +61,17 @@
       width: 100%;
       padding: 9px 12px;
       border-radius: 9px;
-      border: 1.5px solid var(--brd);
-      background: var(--bg);
+      border: 1.5px solid var(--hairline);
+      background: var(--canvas);
       font-size: 12.5px;
-      color: var(--t1);
-      font-family: 'Sora', sans-serif;
+      color: var(--ink);
+      font-family: var(--f-ui);
       outline: none;
       margin-bottom: 8px;
       transition: border-color .15s;
     }
 
-    .field-input:focus { border-color: var(--blue); }
+    .field-input:focus { border-color: var(--primary); }
 
     .level-select {
       display: grid;
@@ -83,46 +85,46 @@
       border-radius: 8px;
       font-size: 11px;
       font-weight: 600;
-      color: var(--t3);
-      background: var(--bg);
-      border: 1.5px solid var(--brd);
+      color: var(--steel);
+      background: var(--canvas);
+      border: 1.5px solid var(--hairline);
       cursor: pointer;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       transition: all .15s;
     }
 
-    .lvl-btn:hover { border-color: var(--brdh); color: var(--t2); }
-    .lvl-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .lvl-btn:hover { border-color: var(--hairline-strong); color: var(--slate); }
+    .lvl-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
     .iv-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .iv-stat {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 11px;
       padding: 10px;
       text-align: center;
     }
-    .iv-stat-val { font-size: 20px; font-weight: 800; color: var(--t1); margin-bottom: 1px; letter-spacing: -.7px; }
-    .iv-stat-lbl { font-size: 9.5px; color: var(--t3); text-transform: uppercase; letter-spacing: .4px; }
+    .iv-stat-val { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 1px; letter-spacing: -.7px; }
+    .iv-stat-lbl { font-size: 9.5px; color: var(--steel); text-transform: uppercase; letter-spacing: .4px; }
 
     .templates-list { display: flex; flex-direction: column; gap: 6px; }
 
     .tpl-card {
       padding: 10px 12px;
       border-radius: 10px;
-      border: 1px solid var(--brd);
-      background: var(--bg);
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
       cursor: pointer;
       transition: all .15s;
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 12px;
-      color: var(--t2);
+      color: var(--slate);
     }
 
-    .tpl-card:hover { border-color: var(--brdh); color: var(--t1); }
-    .tpl-card.active { border-color: var(--blue); background: var(--bld); color: var(--blb); }
+    .tpl-card:hover { border-color: var(--hairline-strong); color: var(--ink); }
+    .tpl-card.active { border-color: var(--primary); background: var(--tint-lavender); color: var(--primary); }
     .tpl-card-emoji { font-size: 16px; }
 
     /* ── CHAT MAIN ────────────────────────── */
@@ -130,16 +132,16 @@
       display: flex;
       flex-direction: column;
       height: calc(100vh - 64px);
-      background: var(--bg2);
+      background: var(--surface-soft);
     }
 
     .iv-chat-header {
       padding: 14px 20px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--s2);
+      background: var(--surface);
     }
 
     .iv-chat-title {
@@ -151,7 +153,7 @@
     .iv-avatar {
       width: 38px; height: 38px;
       border-radius: 11px;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -165,21 +167,21 @@
       position: absolute;
       bottom: -1px; right: -1px;
       width: 11px; height: 11px;
-      background: var(--gnb);
-      border: 2px solid var(--s2);
+      background: var(--brand-green);
+      border: 2px solid var(--surface);
       border-radius: 50%;
     }
 
     .iv-chat-title h2 {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -.4px;
       margin-bottom: 1px;
     }
 
     .iv-chat-title p {
       font-size: 11px;
-      color: var(--t3);
+      color: var(--steel);
     }
 
     /* MESSAGES */
@@ -215,8 +217,8 @@
       font-size: 14px;
     }
 
-    .iv-msg.bot .iv-msg-avatar { background: var(--grad-primary); }
-    .iv-msg.user .iv-msg-avatar { background: var(--s4); }
+    .iv-msg.bot .iv-msg-avatar { background: linear-gradient(135deg,var(--primary),var(--brand-purple)); }
+    .iv-msg.user .iv-msg-avatar { background: var(--hairline-soft); }
 
     .iv-msg-bubble {
       max-width: 70%;
@@ -224,24 +226,24 @@
       border-radius: 14px;
       font-size: 13.5px;
       line-height: 1.6;
-      color: var(--t1);
+      color: var(--ink);
     }
 
     .iv-msg.bot .iv-msg-bubble {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-top-left-radius: 4px;
     }
 
     .iv-msg.user .iv-msg-bubble {
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       color: #fff;
       border-top-right-radius: 4px;
     }
 
     .iv-msg-time {
       font-size: 10px;
-      color: var(--t3);
+      color: var(--steel);
       margin-top: 4px;
       padding: 0 4px;
     }
@@ -253,8 +255,8 @@
     }
 
     .iv-typing .iv-msg-bubble {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       padding: 14px 18px;
       display: flex;
       gap: 4px;
@@ -262,7 +264,7 @@
 
     .typing-dot {
       width: 6px; height: 6px;
-      background: var(--t3);
+      background: var(--steel);
       border-radius: 50%;
       animation: typingBounce 1.2s infinite;
     }
@@ -283,8 +285,8 @@
       padding: 32px;
     }
 
-    .iv-welcome h2 { font-size: 24px; font-weight: 800; letter-spacing: -.8px; margin-bottom: 10px; }
-    .iv-welcome p { font-size: 13.5px; color: var(--t2); line-height: 1.7; margin-bottom: 24px; }
+    .iv-welcome h2 { font-size: 24px; font-weight: 700; letter-spacing: -.8px; margin-bottom: 10px; }
+    .iv-welcome p { font-size: 13.5px; color: var(--slate); line-height: 1.7; margin-bottom: 24px; }
 
     .iv-suggestions {
       display: grid;
@@ -297,46 +299,46 @@
     .iv-sug {
       padding: 12px 14px;
       border-radius: 11px;
-      border: 1px solid var(--brd);
-      background: var(--s2);
+      border: 1px solid var(--hairline);
+      background: var(--surface);
       cursor: pointer;
       font-size: 12px;
-      color: var(--t2);
+      color: var(--slate);
       text-align: left;
       transition: all .15s;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       line-height: 1.5;
     }
 
-    .iv-sug:hover { border-color: var(--brdh); color: var(--t1); transform: translateY(-1px); }
+    .iv-sug:hover { border-color: var(--hairline-strong); color: var(--ink); transform: translateY(-1px); }
 
     /* INPUT BAR */
     .iv-input-area {
       padding: 16px 20px;
-      border-top: 1px solid var(--brd);
-      background: var(--s2);
+      border-top: 1px solid var(--hairline);
+      background: var(--surface);
     }
 
     .iv-input-wrap {
       display: flex;
       gap: 8px;
       align-items: flex-end;
-      background: var(--bg);
-      border: 1.5px solid var(--brd);
+      background: var(--canvas);
+      border: 1.5px solid var(--hairline);
       border-radius: 14px;
       padding: 8px;
       transition: border-color .15s;
     }
 
-    .iv-input-wrap:focus-within { border-color: var(--blue); }
+    .iv-input-wrap:focus-within { border-color: var(--primary); }
 
     .iv-textarea {
       flex: 1;
       border: none;
       background: transparent;
-      color: var(--t1);
+      color: var(--ink);
       font-size: 13.5px;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       outline: none;
       resize: none;
       min-height: 32px;
@@ -349,7 +351,7 @@
       width: 36px; height: 36px;
       border-radius: 10px;
       border: none;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       color: #fff;
       cursor: pointer;
       font-size: 14px;
@@ -364,17 +366,17 @@
     .iv-mic-btn {
       width: 36px; height: 36px;
       border-radius: 10px;
-      border: 1px solid var(--brd);
+      border: 1px solid var(--hairline);
       background: transparent;
-      color: var(--t3);
+      color: var(--steel);
       cursor: pointer;
       font-size: 13px;
       flex-shrink: 0;
       transition: all .15s;
     }
 
-    .iv-mic-btn:hover { color: var(--t1); border-color: var(--brdh); }
-    .iv-mic-btn.recording { background: var(--red); border-color: var(--red); color: #fff; animation: micPulse 1s infinite; }
+    .iv-mic-btn:hover { color: var(--ink); border-color: var(--hairline-strong); }
+    .iv-mic-btn.recording { background: var(--error); border-color: var(--error); color: #fff; animation: micPulse 1s infinite; }
 
     @keyframes micPulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
@@ -383,15 +385,15 @@
 
     .iv-input-hint {
       font-size: 10px;
-      color: var(--t3);
+      color: var(--steel);
       text-align: center;
       margin-top: 8px;
     }
 
     /* ── PANEL RIGHT (Coach) ────────────── */
     .iv-coach {
-      background: var(--bg);
-      border-left: 1px solid var(--brd);
+      background: var(--canvas);
+      border-left: 1px solid var(--hairline);
       padding: 20px;
       overflow-y: auto;
       display: flex;
@@ -400,8 +402,8 @@
     }
 
     .coach-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px;
     }
@@ -409,7 +411,7 @@
     .coach-card h4 {
       font-size: 11px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       text-transform: uppercase;
       letter-spacing: .8px;
       margin-bottom: 10px;
@@ -424,9 +426,9 @@
       align-items: flex-start;
       padding: 8px 0;
       font-size: 12px;
-      color: var(--t2);
+      color: var(--slate);
       line-height: 1.5;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
     }
 
     .feedback-item:last-child { border-bottom: none; padding-bottom: 0; }
@@ -436,10 +438,10 @@
     .quick-tip {
       padding: 10px 12px;
       border-radius: 10px;
-      background: var(--bld);
+      background: var(--tint-lavender);
       border: 1px solid rgba(59,130,246,.2);
       font-size: 11.5px;
-      color: var(--blb);
+      color: var(--primary);
       line-height: 1.55;
       margin-bottom: 8px;
     }
@@ -447,15 +449,15 @@
     .quick-tip:last-child { margin-bottom: 0; }
 
     .session-hist-item {
-      padding: 8px 10px; background: var(--s3); border: 1px solid var(--brd);
+      padding: 8px 10px; background: var(--tint-gray); border: 1px solid var(--hairline);
       border-radius: 8px; cursor: pointer; transition: .15s; font-size: 11.5px;
     }
-    .session-hist-item:hover { border-color: var(--brdh); background: var(--s4); }
-    .session-hist-role { font-weight: 700; color: var(--t1); margin-bottom: 2px; }
-    .session-hist-meta { color: var(--t3); font-size: 10.5px; display: flex; gap: 8px; }
+    .session-hist-item:hover { border-color: var(--hairline-strong); background: var(--hairline-soft); }
+    .session-hist-role { font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .session-hist-meta { color: var(--steel); font-size: 10.5px; display: flex; gap: 8px; }
     .session-hist-score { font-weight: 700; }
-    .session-hist-score.good { color: var(--gnb); }
-    .session-hist-score.ok { color: var(--ylb); }
+    .session-hist-score.good { color: var(--brand-green); }
+    .session-hist-score.ok { color: var(--brand-yellow); }
     .session-hist-score.low { color: #ef4444; }
 
     /* Feedback badges */
@@ -465,13 +467,13 @@
     }
     .fb-badge.star { background: rgba(34,197,94,.15); color: #22c55e; }
     .fb-badge.warn { background: rgba(245,158,11,.15); color: #f59e0b; }
-    .fb-badge.info { background: rgba(99,102,241,.15); color: var(--blb); }
+    .fb-badge.info { background: rgba(99,102,241,.15); color: var(--primary); }
 
     /* MOBILE TOGGLES */
     .iv-mobile-tabs {
       display: none;
-      background: var(--s2);
-      border-bottom: 1px solid var(--brd);
+      background: var(--surface);
+      border-bottom: 1px solid var(--hairline);
       padding: 8px;
       gap: 4px;
     }
@@ -482,14 +484,14 @@
       border-radius: 8px;
       font-size: 11.5px;
       font-weight: 600;
-      color: var(--t3);
+      color: var(--steel);
       background: transparent;
       border: none;
       cursor: pointer;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
     }
 
-    .iv-mt.active { background: var(--s4); color: var(--t1); }
+    .iv-mt.active { background: var(--hairline-soft); color: var(--ink); }
 
     @media (max-width: 1100px) {
       .iv-page { grid-template-columns: 1fr; }
@@ -509,29 +511,28 @@
 
 <!-- NAV -->
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/tools" class="emp-nav-a">Outils</a>
-      <a href="/interview" class="emp-nav-a active">Entretien IA</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/interview" style="color:var(--primary);font-weight:600">Entretien</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
-
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/interview">🎤 Entretien IA</a>
-  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/interview">Simulateur entretien</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/profil">Mon profil</a>
 </div>
 
 <div class="iv-mobile-tabs">
@@ -554,7 +555,7 @@
         <button class="lvl-btn" data-lvl="senior" onclick="setLevel(this)">Senior</button>
         <button class="lvl-btn" data-lvl="lead" onclick="setLevel(this)">Lead</button>
       </div>
-      <button class="btn btn-primary btn-sm" style="width:100%" onclick="startInterview()">
+      <button class="emp-btn emp-btn-primary emp-btn-sm" style="width:100%" onclick="startInterview()">
         🚀 Démarrer simulation
       </button>
     </div>
@@ -597,12 +598,12 @@
         <div class="iv-avatar">🤖</div>
         <div>
           <h2>Coach Emploia</h2>
-          <p><span style="color:var(--gnb)">●</span> En ligne · IA Claude</p>
+          <p><span style="color:var(--brand-green)">●</span> En ligne · IA Claude</p>
         </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" onclick="saveSession()">💾 Sauver</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportChat()">⬇ PDF</button>
+        <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="saveSession()">💾 Sauver</button>
+        <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="exportChat()">⬇ PDF</button>
         <button class="btn btn-secondary btn-sm" onclick="resetChat()">🔄 Reset</button>
       </div>
     </div>
@@ -661,20 +662,14 @@
     <div class="coach-card">
       <h4>🕒 Sessions précédentes</h4>
       <div id="sessionHistory" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto"></div>
-      <div id="sessionHistoryEmpty" style="font-size:12px;color:var(--t3)">Aucune session sauvegardée.</div>
+      <div id="sessionHistoryEmpty" style="font-size:12px;color:var(--steel)">Aucune session sauvegardée.</div>
     </div>
   </aside>
 
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/interview" class="emp-bottom-nav-item active"><span class="bn-icon">🎤</span>Entretien</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="shared.js"></script>
 <script>

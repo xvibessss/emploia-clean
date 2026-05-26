@@ -19,8 +19,10 @@
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
 
   <!-- Shared design system — CSS variables, fonts, resets -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+    
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="/shared.css"/>
 
   <style>
     /* ── Page layout ──────────────────────────────────── */
@@ -37,7 +39,7 @@
     /* ── Card ─────────────────────────────────────────── */
     .score-card {
       background: var(--s1, #0d1424);
-      border: 1px solid var(--brd, rgba(255,255,255,.07));
+      border: 1px solid var(--brd, rgba(0,0,0,.04));
       border-radius: var(--r3, 20px);
       padding: 48px 40px;
       max-width: 480px;
@@ -46,7 +48,7 @@
       flex-direction: column;
       align-items: center;
       gap: 28px;
-      box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 24px 64px rgba(0,0,0,.5);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.02), 0 24px 64px rgba(0,0,0,.5);
     }
 
     /* ── Header logo + title ──────────────────────────── */
@@ -72,7 +74,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
+      font-weight: 700;
       font-size: 14px;
       color: #fff;
       letter-spacing: -0.5px;
@@ -81,7 +83,7 @@
 
     .logo-text {
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--t1, #f1f5f9);
       letter-spacing: -0.4px;
     }
@@ -134,7 +136,7 @@
 
     .gauge-number {
       font-size: 40px;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--t1, #f1f5f9);
       letter-spacing: -2px;
       line-height: 1;
@@ -194,7 +196,7 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      border: 1px solid var(--brd, rgba(255,255,255,.07));
+      border: 1px solid var(--brd, rgba(0,0,0,.04));
       background: var(--s2, #111827);
       color: var(--t1, #f1f5f9);
       text-decoration: none;
@@ -204,7 +206,7 @@
 
     .btn-share:hover {
       background: var(--s3, #1a2236);
-      border-color: var(--brdh, rgba(255,255,255,.13));
+      border-color: var(--brdh, rgba(0,0,0,.08));
       transform: translateY(-1px);
     }
 
@@ -257,7 +259,7 @@
     .divider {
       width: 100%;
       height: 1px;
-      background: var(--brd, rgba(255,255,255,.07));
+      background: var(--brd, rgba(0,0,0,.04));
     }
 
     /* ── Error / loading states ───────────────────────── */

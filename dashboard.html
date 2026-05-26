@@ -8,13 +8,13 @@
   <link rel="canonical" href="https://emploia.fr/dashboard"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+    
+  <link rel="stylesheet" href="/shared.css"/>
   <style>
-    body { background: var(--bg3); }
+    body { background: var(--surface); }
 
     /* ── LAYOUT ─────────────────────────────── */
     .dash-layout {
@@ -25,8 +25,8 @@
 
     /* ── WELCOME BANNER ─────────────────────── */
     .welcome-banner {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 20px;
       padding: 28px 32px;
       margin-bottom: 24px;
@@ -43,7 +43,7 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
     }
 
     .wb-glow {
@@ -58,7 +58,7 @@
 
     .wb-greeting {
       font-size: 13px;
-      color: var(--t3);
+      color: var(--steel);
       margin-bottom: 6px;
       display: flex;
       align-items: center;
@@ -67,8 +67,8 @@
 
     .wb-name {
       font-size: clamp(20px, 2.5vw, 26px);
-      font-weight: 900;
-      color: var(--t1);
+      font-weight: 700;
+      color: var(--ink);
       letter-spacing: -.6px;
       margin-bottom: 10px;
     }
@@ -84,10 +84,10 @@
       align-items: center;
       gap: 6px;
       font-size: 12px;
-      color: var(--t3);
+      color: var(--steel);
     }
 
-    .wb-stat strong { color: var(--t2); font-weight: 700; }
+    .wb-stat strong { color: var(--slate); font-weight: 700; }
 
     .wb-right {
       display: flex;
@@ -116,7 +116,7 @@
     .ob-title {
       font-size: 14px;
       font-weight: 700;
-      color: var(--t1);
+      color: var(--ink);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -129,8 +129,8 @@
     }
 
     .ob-step {
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--brd);
+      background: rgba(0,0,0,.02);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px;
       display: flex;
@@ -141,7 +141,7 @@
       text-decoration: none;
     }
 
-    .ob-step:hover { border-color: var(--brdh); background: rgba(255,255,255,.07); }
+    .ob-step:hover { border-color: var(--hairline-strong); background: rgba(0,0,0,.04); }
     .ob-step.done { border-color: rgba(16,185,129,.25); background: rgba(16,185,129,.06); }
 
     .ob-step-icon {
@@ -152,17 +152,17 @@
       justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
-      background: var(--s3);
+      background: var(--tint-gray);
     }
 
-    .ob-step.done .ob-step-icon { background: var(--gnd); }
+    .ob-step.done .ob-step-icon { background: var(--tint-mint); }
 
     .ob-step-text { flex: 1; }
-    .ob-step-label { font-size: 12px; font-weight: 700; color: var(--t2); }
-    .ob-step.done .ob-step-label { color: var(--gnb); }
-    .ob-step-sub { font-size: 10px; color: var(--t3); margin-top: 2px; }
+    .ob-step-label { font-size: 12px; font-weight: 700; color: var(--slate); }
+    .ob-step.done .ob-step-label { color: var(--brand-green); }
+    .ob-step-sub { font-size: 10px; color: var(--steel); margin-top: 2px; }
 
-    .ob-check { font-size: 14px; color: var(--gnb); }
+    .ob-check { font-size: 14px; color: var(--brand-green); }
 
     /* ── STATS ROW ──────────────────────────── */
     .stats-row {
@@ -173,15 +173,15 @@
     }
 
     .stat-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 16px;
       padding: 20px;
       transition: all .2s;
       cursor: default;
     }
 
-    .stat-card:hover { border-color: var(--brdh); transform: translateY(-1px); }
+    .stat-card:hover { border-color: var(--hairline-strong); transform: translateY(-1px); }
 
     .sc-icon {
       width: 40px; height: 40px;
@@ -195,14 +195,14 @@
 
     .sc-value {
       font-size: 28px;
-      font-weight: 900;
-      color: var(--t1);
+      font-weight: 700;
+      color: var(--ink);
       letter-spacing: -1px;
       line-height: 1;
       margin-bottom: 4px;
     }
 
-    .sc-label { font-size: 11px; color: var(--t3); }
+    .sc-label { font-size: 11px; color: var(--steel); }
 
     .sc-delta {
       display: inline-flex;
@@ -213,8 +213,8 @@
       margin-top: 8px;
     }
 
-    .sc-delta.up { color: var(--gnb); }
-    .sc-delta.down { color: var(--rnb); }
+    .sc-delta.up { color: var(--brand-green); }
+    .sc-delta.down { color: var(--error); }
 
     /* ── MAIN GRID ──────────────────────────── */
     .dash-grid {
@@ -229,8 +229,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 14px;
       padding: 6px;
       margin-bottom: 16px;
@@ -245,34 +245,34 @@
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
-      color: var(--t3);
+      color: var(--steel);
       cursor: pointer;
       border: none;
       background: transparent;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       white-space: nowrap;
       transition: all .15s;
     }
 
-    .dash-tab:hover { color: var(--t2); background: rgba(255,255,255,.04); }
+    .dash-tab:hover { color: var(--slate); background: rgba(0,0,0,.02); }
 
     .dash-tab.active {
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       color: #fff;
       box-shadow: 0 2px 12px rgba(99,102,241,.3);
     }
 
     .tab-count {
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 700;
       padding: 2px 7px;
       border-radius: 100px;
-      background: rgba(255,255,255,.2);
+      background: rgba(0,0,0,.1);
     }
 
     .dash-tab:not(.active) .tab-count {
-      background: var(--s3);
-      color: var(--t3);
+      background: var(--tint-gray);
+      color: var(--steel);
     }
 
     /* ── KANBAN ─────────────────────────────── */
@@ -284,15 +284,15 @@
     }
 
     .kanban-col {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 14px;
       overflow: hidden;
     }
 
     .kc-header {
       padding: 12px 14px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -301,7 +301,7 @@
     .kc-title {
       font-size: 11px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       text-transform: uppercase;
       letter-spacing: .8px;
       display: flex;
@@ -311,10 +311,10 @@
 
     .kc-dot { width: 7px; height: 7px; border-radius: 50%; }
     .dot-wishlist  { background: #a78bfa; }
-    .dot-applied   { background: var(--blue); }
-    .dot-interview { background: var(--ylw); }
-    .dot-offer     { background: var(--grn); }
-    .dot-rejected  { background: var(--red); }
+    .dot-applied   { background: var(--primary); }
+    .dot-interview { background: var(--warning); }
+    .dot-offer     { background: var(--success); }
+    .dot-rejected  { background: var(--error); }
 
     /* Application modal */
     .app-modal-overlay {
@@ -329,8 +329,8 @@
     }
     .app-modal-overlay.open { display: flex; }
     .app-modal {
-      background: var(--bg);
-      border: 1px solid var(--brd);
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
       border-radius: 16px;
       padding: 24px;
       width: 100%;
@@ -338,17 +338,17 @@
       max-height: 90vh;
       overflow-y: auto;
     }
-    .app-modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 20px; letter-spacing: -.4px; }
+    .app-modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; letter-spacing: -.4px; }
     .app-modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .app-modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-    .app-modal-field label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; }
+    .app-modal-field label { font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; letter-spacing: .5px; }
     .app-modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
     .kc-count {
       font-size: 11px;
-      font-weight: 800;
-      color: var(--t3);
-      background: var(--s3);
+      font-weight: 700;
+      color: var(--steel);
+      background: var(--tint-gray);
       padding: 2px 8px;
       border-radius: 100px;
     }
@@ -356,27 +356,27 @@
     .kc-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
 
     .kanban-card {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 10px;
       padding: 12px;
       cursor: pointer;
       transition: all .2s;
     }
 
-    .kanban-card:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+    .kanban-card:hover { border-color: var(--hairline-strong); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
 
-    .kcard-company { font-size: 10px; font-weight: 700; color: var(--t3); margin-bottom: 4px; }
-    .kcard-title { font-size: 12px; font-weight: 700; color: var(--t1); margin-bottom: 8px; line-height: 1.3; }
+    .kcard-company { font-size: 10px; font-weight: 700; color: var(--steel); margin-bottom: 4px; }
+    .kcard-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.3; }
     .kcard-footer { display: flex; align-items: center; justify-content: space-between; }
-    .kcard-date { font-size: 10px; color: var(--t3); }
+    .kcard-date { font-size: 10px; color: var(--steel); }
     .kcard-actions { display: flex; gap: 4px; }
 
     .kcard-btn {
       width: 22px; height: 22px;
       border-radius: 6px;
       border: none;
-      background: var(--s4);
+      background: var(--hairline-soft);
       cursor: pointer;
       font-size: 10px;
       display: flex;
@@ -385,7 +385,7 @@
       transition: background .15s;
     }
 
-    .kcard-btn:hover { background: var(--bld); }
+    .kcard-btn:hover { background: var(--tint-lavender); }
     .kcard-relance {
       width: 100%; margin-top: 8px; padding: 5px 8px;
       background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25);
@@ -393,11 +393,11 @@
       cursor: pointer; text-align: center; transition: .15s;
     }
     .kcard-relance:hover { background: rgba(245,158,11,.15); }
-    .kcard-note { font-size: 10px; color: var(--t3); margin: 4px 0 6px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .kcard-note { font-size: 10px; color: var(--steel); margin: 4px 0 6px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
     /* Skills gap banner */
     .skills-gap-card {
-      background: var(--s2); border: 1px solid var(--brd); border-radius: 16px;
+      background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px;
       padding: 18px 20px; margin-bottom: 20px; display: none;
     }
     .skills-gap-card h4 { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
@@ -412,17 +412,17 @@
       backdrop-filter: blur(4px);
     }
     .relance-modal-inner {
-      background: var(--s2); border: 1px solid var(--brd); border-radius: 20px;
+      background: var(--surface); border: 1px solid var(--hairline); border-radius: 20px;
       padding: 28px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
     }
-    .relance-modal h3 { font-size: 17px; font-weight: 800; margin: 0 0 6px; }
-    .relance-modal p { font-size: 13px; color: var(--t2); margin: 0 0 18px; }
+    .relance-modal h3 { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+    .relance-modal p { font-size: 13px; color: var(--slate); margin: 0 0 18px; }
     .relance-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-    .relance-tab { flex: 1; padding: 8px; background: var(--s3); border: 1px solid var(--brd); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; color: var(--t2); }
+    .relance-tab { flex: 1; padding: 8px; background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; color: var(--slate); }
     .relance-tab.active { background: var(--acc); border-color: var(--acc); color: #fff; }
-    .relance-content { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--t2); line-height: 1.7; white-space: pre-wrap; max-height: 260px; overflow-y: auto; margin-bottom: 10px; }
+    .relance-content { background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--slate); line-height: 1.7; white-space: pre-wrap; max-height: 260px; overflow-y: auto; margin-bottom: 10px; }
     .relance-tips { margin-bottom: 14px; }
-    .relance-tip { font-size: 12px; color: var(--t3); padding: 4px 0; }
+    .relance-tip { font-size: 12px; color: var(--steel); padding: 4px 0; }
     .relance-tip::before { content: '💡 '; }
 
     .kc-add {
@@ -434,17 +434,17 @@
       border-radius: 8px;
       font-size: 11px;
       font-weight: 600;
-      color: var(--t3);
+      color: var(--steel);
       cursor: pointer;
-      border: 1px dashed var(--brd);
+      border: 1px dashed var(--hairline);
       background: transparent;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       transition: all .15s;
       width: 100%;
       margin-top: 4px;
     }
 
-    .kc-add:hover { border-color: var(--blue); color: var(--blb); background: var(--bls); }
+    .kc-add:hover { border-color: var(--primary); color: var(--primary); background: var(--tint-lavender); }
 
     /* ── LIST VIEW ──────────────────────────── */
     .list-view { display: none; flex-direction: column; gap: 10px; }
@@ -452,8 +452,8 @@
     .list-view.active { display: flex; }
 
     .list-item {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 14px;
       padding: 16px 20px;
       display: flex;
@@ -463,12 +463,12 @@
       cursor: pointer;
     }
 
-    .list-item:hover { border-color: var(--brdh); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+    .list-item:hover { border-color: var(--hairline-strong); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,0,0,.08); }
 
     .li-logo {
       width: 42px; height: 42px;
       border-radius: 10px;
-      background: var(--s3);
+      background: var(--tint-gray);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -477,10 +477,10 @@
     }
 
     .li-info { flex: 1; }
-    .li-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
-    .li-company { font-size: 12px; color: var(--t2); margin-bottom: 6px; }
+    .li-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .li-company { font-size: 12px; color: var(--slate); margin-bottom: 6px; }
     .li-meta { display: flex; gap: 10px; flex-wrap: wrap; }
-    .li-meta-item { font-size: 11px; color: var(--t3); display: flex; align-items: center; gap: 4px; }
+    .li-meta-item { font-size: 11px; color: var(--steel); display: flex; align-items: center; gap: 4px; }
 
     .li-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
@@ -488,15 +488,15 @@
     .generate-panel { display: flex; flex-direction: column; gap: 16px; }
 
     .gen-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 16px;
       overflow: hidden;
     }
 
     .gen-card-header {
       padding: 14px 18px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -505,7 +505,7 @@
     .gen-card-title {
       font-size: 12px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       text-transform: uppercase;
       letter-spacing: .8px;
     }
@@ -516,7 +516,7 @@
       display: flex;
       gap: 4px;
       margin-bottom: 14px;
-      background: var(--s3);
+      background: var(--tint-gray);
       border-radius: 10px;
       padding: 4px;
     }
@@ -527,17 +527,17 @@
       border-radius: 7px;
       font-size: 11px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       cursor: pointer;
       border: none;
       background: transparent;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       transition: all .15s;
       text-align: center;
     }
 
     .gen-tab.active {
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       color: #fff;
     }
 
@@ -545,11 +545,11 @@
       width: 100%;
       padding: 10px 12px;
       border-radius: 9px;
-      border: 1.5px solid var(--brd);
-      background: var(--bg);
+      border: 1.5px solid var(--hairline);
+      background: var(--canvas);
       font-size: 12px;
-      color: var(--t1);
-      font-family: 'Sora', sans-serif;
+      color: var(--ink);
+      font-family: var(--f-ui);
       outline: none;
       resize: none;
       line-height: 1.65;
@@ -557,18 +557,18 @@
       margin-bottom: 10px;
     }
 
-    .gen-textarea:focus { border-color: var(--blue); }
-    .gen-textarea::placeholder { color: var(--t3); }
+    .gen-textarea:focus { border-color: var(--primary); }
+    .gen-textarea::placeholder { color: var(--steel); }
 
     /* RESULT AREA */
     .gen-result {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 10px;
       padding: 14px;
       min-height: 120px;
       font-size: 12px;
-      color: var(--t2);
+      color: var(--slate);
       line-height: 1.7;
       display: flex;
       align-items: center;
@@ -582,14 +582,14 @@
     .gen-result.has-content {
       align-items: flex-start;
       text-align: left;
-      color: var(--t1);
+      color: var(--ink);
       white-space: pre-wrap;
     }
 
     /* USAGE BAR */
     .usage-bar {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px;
     }
@@ -601,8 +601,8 @@
       margin-bottom: 10px;
     }
 
-    .usage-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; }
-    .usage-count { font-size: 12px; font-weight: 700; color: var(--blb); }
+    .usage-label { font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; letter-spacing: .7px; }
+    .usage-count { font-size: 12px; font-weight: 700; color: var(--primary); }
 
     /* RECENT ACTIVITY */
     .activity-list { display: flex; flex-direction: column; gap: 0; }
@@ -612,7 +612,7 @@
       align-items: flex-start;
       gap: 12px;
       padding: 12px 0;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
     }
 
     .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
@@ -621,7 +621,7 @@
     .activity-icon {
       width: 32px; height: 32px;
       border-radius: 9px;
-      background: var(--s3);
+      background: var(--tint-gray);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -630,15 +630,15 @@
     }
 
     .activity-text { flex: 1; }
-    .activity-title { font-size: 12px; font-weight: 600; color: var(--t2); line-height: 1.4; }
-    .activity-title strong { color: var(--t1); }
-    .activity-time { font-size: 10px; color: var(--t3); margin-top: 3px; }
+    .activity-title { font-size: 12px; font-weight: 600; color: var(--slate); line-height: 1.4; }
+    .activity-title strong { color: var(--ink); }
+    .activity-time { font-size: 10px; color: var(--steel); margin-top: 3px; }
 
     /* VIEW TOGGLE */
     .view-toggle {
       display: flex;
       gap: 4px;
-      background: var(--s3);
+      background: var(--tint-gray);
       border-radius: 9px;
       padding: 3px;
     }
@@ -648,20 +648,20 @@
       border-radius: 7px;
       font-size: 11px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       cursor: pointer;
       border: none;
       background: transparent;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       transition: all .15s;
     }
 
-    .vt-btn.active { background: var(--s2); color: var(--t1); }
+    .vt-btn.active { background: var(--surface); color: var(--ink); }
 
     /* SKELETON CARDS */
     .skel-card-dash {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 14px;
       padding: 16px;
       display: flex;
@@ -671,15 +671,15 @@
 
     /* REFERRAL CARD */
     .referral-card{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(99,102,241,.06));border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:18px 20px;}
-    .referral-title{font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px;}
-    .referral-sub{font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6;}
+    .referral-title{font-size:14px;font-weight: 700;color:var(--ink);margin-bottom:6px;}
+    .referral-sub{font-size:12px;color:var(--slate);margin-bottom:14px;line-height:1.6;}
     .referral-stats{display:flex;gap:12px;margin-bottom:14px;}
-    .referral-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:10px 12px;text-align:center;}
-    .referral-stat-n{font-size:20px;font-weight:900;color:var(--gnb);}
-    .referral-stat-l{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
+    .referral-stat{flex:1;background:rgba(0,0,0,.02);border-radius:9px;padding:10px 12px;text-align:center;}
+    .referral-stat-n{font-size:20px;font-weight: 700;color:var(--brand-green);}
+    .referral-stat-l{font-size:10px;color:var(--steel);font-weight:600;margin-top:2px;}
     .referral-link-row{display:flex;gap:8px;align-items:center;}
-    .referral-link-input{flex:1;padding:9px 12px;background:var(--s2);border:1px solid var(--brd);border-radius:8px;color:var(--t2);font-size:11px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .referral-copy-btn{padding:9px 14px;background:linear-gradient(135deg,var(--grn),rgba(16,185,129,.7));color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+    .referral-link-input{flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--hairline);border-radius:8px;color:var(--slate);font-size:11px;font-family:inherit;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .referral-copy-btn{padding:9px 14px;background:linear-gradient(135deg,var(--success),rgba(16,185,129,.7));color:#fff;border:none;border-radius:8px;font-size:12px;font-weight: 700;cursor:pointer;font-family:inherit;white-space:nowrap;}
 
     /* CANCELLATION WARNING BANNER */
     .cancel-banner {
@@ -693,8 +693,8 @@
       gap: 12px;
       margin-bottom: 16px;
     }
-    .cancel-banner-text { font-size: 13px; color: var(--t1); line-height: 1.5; }
-    .cancel-banner-text span { color: #f59e0b; font-weight: 800; }
+    .cancel-banner-text { font-size: 13px; color: var(--ink); line-height: 1.5; }
+    .cancel-banner-text span { color: #f59e0b; font-weight: 700; }
 
     /* UPGRADE BANNER */
     .upgrade-banner {
@@ -708,24 +708,24 @@
       gap: 12px;
     }
 
-    .ub-text { font-size: 12px; color: var(--t2); line-height: 1.5; }
-    .ub-text strong { color: var(--t1); }
+    .ub-text { font-size: 12px; color: var(--slate); line-height: 1.5; }
+    .ub-text strong { color: var(--ink); }
 
     /* Score progression chart */
     .score-chart-canvas { width: 100%; height: 120px; display: block; }
     .score-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
-    .score-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--t3); }
+    .score-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--steel); }
     .score-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
     /* Weekly report modal */
     .report-modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
     .report-modal.open { display: flex; }
-    .report-inner { background: var(--s2); border: 1px solid var(--brd); border-radius: 20px; padding: 28px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .report-inner { background: var(--surface); border: 1px solid var(--hairline); border-radius: 20px; padding: 28px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
     .report-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
-    .report-stat { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 12px; text-align: center; }
-    .report-stat-n { font-size: 22px; font-weight: 900; color: var(--t1); }
-    .report-stat-l { font-size: 10px; color: var(--t3); margin-top: 2px; }
-    .report-action { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--brd); font-size: 13px; color: var(--t2); }
+    .report-stat { background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px; text-align: center; }
+    .report-stat-n { font-size: 22px; font-weight: 700; color: var(--ink); }
+    .report-stat-l { font-size: 10px; color: var(--steel); margin-top: 2px; }
+    .report-action { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--hairline); font-size: 13px; color: var(--slate); }
     .report-action:last-child { border-bottom: none; }
     .report-action::before { content: '→'; color: var(--acc); font-weight: 700; flex-shrink: 0; }
 
@@ -756,32 +756,29 @@
 
 <!-- NAV -->
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/tools" class="emp-nav-a">Outils</a>
-      <a href="/interview" class="emp-nav-a">Entretien</a>
-      <a href="/dashboard" class="emp-nav-a active">Dashboard</a>
-      <a href="/profil" class="emp-nav-a">Profil</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/dashboard" style="color:var(--primary);font-weight:600">Dashboard</a>
+      <a href="/profil">Profil</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
-
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/interview">🎤 Entretien IA</a>
-  <a href="/dashboard">📊 Dashboard</a>
-  <a href="/profil">👤 Mon Profil</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/profil">Mon profil</a>
+  <a href="/interview">Simulateur entretien</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -804,9 +801,9 @@
       </div>
     </div>
     <div class="wb-right">
-      <button onclick="openWeeklyReport()" class="btn btn-ghost btn-sm">📧 Rapport hebdo</button>
-      <a href="/jobs" class="btn btn-ghost btn-sm">📋 Chercher une offre</a>
-      <a href="/app" class="btn btn-primary btn-sm">✨ Générer un CV</a>
+      <button onclick="openWeeklyReport()" class="emp-btn emp-btn-ghost emp-btn-sm">📧 Rapport hebdo</button>
+      <a href="/jobs" class="emp-btn emp-btn-ghost emp-btn-sm">📋 Chercher une offre</a>
+      <a href="/app" class="emp-btn emp-btn-primary emp-btn-sm">✨ Générer un CV</a>
     </div>
   </div>
 
@@ -815,16 +812,16 @@
     <div class="cancel-banner-text">
       ⚠️ Votre abonnement Pro sera annulé le <span id="cancelBannerDate">—</span>. Vous conserverez l'accès jusqu'à cette date.
     </div>
-    <a href="/api/stripe-portal" class="btn btn-sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;white-space:nowrap;flex-shrink:0">Réactiver →</a>
+    <a href="/api/stripe-portal" class="emp-btn emp-btn-sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;white-space:nowrap;flex-shrink:0">Réactiver →</a>
   </div>
 
   <!-- ONBOARDING STEPS -->
   <div class="onboarding-card" id="onboardingCard">
     <div class="ob-header">
       <div class="ob-title">🚀 Complétez votre profil pour de meilleures recommandations
-        <span class="badge badge-blue" id="obProgressBadge">0% complété</span>
+        <span class="emp-badge emp-badge-purple" id="obProgressBadge">0% complété</span>
       </div>
-      <button onclick="document.getElementById('onboardingCard').style.display='none'" style="background:transparent;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:4px">✕</button>
+      <button onclick="document.getElementById('onboardingCard').style.display='none'" style="background:transparent;border:none;cursor:pointer;color:var(--steel);font-size:16px;padding:4px">✕</button>
     </div>
     <div class="ob-steps">
       <a href="/app" class="ob-step" id="ob-1">
@@ -864,25 +861,25 @@
   <!-- STATS -->
   <div class="stats-row">
     <div class="stat-card">
-      <div class="sc-icon" style="background:var(--bld)">📤</div>
+      <div class="sc-icon" style="background:var(--tint-lavender)">📤</div>
       <div class="sc-value" id="statTotal">—</div>
       <div class="sc-label">Candidatures envoyées</div>
       <div class="sc-delta" id="statTotalDelta">—</div>
     </div>
     <div class="stat-card">
-      <div class="sc-icon" style="background:var(--yld)">🎤</div>
+      <div class="sc-icon" style="background:var(--tint-yellow)">🎤</div>
       <div class="sc-value" id="statInterviews">—</div>
       <div class="sc-label">Entretiens obtenus</div>
       <div class="sc-delta" id="statInterviewsDelta">—</div>
     </div>
     <div class="stat-card">
-      <div class="sc-icon" style="background:var(--gnd)">🏆</div>
+      <div class="sc-icon" style="background:var(--tint-mint)">🏆</div>
       <div class="sc-value" id="statOffers">—</div>
       <div class="sc-label">Offres reçues</div>
       <div class="sc-delta up" id="statOffersDelta">—</div>
     </div>
     <div class="stat-card">
-      <div class="sc-icon" style="background:var(--ind2)">📄</div>
+      <div class="sc-icon" style="background:var(--tint-lavender)">📄</div>
       <div class="sc-value" id="statWishlist">—</div>
       <div class="sc-label">À postuler (wishlist)</div>
       <div class="sc-delta" id="statWishlistDelta">—</div>
@@ -902,13 +899,13 @@
   </div>
 
   <!-- ACTIVITY CHART -->
-  <div id="activityChart" style="background:var(--s2);border:1px solid var(--brd);border-radius:18px;padding:20px 24px;margin-bottom:24px;display:none">
+  <div id="activityChart" style="background:var(--surface);border:1px solid var(--hairline);border-radius:18px;padding:20px 24px;margin-bottom:24px;display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
         <div style="font-size:14px;font-weight:700">Activité candidature</div>
-        <div style="font-size:12px;color:var(--t3);margin-top:2px" id="chartSubtitle">7 derniers jours</div>
+        <div style="font-size:12px;color:var(--steel);margin-top:2px" id="chartSubtitle">7 derniers jours</div>
       </div>
-      <div style="font-size:22px;font-weight:800;color:var(--acc)" id="chartTotal">0</div>
+      <div style="font-size:22px;font-weight:700;color:var(--acc)" id="chartTotal">0</div>
     </div>
     <div id="chartBars" style="display:flex;align-items:flex-end;gap:6px;height:60px"></div>
     <div id="chartLabels" style="display:flex;gap:6px;margin-top:6px"></div>
@@ -923,7 +920,7 @@
       <div class="skills-gap-card" id="skillsGapCard">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <h4>🧠 Compétences manquantes</h4>
-          <span style="font-size:11px;color:var(--t3)">Basé sur vos candidatures</span>
+          <span style="font-size:11px;color:var(--steel)">Basé sur vos candidatures</span>
         </div>
         <div class="skills-gap-tags" id="skillsGapTags"></div>
       </div>
@@ -943,8 +940,8 @@
             <button class="vt-btn active" id="vtKanban" onclick="setView('kanban')">⊞ Kanban</button>
             <button class="vt-btn" id="vtList" onclick="setView('list')">≡ Liste</button>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇️ CSV</button>
-          <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Ajouter</button>
+          <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="exportCSV()">⬇️ CSV</button>
+          <button class="emp-btn emp-btn-primary emp-btn-sm" onclick="openAddModal()">+ Ajouter</button>
         </div>
       </div>
 
@@ -995,38 +992,38 @@
       <!-- UPGRADE -->
       <div class="upgrade-banner" style="margin-top:16px">
         <div class="ub-text"><strong>Passez Pro</strong> pour des candidatures illimitées, la négociation salariale IA, le bilan post-entretien et 20 versions de CV.</div>
-        <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
+        <a href="/#pricing" class="emp-btn emp-btn-primary emp-btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
       </div>
 
       <!-- JOBS POUR VOUS -->
       <div id="jobsForYouSection" style="margin-top:16px;display:none">
-        <div style="background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden">
-          <div style="padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">
+        <div style="background:var(--surface);border:1px solid var(--hairline);border-radius:16px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;font-weight:700;color:var(--steel);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">
               ⭐ Offres pour vous
-              <span style="background:var(--bld);color:var(--blb);font-size:9px;padding:2px 7px;border-radius:100px;font-weight:800">IA</span>
+              <span style="background:var(--tint-lavender);color:var(--primary);font-size:9px;padding:2px 7px;border-radius:100px;font-weight:700">IA</span>
             </div>
-            <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Voir toutes les offres →</a>
+            <a href="/jobs" style="font-size:11px;color:var(--primary);text-decoration:none">Voir toutes les offres →</a>
           </div>
           <div id="jobsForYouList" style="padding:12px;display:flex;flex-direction:column;gap:8px">
-            <div style="text-align:center;padding:16px;color:var(--t3);font-size:12px">Chargement...</div>
+            <div style="text-align:center;padding:16px;color:var(--steel);font-size:12px">Chargement...</div>
           </div>
-          <div style="padding:12px 18px;border-top:1px solid var(--brd);display:flex;gap:8px">
-            <a href="/alerts" class="btn btn-ghost btn-sm" style="font-size:11px">🔔 Créer une alerte →</a>
-            <a href="/jobs" class="btn btn-primary btn-sm" style="font-size:11px">Voir toutes les offres →</a>
+          <div style="padding:12px 18px;border-top:1px solid var(--hairline);display:flex;gap:8px">
+            <a href="/alerts" class="emp-btn emp-btn-ghost emp-btn-sm" style="font-size:11px">🔔 Créer une alerte →</a>
+            <a href="/jobs" class="emp-btn emp-btn-primary emp-btn-sm" style="font-size:11px">Voir toutes les offres →</a>
           </div>
         </div>
       </div>
 
       <!-- SAVED JOBS -->
       <div id="savedJobsSection" style="margin-top:16px;display:none">
-        <div style="background:var(--s2);border:1px solid var(--brd);border-radius:16px;overflow:hidden">
-          <div style="padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
-            <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">⭐ Offres sauvegardées <span id="savedCount" style="background:var(--s3);color:var(--t3);font-size:10px;padding:2px 8px;border-radius:100px">0</span></div>
-            <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Parcourir les offres →</a>
+        <div style="background:var(--surface);border:1px solid var(--hairline);border-radius:16px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;font-weight:700;color:var(--steel);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px">⭐ Offres sauvegardées <span id="savedCount" style="background:var(--tint-gray);color:var(--steel);font-size:10px;padding:2px 8px;border-radius:100px">0</span></div>
+            <a href="/jobs" style="font-size:11px;color:var(--primary);text-decoration:none">Parcourir les offres →</a>
           </div>
           <div id="savedJobsList" style="padding:12px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto">
-            <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px">Aucune offre sauvegardée.<br><a href="/jobs" style="color:var(--inb)">Parcourir les offres</a></div>
+            <div style="text-align:center;padding:24px;color:var(--steel);font-size:13px">Aucune offre sauvegardée.<br><a href="/jobs" style="color:var(--primary)">Parcourir les offres</a></div>
           </div>
         </div>
       </div>
@@ -1039,7 +1036,7 @@
       <div class="gen-card">
         <div class="gen-card-header">
           <div class="gen-card-title">✨ Générer</div>
-          <span class="badge badge-blue" id="genCreditsLabel">— crédits restants</span>
+          <span class="emp-badge emp-badge-purple" id="genCreditsLabel">— crédits restants</span>
         </div>
         <div class="gen-card-body">
           <div class="gen-tabs">
@@ -1052,13 +1049,13 @@
           <textarea class="gen-textarea" id="genProfile" rows="3" placeholder="Votre profil / expériences..."></textarea>
 
           <div class="gen-result" id="genResult">
-            <div style="color:var(--t3);font-size:12px">
+            <div style="color:var(--steel);font-size:12px">
               <div style="font-size:32px;margin-bottom:10px">✨</div>
               Remplissez les champs et cliquez sur Générer
             </div>
           </div>
 
-          <button class="btn btn-primary" id="genBtn" style="width:100%" onclick="handleGen()">
+          <button class="emp-btn emp-btn-primary" id="genBtn" style="width:100%" onclick="handleGen()">
             ✨ Générer avec l'IA
           </button>
 
@@ -1071,7 +1068,7 @@
               <div class="emp-progress-track">
                 <div class="emp-progress-fill" id="genUsageFill" style="width:0%"></div>
               </div>
-              <div style="margin-top:8px;font-size:11px;color:var(--t3)" id="genUsageFooter">— générations restantes · <a href="/#pricing" style="color:var(--blb)">Passer Pro →</a></div>
+              <div style="margin-top:8px;font-size:11px;color:var(--steel)" id="genUsageFooter">— générations restantes · <a href="/#pricing" style="color:var(--primary)">Passer Pro →</a></div>
             </div>
           </div>
         </div>
@@ -1084,7 +1081,7 @@
         </div>
         <div class="gen-card-body" style="padding-top:4px">
           <div class="activity-list" id="activityList">
-            <div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">
+            <div style="color:var(--steel);font-size:12px;text-align:center;padding:16px">
               Chargement de l'activité…
             </div>
           </div>
@@ -1095,7 +1092,7 @@
       <div class="gen-card" id="scoreChartCard" style="display:none">
         <div class="gen-card-header">
           <div class="gen-card-title">📈 Score évolution</div>
-          <span style="font-size:10px;color:var(--t3)" id="scoreChartMeta"></span>
+          <span style="font-size:10px;color:var(--steel)" id="scoreChartMeta"></span>
         </div>
         <div class="gen-card-body" style="padding:12px 14px">
           <canvas id="scoreCanvas" class="score-chart-canvas"></canvas>
@@ -1113,10 +1110,10 @@
           <div class="gen-card-title">💡 Conseil du jour</div>
         </div>
         <div class="gen-card-body" id="conseilBody">
-          <div style="font-size:13px;color:var(--t2);line-height:1.7">
+          <div style="font-size:13px;color:var(--slate);line-height:1.7">
             Commencez par <strong>trouver des offres</strong> qui vous correspondent, puis générez votre CV ATS-optimisé en 30 secondes.
           </div>
-          <a href="/jobs" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%">📋 Chercher des offres →</a>
+          <a href="/jobs" class="emp-btn emp-btn-primary emp-btn-sm" style="margin-top:12px;width:100%">📋 Chercher des offres →</a>
         </div>
       </div>
 
@@ -1142,43 +1139,43 @@
 <div class="report-modal" id="reportModal" onclick="if(event.target===this)closeReportModal()">
   <div class="report-inner">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <h3 style="font-size:17px;font-weight:900;letter-spacing:-.4px">📧 Rapport hebdomadaire</h3>
-      <button onclick="closeReportModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--t3)">×</button>
+      <h3 style="font-size:17px;font-weight:700;letter-spacing:-.4px">📧 Rapport hebdomadaire</h3>
+      <button onclick="closeReportModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--steel)">×</button>
     </div>
-    <div id="reportSubtitle" style="font-size:12px;color:var(--t3);margin-bottom:16px"></div>
+    <div id="reportSubtitle" style="font-size:12px;color:var(--steel);margin-bottom:16px"></div>
 
     <div id="reportLoading" style="text-align:center;padding:32px">
       <div class="spin" style="margin:0 auto 12px"></div>
-      <div style="font-size:13px;color:var(--t3)">Génération de votre rapport IA…</div>
+      <div style="font-size:13px;color:var(--steel)">Génération de votre rapport IA…</div>
     </div>
 
     <div id="reportContent" style="display:none">
-      <div id="reportHeadline" style="font-size:16px;font-weight:800;color:var(--t1);margin-bottom:12px;line-height:1.3"></div>
-      <div id="reportSummary" style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px;background:var(--s3);border-radius:10px;padding:12px"></div>
+      <div id="reportHeadline" style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.3"></div>
+      <div id="reportSummary" style="font-size:13px;color:var(--slate);line-height:1.7;margin-bottom:14px;background:var(--tint-gray);border-radius:10px;padding:12px"></div>
 
       <div class="report-stat-grid" id="reportStats"></div>
 
       <div style="margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px">✅ Points positifs</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--steel);margin-bottom:8px">✅ Points positifs</div>
         <div id="reportHighlights" style="display:flex;flex-direction:column;gap:4px"></div>
       </div>
 
       <div style="margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:8px">🎯 Actions prioritaires</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--steel);margin-bottom:8px">🎯 Actions prioritaires</div>
         <div id="reportActions"></div>
       </div>
 
       <div style="background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(59,130,246,.05));border:1px solid rgba(99,102,241,.2);border-radius:10px;padding:12px;margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;color:var(--acc);margin-bottom:4px">💪 Objectif semaine prochaine</div>
-        <div id="reportGoal" style="font-size:13px;color:var(--t1);font-weight:600"></div>
+        <div id="reportGoal" style="font-size:13px;color:var(--ink);font-weight:600"></div>
       </div>
 
-      <div id="reportMotivation" style="font-size:13px;color:var(--t2);font-style:italic;text-align:center;padding:8px 0;border-top:1px solid var(--brd)"></div>
+      <div id="reportMotivation" style="font-size:13px;color:var(--slate);font-style:italic;text-align:center;padding:8px 0;border-top:1px solid var(--hairline)"></div>
     </div>
 
     <div style="margin-top:16px;display:flex;gap:8px">
-      <a href="/alerts" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center">🔔 Gérer les alertes</a>
-      <button onclick="closeReportModal()" class="btn btn-ghost btn-sm">Fermer</button>
+      <a href="/alerts" class="emp-btn emp-btn-ghost emp-btn-sm" style="flex:1;justify-content:center">🔔 Gérer les alertes</a>
+      <button onclick="closeReportModal()" class="emp-btn emp-btn-ghost emp-btn-sm">Fermer</button>
     </div>
   </div>
 </div>
@@ -1236,20 +1233,14 @@
       <textarea class="emp-input" id="appNotes" rows="3" placeholder="Contacts, infos, suivi..."></textarea>
     </div>
     <div class="app-modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Annuler</button>
-      <button class="btn btn-primary btn-sm" id="saveAppBtn" onclick="saveApplication()">Enregistrer</button>
+      <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="closeModal()">Annuler</button>
+      <button class="emp-btn emp-btn-primary emp-btn-sm" id="saveAppBtn" onclick="saveApplication()">Enregistrer</button>
     </div>
   </div>
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/apply-queue" class="emp-bottom-nav-item"><span class="bn-icon">📬</span>File</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>IA</a>
-  <a href="/dashboard" class="emp-bottom-nav-item active"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="shared.js"></script>
 <script>

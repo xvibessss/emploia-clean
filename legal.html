@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://emploia.fr/legal"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="/manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
@@ -23,15 +23,15 @@
       gap: 8px;
       flex-wrap: wrap;
       margin-bottom: 40px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       padding-bottom: 16px;
     }
     .legal-tab {
       padding: 8px 18px;
       border-radius: 100px;
-      background: var(--s2);
-      border: 1px solid var(--brd);
-      color: var(--t2);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      color: var(--slate);
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
@@ -39,9 +39,9 @@
       transition: all .15s;
     }
     .legal-tab.active, .legal-tab:hover {
-      background: var(--ind2);
-      border-color: var(--ind);
-      color: var(--inb);
+      background: var(--tint-lavender);
+      border-color: var(--primary);
+      color: var(--primary);
     }
     .legal-section {
       display: none;
@@ -51,46 +51,46 @@
     }
     .legal-section h1 {
       font-size: 32px;
-      font-weight: 800;
+      font-weight: 700;
       margin-bottom: 8px;
-      color: var(--t1);
+      color: var(--ink);
     }
     .legal-section .legal-date {
       font-size: 12px;
-      color: var(--t3);
+      color: var(--steel);
       margin-bottom: 40px;
     }
     .legal-section h2 {
       font-size: 18px;
       font-weight: 700;
-      color: var(--t1);
+      color: var(--ink);
       margin: 36px 0 12px;
     }
     .legal-section h3 {
       font-size: 15px;
       font-weight: 600;
-      color: var(--t2);
+      color: var(--slate);
       margin: 24px 0 8px;
     }
     .legal-section p {
       font-size: 14px;
-      color: var(--t2);
+      color: var(--slate);
       line-height: 1.8;
       margin-bottom: 12px;
     }
     .legal-section ul {
       margin: 8px 0 16px 20px;
-      color: var(--t2);
+      color: var(--slate);
       font-size: 14px;
       line-height: 1.8;
     }
     .legal-section a {
-      color: var(--blb);
+      color: var(--primary);
     }
     .legal-box {
-      background: var(--s2);
-      border: 1px solid var(--brd);
-      border-radius: var(--r2);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xl);
       padding: 20px 24px;
       margin: 24px 0;
     }
@@ -99,29 +99,28 @@
 </head>
 <body>
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/blog" class="emp-nav-a">Blog</a>
-      <a href="/app" class="emp-nav-cta">Commencer →</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/blog">Blog</a>
+      <a href="/#pricing">Tarifs</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/interview">🎤 Entretien IA</a>
-  <a href="/dashboard">📊 Dashboard</a>
-  <a href="/profil">👤 Mon Profil</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -318,42 +317,39 @@
 </div>
 
 <footer class="emp-footer">
-  <div class="emp-footer-grid">
-    <div class="emp-footer-col">
-      <a href="/" class="emp-logo" style="margin-bottom:12px;display:inline-flex">
-        <div class="emp-logo-mark">E</div>
-        Emploia
-      </a>
-      <p style="font-size:12px;color:var(--t3);line-height:1.6">Le copilote de candidature 100% français, propulsé par Claude AI d'Anthropic.</p>
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div class="emp-footer-col">
+        <a href="/" class="emp-brand" style="margin-bottom:12px">
+          <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+          Emploia
+        </a>
+        <p style="font-size:12px;color:var(--steel);line-height:1.6;margin-bottom:14px">Le copilote de candidature 100% français, propulsé par Claude AI d'Anthropic.</p>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Produit</h5>
+        <a href="/jobs">Offres d'emploi</a>
+        <a href="/app">Générateur IA</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/interview">Simulateur entretien</a>
+        <a href="/#pricing">Tarifs</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Ressources</h5>
+        <a href="/blog">Blog &amp; Guides</a>
+        <a href="/referral">Parrainage</a>
+        <a href="mailto:contact@emploia.fr">Contact</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Légal</h5>
+        <a href="/legal">Mentions légales</a>
+        <a href="/legal">Confidentialité</a>
+        <a href="/legal">CGU</a>
+      </div>
     </div>
-    <div class="emp-footer-col">
-      <h4>Produit</h4>
-      <a href="/jobs">Offres d'emploi</a>
-      <a href="/app">Générateur IA</a>
-      <a href="/dashboard">Suivi candidatures</a>
-      <a href="/interview">Simulateur entretien</a>
-    </div>
-    <div class="emp-footer-col">
-      <h4>Ressources</h4>
-      <a href="/blog">Blog & Guides</a>
-      <a href="/about">À propos</a>
-      <a href="/contact">Contact</a>
-      <a href="/referral">Parrainage 🎁</a>
-    </div>
-    <div class="emp-footer-col">
-      <h4>Légal</h4>
-      <a href="/legal/mentions">Mentions légales</a>
-      <a href="/legal/privacy">Confidentialité</a>
-      <a href="/legal/cgu">CGU</a>
-      <a href="/legal/cookies">Cookies</a>
-    </div>
-  </div>
-  <div class="emp-footer-bottom">
-    <p>© <span id="yr"></span> Emploia. Tous droits réservés.</p>
-    <div class="emp-footer-badges">
-      <span class="emp-footer-badge">🇫🇷 Fait en France</span>
-      <span class="emp-footer-badge">🔒 RGPD</span>
-      <span class="emp-footer-badge">Claude AI</span>
+    <div class="emp-footer-bot">
+      <span>© <span data-year></span> Emploia. Tous droits réservés.</span>
+      <a href="/legal" style="color:var(--steel)">Confidentialité</a>
     </div>
   </div>
 </footer>

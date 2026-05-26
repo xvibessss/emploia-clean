@@ -8,7 +8,7 @@
   <link rel="canonical" href="https://emploia.fr/cv-builder"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <meta property="og:title" content="CV Builder — Créez votre CV professionnel · Emploia"/>
   <meta property="og:description" content="Créez et téléchargez un CV professionnel en quelques minutes. Preview en temps réel, templates ATS-optimisés."/>
   <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
@@ -18,10 +18,10 @@
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="shared.css"/>
+  
+  <link rel="stylesheet" href="/shared.css"/>
   <style>
-    body { background: var(--bg3); overflow-x: hidden; }
+    body { background: var(--surface); overflow-x: hidden; }
 
     .builder-page {
       min-height: 100vh;
@@ -32,14 +32,14 @@
 
     /* ── EDITOR PANEL ────────────────────────── */
     .editor-panel {
-      background: var(--bg);
-      border-right: 1px solid var(--brd);
+      background: var(--canvas);
+      border-right: 1px solid var(--hairline);
       overflow-y: auto;
       height: calc(100vh - 64px);
       padding: 20px;
     }
     .editor-panel::-webkit-scrollbar { width: 5px; }
-    .editor-panel::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 3px; }
+    .editor-panel::-webkit-scrollbar-thumb { background: var(--hairline-soft); border-radius: 3px; }
 
     .ed-header {
       display: flex;
@@ -47,14 +47,14 @@
       align-items: center;
       margin-bottom: 14px;
     }
-    .ed-header h2 { font-size: 18px; font-weight: 800; letter-spacing: -.6px; }
-    .save-status { font-size: 11px; color: var(--gnb); display: flex; align-items: center; gap: 5px; }
+    .ed-header h2 { font-size: 18px; font-weight: 700; letter-spacing: -.6px; }
+    .save-status { font-size: 11px; color: var(--brand-green); display: flex; align-items: center; gap: 5px; }
 
     /* TABS */
     .ed-tabs {
       display: flex;
       gap: 3px;
-      background: var(--s2);
+      background: var(--surface);
       padding: 3px;
       border-radius: 10px;
       margin-bottom: 16px;
@@ -68,16 +68,16 @@
       border-radius: 7px;
       font-size: 11px;
       font-weight: 600;
-      color: var(--t3);
+      color: var(--steel);
       background: transparent;
       border: none;
       cursor: pointer;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       transition: all .15s;
       white-space: nowrap;
     }
-    .ed-tab:hover { color: var(--t2); }
-    .ed-tab.active { background: var(--s4); color: var(--t1); box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+    .ed-tab:hover { color: var(--slate); }
+    .ed-tab.active { background: var(--hairline-soft); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 
     .ed-section { display: none; animation: fadeIn .2s; }
     .ed-section.active { display: block; }
@@ -86,40 +86,40 @@
     .field { margin-bottom: 12px; }
     .field label {
       display: block; font-size: 11px; font-weight: 700;
-      color: var(--t3); margin-bottom: 5px;
+      color: var(--steel); margin-bottom: 5px;
       text-transform: uppercase; letter-spacing: .6px;
     }
     .field input, .field textarea, .field select {
       width: 100%; padding: 9px 11px; border-radius: 9px;
-      border: 1.5px solid var(--brd); background: var(--s2);
-      font-size: 13px; color: var(--t1); font-family: 'Sora', sans-serif;
+      border: 1.5px solid var(--hairline); background: var(--surface);
+      font-size: 13px; color: var(--ink); font-family: var(--f-ui);
       outline: none; transition: border-color .15s; resize: vertical;
     }
     .field textarea { min-height: 72px; line-height: 1.55; }
-    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); background: var(--s3); }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--primary); background: var(--tint-gray); }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
     /* REPEATER */
     .rep-item {
-      background: var(--s2); border: 1px solid var(--brd);
+      background: var(--surface); border: 1px solid var(--hairline);
       border-radius: 11px; padding: 13px; margin-bottom: 8px; position: relative;
     }
     .rep-del {
       position: absolute; top: 9px; right: 9px;
       width: 24px; height: 24px; border-radius: 6px;
-      border: 1px solid var(--brd); background: transparent;
-      color: var(--rnb); cursor: pointer; font-size: 11px;
+      border: 1px solid var(--hairline); background: transparent;
+      color: var(--error); cursor: pointer; font-size: 11px;
     }
-    .rep-del:hover { background: var(--rnd); }
+    .rep-del:hover { background: rgba(196,59,59,.08); }
     .btn-add {
       width: 100%; padding: 9px; border-radius: 9px;
-      border: 1.5px dashed var(--brdh); background: transparent;
-      color: var(--t2); font-size: 12px; font-weight: 600;
-      font-family: 'Sora', sans-serif; cursor: pointer;
+      border: 1.5px dashed var(--hairline-strong); background: transparent;
+      color: var(--slate); font-size: 12px; font-weight: 600;
+      font-family: var(--f-ui); cursor: pointer;
       transition: all .15s; display: flex; align-items: center;
       justify-content: center; gap: 6px; margin-top: 2px;
     }
-    .btn-add:hover { border-color: var(--blue); color: var(--blb); background: var(--bld); }
+    .btn-add:hover { border-color: var(--primary); color: var(--primary); background: var(--tint-lavender); }
 
     /* AI HINT */
     .ai-hint {
@@ -127,17 +127,17 @@
       border: 1px solid rgba(99,102,241,.18); border-radius: 9px;
       padding: 9px 11px; margin-bottom: 12px;
       display: flex; gap: 8px; align-items: center;
-      font-size: 11px; color: var(--t2); line-height: 1.5;
+      font-size: 11px; color: var(--slate); line-height: 1.5;
     }
     .ai-hint button {
       padding: 4px 9px; border-radius: 6px; font-size: 10px; font-weight: 700;
-      color: #fff; background: var(--grad-primary); border: none;
-      cursor: pointer; font-family: 'Sora', sans-serif; flex-shrink: 0;
+      color: #fff; background: linear-gradient(135deg,var(--primary),var(--brand-purple)); border: none;
+      cursor: pointer; font-family: var(--f-ui); flex-shrink: 0;
     }
 
     /* ── DESIGN TAB ──────────────────────────── */
     .design-section-title {
-      font-size: 11px; font-weight: 700; color: var(--t3);
+      font-size: 11px; font-weight: 700; color: var(--steel);
       text-transform: uppercase; letter-spacing: .7px;
       margin: 16px 0 10px;
     }
@@ -148,17 +148,17 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 4px;
     }
     .tpl-thumb {
-      border: 2px solid var(--brd); border-radius: 10px; overflow: hidden;
+      border: 2px solid var(--hairline); border-radius: 10px; overflow: hidden;
       cursor: pointer; transition: all .15s; background: #fff; aspect-ratio: 3/4;
       position: relative;
     }
-    .tpl-thumb:hover { border-color: var(--blue); transform: translateY(-1px); }
-    .tpl-thumb.active { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.2); }
+    .tpl-thumb:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .tpl-thumb.active { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.2); }
     .tpl-thumb-label {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: rgba(0,0,0,.55); color: #fff;
       font-size: 10px; font-weight: 700; padding: 4px 6px;
-      text-align: center; font-family: 'Sora', sans-serif;
+      text-align: center; font-family: var(--f-ui);
     }
     .tpl-thumb-inner { width: 100%; height: 100%; }
 
@@ -178,56 +178,56 @@
       transition: transform .1s; flex-shrink: 0;
     }
     .color-swatch:hover { transform: scale(1.15); }
-    .color-swatch.active { border-color: var(--t1); box-shadow: 0 0 0 2px var(--bg); }
+    .color-swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px var(--canvas); }
     .color-custom-row { display: flex; align-items: center; gap: 8px; }
     .color-custom-row input[type="color"] {
-      width: 36px; height: 32px; border: 1.5px solid var(--brd);
-      border-radius: 8px; cursor: pointer; padding: 2px; background: var(--s2);
+      width: 36px; height: 32px; border: 1.5px solid var(--hairline);
+      border-radius: 8px; cursor: pointer; padding: 2px; background: var(--surface);
     }
-    .color-custom-row span { font-size: 12px; color: var(--t2); }
+    .color-custom-row span { font-size: 12px; color: var(--slate); }
 
     /* Font selector */
     .font-opts { display: flex; flex-direction: column; gap: 6px; }
     .font-opt {
       display: flex; align-items: center; gap: 10px; padding: 9px 12px;
-      border: 1.5px solid var(--brd); border-radius: 9px; cursor: pointer;
-      background: var(--s2); transition: all .15s;
+      border: 1.5px solid var(--hairline); border-radius: 9px; cursor: pointer;
+      background: var(--surface); transition: all .15s;
     }
-    .font-opt:hover { border-color: var(--blue); }
-    .font-opt.active { border-color: var(--blue); background: var(--bld); }
-    .font-opt-name { font-size: 13px; font-weight: 600; color: var(--t1); }
-    .font-opt-sample { font-size: 11px; color: var(--t3); }
+    .font-opt:hover { border-color: var(--primary); }
+    .font-opt.active { border-color: var(--primary); background: var(--tint-lavender); }
+    .font-opt-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .font-opt-sample { font-size: 11px; color: var(--steel); }
     .font-inter { font-family: 'Inter', sans-serif; }
-    .font-sora { font-family: 'Sora', sans-serif; }
+    .font-sora { font-family: var(--f-ui); }
     .font-georgia { font-family: 'Georgia', serif; }
 
     /* ── SECTIONS TAB ────────────────────────── */
     .sections-note {
-      font-size: 11px; color: var(--t3); margin-bottom: 12px; line-height: 1.5;
+      font-size: 11px; color: var(--steel); margin-bottom: 12px; line-height: 1.5;
     }
     .section-rows { display: flex; flex-direction: column; gap: 6px; }
     .section-row {
       display: flex; align-items: center; gap: 10px;
-      background: var(--s2); border: 1px solid var(--brd);
+      background: var(--surface); border: 1px solid var(--hairline);
       border-radius: 10px; padding: 10px 12px;
       cursor: grab; transition: all .15s; user-select: none;
     }
     .section-row:active { cursor: grabbing; }
-    .section-row.drag-over { border-color: var(--blue); background: var(--bld); transform: scale(1.01); }
+    .section-row.drag-over { border-color: var(--primary); background: var(--tint-lavender); transform: scale(1.01); }
     .section-row.dragging { opacity: .4; }
-    .drag-handle { color: var(--t4); font-size: 14px; flex-shrink: 0; }
-    .section-row-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--t1); }
+    .drag-handle { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+    .section-row-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--ink); }
     .section-row-icon { font-size: 16px; flex-shrink: 0; }
     .visibility-toggle {
       background: none; border: none; cursor: pointer;
-      font-size: 15px; color: var(--t3); transition: color .15s; flex-shrink: 0;
+      font-size: 15px; color: var(--steel); transition: color .15s; flex-shrink: 0;
     }
-    .visibility-toggle:hover { color: var(--t1); }
-    .visibility-toggle.hidden { color: var(--t4); }
+    .visibility-toggle:hover { color: var(--ink); }
+    .visibility-toggle.hidden { color: var(--muted); }
 
     /* ── PREVIEW PANEL ───────────────────────── */
     .preview-panel {
-      background: var(--bg3); padding: 20px;
+      background: var(--surface); padding: 20px;
       overflow-y: auto; height: calc(100vh - 64px);
       display: flex; flex-direction: column; align-items: center; gap: 14px;
     }
@@ -249,7 +249,7 @@
     .cv-moderne-header {
       color: #fff; padding: 32px 38px 28px;
     }
-    .cv-moderne-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -.7px; margin-bottom: 3px; }
+    .cv-moderne-header h1 { font-size: 30px; font-weight: 700; letter-spacing: -.7px; margin-bottom: 3px; }
     .cv-moderne-header .cv-role { font-size: 14px; opacity: .9; font-weight: 500; margin-bottom: 12px; }
     .cv-moderne-header .cv-contact {
       display: flex; flex-wrap: wrap; gap: 14px; font-size: 10.5px; opacity: .88;
@@ -293,14 +293,14 @@
     /* ── TEMPLATE: CRÉATIF ───────────────────── */
     .cv-creatif { display: grid; grid-template-columns: 200px 1fr; min-height: 842px; }
     .cv-creatif-sidebar { padding: 32px 20px; color: #fff; }
-    .cv-creatif-sidebar h1 { font-size: 19px; font-weight: 800; line-height: 1.2; margin-bottom: 5px; letter-spacing: -.4px; }
+    .cv-creatif-sidebar h1 { font-size: 19px; font-weight: 700; line-height: 1.2; margin-bottom: 5px; letter-spacing: -.4px; }
     .cv-creatif-sidebar .cv-role { font-size: 11px; opacity: .85; margin-bottom: 22px; }
     .cv-creatif-sidebar .cv-contact { font-size: 10px; opacity: .9; line-height: 2; }
     .cv-creatif-main { padding: 28px 28px 28px 24px; }
 
     /* SHARED CV STYLES */
     .cv-h2 {
-      font-size: 11px; font-weight: 800;
+      font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1px;
       margin-bottom: 10px; padding-bottom: 5px;
     }
@@ -326,12 +326,12 @@
     .cv-summary { font-size: 10.5px; color: #444; line-height: 1.65; }
 
     /* sidebar dark h2 */
-    .cv-h2-sidebar { color: rgba(255,255,255,.6); border-color: rgba(255,255,255,.2); }
+    .cv-h2-sidebar { color: rgba(255,255,255,.6); border-color: rgba(0,0,0,.1); }
 
     /* ATS FLOAT */
     .ats-float {
       position: fixed; bottom: 24px; right: 24px;
-      background: var(--s2); border: 1px solid var(--brd);
+      background: var(--surface); border: 1px solid var(--hairline);
       border-radius: 13px; padding: 12px 16px;
       box-shadow: 0 10px 36px rgba(0,0,0,.45);
       display: flex; align-items: center; gap: 10px; z-index: 50;
@@ -339,32 +339,32 @@
     .ats-circle {
       width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800; color: var(--t1); position: relative;
+      font-size: 12px; font-weight: 700; color: var(--ink); position: relative;
     }
     .ats-circle::before {
       content: ''; position: absolute; inset: 4px;
-      background: var(--s2); border-radius: 50%; z-index: 0;
+      background: var(--surface); border-radius: 50%; z-index: 0;
     }
     .ats-circle span { position: relative; z-index: 1; }
     .ats-info { font-size: 11px; }
-    .ats-info b { display: block; font-size: 12px; color: var(--t1); margin-bottom: 1px; }
-    .ats-info span { color: var(--t3); }
+    .ats-info b { display: block; font-size: 12px; color: var(--ink); margin-bottom: 1px; }
+    .ats-info span { color: var(--steel); }
 
     /* MOBILE */
     .mobile-mode-toggle {
-      display: none; gap: 4px; background: var(--s2);
+      display: none; gap: 4px; background: var(--surface);
       padding: 3px; border-radius: 10px; margin-bottom: 10px; width: 100%;
     }
     .mmt-btn {
       flex: 1; padding: 7px; border-radius: 7px; font-size: 11px; font-weight: 600;
-      color: var(--t3); background: transparent; border: none;
-      cursor: pointer; font-family: 'Sora', sans-serif;
+      color: var(--steel); background: transparent; border: none;
+      cursor: pointer; font-family: var(--f-ui);
     }
-    .mmt-btn.active { background: var(--s4); color: var(--t1); }
+    .mmt-btn.active { background: var(--hairline-soft); color: var(--ink); }
 
     @media (max-width: 1100px) {
       .builder-page { grid-template-columns: 1fr; }
-      .editor-panel { height: auto; border-right: none; border-bottom: 1px solid var(--brd); display: var(--ed-display,block); }
+      .editor-panel { height: auto; border-right: none; border-bottom: 1px solid var(--hairline); display: var(--ed-display,block); }
       .preview-panel { height: auto; min-height: 50vh; padding-bottom: 80px; display: var(--pv-display,flex); }
       .mobile-mode-toggle { display: flex; }
       .builder-page.mobile-edit { --ed-display:block; --pv-display:none; }
@@ -380,26 +380,28 @@
 <div id="empToasts" class="emp-toast-container"></div>
 
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+      Emploia
+    </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/cv-builder" class="emp-nav-a active">CV Builder</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <div id="empNavAuth"><button class="emp-nav-login" onclick="empShowAuth('login')">Se connecter</button></div>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/cv-builder" style="color:var(--primary);font-weight:600">CV Builder</a>
+      <a href="/dashboard">Dashboard</a>
     </div>
-    <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
   </div>
 </nav>
-
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV (IA)</a>
-  <a href="/cv-builder">🎨 CV Builder</a>
-  <a href="/dashboard">📊 Dashboard</a>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/cv-builder">CV Builder</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/profil">Mon profil</a>
 </div>
 
 <div class="builder-page mobile-edit" id="builderPage">
@@ -414,7 +416,7 @@
     <div class="ed-header">
       <h2>Mon CV</h2>
       <div class="save-status">
-        <span style="width:7px;height:7px;border-radius:50%;background:var(--gnb)"></span>
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--brand-green)"></span>
         <span id="saveStatus">Sauvegardé</span>
       </div>
     </div>
@@ -572,17 +574,17 @@
         <span style="font-size:16px">☁️</span>
         <span>Sauvegardez plusieurs versions de votre CV dans le cloud</span>
       </div>
-      <div id="versionsLoginBanner" style="display:none;background:var(--ind2);border-radius:10px;padding:14px;font-size:13px;color:var(--inb);margin-bottom:14px">
+      <div id="versionsLoginBanner" style="display:none;background:var(--tint-lavender);border-radius:10px;padding:14px;font-size:13px;color:var(--primary);margin-bottom:14px">
         <b>Connexion requise</b> pour sauvegarder vos versions.<br>
         <button onclick="empShowAuth('login')" style="margin-top:8px;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;color:#fff;background:var(--acc);border:none;cursor:pointer">Se connecter</button>
       </div>
-      <button onclick="saveVersion()" id="btnSaveVersion" class="btn btn-primary" style="width:100%;margin-bottom:16px;display:none">
+      <button onclick="saveVersion()" id="btnSaveVersion" class="emp-btn emp-btn-primary" style="width:100%;margin-bottom:16px;display:none">
         + Sauvegarder cette version
       </button>
       <div id="versionsList" style="display:flex;flex-direction:column;gap:8px">
-        <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px" id="versionsEmpty">Aucune version sauvegardée</div>
+        <div style="text-align:center;padding:24px;color:var(--steel);font-size:13px" id="versionsEmpty">Aucune version sauvegardée</div>
       </div>
-      <div id="versionsPlanNote" style="display:none;font-size:11px;color:var(--t3);text-align:center;margin-top:12px"></div>
+      <div id="versionsPlanNote" style="display:none;font-size:11px;color:var(--steel);text-align:center;margin-top:12px"></div>
     </div>
   </div>
 
@@ -590,7 +592,7 @@
   <div class="preview-panel">
     <div class="preview-toolbar">
       <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Imprimer</button>
-      <button class="btn btn-primary btn-sm" onclick="exportCV()">⬇ Télécharger PDF</button>
+      <button class="emp-btn emp-btn-primary emp-btn-sm" onclick="exportCV()">⬇ Télécharger PDF</button>
     </div>
     <div class="cv-paper" id="cvPaper"></div>
   </div>
@@ -603,13 +605,7 @@
   <div class="ats-info"><b>Score ATS</b><span id="atsHint">Bon démarrage 💪</span></div>
 </div>
 
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/cv-builder" class="emp-bottom-nav-item active"><span class="bn-icon">🎨</span>Builder</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="shared.js"></script>
 <script>

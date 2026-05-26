@@ -8,13 +8,13 @@
   <link rel="canonical" href="https://emploia.fr/alerts"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+    
+  <link rel="stylesheet" href="/shared.css"/>
   <style>
-    body { background: var(--bg3); }
+    body { background: var(--surface); }
 
     .alerts-layout {
       max-width: 780px;
@@ -38,14 +38,14 @@
 
     .page-hero h1 {
       font-size: clamp(24px, 4vw, 36px);
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: -1.2px;
       margin-bottom: 8px;
     }
 
     .page-hero p {
       font-size: 14px;
-      color: var(--t2);
+      color: var(--slate);
       line-height: 1.65;
       max-width: 440px;
       margin: 0 auto;
@@ -53,8 +53,8 @@
 
     /* CREATE FORM */
     .create-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 18px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -66,12 +66,12 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
     }
 
     .create-header {
       padding: 18px 24px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -79,8 +79,8 @@
 
     .create-title {
       font-size: 14px;
-      font-weight: 800;
-      color: var(--t1);
+      font-weight: 700;
+      color: var(--ink);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -90,19 +90,19 @@
 
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .6px; }
+    .form-label { font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; letter-spacing: .6px; }
 
     /* ALERTS LIST */
     .alerts-section {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 18px;
       overflow: hidden;
     }
 
     .alerts-header {
       padding: 16px 24px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -111,7 +111,7 @@
     .alerts-title {
       font-size: 12px;
       font-weight: 700;
-      color: var(--t3);
+      color: var(--steel);
       text-transform: uppercase;
       letter-spacing: .8px;
       display: flex;
@@ -121,7 +121,7 @@
 
     .alert-card {
       padding: 16px 24px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -137,7 +137,7 @@
     .alert-keywords {
       font-size: 14px;
       font-weight: 700;
-      color: var(--t1);
+      color: var(--ink);
       margin-bottom: 8px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -157,16 +157,16 @@
     }
 
     .hiw-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 14px;
       padding: 16px;
       text-align: center;
     }
 
     .hiw-icon { font-size: 28px; margin-bottom: 10px; }
-    .hiw-title { font-size: 12px; font-weight: 800; color: var(--t1); margin-bottom: 4px; }
-    .hiw-desc { font-size: 11px; color: var(--t3); line-height: 1.55; }
+    .hiw-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .hiw-desc { font-size: 11px; color: var(--steel); line-height: 1.55; }
 
     /* UPGRADE */
     .upgrade-card {
@@ -181,8 +181,8 @@
       margin-top: 20px;
     }
 
-    .uc-text { font-size: 13px; color: var(--t2); line-height: 1.55; }
-    .uc-text strong { color: var(--t1); }
+    .uc-text { font-size: 13px; color: var(--slate); line-height: 1.55; }
+    .uc-text strong { color: var(--ink); }
 
     @media (max-width: 600px) {
       .form-row { grid-template-columns: 1fr; }
@@ -198,38 +198,34 @@
 
 <!-- NAV -->
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/tools" class="emp-nav-a">Outils</a>
-      <a href="/interview" class="emp-nav-a">Entretien IA</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <a href="/profil" class="emp-nav-a">Profil</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/alerts" style="color:var(--primary);font-weight:600">Alertes</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
-
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/interview">🎤 Entretien IA</a>
-  <a href="/dashboard">📊 Dashboard</a>
-  <a href="/profil">👤 Mon Profil</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/alerts">Mes alertes</a>
+  <a href="/dashboard">Dashboard</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
 <!-- HERO -->
 <div class="page-hero">
-  <div style="display:inline-flex;align-items:center;gap:8px;background:var(--ind2);border:1px solid rgba(99,102,241,.2);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;color:var(--inb);margin-bottom:16px">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:var(--tint-lavender);border:1px solid rgba(99,102,241,.2);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;color:var(--primary);margin-bottom:16px">
     <div class="animate-pulse-dot"></div>
     Alertes actives · Emploia
   </div>
@@ -276,32 +272,32 @@
           </select>
         </div>
       </div>
-      <button class="btn btn-primary" id="createAlertBtn" onclick="createAlert()" style="width:100%;padding:12px">
+      <button class="emp-btn emp-btn-primary" id="createAlertBtn" onclick="createAlert()" style="width:100%;padding:12px">
         🔔 Créer cette alerte
       </button>
     </div>
   </div>
 
   <!-- PUSH NOTIFICATIONS TOGGLE -->
-  <div id="pushCard" style="background:var(--s2);border:1px solid var(--brd);border-radius:18px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;display:none">
+  <div id="pushCard" style="background:var(--surface);border:1px solid var(--hairline);border-radius:18px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;display:none">
     <div style="font-size:32px;flex-shrink:0">🔔</div>
     <div style="flex:1">
-      <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:4px">Notifications push</div>
-      <div id="pushStatus" style="font-size:12px;color:var(--t2)">Recevez une notification immédiate dès qu'une nouvelle offre correspond à vos alertes.</div>
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">Notifications push</div>
+      <div id="pushStatus" style="font-size:12px;color:var(--slate)">Recevez une notification immédiate dès qu'une nouvelle offre correspond à vos alertes.</div>
     </div>
-    <button id="pushBtn" onclick="togglePushNotifs()" class="btn btn-ghost btn-sm" style="flex-shrink:0;white-space:nowrap">Activer</button>
+    <button id="pushBtn" onclick="togglePushNotifs()" class="emp-btn emp-btn-ghost emp-btn-sm" style="flex-shrink:0;white-space:nowrap">Activer</button>
   </div>
 
   <!-- ALERTS LIST -->
   <div class="alerts-section">
     <div class="alerts-header">
-      <div class="alerts-title">🔔 Mes alertes <span id="alertsCount" style="background:var(--s3);color:var(--t3);font-size:10px;padding:2px 8px;border-radius:100px;font-weight:800">0</span></div>
-      <a href="/jobs" style="font-size:11px;color:var(--inb);text-decoration:none">Parcourir les offres →</a>
+      <div class="alerts-title">🔔 Mes alertes <span id="alertsCount" style="background:var(--tint-gray);color:var(--steel);font-size:10px;padding:2px 8px;border-radius:100px;font-weight:700">0</span></div>
+      <a href="/jobs" style="font-size:11px;color:var(--primary);text-decoration:none">Parcourir les offres →</a>
     </div>
     <div id="alertsList">
-      <div style="text-align:center;padding:48px 24px;color:var(--t3)">
+      <div style="text-align:center;padding:48px 24px;color:var(--steel)">
         <div style="font-size:40px;margin-bottom:12px">🔔</div>
-        <div style="font-size:14px;font-weight:700;color:var(--t2);margin-bottom:6px">Aucune alerte configurée</div>
+        <div style="font-size:14px;font-weight:700;color:var(--slate);margin-bottom:6px">Aucune alerte configurée</div>
         <div style="font-size:12px">Créez votre première alerte pour ne plus rater d'opportunité.</div>
       </div>
     </div>
@@ -332,19 +328,13 @@
       <strong>Plan Pro — Alertes illimitées</strong><br>
       Le plan gratuit permet jusqu'à 10 alertes. Passez Pro pour des alertes illimitées avec matching IA avancé et résumé hebdomadaire personnalisé.
     </div>
-    <a href="/#pricing" class="btn btn-primary btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
+    <a href="/#pricing" class="emp-btn emp-btn-primary emp-btn-sm" style="flex-shrink:0">Passer Pro — 9€/mois</a>
   </div>
 
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="shared.js"></script>
 <script>

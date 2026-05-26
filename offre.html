@@ -6,7 +6,7 @@
   <title>Offre d'emploi — Emploia</title>
   <meta name="description" content="Consultez cette offre et générez votre CV ATS-optimisé en 30 secondes avec Emploia."/>
   <link rel="manifest" href="/manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
@@ -25,15 +25,15 @@
     .offre-sidebar {}
     .offre-back {
       display: inline-flex; align-items: center; gap: 6px;
-      color: var(--t3); font-size: 13px; text-decoration: none;
+      color: var(--steel); font-size: 13px; text-decoration: none;
       margin-bottom: 24px;
       transition: color .15s;
     }
-    .offre-back:hover { color: var(--t2); }
+    .offre-back:hover { color: var(--slate); }
     .offre-header {
-      background: var(--s2);
-      border: 1px solid var(--brd);
-      border-radius: var(--r3);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xxl);
       padding: 28px;
       margin-bottom: 16px;
     }
@@ -42,37 +42,37 @@
     }
     .offre-logo {
       width: 52px; height: 52px;
-      border-radius: var(--r);
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      border-radius: var(--r-lg);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; color: var(--t2);
+      font-size: 22px; color: var(--slate);
       flex-shrink: 0;
     }
-    .offre-company-name { font-size: 14px; color: var(--t2); }
-    .offre-title { font-size: 26px; font-weight: 800; margin-bottom: 16px; color: var(--t1); }
+    .offre-company-name { font-size: 14px; color: var(--slate); }
+    .offre-title { font-size: 26px; font-weight: 700; margin-bottom: 16px; color: var(--ink); }
     .offre-tags {
       display: flex; flex-wrap: wrap; gap: 8px;
     }
     .offre-tag {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 100px;
       padding: 5px 12px;
       font-size: 12px;
-      color: var(--t2);
+      color: var(--slate);
     }
-    .offre-tag.type { background: var(--ind2); border-color: rgba(99,102,241,.2); color: var(--inb); }
+    .offre-tag.type { background: var(--tint-lavender); border-color: rgba(99,102,241,.2); color: var(--primary); }
     .offre-section {
-      background: var(--s2);
-      border: 1px solid var(--brd);
-      border-radius: var(--r3);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xxl);
       padding: 28px;
       margin-bottom: 16px;
     }
     .offre-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
     .offre-section p, .offre-section li {
-      font-size: 14px; color: var(--t2); line-height: 1.8;
+      font-size: 14px; color: var(--slate); line-height: 1.8;
     }
     .offre-section ul { margin: 0 0 0 20px; }
     .offre-section li { margin-bottom: 6px; }
@@ -80,76 +80,76 @@
       position: sticky; top: 100px;
     }
     .gen-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
-      border-radius: var(--r3);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xxl);
       padding: 28px;
       margin-bottom: 16px;
     }
     .gen-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .gen-card p { font-size: 13px; color: var(--t2); margin-bottom: 20px; line-height: 1.6; }
+    .gen-card p { font-size: 13px; color: var(--slate); margin-bottom: 20px; line-height: 1.6; }
     .gen-card .btn { width: 100%; justify-content: center; margin-bottom: 8px; }
     .offre-meta {
-      background: var(--bg2);
-      border: 1px solid var(--brd);
-      border-radius: var(--r2);
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-xl);
       padding: 16px;
     }
     .offre-meta-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 8px 0;
-      border-bottom: 1px solid var(--brd2);
+      border-bottom: 1px solid var(--hairline-soft);
       font-size: 13px;
     }
     .offre-meta-row:last-child { border-bottom: none; padding-bottom: 0; }
-    .offre-meta-label { color: var(--t3); }
-    .offre-meta-val { color: var(--t1); font-weight: 500; }
+    .offre-meta-label { color: var(--steel); }
+    .offre-meta-val { color: var(--ink); font-weight: 500; }
     .loading-state {
       display: flex; align-items: center; justify-content: center;
-      padding: 80px 24px; color: var(--t3); gap: 12px;
+      padding: 80px 24px; color: var(--steel); gap: 12px;
     }
-    .offre-score-bar { height: 6px; border-radius: 3px; background: var(--s3); margin-top: 8px; overflow: hidden; }
-    .offre-score-fill { height: 100%; border-radius: 3px; background: var(--grad-primary); transition: width .6s ease; }
+    .offre-score-bar { height: 6px; border-radius: 3px; background: var(--tint-gray); margin-top: 8px; overflow: hidden; }
+    .offre-score-fill { height: 100%; border-radius: 3px; background: linear-gradient(135deg,var(--primary),var(--brand-purple)); transition: width .6s ease; }
 
     /* Smart Apply */
     .sa-btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .btn-sa-main { flex: 1; padding: 12px; background: var(--grad-primary); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s; }
+    .btn-sa-main { flex: 1; padding: 12px; background: linear-gradient(135deg,var(--primary),var(--brand-purple)); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: .2s; }
     .btn-sa-main:hover { opacity: .9; transform: translateY(-1px); }
     .btn-sa-main:disabled { opacity: .5; cursor: default; transform: none; }
-    .btn-sa-icon { padding: 12px; background: var(--s3); border: 1px solid var(--brd); border-radius: 12px; font-size: 15px; cursor: pointer; transition: .2s; }
-    .btn-sa-icon:hover { background: var(--s4); }
+    .btn-sa-icon { padding: 12px; background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 12px; font-size: 15px; cursor: pointer; transition: .2s; }
+    .btn-sa-icon:hover { background: var(--hairline-soft); }
     .btn-sa-icon.saved { color: #f59e0b; }
     .btn-sa-icon.queued { color: var(--acc); }
 
     /* Smart Apply Result Panel */
     .sa-result { margin-top: 14px; display: none; }
     .sa-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
-    .sa-tab { flex: 1; padding: 7px 4px; background: var(--s3); border: 1px solid var(--brd); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; color: var(--tx2); transition: .15s; }
+    .sa-tab { flex: 1; padding: 7px 4px; background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; color: var(--tx2); transition: .15s; }
     .sa-tab.active { background: var(--acc); border-color: var(--acc); color: #fff; }
-    .sa-content { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 12px; font-size: 12.5px; line-height: 1.7; color: var(--tx2); max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+    .sa-content { background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px; font-size: 12.5px; line-height: 1.7; color: var(--tx2); max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
     .sa-actions { display: flex; gap: 6px; margin-top: 8px; }
-    .sa-copy-btn { flex: 1; padding: 7px; background: var(--s3); border: 1px solid var(--brd); border-radius: 8px; font-size: 12px; cursor: pointer; color: var(--tx1); }
-    .sa-email-subject { background: var(--s3); border: 1px solid rgba(99,102,241,.3); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--acc); margin-top: 8px; display: none; }
+    .sa-copy-btn { flex: 1; padding: 7px; background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 8px; font-size: 12px; cursor: pointer; color: var(--tx1); }
+    .sa-email-subject { background: var(--tint-gray); border: 1px solid rgba(99,102,241,.3); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--acc); margin-top: 8px; display: none; }
     .sa-email-subject strong { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--tx3); margin-bottom: 2px; }
 
     /* ATS score card */
-    .ats-score-card { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 14px; margin-top: 12px; }
+    .ats-score-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px; margin-top: 12px; }
     .ats-score-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .ats-score-label { font-size: 12px; font-weight: 700; color: var(--tx2); }
-    .ats-score-val { font-size: 18px; font-weight: 800; }
+    .ats-score-val { font-size: 18px; font-weight: 700; }
     .ats-kw { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
     .ats-kw-tag { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
     .ats-kw-tag.match { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
-    .ats-kw-tag.miss { background: var(--s3); color: var(--tx3); border: 1px solid var(--brd); }
+    .ats-kw-tag.miss { background: var(--tint-gray); color: var(--tx3); border: 1px solid var(--hairline); }
 
     /* Company insights */
-    .ins-block { background: var(--s3); border: 1px solid var(--brd); border-radius: 10px; padding: 12px 14px; }
-    .ins-block-label { font-size: 10px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-    .ins-block-val { font-size: 13px; color: var(--t1); font-weight: 600; line-height: 1.4; }
-    .ins-label { font-size: 12px; font-weight: 700; color: var(--t2); margin-bottom: 8px; }
+    .ins-block { background: var(--tint-gray); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; }
+    .ins-block-label { font-size: 10px; font-weight: 700; color: var(--steel); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .ins-block-val { font-size: 13px; color: var(--ink); font-weight: 600; line-height: 1.4; }
+    .ins-label { font-size: 12px; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
     .ins-list { margin: 0 0 0 16px; padding: 0; }
-    .ins-list li { font-size: 13px; color: var(--t2); line-height: 1.6; margin-bottom: 4px; }
-    .ins-loading { display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3);padding:16px 0; }
+    .ins-list li { font-size: 13px; color: var(--slate); line-height: 1.6; margin-bottom: 4px; }
+    .ins-loading { display:flex;align-items:center;gap:8px;font-size:13px;color:var(--steel);padding:16px 0; }
     @media(max-width:600px) { #insightsGrid { grid-template-columns: 1fr; } }
 
     /* Interview prep link */
@@ -161,31 +161,28 @@
 </head>
 <body>
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/tools" class="emp-nav-a">Outils</a>
-      <a href="/interview" class="emp-nav-a">Entretien</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <a href="/profil" class="emp-nav-a">Profil</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs" style="color:var(--primary);font-weight:600">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/blog">Blog</a>
+      <a href="/#pricing">Tarifs</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/interview">🎤 Entretien IA</a>
-  <a href="/dashboard">📊 Dashboard</a>
-  <a href="/profil">👤 Mon Profil</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -203,7 +200,7 @@
         <div class="offre-logo" id="offreLogo">🏢</div>
         <div>
           <div class="offre-company-name" id="offreCompany">—</div>
-          <div style="font-size:12px;color:var(--t3)" id="offreLocation">—</div>
+          <div style="font-size:12px;color:var(--steel)" id="offreLocation">—</div>
         </div>
       </div>
       <div class="offre-title" id="offreTitle">Chargement...</div>
@@ -212,7 +209,7 @@
 
     <div class="offre-section" id="offreDescSection">
       <h2>Description du poste</h2>
-      <div id="offreDesc" style="font-size:14px;color:var(--t2);line-height:1.8">Chargement...</div>
+      <div id="offreDesc" style="font-size:14px;color:var(--slate);line-height:1.8">Chargement...</div>
     </div>
 
     <!-- Company Insights — lazy loaded -->
@@ -317,19 +314,19 @@
       </a>
 
       <!-- LinkedIn networking -->
-      <div id="linkedinCard" style="display:none;background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:14px;margin-top:12px">
+      <div id="linkedinCard" style="display:none;background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:14px;margin-top:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:12px;font-weight:700;color:var(--t2)">💼 Réseauter chez <span id="liCompanyName"></span></div>
+          <div style="font-size:12px;font-weight:700;color:var(--slate)">💼 Réseauter chez <span id="liCompanyName"></span></div>
         </div>
-        <a id="liSearchLink" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;font-size:11px">🔍 Trouver des contacts LinkedIn →</a>
-        <button id="liMsgBtn" onclick="generateLinkedInMsg()" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:11px">✉️ Générer un message de connexion</button>
+        <a id="liSearchLink" href="#" target="_blank" rel="noopener" class="emp-btn emp-btn-ghost emp-btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;font-size:11px">🔍 Trouver des contacts LinkedIn →</a>
+        <button id="liMsgBtn" onclick="generateLinkedInMsg()" class="emp-btn emp-btn-ghost emp-btn-sm" style="width:100%;justify-content:center;font-size:11px">✉️ Générer un message de connexion</button>
         <div id="liResult" style="display:none;margin-top:10px">
           <div style="display:flex;gap:4px;margin-bottom:8px">
             <button class="sa-tab active" onclick="setLiTab('direct',this)" style="flex:1;padding:5px 4px;font-size:10px">RH / Recruteur</button>
             <button class="sa-tab" onclick="setLiTab('indirect',this)" style="flex:1;padding:5px 4px;font-size:10px">Employé du métier</button>
           </div>
           <div id="liContent" class="sa-content" style="font-size:11.5px;max-height:140px"></div>
-          <div id="liTip" style="font-size:11px;color:var(--t3);margin-top:6px;line-height:1.5"></div>
+          <div id="liTip" style="font-size:11px;color:var(--steel);margin-top:6px;line-height:1.5"></div>
           <button onclick="copyLiMsg()" class="sa-copy-btn" style="margin-top:6px;width:100%;font-size:11px">📋 Copier</button>
         </div>
       </div>
@@ -341,17 +338,11 @@
 <div id="errorState" style="display:none;text-align:center;padding:80px 24px">
   <div style="font-size:48px;margin-bottom:16px">🔍</div>
   <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Offre introuvable</h2>
-  <p style="font-size:14px;color:var(--t2);margin-bottom:24px">Cette offre n'existe plus ou a expiré.</p>
-  <a href="/jobs" class="btn btn-primary">Voir toutes les offres →</a>
+  <p style="font-size:14px;color:var(--slate);margin-bottom:24px">Cette offre n'existe plus ou a expiré.</p>
+  <a href="/jobs" class="emp-btn emp-btn-primary">Voir toutes les offres →</a>
 </div>
 
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="/shared.js"></script>
 <script>

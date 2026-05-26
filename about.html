@@ -8,7 +8,7 @@
 <meta name="description" content="Découvrez Emploia : qui nous sommes, pourquoi nous avons créé le premier copilote de candidature IA 100% français, et notre mission pour révolutionner la recherche d'emploi en France."/>
 <link rel="canonical" href="https://emploia.fr/about"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#6366f1"/>
+<meta name="theme-color" content="#6E48BE"/>
 <meta property="og:title" content="À propos — Emploia"/>
 <meta property="og:description" content="Le premier copilote IA de recherche d'emploi 100% français. Notre histoire, notre mission."/>
 <meta property="og:type" content="website"/>
@@ -18,40 +18,40 @@
 <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+  
+  <link rel="stylesheet" href="/shared.css"/>
 <style>
 .about-hero { padding: 80px 24px 56px; text-align: center; max-width: 760px; margin: 0 auto; }
-.about-hero h1 { font-size: clamp(32px,5vw,52px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
-.about-hero p { font-size: 17px; color: var(--t2); line-height: 1.75; max-width: 580px; margin: 0 auto; }
+.about-hero h1 { font-size: clamp(32px,5vw,52px); font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
+.about-hero p { font-size: 17px; color: var(--slate); line-height: 1.75; max-width: 580px; margin: 0 auto; }
 
 .about-body { max-width: 820px; margin: 0 auto; padding: 0 24px 100px; display: flex; flex-direction: column; gap: 24px; }
 
-.about-card { background: var(--s2); border: 1px solid var(--brd); border-radius: 20px; padding: 36px 40px; }
-.about-card h2 { font-size: 22px; font-weight: 900; letter-spacing: -.6px; margin-bottom: 14px; }
-.about-card p { font-size: 14px; color: var(--t2); line-height: 1.8; margin-bottom: 14px; }
+.about-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 20px; padding: 36px 40px; }
+.about-card h2 { font-size: 22px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 14px; }
+.about-card p { font-size: 14px; color: var(--slate); line-height: 1.8; margin-bottom: 14px; }
 .about-card p:last-child { margin-bottom: 0; }
 
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
-.stat-item { background: var(--s3); border-radius: 14px; padding: 20px; text-align: center; }
-.stat-num { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, var(--blue), var(--ind)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
-.stat-label { font-size: 12px; color: var(--t3); margin-top: 4px; }
+.stat-item { background: var(--tint-gray); border-radius: 14px; padding: 20px; text-align: center; }
+.stat-num { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+.stat-label { font-size: 12px; color: var(--steel); margin-top: 4px; }
 
 .value-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
-.value-item { background: var(--s3); border-radius: 14px; padding: 20px; }
+.value-item { background: var(--tint-gray); border-radius: 14px; padding: 20px; }
 .value-icon { font-size: 24px; margin-bottom: 10px; }
-.value-title { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
-.value-desc { font-size: 12px; color: var(--t2); line-height: 1.65; }
+.value-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.value-desc { font-size: 12px; color: var(--slate); line-height: 1.65; }
 
 .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 8px; }
-.team-card { background: var(--s3); border-radius: 14px; padding: 20px; text-align: center; }
-.team-av { width: 52px; height: 52px; border-radius: 50%; background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff; margin: 0 auto 12px; }
-.team-name { font-size: 13px; font-weight: 800; }
-.team-role { font-size: 11px; color: var(--t3); margin-top: 3px; }
+.team-card { background: var(--tint-gray); border-radius: 14px; padding: 20px; text-align: center; }
+.team-av { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg,var(--primary),var(--brand-purple)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; margin: 0 auto 12px; }
+.team-name { font-size: 13px; font-weight: 700; }
+.team-role { font-size: 11px; color: var(--steel); margin-top: 3px; }
 
 .cta-section { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px 40px; text-align: center; }
-.cta-section h2 { font-size: 24px; font-weight: 900; letter-spacing: -.6px; margin-bottom: 12px; }
-.cta-section p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
+.cta-section h2 { font-size: 24px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 12px; }
+.cta-section p { font-size: 14px; color: var(--slate); margin-bottom: 24px; }
 
 @media (max-width: 640px) {
   .about-card { padding: 24px; }
@@ -67,28 +67,28 @@
 <div id="empToasts" class="emp-toast-container"></div>
 
 <nav class="emp-nav">
-  <a href="/" class="emp-logo">
-    <div class="emp-logo-mark">E</div>
-    Emploia
-  </a>
-  <div class="emp-nav-links">
-    <a href="/jobs" class="emp-nav-a">Offres</a>
-    <a href="/app" class="emp-nav-a">Générer CV</a>
-    <a href="/blog" class="emp-nav-a">Blog</a>
-    <a href="/about" class="emp-nav-a active">À propos</a>
-    <div id="empNavAuth"><button class="emp-nav-login" onclick="empShowAuth('login')">Se connecter</button></div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/blog">Blog</a>
+      <a href="/#pricing">Tarifs</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
   </div>
-  <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </nav>
-
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/blog">📝 Blog</a>
-  <a href="/about">👋 À propos</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -133,7 +133,7 @@
   <div class="about-card">
     <h2>🎯 Notre mission</h2>
     <p>Le marché de l'emploi est fondamentalement injuste. Un candidat qualifié peut voir son CV rejeté automatiquement par un ATS avant qu'un humain ne le lise — non pas parce qu'il ne convient pas au poste, mais parce qu'il n'a pas utilisé les bons mots-clés au bon endroit.</p>
-    <p>Notre mission : <strong style="color:var(--t1)">rendre les outils des grands cabinets de recrutement accessibles à tous les candidats</strong>, pas seulement à ceux qui peuvent se payer un coach carrière à 200€/h.</p>
+    <p>Notre mission : <strong style="color:var(--ink)">rendre les outils des grands cabinets de recrutement accessibles à tous les candidats</strong>, pas seulement à ceux qui peuvent se payer un coach carrière à 200€/h.</p>
     <p>9€/mois pour avoir les mêmes armes que n'importe quel candidat qui paie un recruteur. C'est ça, Emploia.</p>
   </div>
 
@@ -169,12 +169,12 @@
     <h2>⚙️ Comment c'est construit</h2>
     <p>Emploia tourne sur une stack 100% Edge — rapide, scalable, sans serveur à gérer. Voici les briques principales :</p>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Claude AI (Anthropic)</span>
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Vercel Edge Functions</span>
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Upstash KV</span>
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Stripe</span>
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">API France Travail</span>
-      <span style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Resend</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Claude AI (Anthropic)</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Vercel Edge Functions</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Upstash KV</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Stripe</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">API France Travail</span>
+      <span style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600">Resend</span>
     </div>
   </div>
 
@@ -186,18 +186,12 @@
       <a href="/app" class="btn btn-primary btn-lg">✨ Essayer gratuitement</a>
       <a href="/contact" class="btn btn-ghost btn-lg">Nous contacter →</a>
     </div>
-    <p style="font-size:12px;color:var(--t3);margin-top:12px">5 générations gratuites · Sans carte bancaire</p>
+    <p style="font-size:12px;color:var(--steel);margin-top:12px">5 générations gratuites · Sans carte bancaire</p>
   </div>
 
 </div>
 
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/blog" class="emp-bottom-nav-item"><span class="bn-icon">📝</span>Blog</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-</nav>
+
 
 <script src="shared.js"></script>
 </body>

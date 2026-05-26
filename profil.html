@@ -8,11 +8,11 @@
   <link rel="canonical" href="https://emploia.fr/profil"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6366f1"/>
+  <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"/>
-  <link rel="stylesheet" href="shared.css"/>
+    
+  <link rel="stylesheet" href="/shared.css"/>
   <style>
     .profile-layout {
       max-width: 1100px;
@@ -27,8 +27,8 @@
     .profile-sidebar { display: flex; flex-direction: column; gap: 16px; }
 
     .profile-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 18px;
       padding: 28px 24px;
       text-align: center;
@@ -40,14 +40,14 @@
       width: 88px;
       height: 88px;
       border-radius: 50%;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 34px;
-      font-weight: 900;
+      font-weight: 700;
       color: #fff;
-      border: 3px solid var(--brd);
+      border: 3px solid var(--hairline);
     }
 
     .avatar-edit {
@@ -55,8 +55,8 @@
       bottom: 0; right: 0;
       width: 28px; height: 28px;
       border-radius: 50%;
-      background: var(--s3);
-      border: 2px solid var(--bg);
+      background: var(--tint-gray);
+      border: 2px solid var(--canvas);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -65,24 +65,24 @@
       transition: background .15s;
     }
 
-    .avatar-edit:hover { background: var(--s4); }
+    .avatar-edit:hover { background: var(--hairline-soft); }
 
     .profile-name {
       font-size: 19px;
-      font-weight: 800;
-      color: var(--t1);
+      font-weight: 700;
+      color: var(--ink);
       letter-spacing: -.5px;
       margin-bottom: 4px;
     }
 
     .profile-title {
       font-size: 13px;
-      color: var(--t2);
+      color: var(--slate);
       margin-bottom: 16px;
     }
 
     .profile-completion {
-      background: var(--s3);
+      background: var(--tint-gray);
       border-radius: 12px;
       padding: 14px;
       margin-top: 4px;
@@ -93,23 +93,23 @@
       align-items: center;
       justify-content: space-between;
       font-size: 11px;
-      color: var(--t3);
+      color: var(--steel);
       margin-bottom: 8px;
     }
 
-    .pc-pct { font-weight: 700; color: var(--blb); }
+    .pc-pct { font-weight: 700; color: var(--primary); }
 
     .pc-track {
       height: 5px;
       border-radius: 3px;
-      background: var(--s4);
+      background: var(--hairline-soft);
       overflow: hidden;
     }
 
     .pc-fill {
       height: 100%;
       border-radius: 3px;
-      background: var(--grad-primary);
+      background: linear-gradient(135deg,var(--primary),var(--brand-purple));
       width: 72%;
       transition: width 1s ease;
     }
@@ -122,7 +122,7 @@
     }
 
     .pstat {
-      background: var(--s3);
+      background: var(--tint-gray);
       border-radius: 10px;
       padding: 12px 10px;
       text-align: center;
@@ -130,12 +130,12 @@
 
     .pstat-num {
       font-size: 22px;
-      font-weight: 900;
+      font-weight: 700;
       letter-spacing: -1px;
-      color: var(--blb);
+      color: var(--primary);
     }
 
-    .pstat-label { font-size: 10px; color: var(--t3); margin-top: 2px; }
+    .pstat-label { font-size: 10px; color: var(--steel); margin-top: 2px; }
 
     /* SIDEBAR NAV */
     .profile-nav { display: flex; flex-direction: column; gap: 4px; }
@@ -148,33 +148,33 @@
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
-      color: var(--t2);
+      color: var(--slate);
       cursor: pointer;
       transition: all .15s;
       border: none;
       background: transparent;
-      font-family: 'Sora', sans-serif;
+      font-family: var(--f-ui);
       text-align: left;
       text-decoration: none;
     }
 
-    .pnav-item:hover { background: var(--s3); color: var(--t1); }
-    .pnav-item.active { background: var(--bld); color: var(--blb); }
+    .pnav-item:hover { background: var(--tint-gray); color: var(--ink); }
+    .pnav-item.active { background: var(--tint-lavender); color: var(--primary); }
     .pnav-icon { font-size: 16px; width: 20px; text-align: center; }
 
     /* ── MAIN CONTENT ───────────────────────── */
     .profile-main { display: flex; flex-direction: column; gap: 20px; }
 
     .section-card {
-      background: var(--s2);
-      border: 1px solid var(--brd);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
       border-radius: 18px;
       overflow: hidden;
     }
 
     .sc-header {
       padding: 18px 24px;
-      border-bottom: 1px solid var(--brd);
+      border-bottom: 1px solid var(--hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -183,7 +183,7 @@
     .sc-title {
       font-size: 14px;
       font-weight: 700;
-      color: var(--t1);
+      color: var(--ink);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -198,8 +198,8 @@
     .exp-list { display: flex; flex-direction: column; gap: 12px; }
 
     .exp-item {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 16px 18px;
       display: flex;
@@ -208,12 +208,12 @@
       transition: border-color .15s;
     }
 
-    .exp-item:hover { border-color: var(--brdh); }
+    .exp-item:hover { border-color: var(--hairline-strong); }
 
     .exp-logo {
       width: 44px; height: 44px;
       border-radius: 10px;
-      background: var(--s4);
+      background: var(--hairline-soft);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -223,20 +223,20 @@
 
     .exp-info { flex: 1; }
 
-    .exp-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
-    .exp-company { font-size: 12px; color: var(--t2); margin-bottom: 6px; }
-    .exp-period { font-size: 11px; color: var(--t3); }
-    .exp-desc { font-size: 12px; color: var(--t2); line-height: 1.6; margin-top: 8px; }
+    .exp-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .exp-company { font-size: 12px; color: var(--slate); margin-bottom: 6px; }
+    .exp-period { font-size: 11px; color: var(--steel); }
+    .exp-desc { font-size: 12px; color: var(--slate); line-height: 1.6; margin-top: 8px; }
 
     .exp-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
     .icon-btn {
       width: 30px; height: 30px;
       border-radius: 8px;
-      border: 1px solid var(--brd);
+      border: 1px solid var(--hairline);
       background: transparent;
       cursor: pointer;
-      color: var(--t3);
+      color: var(--steel);
       font-size: 13px;
       display: flex;
       align-items: center;
@@ -244,7 +244,7 @@
       transition: all .15s;
     }
 
-    .icon-btn:hover { background: var(--s4); color: var(--t1); }
+    .icon-btn:hover { background: var(--hairline-soft); color: var(--ink); }
 
     /* SKILLS */
     .skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
@@ -255,30 +255,30 @@
       gap: 6px;
       padding: 6px 12px;
       border-radius: 8px;
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       font-size: 12px;
       font-weight: 600;
-      color: var(--t2);
+      color: var(--slate);
       transition: all .15s;
     }
 
-    .skill-tag:hover { border-color: var(--brdh); color: var(--t1); }
+    .skill-tag:hover { border-color: var(--hairline-strong); color: var(--ink); }
 
     .skill-tag .remove {
       cursor: pointer;
-      color: var(--t3);
+      color: var(--steel);
       font-size: 10px;
       transition: color .15s;
     }
 
-    .skill-tag .remove:hover { color: var(--rnb); }
+    .skill-tag .remove:hover { color: var(--error); }
 
     .skill-level-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .level-expert { background: var(--gnb); }
-    .level-advanced { background: var(--blb); }
-    .level-intermediate { background: var(--ylb); }
-    .level-beginner { background: var(--t3); }
+    .level-expert { background: var(--brand-green); }
+    .level-advanced { background: var(--primary); }
+    .level-intermediate { background: var(--brand-yellow); }
+    .level-beginner { background: var(--steel); }
 
     .skill-input-row { display: flex; gap: 8px; }
 
@@ -286,8 +286,8 @@
     .pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     .pref-item {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px 16px;
       display: flex;
@@ -296,14 +296,14 @@
       gap: 12px;
     }
 
-    .pref-label { font-size: 12px; font-weight: 600; color: var(--t2); }
-    .pref-value { font-size: 13px; font-weight: 700; color: var(--t1); }
+    .pref-label { font-size: 12px; font-weight: 600; color: var(--slate); }
+    .pref-value { font-size: 13px; font-weight: 700; color: var(--ink); }
 
     /* TOGGLE SWITCH */
     .emp-toggle {
       width: 38px; height: 22px;
-      background: var(--s4);
-      border: 1px solid var(--brd);
+      background: var(--hairline-soft);
+      border: 1px solid var(--hairline);
       border-radius: 100px;
       cursor: pointer;
       position: relative;
@@ -311,7 +311,7 @@
       flex-shrink: 0;
     }
 
-    .emp-toggle.on { background: var(--blue); border-color: var(--blue); }
+    .emp-toggle.on { background: var(--primary); border-color: var(--primary); }
 
     .emp-toggle-knob {
       width: 16px; height: 16px;
@@ -320,7 +320,7 @@
       position: absolute;
       top: 2px; left: 2px;
       transition: left .2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,.3);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
     }
 
     .emp-toggle.on .emp-toggle-knob { left: 18px; }
@@ -329,8 +329,8 @@
     .doc-list { display: flex; flex-direction: column; gap: 10px; }
 
     .doc-item {
-      background: var(--s3);
-      border: 1px solid var(--brd);
+      background: var(--tint-gray);
+      border: 1px solid var(--hairline);
       border-radius: 12px;
       padding: 14px 18px;
       display: flex;
@@ -339,12 +339,12 @@
       transition: border-color .15s;
     }
 
-    .doc-item:hover { border-color: var(--brdh); }
+    .doc-item:hover { border-color: var(--hairline-strong); }
 
     .doc-icon {
       width: 40px; height: 40px;
       border-radius: 10px;
-      background: var(--bld);
+      background: var(--tint-lavender);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -353,12 +353,12 @@
     }
 
     .doc-info { flex: 1; }
-    .doc-name { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 2px; }
-    .doc-meta { font-size: 11px; color: var(--t3); }
+    .doc-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .doc-meta { font-size: 11px; color: var(--steel); }
 
     /* UPLOAD ZONE */
     .upload-zone {
-      border: 2px dashed var(--brd);
+      border: 2px dashed var(--hairline);
       border-radius: 12px;
       padding: 32px;
       text-align: center;
@@ -368,13 +368,13 @@
     }
 
     .upload-zone:hover {
-      border-color: var(--blue);
-      background: var(--bls);
+      border-color: var(--primary);
+      background: var(--tint-lavender);
     }
 
     .upload-zone-icon { font-size: 32px; margin-bottom: 10px; }
-    .upload-zone p { font-size: 13px; color: var(--t2); line-height: 1.6; }
-    .upload-zone strong { color: var(--blb); }
+    .upload-zone p { font-size: 13px; color: var(--slate); line-height: 1.6; }
+    .upload-zone strong { color: var(--primary); }
 
     /* SAVE BAR */
     .save-bar {
@@ -382,7 +382,7 @@
       bottom: 0;
       background: rgba(7,12,24,.97);
       backdrop-filter: blur(20px);
-      border-top: 1px solid var(--brd);
+      border-top: 1px solid var(--hairline);
       padding: 14px 24px;
       display: flex;
       align-items: center;
@@ -391,7 +391,7 @@
       z-index: 100;
     }
 
-    .save-bar p { font-size: 13px; color: var(--t2); }
+    .save-bar p { font-size: 13px; color: var(--slate); }
 
     @media (max-width: 900px) {
       .profile-layout { grid-template-columns: 1fr; }
@@ -405,35 +405,29 @@
 
 <div id="emp-scroll-prog"></div>
 
-<!-- NAV -->
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo">
-      <div class="emp-logo-mark">E</div>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
       Emploia
     </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <a href="/tools" class="emp-nav-a">Outils</a>
-      <a href="/interview" class="emp-nav-a">Entretien</a>
-      <a href="/profil" class="emp-nav-a active">Mon Profil</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/profil" style="color:var(--primary);font-weight:600">Profil</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
-
-<!-- MOBILE NAV -->
 <div class="emp-mobile-nav" id="empMobileNav">
-  <a href="/jobs">📋 Offres d'emploi</a>
-  <a href="/app">✨ Générer CV</a>
-  <a href="/dashboard">📊 Dashboard</a>
-  <a href="/interview">🎤 Entretien</a>
-  <a href="/profil">👤 Mon Profil</a>
-  <div class="mn-div"></div>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/profil">Mon profil</a>
+</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -458,7 +452,7 @@
         <div class="pc-track">
           <div class="pc-fill" id="completionBar" style="width:0%"></div>
         </div>
-        <div id="completionTip" style="font-size:11px;color:var(--t3);margin-top:8px;min-height:14px"></div>
+        <div id="completionTip" style="font-size:11px;color:var(--steel);margin-top:8px;min-height:14px"></div>
       </div>
 
       <div class="profile-stats">
@@ -517,22 +511,22 @@
     <div style="background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(99,102,241,.06));border:1px solid rgba(10,102,194,.2);border-radius:16px;padding:18px 22px;margin-bottom:0">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div>
-          <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:8px">
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px">
             <span style="background:#0a66c2;color:#fff;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700">in</span>
             Importer depuis LinkedIn
           </div>
-          <div style="font-size:12px;color:var(--t2)">Collez votre texte de profil LinkedIn pour pré-remplir automatiquement votre profil Emploia.</div>
+          <div style="font-size:12px;color:var(--slate)">Collez votre texte de profil LinkedIn pour pré-remplir automatiquement votre profil Emploia.</div>
         </div>
-        <button onclick="toggleLinkedInImport()" id="liToggleBtn" class="btn btn-ghost btn-sm">Ouvrir →</button>
+        <button onclick="toggleLinkedInImport()" id="liToggleBtn" class="emp-btn emp-btn-ghost emp-btn-sm">Ouvrir →</button>
       </div>
       <div id="liImportPanel" style="display:none;margin-top:16px">
-        <div style="background:var(--bls);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11.5px;color:var(--blb);line-height:1.7">
+        <div style="background:var(--tint-lavender);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11.5px;color:var(--primary);line-height:1.7">
           <strong>Comment faire :</strong> Sur LinkedIn → votre profil → sélectionnez tout le texte (Ctrl+A) → copiez (Ctrl+C) → collez ici. Ou collez directement vos expériences, compétences, résumé.
         </div>
         <textarea id="liText" rows="6" class="emp-input" placeholder="Collez ici votre texte de profil LinkedIn (expériences, compétences, résumé...)..." style="width:100%;resize:vertical;margin-bottom:10px"></textarea>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="importLinkedIn()" id="liImportBtn">✨ Importer dans mon profil</button>
-          <button class="btn btn-ghost btn-sm" onclick="toggleLinkedInImport()">Fermer</button>
+          <button class="emp-btn emp-btn-primary emp-btn-sm" onclick="importLinkedIn()" id="liImportBtn">✨ Importer dans mon profil</button>
+          <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="toggleLinkedInImport()">Fermer</button>
         </div>
       </div>
     </div>
@@ -542,8 +536,8 @@
       <div class="sc-header">
         <div class="sc-title">👤 Informations personnelles</div>
         <div style="display:flex;gap:8px;align-items:center">
-          <span class="badge badge-blue">Profil public</span>
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('cvFileInput').click()" title="Importer un CV PDF">📄 Importer CV</button>
+          <span class="emp-badge emp-badge-purple">Profil public</span>
+          <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="document.getElementById('cvFileInput').click()" title="Importer un CV PDF">📄 Importer CV</button>
           <input type="file" id="cvFileInput" accept="application/pdf" style="display:none" onchange="importCV(this)"/>
         </div>
       </div>
@@ -584,7 +578,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="emp-label" style="display:flex;align-items:center;justify-content:space-between">LinkedIn <a href="/tools" style="font-size:11px;color:var(--inb);font-weight:700;text-decoration:none">✨ Optimiser avec l'IA →</a></label>
+            <label class="emp-label" style="display:flex;align-items:center;justify-content:space-between">LinkedIn <a href="/tools" style="font-size:11px;color:var(--primary);font-weight:700;text-decoration:none">✨ Optimiser avec l'IA →</a></label>
             <input type="url" class="emp-input" id="prfLinkedin" placeholder="https://linkedin.com/in/..."/>
           </div>
           <div class="form-group">
@@ -599,7 +593,7 @@
     <div class="section-card" id="sec-experience" style="display:none">
       <div class="sc-header">
         <div class="sc-title">💼 Expériences professionnelles</div>
-        <button class="btn btn-primary btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
+        <button class="emp-btn emp-btn-primary emp-btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
       </div>
       <div class="sc-body">
         <div class="exp-list">
@@ -637,7 +631,7 @@
     <div class="section-card" id="sec-formation" style="display:none">
       <div class="sc-header">
         <div class="sc-title">🎓 Formation</div>
-        <button class="btn btn-primary btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
+        <button class="emp-btn emp-btn-primary emp-btn-sm" onclick="empToast('Formulaire d\'ajout ouvert','info')">+ Ajouter</button>
       </div>
       <div class="sc-body">
         <div class="exp-list">
@@ -700,15 +694,15 @@
           </div>
         </div>
 
-        <div style="margin-top:16px;padding:14px;background:var(--s3);border-radius:12px;display:flex;gap:10px;align-items:flex-start">
+        <div style="margin-top:16px;padding:14px;background:var(--tint-gray);border-radius:12px;display:flex;gap:10px;align-items:flex-start">
           <span style="font-size:20px">💡</span>
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px">Niveau de compétence</div>
-            <div style="font-size:11px;color:var(--t3);line-height:1.6">
-              <span style="color:var(--gnb)">●</span> Expert &nbsp;
-              <span style="color:var(--blb)">●</span> Avancé &nbsp;
-              <span style="color:var(--ylb)">●</span> Intermédiaire &nbsp;
-              <span style="color:var(--t3)">●</span> Débutant
+            <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px">Niveau de compétence</div>
+            <div style="font-size:11px;color:var(--steel);line-height:1.6">
+              <span style="color:var(--brand-green)">●</span> Expert &nbsp;
+              <span style="color:var(--primary)">●</span> Avancé &nbsp;
+              <span style="color:var(--brand-yellow)">●</span> Intermédiaire &nbsp;
+              <span style="color:var(--steel)">●</span> Débutant
             </div>
           </div>
         </div>
@@ -767,19 +761,19 @@
         </div>
 
         <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--s3);border-radius:12px;border:1px solid var(--brd)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--tint-gray);border-radius:12px;border:1px solid var(--hairline)">
             <div>
-              <div style="font-size:13px;font-weight:600;color:var(--t1)">Alertes email nouvelles offres</div>
-              <div style="font-size:11px;color:var(--t3);margin-top:2px">Recevez les offres correspondant à vos critères</div>
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Alertes email nouvelles offres</div>
+              <div style="font-size:11px;color:var(--steel);margin-top:2px">Recevez les offres correspondant à vos critères</div>
             </div>
             <div class="emp-toggle on" id="alertToggle" onclick="this.classList.toggle('on')">
               <div class="emp-toggle-knob"></div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--s3);border-radius:12px;border:1px solid var(--brd)">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--tint-gray);border-radius:12px;border:1px solid var(--hairline)">
             <div>
-              <div style="font-size:13px;font-weight:600;color:var(--t1)">Profil visible aux recruteurs</div>
-              <div style="font-size:11px;color:var(--t3);margin-top:2px">Les recruteurs peuvent vous contacter directement</div>
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Profil visible aux recruteurs</div>
+              <div style="font-size:11px;color:var(--steel);margin-top:2px">Les recruteurs peuvent vous contacter directement</div>
             </div>
             <div class="emp-toggle" id="visibleToggle" onclick="this.classList.toggle('on')">
               <div class="emp-toggle-knob"></div>
@@ -793,11 +787,11 @@
     <div class="section-card" id="sec-documents" style="display:none">
       <div class="sc-header">
         <div class="sc-title">📄 Mes documents</div>
-        <a href="/cv-builder" class="btn btn-primary btn-sm">+ Nouveau CV</a>
+        <a href="/cv-builder" class="emp-btn emp-btn-primary emp-btn-sm">+ Nouveau CV</a>
       </div>
       <div class="sc-body">
         <div class="doc-list" id="docList">
-          <div style="text-align:center;padding:40px;color:var(--t3);font-size:13px">Chargement...</div>
+          <div style="text-align:center;padding:40px;color:var(--steel);font-size:13px">Chargement...</div>
         </div>
       </div>
     </div>
@@ -823,23 +817,23 @@
               <input type="password" class="emp-input" id="pwdConfirm" placeholder="••••••••"/>
             </div>
           </div>
-          <button class="btn btn-primary" style="align-self:flex-start" id="pwdBtn" onclick="changePassword()">Mettre à jour</button>
+          <button class="emp-btn emp-btn-primary" style="align-self:flex-start" id="pwdBtn" onclick="changePassword()">Mettre à jour</button>
 
           <div class="emp-divider" style="margin:8px 0"></div>
 
-          <div id="subscriptionSection" style="background:var(--s3);border:1px solid var(--brd);border-radius:12px;padding:20px;margin-bottom:8px;display:none">
-            <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:12px">💳 Abonnement</div>
-            <div style="font-size:13px;color:var(--t2);margin-bottom:12px">Plan actuel : <strong id="subPlanLabel" style="color:var(--t1)">—</strong></div>
+          <div id="subscriptionSection" style="background:var(--tint-gray);border:1px solid var(--hairline);border-radius:12px;padding:20px;margin-bottom:8px;display:none">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px">💳 Abonnement</div>
+            <div style="font-size:13px;color:var(--slate);margin-bottom:12px">Plan actuel : <strong id="subPlanLabel" style="color:var(--ink)">—</strong></div>
             <div id="cancelWarning" style="display:none;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#f59e0b;margin-bottom:12px">
               ⚠️ Votre abonnement sera annulé le <span id="subCancelDate">—</span>
             </div>
-            <a href="/api/stripe-portal" class="btn btn-ghost btn-sm" style="display:inline-block">Gérer mon abonnement →</a>
+            <a href="/api/stripe-portal" class="emp-btn emp-btn-ghost emp-btn-sm" style="display:inline-block">Gérer mon abonnement →</a>
           </div>
 
-          <div style="background:var(--rnd);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
-            <div style="font-size:14px;font-weight:700;color:var(--rnb);margin-bottom:8px">⚠️ Zone de danger</div>
-            <p style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6">La suppression de votre compte est irréversible. Toutes vos données, candidatures et documents seront effacés définitivement.</p>
-            <button class="btn" style="background:rgba(239,68,68,.15);color:var(--rnb);border:1px solid rgba(239,68,68,.2)" onclick="confirmDeleteAccount()">Supprimer mon compte</button>
+          <div style="background:rgba(196,59,59,.08);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--error);margin-bottom:8px">⚠️ Zone de danger</div>
+            <p style="font-size:13px;color:var(--slate);margin-bottom:16px;line-height:1.6">La suppression de votre compte est irréversible. Toutes vos données, candidatures et documents seront effacés définitivement.</p>
+            <button class="btn" style="background:rgba(239,68,68,.15);color:var(--error);border:1px solid rgba(239,68,68,.2)" onclick="confirmDeleteAccount()">Supprimer mon compte</button>
           </div>
         </div>
       </div>
@@ -852,19 +846,13 @@
 <div class="save-bar">
   <p>💾 Des modifications non sauvegardées sont en attente.</p>
   <div style="display:flex;gap:10px">
-    <button class="btn btn-ghost btn-sm" onclick="empToast('Modifications annulées','info')">Annuler</button>
-    <button class="btn btn-primary btn-sm" id="saveProfileBtn" onclick="saveProfile()">Sauvegarder les modifications</button>
+    <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="empToast('Modifications annulées','info')">Annuler</button>
+    <button class="emp-btn emp-btn-primary emp-btn-sm" id="saveProfileBtn" onclick="saveProfile()">Sauvegarder les modifications</button>
   </div>
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="emp-bottom-nav">
-  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
-  <a href="/jobs" class="emp-bottom-nav-item"><span class="bn-icon">📋</span>Offres</a>
-  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
-  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
-  <a href="/profil" class="emp-bottom-nav-item active"><span class="bn-icon">👤</span>Profil</a>
-</nav>
+
 
 <script src="shared.js"></script>
 <script>
