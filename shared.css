@@ -522,6 +522,10 @@ input,textarea,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:2px}
 :focus:not(:focus-visible){outline:none}
 
+/* ── SKIP TO MAIN (accessibility) ───────────────────── */
+.skip-to-main{position:absolute;top:-100%;left:24px;background:var(--primary);color:#fff;padding:8px 16px;border-radius:0 0 var(--r-md) var(--r-md);font-size:14px;font-weight:600;z-index:9999;transition:top .2s}
+.skip-to-main:focus{top:0}
+
 /* ── SOCIAL PROOF TOAST ──────────────────────────────── */
 #emp-sp-toast{position:fixed;bottom:80px;left:24px;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh-3);z-index:400;max-width:320px;transform:translateY(16px) scale(.97);opacity:0;transition:transform .35s var(--ease-out),opacity .35s;pointer-events:none}
 #emp-sp-toast.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}

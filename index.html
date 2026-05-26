@@ -17,7 +17,10 @@
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://emploia.fr/"/>
 <meta name="twitter:card" content="summary_large_image"/>
+<link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="dns-prefetch" href="https://plausible.io"/>
+<link rel="dns-prefetch" href="https://fonts.gstatic.com"/>
 <link rel="stylesheet" href="/shared.css"/>
 <script type="application/ld+json">
 {
@@ -240,21 +243,12 @@
 /* Count-up stat values */
 .emp-stat-item .val[data-count]{transition:all .1s}
 
-/* Scroll reveal */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .55s ease,transform .55s ease}
-.reveal.visible{opacity:1;transform:none}
-.reveal[data-delay="1"]{transition-delay:.08s}
-.reveal[data-delay="2"]{transition-delay:.16s}
-.reveal[data-delay="3"]{transition-delay:.24s}
-.reveal[data-delay="4"]{transition-delay:.32s}
-
 /* Typewriter */
 .tw-word{color:var(--brand-yellow);font-style:italic}
 .tw-cursor{display:inline-block;width:2px;height:.85em;background:var(--brand-yellow);margin-left:3px;vertical-align:middle;animation:blink .7s steps(1) infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* Scroll progress */
-#emp-scroll-prog{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--primary);z-index:9999;transition:width .1s linear;pointer-events:none}
+/* Scroll progress — handled by shared.css */
 
 /* Nav scrolled state */
 .emp-nav.scrolled{box-shadow:0 1px 16px rgba(0,0,0,.09)}
@@ -299,12 +293,12 @@
 </style>
 </head>
 <body>
-
+<a href="#main-content" class="skip-to-main">Aller au contenu principal</a>
 <div id="emp-scroll-prog"></div>
 
 <!-- ═════ PROMO BANNER ═════ -->
 <a href="/app" class="emp-promo" style="text-decoration:none;display:block;text-align:center">
-  Nouveau : extension LinkedIn — analysez n'importe quelle offre en 1 clic <span class="arrow">→</span>
+  <span style="display:inline-flex;align-items:center;gap:8px"><span style="background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.3px">NOUVEAU</span> Extension LinkedIn — analysez n'importe quelle offre en 1 clic</span> <span class="arrow">→</span>
 </a>
 
 <!-- ═════ NAV ═════ -->
@@ -342,6 +336,7 @@
 </nav>
 
 <!-- ═════ HERO ═════ -->
+<main id="main-content">
 <section class="emp-hero-dark">
   <!-- Decorative dots -->
   <div class="emp-dot lg" style="--r:-8deg;background:var(--brand-pink);top:120px;left:8%"></div>
@@ -364,7 +359,7 @@
 
   <div class="emp-hero-inner">
     <div class="live-chip"><span class="live-dot"></span><span>🟢 <strong id="liveCount">847</strong> candidats actifs en ce moment</span></div>
-    <h1 class="t-hero">Le copilote qui<br/>candidate à votre place.</h1>
+    <h1 class="t-hero">Le copilote qui<br/><span style="background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidate à votre place.</span></h1>
     <p class="emp-hero-sub">Conçu pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — CV taillé pour chaque offre, entretiens préparés, suivi de candidatures. En français.</p>
     <div class="emp-hero-cta">
       <a href="/app" class="emp-btn emp-btn-primary">Essayer gratuitement →</a>
@@ -771,7 +766,7 @@
   <div class="container">
     <div class="emp-stat-row reveal">
       <div>
-        <h3 class="t-h2">Plus d'entretiens.<br/>Moins d'onglets.</h3>
+        <h3 class="t-h2"><span class="grad-text">Plus d'entretiens.</span><br/>Moins d'onglets.</h3>
         <p class="t-subtitle mt-4">Les utilisateurs EmploiA passent 4× moins de temps à candidater — et obtiennent 3× plus de réponses positives.</p>
       </div>
       <div class="stat-list">
@@ -1036,7 +1031,7 @@
   <div class="container">
     <div class="emp-cta-banner reveal">
       <div class="star-row" style="font-size:18px">★★★★★ <span style="font-size:14px;font-weight:500;color:var(--slate);margin-left:6px">4,9 / 5 · 1 240 avis</span></div>
-      <h2 class="t-h1">Votre prochain entretien<br/>vous attend.</h2>
+      <h2 class="t-h1">Votre prochain entretien<br/><span class="grad-text">vous attend.</span></h2>
       <p>Rejoignez 24 800 candidats qui ont laissé EmploiA s'occuper du plus pénible.</p>
       <div class="row">
         <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Essayer EmploiA gratuitement</a>
@@ -1046,6 +1041,8 @@
     </div>
   </div>
 </section>
+
+</main>
 
 <!-- ═════ STICKY CTA BAR ═════ -->
 <div id="stickyBar" role="complementary" aria-label="Essayer EmploiA">
@@ -1071,9 +1068,10 @@
         <h5>Produit</h5>
         <a href="/app">Générateur de CV</a>
         <a href="/app">Lettres de motivation</a>
-        <a href="/interview">Coach d'entretien</a>
+        <a href="/interview">Coach d'entretien IA</a>
+        <a href="/tools">Outils IA gratuits</a>
+        <a href="/jobs">800 000 offres</a>
         <a href="/dashboard">Tableau de bord</a>
-        <a href="/app">Extension LinkedIn</a>
       </div>
       <div class="emp-footer-col">
         <h5>Métiers</h5>
@@ -1093,10 +1091,11 @@
       </div>
       <div class="emp-footer-col">
         <h5>Ressources</h5>
-        <a href="/blog">Blog</a>
-        <a href="/app">Modèles de CV</a>
-        <a href="/blog">Guides entretien</a>
-        <a href="/blog">Salaires</a>
+        <a href="/blog">Blog emploi</a>
+        <a href="/blog/comment-faire-un-cv">Guide CV 2026</a>
+        <a href="/blog/preparer-entretien-embauche">Préparer son entretien</a>
+        <a href="/blog/salaires-france-2026">Salaires en France</a>
+        <a href="/blog/cv-ats-2026">Optimiser son ATS</a>
       </div>
       <div class="emp-footer-col">
         <h5>Mentions</h5>

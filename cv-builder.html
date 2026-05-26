@@ -8,17 +8,19 @@
   <link rel="canonical" href="https://emploia.fr/cv-builder"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6E48BE"/>
+  <meta name="theme-color" content="#0E1830"/>
   <meta property="og:title" content="CV Builder — Créez votre CV professionnel · Emploia"/>
   <meta property="og:description" content="Créez et téléchargez un CV professionnel en quelques minutes. Preview en temps réel, templates ATS-optimisés."/>
   <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.fr/cv-builder"/>
   <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="CV Builder — Créez votre CV professionnel · Emploia"/>
+  <meta name="twitter:description" content="Créez et téléchargez un CV professionnel en quelques minutes. Preview en temps réel, templates ATS-optimisés."/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  
+  <link rel="dns-prefetch" href="https://plausible.io"/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
     body { background: var(--surface); overflow-x: hidden; }
@@ -413,7 +415,7 @@
       <button class="mmt-btn" onclick="setMobileMode('preview',event)">👁 Preview</button>
     </div>
 
-    <div class="ed-header">
+    <div class="ed-header reveal">
       <h2>Mon CV</h2>
       <div class="save-status">
         <span style="width:7px;height:7px;border-radius:50%;background:var(--brand-green)"></span>
@@ -607,7 +609,7 @@
 
 
 
-<script src="shared.js"></script>
+<script src="/shared.js"></script>
 <script>
 // ── DATA MODEL ────────────────────────────────────────────────────
 const SECTION_META = {

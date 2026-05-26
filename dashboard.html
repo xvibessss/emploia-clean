@@ -8,10 +8,19 @@
   <link rel="canonical" href="https://emploia.fr/dashboard"/>
   <meta name="robots" content="noindex"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6E48BE"/>
+  <meta name="theme-color" content="#0E1830"/>
+  <meta property="og:title" content="Dashboard — Emploia"/>
+  <meta property="og:description" content="Gérez toutes vos candidatures, générez des CVs ATS-optimisés et suivez vos entretiens depuis votre dashboard Emploia."/>
+  <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/dashboard"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Dashboard — Emploia"/>
+  <meta name="twitter:description" content="Gérez toutes vos candidatures, générez des CVs ATS-optimisés et suivez vos entretiens depuis votre dashboard Emploia."/>
+  <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    
+  <link rel="dns-prefetch" href="https://plausible.io"/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
     body { background: var(--surface); }
@@ -785,7 +794,7 @@
 <div class="dash-layout page-enter">
 
   <!-- WELCOME BANNER -->
-  <div class="welcome-banner">
+  <div class="welcome-banner reveal">
     <div class="wb-glow"></div>
     <div class="wb-left">
       <div class="wb-greeting">
@@ -1242,7 +1251,7 @@
 <!-- BOTTOM NAV -->
 
 
-<script src="shared.js"></script>
+<script src="/shared.js"></script>
 <script>
   // Greeting
   const hr = new Date().getHours();

@@ -7,7 +7,7 @@
   <meta name="description" content="Trouvez votre prochain poste, stage ou alternance en France. Générez votre CV ATS-optimisé en 30 secondes pour chaque offre avec Emploia."/>
   <link rel="canonical" href="https://emploia.fr/jobs"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6E48BE"/>
+  <meta name="theme-color" content="#0E1830"/>
   <meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA"/>
   <meta property="og:title" content="Emploia — Offres d'emploi CDI, Stage, Alternance en France"/>
   <meta property="og:description" content="Trouvez votre prochain poste, stage ou alternance en France. Générez votre CV ATS-optimisé en 30 secondes pour chaque offre."/>
@@ -15,14 +15,23 @@
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.fr/jobs"/>
   <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Emploia — Offres d'emploi CDI, Stage, Alternance en France"/>
+  <meta name="twitter:description" content="Trouvez votre prochain poste, stage ou alternance en France. Générez votre CV ATS-optimisé en 30 secondes pour chaque offre."/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
     body { background: var(--surface); }
     /* hero */
-    .jb-hero { padding: calc(var(--nav-h) + 32px) 0 28px; text-align: center; background: var(--canvas); border-bottom: 1px solid var(--hairline); }
+    .jb-hero { background: #0E1830; color: #fff; padding: calc(var(--nav-h) + 40px) 0 36px; border-bottom: none; position: relative; overflow: hidden; text-align: center; }
+    .jb-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(139,92,246,.35) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 80% 60%, rgba(96,165,250,.15) 0%, transparent 60%); pointer-events: none; }
+    .jb-hero-inner { position: relative; z-index: 1; }
+    .jb-hero h1.t-h2 { color: #fff; }
+    .jb-hero .t-body { color: rgba(255,255,255,.75); }
+    .jb-eyebrow { display: inline-flex; align-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 9999px; padding: 5px 16px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); margin-bottom: 18px; letter-spacing: .3px; }
+    .jb-search-box { background: var(--canvas); border-color: rgba(255,255,255,.15); box-shadow: 0 8px 32px rgba(0,0,0,.25); }
     .jb-live-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: var(--r-full); margin-bottom: 14px; }
     .jb-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
     /* search box */
@@ -145,7 +154,7 @@
     .cop-msg.user { background: var(--primary); color: #fff; align-self: flex-end; }
     .cop-msg.assistant { background: var(--surface); color: var(--slate); align-self: flex-start; border: 1px solid var(--hairline); }
     @media(max-width:900px) { .jb-layout{grid-template-columns:1fr} .jb-sidebar{display:none;position:static} .jb-sidebar.open{display:flex} .jb-mobile-filters-btn{display:flex} .jb-search-row{flex-wrap:wrap} .jb-search-loc{width:100%} }
-    @media(max-width:600px) { .jb-hero{padding-top:calc(var(--nav-h)+16px)} }
+    @media(max-width:600px) { .jb-hero{padding-top:calc(var(--nav-h)+20px);padding-bottom:24px} }
   </style>
 </head>
 <body>
@@ -179,15 +188,16 @@
 
 <!-- HERO SEARCH -->
 <div class="jb-hero">
-  <div class="container">
-    <div id="liveBadge" class="jb-live-badge" style="display:none;background:var(--tint-mint);color:var(--brand-green);border:1px solid #c8e6ca">
+  <div class="jb-hero-inner container">
+    <div class="jb-eyebrow">🇫🇷 800 000+ offres françaises en temps réel</div>
+    <div id="liveBadge" class="jb-live-badge" style="display:none;background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.22)">
       <div class="jb-live-dot"></div> Offres en temps réel · France Travail
     </div>
-    <div id="demoBadge" class="jb-live-badge" style="background:var(--tint-yellow);color:var(--brand-orange-deep);border:1px solid #e8d48a">
+    <div id="demoBadge" class="jb-live-badge" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.22)">
       Mode démo — offres représentatives
     </div>
-    <h1 class="t-h2" style="margin-bottom:10px">Trouvez votre <span style="color:var(--primary)">prochain poste</span></h1>
-    <p class="t-body" style="color:var(--slate);max-width:480px;margin:0 auto 24px">Stage, alternance, CDI, CDD — toutes les offres françaises. Emploia génère votre CV ATS-optimisé en 30 secondes pour chaque poste.</p>
+    <h1 class="t-h2" style="margin-bottom:10px">Trouvez votre <span style="color:#a78bfa">prochain poste</span></h1>
+    <p class="t-body" style="max-width:480px;margin:0 auto 24px">Stage, alternance, CDI, CDD — toutes les offres françaises. Emploia génère votre CV ATS-optimisé en 30 secondes pour chaque poste.</p>
 
     <div class="jb-search-box">
       <div class="jb-search-row">
@@ -211,7 +221,7 @@
   </div>
 </div>
 
-<div class="jb-stats container" id="searchStats">Chargement des offres...</div>
+<div class="jb-stats container reveal" id="searchStats">Chargement des offres...</div>
 
 <div class="jb-layout">
 

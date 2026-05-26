@@ -7,25 +7,38 @@
   <meta name="description" content="Outils IA pour booster votre candidature : profil LinkedIn optimisé, email de relance, négociation salariale, bilan post-entretien. Gratuit pour les outils de base."/>
   <link rel="canonical" href="https://emploia.fr/tools"/>
   <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#6E48BE"/>
+  <meta name="theme-color" content="#0E1830"/>
   <meta property="og:title" content="Outils IA candidature · Emploia"/>
   <meta property="og:description" content="LinkedIn, relance, négociation salariale — tous vos outils IA candidature au même endroit."/>
   <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.fr/tools"/>
   <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Outils IA candidature · Emploia"/>
+  <meta name="twitter:description" content="LinkedIn, relance, négociation salariale — tous vos outils IA candidature au même endroit."/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Outils IA Candidature — Emploia","description":"5 outils IA pour booster votre candidature : LinkedIn, email de relance, négociation salariale, bilan post-entretien.","url":"https://emploia.fr/tools","isPartOf":{"@type":"WebSite","name":"Emploia","url":"https://emploia.fr"}}</script>
     
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="/shared.css"/>
   <style>
     body { background: var(--surface); }
-    .tools-container { max-width: 1200px; margin: 0 auto; padding: 80px 24px 60px; }
-    .tools-header { text-align: center; margin-bottom: 36px; }
-    .tools-header h1 { font-size: clamp(24px,4vw,36px); font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
-    .tools-header p { font-size: 14px; color: var(--slate); }
+
+    /* ── Dark Hero ── */
+    .tools-hero { background: #0E1830; color: #fff; padding: 120px 24px 56px; text-align: center; position: relative; overflow: hidden; }
+    .tools-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(139,92,246,.35) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 80% 60%, rgba(96,165,250,.15) 0%, transparent 60%); pointer-events: none; }
+    .tools-hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+    .tools-hero-eyebrow { display: inline-flex; align-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 9999px; padding: 5px 16px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); margin-bottom: 20px; letter-spacing: .3px; }
+    .tools-hero h1 { font-size: clamp(28px,4.5vw,44px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; color: #fff; }
+    .tools-hero p { font-size: 16px; color: rgba(255,255,255,.72); line-height: 1.6; margin-bottom: 28px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .tools-trust-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+    .tools-trust-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 9999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); }
+    .tools-nav-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 24px; }
+    .tools-nav-chip { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 9999px; padding: 6px 16px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); }
+
+    .tools-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 60px; }
 
     .tool-tabs {
       display: flex;
@@ -198,12 +211,27 @@
   <a href="/dashboard">Dashboard</a>
 </div>
 
-<div class="tools-container">
-  <div class="tools-header">
-    <h1>Outils IA candidature</h1>
-    <p>Profil LinkedIn, relance, négociation — tout ce qui compte au-delà du CV.</p>
+<section class="tools-hero">
+  <div class="tools-hero-inner">
+    <div class="tools-hero-eyebrow">✨ Propulsé par Claude AI</div>
+    <h1>Tous vos outils IA<br/><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidature</span></h1>
+    <p>Profil LinkedIn optimisé, email de relance, négociation salariale — tout ce qui compte au-delà du CV.</p>
+    <div class="tools-trust-chips">
+      <span class="tools-trust-chip">🎁 5 outils gratuits</span>
+      <span class="tools-trust-chip">🤖 Propulsé par Claude AI</span>
+      <span class="tools-trust-chip">⚡ Résultats en 30s</span>
+    </div>
+    <div class="tools-nav-chips">
+      <span class="tools-nav-chip">🔗 LinkedIn</span>
+      <span class="tools-nav-chip">📧 Relance</span>
+      <span class="tools-nav-chip">💬 Outreach</span>
+      <span class="tools-nav-chip">💰 Négociation</span>
+      <span class="tools-nav-chip">🎤 Entretien</span>
+    </div>
   </div>
+</section>
 
+<div class="tools-container">
   <div class="tool-tabs">
     <button class="tool-tab active" onclick="switchTool('linkedin')">🔗 LinkedIn "À propos"</button>
     <button class="tool-tab" onclick="switchTool('relance')">📧 Email de relance</button>
@@ -213,7 +241,7 @@
   </div>
 
   <!-- ── LINKEDIN SUMMARY ──────────────────── -->
-  <div id="tool-linkedin" class="tool-section active">
+  <div id="tool-linkedin" class="tool-section active reveal">
     <div class="tool-grid">
       <div class="panel">
         <div class="panel-title">🔗 Profil LinkedIn "À propos" <span class="panel-badge">Gratuit</span></div>
@@ -247,7 +275,7 @@
   </div>
 
   <!-- ── EMAIL DE RELANCE ──────────────────── -->
-  <div id="tool-relance" class="tool-section">
+  <div id="tool-relance" class="tool-section reveal">
     <div class="tool-grid">
       <div class="panel">
         <div class="panel-title">📧 Email de relance <span class="panel-badge">Gratuit</span></div>
@@ -292,7 +320,7 @@
   </div>
 
   <!-- ── LINKEDIN OUTREACH ──────────────────── -->
-  <div id="tool-outreach" class="tool-section">
+  <div id="tool-outreach" class="tool-section reveal">
     <div class="tool-grid">
       <div class="panel">
         <div class="panel-title">💬 Message LinkedIn <span class="panel-badge">Gratuit</span></div>
@@ -326,7 +354,7 @@
   </div>
 
   <!-- ── NÉGOCIATION SALARIALE ──────────────── -->
-  <div id="tool-negociation" class="tool-section">
+  <div id="tool-negociation" class="tool-section reveal">
     <div class="tool-grid" id="neg-grid">
       <div class="panel">
         <div class="panel-title">💰 Négociation salariale <span class="panel-badge pro">Pro</span></div>
@@ -376,7 +404,7 @@
     </div>
   </div>
   <!-- ── INTERVIEW DEBRIEF ─────────────────── -->
-  <div id="tool-debrief" class="tool-section">
+  <div id="tool-debrief" class="tool-section reveal">
     <div class="tool-grid">
       <div class="panel">
         <div class="panel-title">🎤 Bilan post-entretien <span class="panel-badge pro-badge">Pro</span></div>
@@ -415,7 +443,7 @@
   </div>
 </div>
 
-<script src="shared.js"></script>
+<script src="/shared.js"></script>
 <script>
 function switchTool(name) {
   document.querySelectorAll('.tool-tab').forEach((t, i) => t.classList.toggle('active', ['linkedin','relance','outreach','negociation','debrief'][i] === name));
