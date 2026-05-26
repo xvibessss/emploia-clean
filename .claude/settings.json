@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '## %s — session end\\n%s\\n\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$(cd /Users/chapellehugo/emploia-clean && git log --oneline -3 2>/dev/null)\" >> /Users/chapellehugo/.claude/projects/-Users-chapellehugo/memory/session_log.md 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

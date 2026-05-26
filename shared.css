@@ -400,3 +400,77 @@ input,textarea,select{font:inherit;color:inherit}
   --grad-primary:linear-gradient(135deg,var(--primary),var(--brand-purple));
   --grad-text:linear-gradient(135deg,var(--brand-purple-300),var(--primary));
 }
+
+/* ── HERO MOCKUP DECORATIONS ─────────────────────────── */
+.emp-dot{position:absolute;border-radius:6px;box-shadow:rgba(0,0,0,.25) 0 8px 16px -4px;transform:rotate(var(--r,-4deg));pointer-events:none}
+.emp-dot.lg{width:78px;height:78px;border-radius:10px}
+.emp-dot.sm{width:48px;height:48px}
+.emp-wire{position:absolute;pointer-events:none;opacity:.5}
+.emp-hero-mockup-wrap{position:relative;z-index:3;max-width:1120px;margin:48px auto -120px;padding:0 32px}
+@media(max-width:767px){.emp-hero-mockup-wrap{margin-bottom:-80px}}
+
+/* ── STAT ROW ────────────────────────────────────────── */
+.emp-stat-row{background:var(--surface);border-radius:var(--r-lg);padding:48px;display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center}
+.emp-stat-row .stat-list{display:flex;flex-direction:column;gap:18px}
+.emp-stat-item{display:flex;align-items:center;gap:14px}
+.emp-stat-item .val{font-size:32px;font-weight:600;color:var(--ink);min-width:80px;letter-spacing:-.5px}
+.emp-stat-item .bar{flex:1;height:12px;background:var(--hairline);border-radius:6px;overflow:hidden}
+.emp-stat-item .bar i{display:block;height:100%;background:var(--primary);border-radius:6px}
+.emp-stat-item .lbl{font-size:14px;color:var(--slate);font-weight:500;min-width:160px}
+@media(max-width:767px){.emp-stat-row{grid-template-columns:1fr;padding:32px 22px}}
+
+/* ── SEARCH PILL ─────────────────────────────────────── */
+.emp-search-pill{display:flex;align-items:center;gap:10px;background:var(--surface);color:var(--steel);border:1px solid var(--hairline);border-radius:var(--r-md);padding:0 16px;height:44px;font-size:15px}
+.emp-search-pill input{flex:1;border:0;outline:0;background:transparent;font-size:15px;color:var(--ink);height:100%;padding:0}
+.emp-search-pill input::placeholder{color:var(--stone)}
+
+/* ── SELECT WITH ARROW ───────────────────────────────── */
+.emp-select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23837F77' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center}
+
+/* ── CHECKBOX ────────────────────────────────────────── */
+.emp-check{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;color:var(--charcoal)}
+.emp-check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1.5px solid var(--hairline-strong);border-radius:4px;background:#fff;cursor:pointer;transition:background .15s,border-color .15s;flex-shrink:0;display:grid;place-items:center}
+.emp-check input:checked{background:var(--primary);border-color:var(--primary)}
+.emp-check input:checked::after{content:"";width:10px;height:10px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat}
+
+/* ── COMPARE SECTION ─────────────────────────────────── */
+.emp-compare-section{padding:14px 20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--steel);background:var(--surface-soft);border-top:1px solid var(--hairline-soft)}
+.emp-compare-head > div + div{text-align:center}
+.emp-compare-row > div + div{text-align:center;color:var(--slate)}
+.emp-compare-row .yes{color:var(--ink)}
+
+/* ── EXTRA CARD VARIANTS ─────────────────────────────── */
+.emp-card-yellow-bold{background:var(--tint-yellow-bold);color:var(--ink);border-radius:var(--r-lg);padding:var(--sp-xxl)}
+.emp-card-brown{background:#5C4530;color:#fff;border-radius:var(--r-lg);padding:var(--sp-xxl)}
+
+/* ── EXTRA BADGES ────────────────────────────────────── */
+.emp-badge-pink{background:var(--brand-pink);color:#fff}
+.emp-badge-orange{background:var(--brand-orange);color:#fff}
+.emp-badge-popular{background:var(--primary);color:#fff;padding:5px 12px}
+
+/* ── TESTIMONIAL EXTRAS ──────────────────────────────── */
+.emp-testi-stat .l{font-size:13px;color:var(--slate)}
+.emp-testi-attr{display:flex;align-items:center;gap:12px}
+.emp-testi-name{font-size:14px;color:var(--ink);font-weight:600}
+.emp-testi-role{font-size:13px;color:var(--slate)}
+
+/* ── JOB MATCH VARIANTS ──────────────────────────────── */
+.emp-job-match.med{background:var(--tint-yellow);color:#7A5B12}
+.emp-job-match.low{background:var(--tint-peach);color:var(--brand-orange-deep)}
+@media(max-width:640px){
+  .emp-job-card{grid-template-columns:auto 1fr}
+  .emp-job-actions{grid-column:1/3;grid-row:auto;flex-direction:row;align-items:center;justify-content:flex-start;margin-top:8px}
+}
+
+/* ── FOOTER EXTRAS ───────────────────────────────────── */
+.emp-footer-tagline{color:var(--slate);font-size:14px;line-height:1.55;margin-top:14px;max-width:320px}
+.emp-footer-bot .soc{display:flex;gap:16px}
+.emp-footer-bot .soc a{color:var(--steel)}
+.emp-footer-bot .soc a:hover{color:var(--ink)}
+@media(max-width:640px){.emp-footer-bot{flex-direction:column;gap:10px;align-items:flex-start}}
+
+/* ── EXTRA UTILS ─────────────────────────────────────── */
+.items-start{align-items:flex-start}
+.text-left{text-align:left}
+.gap-1{gap:4px}
+.mt-16{margin-top:64px}
