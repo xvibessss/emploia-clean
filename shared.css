@@ -476,7 +476,7 @@ input,textarea,select{font:inherit;color:inherit}
 .mt-16{margin-top:64px}
 
 /* ── GLOBAL POLISH (scroll progress, nav, reveals) ───── */
-#emp-scroll-prog{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--primary);z-index:9999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
+#emp-scroll-prog{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--primary),var(--brand-purple));z-index:9999;transition:width .1s linear;pointer-events:none;border-radius:0 2px 2px 0}
 .emp-nav.scrolled{box-shadow:0 1px 18px rgba(0,0,0,.09)}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}
 .reveal.visible{opacity:1;transform:none}
@@ -486,3 +486,48 @@ input,textarea,select{font:inherit;color:inherit}
 .reveal[data-delay="4"]{transition-delay:.32s}
 .reveal[data-delay="5"]{transition-delay:.40s}
 .reveal[data-delay="6"]{transition-delay:.48s}
+.reveal[data-delay="7"]{transition-delay:.56s}
+.reveal[data-delay="8"]{transition-delay:.64s}
+
+/* ── REVEAL VARIANTS ─────────────────────────────────── */
+.reveal-left{opacity:0;transform:translateX(-28px);transition:opacity .55s ease,transform .55s ease}
+.reveal-left.visible{opacity:1;transform:none}
+.reveal-right{opacity:0;transform:translateX(28px);transition:opacity .55s ease,transform .55s ease}
+.reveal-right.visible{opacity:1;transform:none}
+.reveal-scale{opacity:0;transform:scale(.96);transition:opacity .5s ease,transform .5s ease}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+.reveal-left[data-delay="1"],.reveal-right[data-delay="1"],.reveal-scale[data-delay="1"]{transition-delay:.08s}
+.reveal-left[data-delay="2"],.reveal-right[data-delay="2"],.reveal-scale[data-delay="2"]{transition-delay:.16s}
+.reveal-left[data-delay="3"],.reveal-right[data-delay="3"],.reveal-scale[data-delay="3"]{transition-delay:.24s}
+
+/* ── BUTTON SHIMMER ──────────────────────────────────── */
+.emp-btn-primary{position:relative;overflow:hidden}
+.emp-btn-primary::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);pointer-events:none;transition:left .6s var(--ease-out)}
+.emp-btn-primary:hover::after{left:160%}
+
+/* ── CARD HOVER LIFT ─────────────────────────────────── */
+.emp-card,.emp-card-feature{transition:transform .22s var(--ease-out),box-shadow .22s var(--ease-out),border-color .22s}
+.emp-card:hover,.emp-card-feature:hover{transform:translateY(-3px);box-shadow:var(--sh-3);border-color:var(--hairline-strong)}
+
+/* ── GRADIENT TEXT ───────────────────────────────────── */
+.grad-text{background:linear-gradient(135deg,var(--primary) 0%,var(--brand-purple) 60%,#c084fc 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline}
+
+/* ── CUSTOM SCROLLBAR ────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--hairline-strong);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--stone)}
+
+/* ── FOCUS VISIBLE ───────────────────────────────────── */
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:2px}
+:focus:not(:focus-visible){outline:none}
+
+/* ── SOCIAL PROOF TOAST ──────────────────────────────── */
+#emp-sp-toast{position:fixed;bottom:80px;left:24px;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh-3);z-index:400;max-width:320px;transform:translateY(16px) scale(.97);opacity:0;transition:transform .35s var(--ease-out),opacity .35s;pointer-events:none}
+#emp-sp-toast.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+#emp-sp-toast .sp-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+#emp-sp-toast .sp-body{flex:1;min-width:0}
+#emp-sp-toast .sp-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+#emp-sp-toast .sp-msg{font-size:12px;color:var(--slate);line-height:1.4}
+#emp-sp-toast .sp-close{font-size:14px;color:var(--stone);cursor:pointer;flex-shrink:0;padding:2px;background:none;border:0;line-height:1}
+#emp-sp-toast .sp-close:hover{color:var(--ink)}
