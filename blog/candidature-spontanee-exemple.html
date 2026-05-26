@@ -40,7 +40,7 @@
 }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/shared.css"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -55,20 +55,9 @@
 }
 </script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#04080f;--s1:#0d1424;--s2:#111827;--s3:#1a2236;--brd:rgba(255,255,255,.07);--brdh:rgba(255,255,255,.13);--blue:#3b82f6;--blb:#60a5fa;--bld:rgba(59,130,246,.12);--ind:#6366f1;--inb:#818cf8;--ind2:rgba(99,102,241,.1);--grn:#10b981;--gnb:#34d399;--gnd:rgba(16,185,129,.1);--ylw:#f59e0b;--ylb:#fbbf24;--yld:rgba(245,158,11,.1);--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;}
-html{scroll-behavior:smooth;}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 #read-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(135deg,var(--blue),var(--ind));width:0%;z-index:999;transition:width .1s linear;}
-.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 35% at 15% 5%,rgba(99,102,241,.09) 0%,transparent 60%);}
-nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:0 24px;}
-.nav-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-size:16px;font-weight:800;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:9px;letter-spacing:-.4px;}
-.logo-m{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;}
-.nav-links{display:flex;align-items:center;gap:6px;}
-.nav-a{font-size:12px;font-weight:500;color:var(--t2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .15s;}
-.nav-a:hover,.nav-a.active{background:var(--s3);color:var(--t1);}
-.btn-nav{font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--ind));border:none;cursor:pointer;padding:7px 16px;border-radius:8px;text-decoration:none;}
+
+.btn-
 .wrap{max-width:760px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:1;}
 .breadcrumb{padding:20px 0 0;font-size:12px;color:var(--t3);}
 .breadcrumb a{color:var(--t3);text-decoration:none;}
@@ -76,7 +65,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
 .art-tag{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;padding:4px 12px;border-radius:100px;background:var(--gnd);color:var(--gnb);border:1px solid rgba(16,185,129,.2);margin-bottom:14px;}
 .art-hero h1{font-size:clamp(24px,4vw,38px);font-weight:900;letter-spacing:-1.2px;line-height:1.15;margin-bottom:14px;}
 .art-meta{font-size:12px;color:var(--t3);display:flex;gap:16px;flex-wrap:wrap;}
-.art-body{padding:32px 0;}
+.art-
 .art-body h2{font-size:20px;font-weight:800;letter-spacing:-.5px;margin:36px 0 14px;color:var(--t1);}
 .art-body h3{font-size:16px;font-weight:700;margin:24px 0 10px;color:var(--blb);}
 .art-body p{font-size:14.5px;color:var(--t2);line-height:1.8;margin-bottom:14px;}
@@ -112,9 +101,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
 .nw-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:6px;}
 .nw-sub{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6;}
 .nw-form{display:flex;gap:10px;flex-wrap:wrap;}
-.nw-input{flex:1;min-width:200px;padding:11px 14px;background:var(--s3);border:1.5px solid var(--brd);border-radius:10px;color:var(--t1);font-size:14px;font-family:'Sora',sans-serif;outline:none;}
+.nw-input{flex:1;min-width:200px;padding:11px 14px;background:var(--s3);border:1.5px solid var(--brd);border-radius:10px;color:var(--t1);font-size:14px;font-family:var(--f-ui);outline:none;}
 .nw-input:focus{border-color:var(--ind);}
-.nw-btn{padding:11px 22px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;}
+.nw-btn{padding:11px 22px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:var(--f-ui);white-space:nowrap;}
 .nw-success{font-size:13px;color:var(--gnb);font-weight:700;display:none;}
 @media(max-width:600px){.related-grid{grid-template-columns:1fr;}.share-bar{flex-direction:column;align-items:flex-start;}}
 .toc{background:var(--s2);border:1px solid var(--brd);border-radius:14px;padding:20px 24px;margin:28px 0 36px;}
@@ -130,22 +119,36 @@ nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,.92);backdrop-filte
 .faq-item summary::-webkit-details-marker{display:none;}
 .faq-item summary::after{content:"+";font-size:20px;color:var(--inb);transition:transform .2s;flex-shrink:0;margin-left:12px;}
 details[open] .faq-item summary::after{transform:rotate(45deg);}
-.faq-item .faq-body{padding:16px 20px;font-size:14px;color:var(--t2);line-height:1.8;background:var(--s3);}
+.faq-item .faq-
 </style>
 </head>
 <body>
 <div id="read-progress"></div>
-<div class="ambient"></div>
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="logo"><div class="logo-m">E</div>Emploia</a>
-    <div class="nav-links">
-      <a class="nav-a" href="/jobs">Offres</a>
-      <a class="nav-a active" href="/blog">Blog</a>
-      <a class="btn-nav" href="/app">Commencer →</a>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<nav class="emp-nav">
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer</a>
+      <a href="/blog" style="color:var(--primary);font-weight:600">Blog</a>
+      <a href="/#pricing">Tarifs</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/app">Générer un CV</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</div>
 
 <div class="wrap">
   <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Candidature spontanée</div>
@@ -379,5 +382,45 @@ async function submitNW(e, form) {
   } catch { btn.disabled = false; btn.textContent = "S'abonner →"; }
 }
 </script>
+
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div class="emp-footer-col">
+        <a href="/" class="emp-brand" style="margin-bottom:12px">
+          <div class="emp-brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+          Emploia
+        </a>
+        <p style="font-size:12px;color:var(--steel);line-height:1.6;margin-bottom:14px">Le copilote de candidature 100% français, propulsé par Claude AI d'Anthropic.</p>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Produit</h5>
+        <a href="/jobs">Offres d'emploi</a>
+        <a href="/app">Générateur IA</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/interview">Simulateur entretien</a>
+        <a href="/#pricing">Tarifs</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Ressources</h5>
+        <a href="/blog">Blog &amp; Guides</a>
+        <a href="/referral">Parrainage</a>
+        <a href="mailto:contact@emploia.fr">Contact</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Légal</h5>
+        <a href="/legal">Mentions légales</a>
+        <a href="/legal">Confidentialité</a>
+        <a href="/legal">CGU</a>
+      </div>
+    </div>
+    <div class="emp-footer-bot">
+      <span>© <span data-year></span> Emploia. Tous droits réservés.</span>
+      <a href="/legal" style="color:var(--steel)">Confidentialité</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
 </body>
 </html>
