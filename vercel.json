@@ -421,6 +421,7 @@
     { "source": "/blog/cv-manager", "destination": "/blog/cv-manager.html" },
     { "source": "/blog/13eme-mois", "destination": "/blog/13eme-mois.html" },
     { "source": "/blog/prime-activite", "destination": "/blog/prime-activite.html" },
+    { "source": "/blog/augmentation-salaire", "destination": "/blog/augmentation-salaire.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },

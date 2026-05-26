@@ -388,6 +388,13 @@ export default function handler(req, res) {
       pubDate: 'Sun, 24 May 2026 11:00:00 +0200',
       category: 'Aides & revenus',
     },
+    {
+      title: "Demander une augmentation de salaire en 2026 : méthode, timing et scripts",
+      link: `${base}/blog/augmentation-salaire`,
+      description: "Comment demander une augmentation de salaire en 2026 : quand le faire, combien demander, scripts de négociation testés, erreurs à éviter et plan B si refus.",
+      pubDate: 'Mon, 25 May 2026 09:00:00 +0200',
+      category: 'Salaire & Négociation',
+    },
   ];
 
   const items = articles.map(a => `
