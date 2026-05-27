@@ -115,7 +115,7 @@
 @media (max-width:1023px){.assist-banner{grid-template-columns:1fr}}
 
 /* Tiles + viz */
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:24px}
 .tile h4{margin:0 0 8px;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
 .tile p{margin:0;font-size:14px;color:var(--slate);line-height:1.5}
 .tile{display:flex;flex-direction:column;min-height:280px}
@@ -594,9 +594,12 @@
         <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
           <span class="chip-tag">CV ATS</span>
           <span class="chip-tag">Lettre de motivation</span>
+          <span class="chip-tag">Orion IA Chat</span>
           <span class="chip-tag">Préparation d'entretien</span>
           <span class="chip-tag">Relances</span>
           <span class="chip-tag">Négociation</span>
+          <span class="chip-tag">CV Vault</span>
+          <span class="chip-tag">Analyse entreprise</span>
         </div>
       </div>
       <div class="assist-visual">
@@ -653,6 +656,24 @@
               <div style="flex:1;height:6px;background:var(--hairline);border-radius:3px;overflow:hidden"><div style="width:91%;height:100%;background:var(--brand-green)"></div></div>
             </div>
             <div style="font-size:11px;color:var(--steel);margin-top:6px">+14% en une nuit</div>
+          </div>
+        </div>
+      </div>
+      <div class="tile reveal" data-delay="4" style="background:linear-gradient(135deg,#f0ebff 0%,#e8f4ff 100%);border-radius:var(--r-xl);padding:32px">
+        <h4 style="color:var(--ink);margin:0 0 10px;font-size:18px;font-weight:700">Orion — Copilote IA</h4>
+        <p style="color:var(--slate);font-size:14px;line-height:1.6;margin:0 0 20px">Posez n'importe quelle question sur votre candidature, 24h/24. Conseils CV, préparation entretien, négociation salariale — en moins de 30 secondes.</p>
+        <div class="viz">
+          <div class="mini-card" style="background:#fff">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:8px;align-items:flex-start">
+                <div style="width:22px;height:22px;border-radius:50%;background:var(--primary);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">O</div>
+                <div style="font-size:11.5px;color:var(--ink);line-height:1.5;background:var(--canvas);border-radius:0 8px 8px 8px;padding:7px 10px;flex:1"><strong>Bonne question !</strong> Pour ce poste PM chez Doctolib, valorisez votre expérience en discovery research — c'est leur mot-clé le plus discriminant.</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-start;flex-direction:row-reverse">
+                <div style="width:22px;height:22px;border-radius:50%;background:var(--primary);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">C</div>
+                <div style="font-size:11.5px;color:#fff;background:var(--primary);border-radius:8px 0 8px 8px;padding:7px 10px">Et pour la négo salariale ?</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

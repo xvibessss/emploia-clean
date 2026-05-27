@@ -269,6 +269,7 @@
           <div class="sa-email-subject" id="saEmailSubject"><strong>Objet email</strong><span id="saEmailSubjectText"></span></div>
           <div class="sa-actions">
             <button class="sa-copy-btn" onclick="copySA()">📋 Copier</button>
+            <button class="sa-copy-btn" id="saVaultBtn" onclick="saveSAToVault()">📁 Sauvegarder</button>
             <button class="sa-copy-btn" onclick="applyWithSA()">🚀 Postuler →</button>
           </div>
         </div>
@@ -537,6 +538,34 @@
   function copySA() {
     const txt = document.getElementById('saContent').textContent;
     navigator.clipboard.writeText(txt).then(() => empToast('Copié !', 'success'));
+  }
+
+  async function saveSAToVault() {
+    if (!window.empUser) { empShowAuth('login'); return; }
+    if (!saData) return;
+    const job = currentJob;
+    const jobLabel = job ? `${job.title || ''}${job.company ? ' — ' + job.company : ''}` : '';
+    const name = `Smart Apply${jobLabel ? ' · ' + jobLabel.slice(0, 50) : ''} · ${new Date().toLocaleDateString('fr-FR')}`;
+    const parts = [];
+    if (saData.coverLetter) parts.push(`=== LETTRE DE MOTIVATION ===\n\n${saData.coverLetter}`);
+    if (saData.cvBullets?.length) parts.push(`=== PUCES CV ===\n\n${saData.cvBullets.map(b => '▸ ' + b).join('\n')}`);
+    if (saData.questions?.length) parts.push(`=== PRÉPARATION ENTRETIEN ===\n\n${saData.questions.map(q => `Q: ${q.q}\nR: ${q.a}`).join('\n\n')}`);
+    const content = parts.join('\n\n');
+    if (!content.trim()) return;
+    const btn = document.getElementById('saVaultBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+    try {
+      const res = await fetch('/api/cv-versions', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content, type: 'letter' }),
+      });
+      const d = await res.json();
+      if (!res.ok) return empToast(d.error || 'Erreur', 'error');
+      empToast('Sauvegardé dans vos documents !', 'success');
+      if (btn) btn.textContent = '✅ Sauvegardé';
+    } catch { empToast('Erreur réseau', 'error'); }
+    finally { if (btn) btn.disabled = false; }
   }
 
   function applyWithSA() {

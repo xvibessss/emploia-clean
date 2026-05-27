@@ -104,6 +104,9 @@ export default function handler(req, res) {
     { loc: `${base}/blog/13eme-mois`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
     { loc: `${base}/blog/prime-activite`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-24' },
     { loc: `${base}/blog/augmentation-salaire`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-25' },
+    { loc: `${base}/blog/devenir-freelance-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
+    { loc: `${base}/blog/cv-ingenieur-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
+    { loc: `${base}/blog/repondre-recruteur-linkedin`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
