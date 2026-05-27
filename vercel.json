@@ -152,9 +152,6 @@
     "api/admin/stats.js": {
       "maxDuration": 10
     },
-    "api/track.js": {
-      "maxDuration": 5
-    },
     "api/nps.js": {
       "maxDuration": 5
     }
