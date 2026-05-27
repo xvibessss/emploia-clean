@@ -17,7 +17,7 @@
   <meta name="twitter:title" content="Outils IA candidature · Emploia"/>
   <meta name="twitter:description" content="LinkedIn, relance, négociation salariale — tous vos outils IA candidature au même endroit."/>
   <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Outils IA Candidature — Emploia","description":"5 outils IA pour booster votre candidature : LinkedIn, email de relance, négociation salariale, bilan post-entretien.","url":"https://emploia.fr/tools","isPartOf":{"@type":"WebSite","name":"Emploia","url":"https://emploia.fr"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Outils IA Candidature — Emploia","description":"6 outils IA pour booster votre candidature : LinkedIn, email de relance, négociation salariale, bilan post-entretien, analyse entreprise.","url":"https://emploia.fr/tools","isPartOf":{"@type":"WebSite","name":"Emploia","url":"https://emploia.fr"}}</script>
     
   <link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -217,7 +217,7 @@
     <h1>Tous vos outils IA<br/><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidature</span></h1>
     <p>Profil LinkedIn optimisé, email de relance, négociation salariale — tout ce qui compte au-delà du CV.</p>
     <div class="tools-trust-chips">
-      <span class="tools-trust-chip">🎁 5 outils gratuits</span>
+      <span class="tools-trust-chip">🎁 6 outils gratuits</span>
       <span class="tools-trust-chip">🤖 Propulsé par Claude AI</span>
       <span class="tools-trust-chip">⚡ Résultats en 30s</span>
     </div>
@@ -227,6 +227,7 @@
       <span class="tools-nav-chip">💬 Outreach</span>
       <span class="tools-nav-chip">💰 Négociation</span>
       <span class="tools-nav-chip">🎤 Entretien</span>
+      <span class="tools-nav-chip">🏢 Entreprise</span>
     </div>
   </div>
 </section>
@@ -238,6 +239,7 @@
     <button class="tool-tab" onclick="switchTool('outreach')">💬 Message LinkedIn</button>
     <button class="tool-tab" onclick="switchTool('negociation')">💰 Négociation salariale</button>
     <button class="tool-tab" onclick="switchTool('debrief')">🎤 Bilan entretien</button>
+    <button class="tool-tab" onclick="switchTool('entreprise')">🏢 Analyse entreprise</button>
   </div>
 
   <!-- ── LINKEDIN SUMMARY ──────────────────── -->
@@ -270,6 +272,9 @@
           <span>Votre profil LinkedIn optimisé apparaîtra ici</span>
         </div>
         <div id="li-output" style="display:none"></div>
+        <div id="li-save-row" style="display:none;margin-top:12px">
+          <button id="li-save-btn" onclick="saveLinkedinToVault()" class="emp-btn emp-btn-secondary" style="font-size:12px;padding:7px 14px">📁 Sauvegarder dans mes docs</button>
+        </div>
       </div>
     </div>
   </div>
@@ -403,6 +408,36 @@
       </div>
     </div>
   </div>
+  <!-- ── ANALYSE ENTREPRISE ──────────────────── -->
+  <div id="tool-entreprise" class="tool-section reveal">
+    <div class="tool-grid">
+      <div class="panel">
+        <div class="panel-title">🏢 Analyse entreprise <span class="panel-badge">Gratuit</span></div>
+        <div class="field-group">
+          <label>Nom de l'entreprise <span style="color:var(--steel);font-weight:400">requis</span></label>
+          <input id="ent-company" type="text" placeholder="Ex : Dassault Systèmes, BlaBlaCar, L'Oréal..."/>
+        </div>
+        <div class="field-group">
+          <label>Poste visé <span style="color:var(--steel);font-weight:400">optionnel — améliore l'analyse</span></label>
+          <input id="ent-job" type="text" placeholder="Ex : Product Manager Senior"/>
+        </div>
+        <div class="field-group">
+          <label>Description du poste <span style="color:var(--steel);font-weight:400">optionnel — recommandé</span></label>
+          <textarea id="ent-jd" rows="5" placeholder="Collez l'annonce pour une analyse plus précise..."></textarea>
+        </div>
+        <button class="btn-generate" id="ent-btn" onclick="generateEntreprise()">Analyser l'entreprise</button>
+      </div>
+
+      <div class="result-panel" id="ent-result">
+        <div class="result-placeholder" id="ent-placeholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span>Insights entreprise, culture, processus et questions à poser</span>
+        </div>
+        <div id="ent-output" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── INTERVIEW DEBRIEF ─────────────────── -->
   <div id="tool-debrief" class="tool-section reveal">
     <div class="tool-grid">
@@ -446,7 +481,7 @@
 <script src="/shared.js"></script>
 <script>
 function switchTool(name) {
-  document.querySelectorAll('.tool-tab').forEach((t, i) => t.classList.toggle('active', ['linkedin','relance','outreach','negociation','debrief'][i] === name));
+  document.querySelectorAll('.tool-tab').forEach((t, i) => t.classList.toggle('active', ['linkedin','relance','outreach','negociation','debrief','entreprise'][i] === name));
   document.querySelectorAll('.tool-section').forEach(s => s.classList.remove('active'));
   document.getElementById('tool-' + name).classList.add('active');
 }
@@ -491,6 +526,8 @@ async function generateLinkedin() {
     document.getElementById('li-placeholder').style.display = 'none';
     const out = document.getElementById('li-output');
     out.style.display = 'block';
+    const saveRow = document.getElementById('li-save-row');
+    if (saveRow) { saveRow.style.display = 'block'; const sb = document.getElementById('li-save-btn'); if (sb) { sb.disabled = false; sb.textContent = '📁 Sauvegarder dans mes docs'; } }
     out.innerHTML = `
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
@@ -716,6 +753,51 @@ async function generateDebrief() {
   finally { setLoading('debrief-btn', false, 'Analyser mon entretien ✨'); }
 }
 
+// ── ANALYSE ENTREPRISE ───────────────────────
+async function generateEntreprise() {
+  const company = document.getElementById('ent-company').value.trim();
+  if (!company) return empToast('Précisez le nom de l\'entreprise', 'error');
+  setLoading('ent-btn', true, 'Analyser l\'entreprise');
+  try {
+    const res = await fetch('/api/company-insights', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company,
+        jobTitle: document.getElementById('ent-job').value.trim(),
+        jobDescription: document.getElementById('ent-jd').value.trim(),
+      }),
+    });
+    const d = await res.json();
+    if (!res.ok) {
+      if (res.status === 401) return empRedirectToAuth();
+      return empToast(d.error || 'Erreur', 'error');
+    }
+    document.getElementById('ent-placeholder').style.display = 'none';
+    const out = document.getElementById('ent-output');
+    out.style.display = 'block';
+    out.innerHTML = `
+      <div class="result-block">
+        <div class="result-block-title">🏢 Culture &amp; environnement</div>
+        <div class="tip-item" style="font-weight:600">${esc(d.cultureType || '')}</div>
+        <div class="result-block-body" style="margin-top:8px">${esc(d.cultureDesc || '')}</div>
+      </div>
+      <div class="result-block">
+        <div class="result-block-title">🎤 Processus d'entretien probable</div>
+        <div class="tip-item"><strong>Style :</strong> ${esc(d.interviewStyle || '')}</div>
+        <div class="tip-item" style="margin-top:6px">${esc(d.interviewProcess || '')}</div>
+      </div>
+      ${d.toResearch?.length ? `<div class="result-block"><div class="result-block-title">📚 À connaître avant l'entretien</div>${d.toResearch.map(r => `<div class="tip-item">${esc(r)}</div>`).join('')}</div>` : ''}
+      ${d.talkingPoints?.length ? `<div class="result-block"><div class="result-block-title">💡 Angles différenciants à valoriser</div>${d.talkingPoints.map(t => `<div class="tip-item" style="background:rgba(110,72,190,.08);color:var(--primary)">${esc(t)}</div>`).join('')}</div>` : ''}
+      ${d.questionsToAsk?.length ? `<div class="result-block"><div class="result-block-title">❓ Questions à poser au recruteur</div>${d.questionsToAsk.map(q => `<div class="tip-item">${esc(q)}</div>`).join('')}</div>` : ''}
+      ${d.salaryContext ? `<div class="result-block"><div class="result-block-title">💰 Contexte salarial</div><div class="tip-item" style="background:rgba(93,175,160,.1);color:#2d7a6e">${esc(d.salaryContext)}</div></div>` : ''}
+      ${d.redFlags?.filter(Boolean).length ? `<div class="result-block"><div class="result-block-title" style="color:#ef4444">⚠️ Signaux d'alerte</div>${d.redFlags.filter(Boolean).map(r => `<div class="tip-item" style="background:rgba(239,68,68,.08);color:#ef4444">${esc(r)}</div>`).join('')}</div>` : ''}
+    `;
+  } catch { empToast('Erreur réseau', 'error'); }
+  finally { setLoading('ent-btn', false, 'Analyser l\'entreprise'); }
+}
+
 function empRedirectToAuth() {
   empShowAuth('login');
 }
@@ -730,8 +812,54 @@ function applyProGates(user) {
     document.getElementById('debrief-form').style.display = 'none';
   }
 }
-window.addEventListener('empUserLoaded', e => applyProGates(e.detail));
-window.addEventListener('empAuthChange', e => applyProGates(e.detail?.user));
+window.addEventListener('empUserLoaded', e => { applyProGates(e.detail); autoFillFromContext(e.detail); });
+window.addEventListener('empAuthChange', e => { applyProGates(e.detail?.user); autoFillFromContext(e.detail?.user); });
+
+// ── AUTO-FILL PROFILE & NAME ──────────────────
+function autoFillFromContext(user) {
+  // Auto-fill profile textarea from saved profile (set in /app)
+  const savedProfile = localStorage.getItem('emploia_profile_text') || '';
+  const liProfile = document.getElementById('li-profile');
+  if (liProfile && !liProfile.value && savedProfile) {
+    liProfile.value = savedProfile;
+  }
+  // Auto-fill user name into name fields
+  const userName = user?.name || '';
+  if (userName) {
+    ['rel-name','out-name','neg-name'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = userName.split(' ')[0] || userName;
+    });
+  }
+}
+
+// ── SAVE LINKEDIN RESULT TO VAULT ────────────
+async function saveLinkedinToVault() {
+  if (!window.empUser) { empShowAuth('login'); return; }
+  const out = document.getElementById('li-output');
+  if (!out || out.style.display === 'none') return;
+  const about = document.getElementById('li-profile')?.value.slice(0, 50) || '';
+  const name = `LinkedIn "À propos" — ${new Date().toLocaleDateString('fr-FR')}`;
+  const content = out.innerText || out.textContent || '';
+  if (!content.trim()) return;
+  const btn = document.getElementById('li-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+  try {
+    const res = await fetch('/api/cv-versions', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, content, type: 'other' }),
+    });
+    const d = await res.json();
+    if (!res.ok) return empToast(d.error || 'Erreur', 'error');
+    empToast('Sauvegardé dans vos documents !', 'success');
+    if (btn) btn.textContent = '✅ Sauvegardé';
+  } catch { empToast('Erreur réseau', 'error'); }
+  finally { if (btn) btn.disabled = false; }
+}
+
+// Run auto-fill immediately with any already-loaded user
+if (window.empUser) autoFillFromContext(window.empUser);
 </script>
 </body>
 </html>

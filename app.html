@@ -267,6 +267,7 @@
         <div class="app-result-actions">
           <button class="emp-btn emp-btn-secondary" style="font-size:12px;padding:7px 14px" onclick="downloadResult()">Télécharger PDF</button>
           <button class="emp-btn emp-btn-secondary" style="font-size:12px;padding:7px 14px" onclick="generate()">Régénérer</button>
+          <button class="emp-btn emp-btn-secondary" style="font-size:12px;padding:7px 14px" id="saveVaultBtn" onclick="saveToVault()">📁 Sauvegarder</button>
           <button class="emp-btn emp-btn-primary" style="font-size:12px;padding:7px 14px" onclick="window.location.href='/cv-builder'">Éditer dans Builder</button>
         </div>
       </div>
@@ -299,6 +300,9 @@
     <div class="app-tools-row">
       <a href="/interview" class="app-tool-link"><span style="font-size:20px">🎤</span><div><div class="app-tool-name">Coaching entretien</div><div class="app-tool-desc">Simulation IA interactive</div></div></a>
       <a href="/cv-builder" class="app-tool-link"><span style="font-size:20px">🎨</span><div><div class="app-tool-name">CV Builder</div><div class="app-tool-desc">Éditeur visuel de CV</div></div></a>
+      <a href="/chat" class="app-tool-link"><span style="font-size:20px">💬</span><div><div class="app-tool-name">Orion IA Chat</div><div class="app-tool-desc">Copilote emploi en direct</div></div></a>
+      <a href="/cv-vault" class="app-tool-link"><span style="font-size:20px">📁</span><div><div class="app-tool-name">Mes documents</div><div class="app-tool-desc">CV &amp; lettres sauvegardés</div></div></a>
+      <a href="/tools" class="app-tool-link"><span style="font-size:20px">🛠</span><div><div class="app-tool-name">Outils avancés</div><div class="app-tool-desc">LinkedIn, négociation, debrief</div></div></a>
       <a href="/dashboard" class="app-tool-link"><span style="font-size:20px">📊</span><div><div class="app-tool-name">Dashboard</div><div class="app-tool-desc">Suivi de candidatures</div></div></a>
       <a href="/jobs" class="app-tool-link"><span style="font-size:20px">🔍</span><div><div class="app-tool-name">Offres d'emploi</div><div class="app-tool-desc">France Travail en direct</div></div></a>
     </div>
@@ -532,6 +536,34 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     navigator.clipboard.writeText(txt).then(() => empToast('Copié dans le presse-papier !', 'success')).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
 
+  async function saveToVault() {
+    if (!lastResult) return;
+    if (!window.empUser) { empShowAuth('login'); return; }
+    const txt = typeof lastResult === 'string' ? lastResult : (lastResult.result || lastResult.text || JSON.stringify(lastResult, null, 2));
+    const modeLabel = { cv: 'CV', letter: 'Lettre de motivation', ats: 'Analyse ATS' }[mode] || mode;
+    const jobVal = (document.getElementById('jobInput')?.value || '').slice(0, 60).trim();
+    const name = `${modeLabel}${jobVal ? ' — ' + jobVal : ''} · ${new Date().toLocaleDateString('fr-FR')}`;
+    const type = mode === 'letter' ? 'letter' : 'cv';
+    const btn = document.getElementById('saveVaultBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+    try {
+      const res = await fetch('/api/cv-versions', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content: txt, type }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        if (res.status === 402) return empToast('Limite de 3 docs atteinte — passez Pro pour 20 documents', 'error');
+        return empToast(d.error || 'Erreur de sauvegarde', 'error');
+      }
+      empToast('Sauvegardé dans vos documents !', 'success');
+      if (btn) btn.textContent = '✅ Sauvegardé';
+    } catch { empToast('Erreur réseau', 'error'); }
+    finally { if (btn) btn.disabled = false; }
+  }
+
   async function downloadResult() {
     if (!lastResult) return;
     const txt = typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult, null, 2);
@@ -645,6 +677,15 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
       history.replaceState(null, '', '/app');
     }
   }
+
+  // ── KEYBOARD SHORTCUT: Cmd/Ctrl+Enter to generate ──────────────────
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      const btn = document.getElementById('genBtn');
+      if (btn && !btn.disabled) generate();
+    }
+  });
 
   // Success banner after Stripe redirect
   if (urlP.get('success') === '1') {

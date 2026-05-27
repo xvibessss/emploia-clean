@@ -785,6 +785,9 @@
   <a href="/jobs">Offres d'emploi</a>
   <a href="/app">Générer un CV</a>
   <a href="/dashboard">Dashboard</a>
+  <a href="/chat">Orion IA Chat</a>
+  <a href="/cv-vault">Mes documents</a>
+  <a href="/tools">Outils avancés</a>
   <a href="/profil">Mon profil</a>
   <a href="/interview">Simulateur entretien</a>
 </div>
@@ -1110,6 +1113,25 @@
             <div class="score-legend-item"><div class="score-legend-dot" style="background:#22c55e"></div>Match</div>
             <div class="score-legend-item"><div class="score-legend-dot" style="background:#f59e0b"></div>Entretien</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ORION CHAT CARD -->
+      <div class="gen-card" style="background:linear-gradient(135deg,rgba(110,72,190,.06) 0%,rgba(110,72,190,.02) 100%);border-color:rgba(110,72,190,.2)">
+        <div class="gen-card-header">
+          <div class="gen-card-title" style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+            Orion — Copilote IA
+          </div>
+        </div>
+        <div class="gen-card-body">
+          <div style="font-size:12px;color:var(--slate);line-height:1.6;margin-bottom:12px">Votre assistant emploi disponible 24h/24. Posez vos questions sur votre CV, un entretien ou votre stratégie.</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+            <a href="/chat?q=Pr%C3%A9pare-moi+%C3%A0+un+entretien" style="display:block;padding:7px 10px;border-radius:var(--r-md);border:1px solid rgba(110,72,190,.2);background:var(--surface);font-size:11px;color:var(--slate);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='rgba(110,72,190,.2)';this.style.color='var(--slate)'">🎤 Prépare-moi à un entretien</a>
+            <a href="/chat?q=Analyse+mon+CV" style="display:block;padding:7px 10px;border-radius:var(--r-md);border:1px solid rgba(110,72,190,.2);background:var(--surface);font-size:11px;color:var(--slate);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='rgba(110,72,190,.2)';this.style.color='var(--slate)'">📄 Analyse mon profil</a>
+            <a href="/chat?q=N%C3%A9gocie+mon+salaire" style="display:block;padding:7px 10px;border-radius:var(--r-md);border:1px solid rgba(110,72,190,.2);background:var(--surface);font-size:11px;color:var(--slate);text-decoration:none;transition:all .15s" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='rgba(110,72,190,.2)';this.style.color='var(--slate)'">💰 Négocie mon salaire</a>
+          </div>
+          <a href="/chat" class="emp-btn emp-btn-primary emp-btn-sm" style="width:100%;justify-content:center">Ouvrir Orion IA →</a>
         </div>
       </div>
 
