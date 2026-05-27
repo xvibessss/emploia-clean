@@ -540,6 +540,7 @@
           <span class="emp-badge emp-badge-purple">Profil public</span>
           <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="document.getElementById('cvFileInput').click()" title="Importer un CV PDF">📄 Importer CV</button>
           <input type="file" id="cvFileInput" accept="application/pdf" style="display:none" onchange="importCV(this)"/>
+          <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="exportProfileText()" title="Exporter le profil en texte">⬇️ Exporter</button>
         </div>
       </div>
       <div class="sc-body">
@@ -1230,6 +1231,21 @@
   document.querySelectorAll('#prfFirstName,#prfLastName,#prfTitle,#prfLocation,#prfPhone,#prfSummary,#prfLinkedin,#prfPortfolio').forEach(el => {
     el.addEventListener('input', () => setTimeout(calculateCompletion, 100));
   });
+
+  function exportProfileText() {
+    const text = localStorage.getItem('emploia_profile_text') || '';
+    if (!text) { empToast('Sauvegardez d\'abord votre profil', 'error'); return; }
+    const firstName = document.getElementById('prfFirstName')?.value || '';
+    const lastName = document.getElementById('prfLastName')?.value || '';
+    const name = (firstName + '_' + lastName).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') || 'profil';
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${name}_emploia.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    empToast('Profil exporté !', 'success');
+  }
 </script>
 </body>
 </html>

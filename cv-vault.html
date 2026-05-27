@@ -603,6 +603,10 @@
         <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/></svg>
         Copier
       </button>
+      <button class="emp-btn emp-btn-secondary" onclick="downloadModalContent()">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        Télécharger
+      </button>
       <button class="emp-btn emp-btn-primary" onclick="closeModal()">Fermer</button>
     </div>
   </div>
@@ -932,6 +936,20 @@ function closeModal() {
 function copyModalContent() {
   const content = document.getElementById('vaultModalContent').textContent;
   copyContent(state.activeModalId, content);
+}
+
+function downloadModalContent() {
+  const v = state.versions.find(v => v.id === state.activeModalId);
+  if (!v) return;
+  const text = v.content || '';
+  const name = (v.name || v.type || 'document').replace(/[^a-z0-9\-_]/gi, '_');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${name}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  empToast('Document téléchargé !', 'success');
 }
 
 /* ── COPY ────────────────────────────────────────── */

@@ -976,6 +976,16 @@ async function saveLinkedinToVault() {
 // Run auto-fill immediately with any already-loaded user
 if (window.empUser) autoFillFromContext(window.empUser);
 
+// ── KEYBOARD SHORTCUT: Ctrl/Cmd+Enter to generate ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    const btnMap = { linkedin:'li-btn', relance:'rel-btn', outreach:'out-btn', negociation:'neg-btn', debrief:'debrief-btn', entreprise:'ent-btn', questions:'iq-btn' };
+    const tabs = ['linkedin','relance','outreach','negociation','debrief','entreprise','questions'];
+    const idx = [...document.querySelectorAll('.tool-tab')].findIndex(t => t.classList.contains('active'));
+    if (idx >= 0) document.getElementById(btnMap[tabs[idx]])?.click();
+  }
+});
+
 // ── URL PARAMS: auto-switch tab + pre-fill from offre/jobs ──
 (function() {
   const p = new URLSearchParams(window.location.search);

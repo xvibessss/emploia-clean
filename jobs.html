@@ -153,6 +153,11 @@
     .cop-msg { border-radius: var(--r-lg); padding: 9px 12px; font-size: 12px; line-height: 1.65; max-width: 88%; }
     .cop-msg.user { background: var(--primary); color: #fff; align-self: flex-end; }
     .cop-msg.assistant { background: var(--surface); color: var(--slate); align-self: flex-start; border: 1px solid var(--hairline); }
+    .jb-recent-searches { max-width: 820px; margin: -6px auto 12px; display: none; align-items: center; gap: 6px; flex-wrap: wrap; padding: 0 4px; }
+    .jb-recent-searches.visible { display: flex; }
+    .jb-recent-label { font-size: 11px; color: rgba(255,255,255,.55); white-space: nowrap; }
+    .jb-recent-chip { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 99px; padding: 3px 12px; font-size: 12px; color: rgba(255,255,255,.85); cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .jb-recent-chip:hover { background: rgba(255,255,255,.2); }
     @media(max-width:900px) { .jb-layout{grid-template-columns:1fr} .jb-sidebar{display:none;position:static} .jb-sidebar.open{display:flex} .jb-mobile-filters-btn{display:flex} .jb-search-row{flex-wrap:wrap} .jb-search-loc{width:100%} }
     @media(max-width:600px) { .jb-hero{padding-top:calc(var(--nav-h)+20px);padding-bottom:24px} }
   </style>
@@ -217,6 +222,9 @@
         <button class="jb-type-chip" data-type="freelance" onclick="setType(this)">Freelance</button>
         <button class="jb-type-chip" id="remoteToggle" data-remote="0" onclick="toggleRemote(this)">Remote</button>
       </div>
+    </div>
+    <div class="jb-recent-searches" id="recentSearches">
+      <span class="jb-recent-label">Récent :</span>
     </div>
   </div>
 </div>
@@ -427,8 +435,33 @@
   const tracked = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]'); } catch { return []; } })());
   let applyQueueIds = new Set((() => { try { return (JSON.parse(localStorage.getItem('emploia_apply_queue') || '[]')).map(q => String(q.id)); } catch { return []; } })());
 
+  // ── RECENT SEARCHES ──
+  const RECENT_KEY = 'emploia_recent_searches';
+  function getRecentSearches() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch { return []; } }
+  function saveRecentSearch(q) {
+    if (!q || q.length < 2) return;
+    let recents = getRecentSearches().filter(r => r.toLowerCase() !== q.toLowerCase());
+    recents.unshift(q);
+    recents = recents.slice(0, 5);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recents));
+    renderRecentSearches();
+  }
+  function renderRecentSearches() {
+    const wrap = document.getElementById('recentSearches');
+    const recents = getRecentSearches();
+    if (!wrap || !recents.length) { if (wrap) wrap.classList.remove('visible'); return; }
+    const label = wrap.querySelector('.jb-recent-label');
+    const chips = recents.map(r => `<button class="jb-recent-chip" onclick="applyRecentSearch(${JSON.stringify(r)})">${r}</button>`).join('');
+    wrap.innerHTML = (label?.outerHTML || '<span class="jb-recent-label">Récent :</span>') + chips;
+    wrap.classList.add('visible');
+  }
+  function applyRecentSearch(q) {
+    const inp = document.getElementById('searchInput');
+    if (inp) { inp.value = q; doSearch(); }
+  }
+
   function setType(btn) { document.querySelectorAll('.jb-type-chip').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentType = btn.dataset.type; currentPage = 0; doSearch(); }
-  function doSearch() { currentPage = 0; loadJobs(); }
+  function doSearch() { currentPage = 0; const q = (document.getElementById('searchInput')?.value || '').trim(); if (q) saveRecentSearch(q); loadJobs(); }
   function toggleRemote(btn) { const on = btn.dataset.remote === '0'; btn.dataset.remote = on ? '1' : '0'; btn.style.background = on ? 'var(--tint-mint)' : ''; btn.style.borderColor = on ? 'var(--brand-green)' : ''; btn.style.color = on ? 'var(--brand-green)' : ''; const cb = document.getElementById('rem1'); if (cb) cb.checked = on; doSearch(); }
 
   const SCORE_CACHE_KEY = 'emploia_scores_v1', SCORE_TTL = 86400000;
@@ -603,6 +636,7 @@
     if (typeParam && typeParam !== 'tous') { const btn = document.querySelector(`.jb-type-chip[data-type="${typeParam}"]`); if (btn) setType(btn); }
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
     document.getElementById('locationInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+    renderRecentSearches();
     loadJobs();
     // Show alert panel when user is logged in
     window.addEventListener('empUserLoaded', () => {
