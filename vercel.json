@@ -125,6 +125,9 @@
     "api/generate/interview-debrief.js": {
       "maxDuration": 50
     },
+    "api/generate/interview-questions.js": {
+      "maxDuration": 25
+    },
     "api/cron/send-reengagement.js": {
       "maxDuration": 45
     },
@@ -422,6 +425,9 @@
     { "source": "/blog/13eme-mois", "destination": "/blog/13eme-mois.html" },
     { "source": "/blog/prime-activite", "destination": "/blog/prime-activite.html" },
     { "source": "/blog/augmentation-salaire", "destination": "/blog/augmentation-salaire.html" },
+    { "source": "/blog/meilleurs-sites-emploi-france-2026", "destination": "/blog/meilleurs-sites-emploi-france-2026.html" },
+    { "source": "/blog/cv-data-scientist-2026", "destination": "/blog/cv-data-scientist-2026.html" },
+    { "source": "/blog/lettre-motivation-bts", "destination": "/blog/lettre-motivation-bts.html" },
     { "source": "/blog/devenir-freelance-2026", "destination": "/blog/devenir-freelance-2026.html" },
     { "source": "/blog/cv-ingenieur-2026", "destination": "/blog/cv-ingenieur-2026.html" },
     { "source": "/blog/repondre-recruteur-linkedin", "destination": "/blog/repondre-recruteur-linkedin.html" },

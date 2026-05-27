@@ -1135,6 +1135,24 @@
         </div>
       </div>
 
+      <!-- PROCHAINS ENTRETIENS -->
+      <div class="gen-card" id="interviewsWidget">
+        <div class="gen-card-header" style="margin-bottom:0">
+          <div class="gen-card-title">📅 Prochains entretiens</div>
+          <button onclick="toggleAddInterview()" id="addIvBtn" style="background:none;border:none;font-size:18px;cursor:pointer;line-height:1;color:var(--primary)">+</button>
+        </div>
+        <div class="gen-card-body">
+          <div id="addIvForm" style="display:none;margin-bottom:12px;background:var(--canvas);border:1px solid var(--hairline);border-radius:10px;padding:12px">
+            <input id="ivCompany" placeholder="Entreprise" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--hairline);font-size:12px;font-family:inherit;color:var(--ink);margin-bottom:6px;box-sizing:border-box"/>
+            <input id="ivRole" placeholder="Poste" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--hairline);font-size:12px;font-family:inherit;color:var(--ink);margin-bottom:6px;box-sizing:border-box"/>
+            <input id="ivDate" type="datetime-local" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--hairline);font-size:12px;font-family:inherit;color:var(--ink);margin-bottom:8px;box-sizing:border-box"/>
+            <button onclick="saveInterview()" style="width:100%;padding:8px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">Ajouter</button>
+          </div>
+          <div id="ivList" style="display:flex;flex-direction:column;gap:7px"></div>
+          <div id="ivEmpty" style="text-align:center;padding:16px 0;color:var(--steel);font-size:12px">Aucun entretien planifié<br><span style="font-size:11px">Cliquez sur + pour en ajouter un</span></div>
+        </div>
+      </div>
+
       <!-- TIPS -->
       <div class="gen-card">
         <div class="gen-card-header">
@@ -1998,6 +2016,72 @@
       }).join('');
     } catch {}
   }
+
+  // ── PROCHAINS ENTRETIENS ──────────────────────────────────────────────────
+  const IV_KEY = 'emploia_interviews';
+
+  function loadInterviews() {
+    const items = JSON.parse(localStorage.getItem(IV_KEY) || '[]')
+      .filter(iv => new Date(iv.date) > new Date() - 86400000)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    localStorage.setItem(IV_KEY, JSON.stringify(items));
+    const list = document.getElementById('ivList');
+    const empty = document.getElementById('ivEmpty');
+    if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    list.innerHTML = items.map(iv => {
+      const d = new Date(iv.date);
+      const diff = Math.round((d - Date.now()) / 86400000);
+      const badge = diff < 0 ? 'Passé' : diff === 0 ? "Aujourd'hui" : diff === 1 ? 'Demain' : `Dans ${diff}j`;
+      const badgeColor = diff < 0 ? '#64748b' : diff <= 1 ? '#ef4444' : diff <= 3 ? '#f59e0b' : '#22c55e';
+      const prepUrl = `/tools?q=${encodeURIComponent(iv.company + ' ' + iv.role)}`;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--canvas);border:1px solid var(--hairline);border-radius:9px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(iv.company)}</div>
+          <div style="font-size:11px;color:var(--slate);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(iv.role)} · ${d.toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          <span style="font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;background:${badgeColor}20;color:${badgeColor}">${badge}</span>
+          <a href="/tools#questions" title="Préparer" style="text-decoration:none;font-size:14px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎯</a>
+          <button onclick="deleteInterview('${iv.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--steel);padding:0" title="Supprimer">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleAddInterview() {
+    const f = document.getElementById('addIvForm');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    if (f.style.display === 'block') {
+      const now = new Date(); now.setMinutes(0);
+      document.getElementById('ivDate').value = now.toISOString().slice(0,16);
+      document.getElementById('ivCompany').focus();
+    }
+  }
+
+  function saveInterview() {
+    const company = document.getElementById('ivCompany').value.trim();
+    const role = document.getElementById('ivRole').value.trim();
+    const date = document.getElementById('ivDate').value;
+    if (!company || !date) return;
+    const items = JSON.parse(localStorage.getItem(IV_KEY) || '[]');
+    items.push({ id: Date.now().toString(), company, role: role || 'Entretien', date });
+    localStorage.setItem(IV_KEY, JSON.stringify(items));
+    document.getElementById('addIvForm').style.display = 'none';
+    document.getElementById('ivCompany').value = '';
+    document.getElementById('ivRole').value = '';
+    loadInterviews();
+  }
+
+  function deleteInterview(id) {
+    const items = JSON.parse(localStorage.getItem(IV_KEY) || '[]').filter(iv => iv.id !== id);
+    localStorage.setItem(IV_KEY, JSON.stringify(items));
+    loadInterviews();
+  }
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  loadInterviews();
 
   // ── INIT ───────────────────────────────────────────────────────────────────
   loadApplications();
