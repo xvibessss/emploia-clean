@@ -286,6 +286,14 @@
       </div>
     </div>
     <button class="jb-filter-reset" onclick="resetFilters()">Réinitialiser les filtres</button>
+    <div class="jb-filter-panel" id="alertPanel" style="display:none">
+      <div class="jb-fp-title">🔔 Alerte emploi</div>
+      <div style="font-size:11.5px;color:var(--slate);margin-bottom:10px;line-height:1.5">Recevez les nouvelles offres par email dès leur publication.</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button id="alertBtnDaily" onclick="createJobAlert('daily',this)" class="jb-type-chip" style="flex:1;font-size:11px">Quotidien</button>
+        <button id="alertBtnWeekly" onclick="createJobAlert('weekly',this)" class="jb-type-chip" style="flex:1;font-size:11px">Hebdo</button>
+      </div>
+    </div>
   </aside>
 
   <!-- JOBS LIST -->
@@ -596,7 +604,43 @@
     document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
     document.getElementById('locationInput').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
     loadJobs();
+    // Show alert panel when user is logged in
+    window.addEventListener('empUserLoaded', () => {
+      if (window.empUser) document.getElementById('alertPanel').style.display = 'block';
+    });
+    if (window.empUser) document.getElementById('alertPanel').style.display = 'block';
   });
+
+  async function createJobAlert(frequency, btn) {
+    if (!window.empUser) { empShowAuth('login'); return; }
+    const q = document.getElementById('searchInput').value.trim();
+    const location = document.getElementById('locationInput').value.trim();
+    const type = currentType !== 'tous' ? currentType : '';
+    if (!q && !location && !type) { empToast('Précisez un poste ou une ville pour créer une alerte', 'info'); return; }
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      const res = await fetch('/api/alerts', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keywords: q, location, type, frequency }),
+      });
+      if (res.ok) {
+        empToast(`Alerte ${frequency === 'daily' ? 'quotidienne' : 'hebdomadaire'} créée !`, 'success');
+        btn.textContent = '✅ Créée';
+      } else if (res.status === 401) {
+        empShowAuth('login');
+        btn.disabled = false; btn.textContent = frequency === 'daily' ? 'Quotidien' : 'Hebdo';
+      } else {
+        const d = await res.json().catch(() => ({}));
+        empToast(d.error || 'Erreur', 'error');
+        btn.disabled = false; btn.textContent = frequency === 'daily' ? 'Quotidien' : 'Hebdo';
+      }
+    } catch {
+      empToast('Erreur réseau', 'error');
+      btn.disabled = false; btn.textContent = frequency === 'daily' ? 'Quotidien' : 'Hebdo';
+    }
+  }
 
   document.addEventListener('keydown', e => { if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)) { e.preventDefault(); document.getElementById('searchInput')?.focus(); } if (e.key === 'Escape') closeApplyDrawer(); });
 

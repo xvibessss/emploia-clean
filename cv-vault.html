@@ -648,6 +648,15 @@
       <button class="vault-filter-btn" data-filter="cv" onclick="setFilter('cv')">CV</button>
       <button class="vault-filter-btn" data-filter="letter" onclick="setFilter('letter')">Lettres</button>
       <button class="vault-filter-btn" data-filter="other" onclick="setFilter('other')">Autres</button>
+      <input
+        type="text"
+        id="vaultSearch"
+        placeholder="Rechercher..."
+        oninput="setSearch(this.value)"
+        style="padding:6px 11px;border-radius:var(--r-md);border:1.5px solid var(--hairline);background:var(--canvas);font-size:12px;color:var(--ink);outline:none;width:160px;font-family:inherit;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--primary)'"
+        onblur="this.style.borderColor='var(--hairline)'"
+      />
     </div>
     <span id="vaultCountLabel" style="font-size:13px;color:var(--steel);font-weight:500"></span>
   </div>
@@ -711,6 +720,7 @@ let state = {
   maxVersions: 3,
   plan: 'free',
   filter: 'all',
+  search: '',
   activeModalId: null
 };
 
@@ -785,12 +795,15 @@ function setFilter(f) {
   applyFilter();
 }
 
+function setSearch(q) {
+  state.search = q.toLowerCase().trim();
+  applyFilter();
+}
+
 function applyFilter() {
-  if (state.filter === 'all') {
-    state.filtered = state.versions;
-  } else {
-    state.filtered = state.versions.filter(v => v.type === state.filter);
-  }
+  let filtered = state.filter === 'all' ? state.versions : state.versions.filter(v => v.type === state.filter);
+  if (state.search) filtered = filtered.filter(v => (v.name || '').toLowerCase().includes(state.search));
+  state.filtered = filtered;
   renderVersions(state.filtered);
 }
 

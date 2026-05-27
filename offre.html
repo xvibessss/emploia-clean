@@ -184,8 +184,6 @@
   <a href="/blog">Blog</a>
   <a href="/#pricing">Tarifs</a>
 </div>
-  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
-</div>
 
 <div id="loadingState" class="loading-state">
   <div class="spin"></div>
@@ -310,9 +308,15 @@
       </div>
 
       <!-- Interview prep -->
-      <a href="/interview" id="interviewPrepLink" class="interview-prep-card">
-        <h4>🎤 Préparer l'entretien</h4>
-        <p>Simulez un entretien pour ce poste avec notre coach IA.</p>
+      <a href="/tools?tab=questions" id="interviewPrepLink" class="interview-prep-card">
+        <h4>🎯 Questions d'entretien</h4>
+        <p>Générez les questions probables + réponses modèles pour ce poste.</p>
+      </a>
+
+      <!-- Salary negotiation -->
+      <a href="/tools?tab=negociation" id="negocLink" class="interview-prep-card" style="background:rgba(99,102,241,.06);border-color:rgba(99,102,241,.2);margin-top:8px">
+        <h4 style="color:var(--primary)">💰 Négocier le salaire</h4>
+        <p>Kit de négociation IA : email, script d'appel, arguments clés.</p>
       </a>
 
       <!-- LinkedIn networking -->
@@ -424,11 +428,15 @@
       document.getElementById('offreApplyBtn').removeAttribute('href');
     }
 
-    // Interview prep link pre-fill
-    const ivParams = new URLSearchParams();
-    if (job.title) ivParams.set('role', job.title);
-    if (job.company_name || job.company) ivParams.set('company', job.company_name || job.company);
-    document.getElementById('interviewPrepLink').href = `/interview?${ivParams}`;
+    // Interview prep + negotiation links pre-fill
+    const jobTitle = job.title || '';
+    const jobCompany = job.company_name || job.company || '';
+    const toolParams = new URLSearchParams();
+    if (jobTitle) toolParams.set('job', jobTitle);
+    if (jobCompany) toolParams.set('company', jobCompany);
+    const toolQuery = toolParams.toString();
+    document.getElementById('interviewPrepLink').href = `/tools?tab=questions${toolQuery ? '&' + toolQuery : ''}`;
+    document.getElementById('negocLink').href = `/tools?tab=negociation${toolQuery ? '&' + toolQuery : ''}`;
 
     // ATS score after render
     setTimeout(computeATSScore, 400);

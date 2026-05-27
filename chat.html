@@ -714,6 +714,15 @@
           </svg>
           Nouvelle conversation
         </button>
+        <input
+          type="text"
+          id="chatSearch"
+          placeholder="Rechercher..."
+          oninput="filterConversations(this.value)"
+          style="width:100%;margin-top:8px;padding:7px 10px;border-radius:var(--r-md);border:1.5px solid var(--hairline);background:var(--surface);font-size:12px;color:var(--ink);outline:none;transition:border-color .15s;box-sizing:border-box;font-family:var(--f-ui)"
+          onfocus="this.style.borderColor='var(--primary)'"
+          onblur="this.style.borderColor='var(--hairline)'"
+        />
       </div>
 
       <div class="chat-sidebar-list" id="chatSidebarList">
@@ -893,15 +902,24 @@
   }
 
   /* ── RENDER SIDEBAR ────────────────────────────── */
-  function renderSidebar() {
+  function renderSidebar(filter) {
     const list = document.getElementById('chatSidebarList');
+    const query = (filter || document.getElementById('chatSearch')?.value || '').toLowerCase().trim();
+    const filtered = query
+      ? conversations.filter(c => c.title.toLowerCase().includes(query))
+      : conversations;
+
     if (conversations.length === 0) {
       list.innerHTML = '<div class="chat-sidebar-empty">Aucune conversation.<br>Commencez une nouvelle session.</div>';
       return;
     }
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="chat-sidebar-empty">Aucune conversation ne correspond.</div>';
+      return;
+    }
 
     let html = '<div class="chat-sidebar-section-label">Conversations</div>';
-    conversations.forEach(convo => {
+    filtered.forEach(convo => {
       const isActive = convo.id === activeId;
       html += `
         <div
@@ -921,6 +939,10 @@
       `;
     });
     list.innerHTML = html;
+  }
+
+  function filterConversations(q) {
+    renderSidebar(q);
   }
 
   /* ── NEW CONVERSATION ──────────────────────────── */

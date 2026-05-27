@@ -181,6 +181,11 @@
 
     .spin { width: 20px; height: 20px; border: 2.5px solid rgba(0,0,0,.12); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .level-select { display: grid; gap: 6px; }
+    .lvl-btn { padding: 8px 4px; border-radius: 8px; border: 1.5px solid var(--hairline); background: var(--canvas); font-size: 12px; font-weight: 600; cursor: pointer; color: var(--slate); transition: all .15s; font-family: 'Inter', sans-serif; }
+    .lvl-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .lvl-btn.active { background: linear-gradient(135deg,#6366f1,#3b82f6); border-color: transparent; color: #fff; }
   </style>
 </head>
 <body>
@@ -217,7 +222,7 @@
     <h1>Tous vos outils IA<br/><span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidature</span></h1>
     <p>Profil LinkedIn optimisé, email de relance, négociation salariale — tout ce qui compte au-delà du CV.</p>
     <div class="tools-trust-chips">
-      <span class="tools-trust-chip">🎁 7 outils gratuits</span>
+      <span class="tools-trust-chip">🎁 5 gratuits · 2 Pro</span>
       <span class="tools-trust-chip">🤖 Propulsé par Claude AI</span>
       <span class="tools-trust-chip">⚡ Résultats en 30s</span>
     </div>
@@ -625,7 +630,11 @@ async function generateRelance() {
     document.getElementById('rel-placeholder').style.display = 'none';
     const out = document.getElementById('rel-output');
     out.style.display = 'block';
+    const relAllText = `Objet : ${d.subject || ''}\n\n--- Version courte ---\n${d.short || ''}\n\n--- Version développée ---\n${d.long || ''}`;
     out.innerHTML = `
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button onclick="copyText(${esc(JSON.stringify(relAllText))})" class="emp-btn emp-btn-secondary emp-btn-sm">📋 Tout copier</button>
+      </div>
       <div class="result-block">
         <div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">
           Objet <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.subject))})">Copier</button>
@@ -966,6 +975,42 @@ async function saveLinkedinToVault() {
 
 // Run auto-fill immediately with any already-loaded user
 if (window.empUser) autoFillFromContext(window.empUser);
+
+// ── URL PARAMS: auto-switch tab + pre-fill from offre/jobs ──
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  const tab = p.get('tab');
+  const tabs = ['linkedin','relance','outreach','negociation','debrief','entreprise','questions'];
+  if (tab && tabs.includes(tab)) switchTool(tab);
+
+  const job = (p.get('job') || p.get('role') || '').trim();
+  const company = (p.get('company') || '').trim();
+
+  // Also read from sessionStorage (set by /app redirect flow)
+  let prefillJob = job, prefillCompany = company;
+  if (!prefillJob || !prefillCompany) {
+    try {
+      const pf = JSON.parse(sessionStorage.getItem('emp_prefill') || '{}');
+      if (!prefillJob && pf.title) prefillJob = pf.title;
+      if (!prefillCompany && pf.company) prefillCompany = pf.company;
+    } catch {}
+  }
+
+  if (prefillJob) {
+    ['iq-job','rel-job','neg-job','out-job','ent-job'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = prefillJob;
+    });
+    const dbJob = document.getElementById('db-job');
+    if (dbJob && !dbJob.value && prefillCompany) dbJob.value = `${prefillJob} chez ${prefillCompany}`;
+  }
+  if (prefillCompany) {
+    ['iq-company','rel-company','neg-company','out-company','ent-company'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = prefillCompany;
+    });
+  }
+})();
 </script>
 </body>
 </html>

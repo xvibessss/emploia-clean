@@ -1694,17 +1694,20 @@
   // ── CSV EXPORT ─────────────────────────────────────────────────────────────
   function exportCSV() {
     if (!allApps.length) { empToast('Aucune candidature à exporter', 'info'); return; }
-    const rows = [['Poste','Entreprise','Statut','Lieu','Salaire','URL','Date']];
+    const rows = [['Poste','Entreprise','Statut','Lieu','Salaire','Contact','Date entretien','Notes','URL','Date candidature']];
     allApps.forEach(a => rows.push([
       a.jobTitle||'', a.company||'', STATUS_LABEL[a.status]||a.status,
-      a.location||'', a.salary||'', a.url||'',
+      a.location||'', a.salary||'', a.contact||'',
+      a.interviewDate ? new Date(a.interviewDate).toLocaleDateString('fr-FR') : '',
+      (a.notes||'').replace(/\n/g,' '),
+      a.url||'',
       new Date(a.createdAt).toLocaleDateString('fr-FR'),
     ]));
     const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'candidatures-emploia.csv'; a.click();
-    empToast('Export CSV téléchargé', 'success');
+    empToast(`Export CSV — ${allApps.length} candidatures téléchargées`, 'success');
   }
 
   // ── KEYBOARD (handled in score/report section below) ──────────────────────
@@ -2034,7 +2037,10 @@
       const diff = Math.round((d - Date.now()) / 86400000);
       const badge = diff < 0 ? 'Passé' : diff === 0 ? "Aujourd'hui" : diff === 1 ? 'Demain' : `Dans ${diff}j`;
       const badgeColor = diff < 0 ? '#64748b' : diff <= 1 ? '#ef4444' : diff <= 3 ? '#f59e0b' : '#22c55e';
-      const prepUrl = `/tools?q=${encodeURIComponent(iv.company + ' ' + iv.role)}`;
+      const prepParams = new URLSearchParams({ tab: 'questions' });
+      if (iv.company) prepParams.set('company', iv.company);
+      if (iv.role) prepParams.set('job', iv.role);
+      const prepUrl = `/tools?${prepParams}`;
       return `<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--canvas);border:1px solid var(--hairline);border-radius:9px">
         <div style="flex:1;min-width:0">
           <div style="font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(iv.company)}</div>
@@ -2042,7 +2048,7 @@
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
           <span style="font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;background:${badgeColor}20;color:${badgeColor}">${badge}</span>
-          <a href="/tools#questions" title="Préparer" style="text-decoration:none;font-size:14px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎯</a>
+          <a href="${prepUrl}" title="Préparer les questions d'entretien" style="text-decoration:none;font-size:14px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎯</a>
           <button onclick="deleteInterview('${iv.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--steel);padding:0" title="Supprimer">✕</button>
         </div>
       </div>`;

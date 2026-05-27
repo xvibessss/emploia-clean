@@ -270,6 +270,12 @@
           <button class="emp-btn emp-btn-secondary" style="font-size:12px;padding:7px 14px" id="saveVaultBtn" onclick="saveToVault()">📁 Sauvegarder</button>
           <button class="emp-btn emp-btn-primary" style="font-size:12px;padding:7px 14px" onclick="window.location.href='/cv-builder'">Éditer dans Builder</button>
         </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding:12px;background:var(--tint-lavender);border-radius:var(--r-lg)">
+          <span style="font-size:11px;font-weight:700;color:var(--primary);margin-right:4px;align-self:center">Étape suivante →</span>
+          <a id="prepInterviewLink" href="/tools?tab=questions" class="emp-btn emp-btn-secondary" style="font-size:11px;padding:5px 12px">🎯 Questions d'entretien</a>
+          <a id="prepRelanceLink" href="/tools?tab=relance" class="emp-btn emp-btn-secondary" style="font-size:11px;padding:5px 12px">📧 Email de relance</a>
+          <a id="prepNegocLink" href="/tools?tab=negociation" class="emp-btn emp-btn-secondary" style="font-size:11px;padding:5px 12px">💰 Négocier le salaire</a>
+        </div>
       </div>
     </div>
   </div>
@@ -411,6 +417,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         const contentEl = resultArea.querySelector('.app-result-content');
         document.getElementById('resultActions').style.display = 'block';
         document.getElementById('resultActionsBottom').style.display = 'block';
+        updateNextStepLinks();
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -471,11 +478,23 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     } catch {}
   }
 
+  function updateNextStepLinks() {
+    const jobVal = (document.getElementById('jobInput')?.value || '').split('\n')[0].slice(0, 80).trim();
+    const p = jobVal ? `&job=${encodeURIComponent(jobVal)}` : '';
+    const links = [
+      ['prepInterviewLink', `/tools?tab=questions${p}`],
+      ['prepRelanceLink', `/tools?tab=relance${p}`],
+      ['prepNegocLink', `/tools?tab=negociation${p}`],
+    ];
+    links.forEach(([id, href]) => { const el = document.getElementById(id); if (el) el.href = href; });
+  }
+
   function showResult(result) {
     clearInterval(window._loadIntv);
     lastResult = result;
     document.getElementById('resultActions').style.display = 'block';
     document.getElementById('resultActionsBottom').style.display = 'block';
+    updateNextStepLinks();
 
     if (mode === 'ats') {
       const score = result.score ?? 0;
