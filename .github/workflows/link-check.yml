@@ -17,8 +17,9 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           args: |
-            --base https://emploia.fr
-            --exclude "^https://emploia\.fr/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
+            --base https://emploia-clean.vercel.app
+            --exclude "^https://emploia-clean\.vercel\.app/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
+            --exclude "^https://emploia\.fr"
             --exclude "^https://fonts\."
             --exclude "^https://plausible\.io"
             --exclude "^https://js\.stripe\.com"
