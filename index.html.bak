@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EmploiA — Le copilote IA français pour décrocher vos entretiens</title>
+<meta name="description" content="EmploiA adapte votre CV à chaque offre, suit vos candidatures et vous prépare aux entretiens. 800 000 offres françaises. Score ATS en 30 secondes."/>
+<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA"/>
+<link rel="canonical" href="https://emploia.fr/"/>
+<link rel="icon" href="favicon.svg"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#0E1830"/>
+<meta property="og:title" content="EmploiA — Le copilote IA français"/>
+<meta property="og:description" content="CV adapté à chaque offre, lettre de motivation, score ATS — en 30 secondes."/>
+<meta property="og:image" content="https://emploia.fr/og-image.svg"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://emploia.fr/"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="stylesheet" href="shared.css"/>
+
+<style>
+/* ─── Page-specific (mockup, sticky-notes, feature visuals) ─── */
+
+/* Workspace mockup inside hero */
+.mk-top{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--hairline-soft);background:var(--surface-soft)}
+.mk-top .tl{width:11px;height:11px;border-radius:50%}
+.mk-top .url{margin-left:12px;font-size:12px;color:var(--steel);background:#fff;border:1px solid var(--hairline);padding:4px 10px;border-radius:6px}
+.mk-body{display:grid;grid-template-columns:220px 1fr;min-height:480px}
+.mk-side{background:#FBFAF7;border-right:1px solid var(--hairline-soft);padding:14px 10px;font-size:13px}
+.mk-side .ws{display:flex;align-items:center;gap:8px;padding:6px 8px;font-weight:600;color:var(--ink)}
+.mk-side .ws .av{width:20px;height:20px;border-radius:5px;background:var(--brand-purple);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+.mk-side .sec{margin-top:14px;color:var(--steel);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:0 8px 6px}
+.mk-side .it{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;color:var(--charcoal);font-size:13px}
+.mk-side .it.on{background:var(--surface)}
+.mk-side .it svg{flex-shrink:0}
+.mk-main{padding:22px 28px}
+.mk-crumb{font-size:12px;color:var(--steel);margin-bottom:18px}
+.mk-title{font-size:30px;font-weight:700;color:var(--ink);margin:0 0 6px;letter-spacing:-.5px}
+.mk-sub{font-size:13px;color:var(--steel);margin-bottom:18px}
+.mk-tabs{display:flex;gap:18px;border-bottom:1px solid var(--hairline-soft);margin-bottom:16px;font-size:13px;color:var(--steel)}
+.mk-tabs span{padding:8px 0}
+.mk-tabs span.on{color:var(--ink);border-bottom:2px solid var(--ink);font-weight:600;margin-bottom:-1px}
+
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kcol .kh{font-size:12px;font-weight:600;color:var(--charcoal);display:flex;align-items:center;gap:6px;padding:4px 0 10px}
+.kcol .kh .pl{font-size:11px;color:var(--slate);background:var(--surface);border-radius:4px;padding:1px 6px;font-weight:500}
+.kcard{background:var(--canvas);border:1px solid var(--hairline);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--charcoal);box-shadow:rgba(15,15,15,.03) 0 1px 2px}
+.kcard .meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px;color:var(--steel);font-size:11px}
+.kcard .av{display:inline-block;width:18px;height:18px;border-radius:50%;color:#fff;font-size:9px;font-weight:700;text-align:center;line-height:18px}
+@media (max-width:767px){.mk-body{grid-template-columns:1fr}.mk-side{display:none}.kanban{grid-template-columns:1fr 1fr;overflow-x:auto}}
+
+/* Sticky panel + notes board */
+.sticky-panel{background:var(--canvas);border-radius:var(--r-xl);border:1px solid var(--hairline);padding:56px 48px;box-shadow:var(--sh-2);overflow:hidden;position:relative}
+.sticky-panel .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+.status-list{display:flex;flex-direction:column;gap:10px}
+.status-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface-soft);border:1px solid var(--hairline-soft);border-radius:8px;font-size:14px;font-weight:500;color:var(--charcoal)}
+.status-ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:#fff;flex-shrink:0;font-size:13px;font-weight:700}
+.status-time{margin-left:auto;font-size:12px;color:var(--steel);font-weight:500}
+.notes-board{position:relative;height:380px}
+.note{position:absolute;background:var(--tint-yellow);border-radius:6px;padding:14px 16px;font-size:13px;line-height:1.4;color:var(--charcoal);box-shadow:rgba(0,0,0,.1) 0 6px 14px -2px;width:200px}
+.note strong{display:block;font-weight:600;margin-bottom:4px;font-size:13px;color:var(--ink)}
+.note .who{font-size:11px;color:var(--steel);margin-top:8px;font-weight:500}
+@media (max-width:767px){.sticky-panel{padding:32px 22px}.sticky-panel .grid{grid-template-columns:1fr;gap:32px}.notes-board{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px}.note{position:static!important;transform:none!important;width:auto!important}}
+
+/* Yellow banner with chat */
+.assist-banner{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center}
+.assist-visual{background:#fff;border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-2)}
+.assist-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--hairline-soft);font-size:13px}
+.assist-row:last-child{border-bottom:0}
+.assist-row .av{width:28px;height:28px;border-radius:7px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
+.assist-row .av.user{background:var(--brand-orange)}
+.assist-row .txt{color:var(--charcoal);line-height:1.5}
+.assist-row .txt strong{font-weight:600;color:var(--ink)}
+.chip-tag{font-size:13px;font-weight:600;padding:5px 11px;border-radius:6px;background:rgba(0,0,0,.08);color:var(--ink)}
+@media (max-width:1023px){.assist-banner{grid-template-columns:1fr}}
+
+/* Tiles + viz */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.tile h4{margin:0 0 8px;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
+.tile p{margin:0;font-size:14px;color:var(--slate);line-height:1.5}
+.tile{display:flex;flex-direction:column;min-height:280px}
+.tile .viz{margin-top:auto;padding-top:20px}
+.mini-card{background:#fff;border-radius:8px;padding:12px 14px;font-size:12px;color:var(--charcoal);box-shadow:rgba(0,0,0,.05) 0 2px 6px}
+.mini-card .ttl{font-weight:600;color:var(--ink);margin-bottom:4px;font-size:13px}
+.mini-card .lbl{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.4px}
+@media (max-width:1023px){.tiles{grid-template-columns:1fr 1fr}}
+@media (max-width:767px){.tiles{grid-template-columns:1fr}}
+
+/* Bring grid */
+.bring-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.bring-card{border-radius:var(--r-lg);padding:32px;color:var(--charcoal);display:flex;flex-direction:column;min-height:380px}
+.bring-card h4{margin:0 0 10px;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
+.bring-card p{margin:0;font-size:14px;color:var(--slate)}
+.bring-card .viz{margin-top:auto;padding-top:24px}
+.tut-card{background:#fff;border-radius:8px;padding:14px;box-shadow:rgba(0,0,0,.06) 0 4px 10px}
+.tut-thumb{aspect-ratio:16/10;background:linear-gradient(135deg,#0E1830,#2A3658);border-radius:6px;position:relative;margin-bottom:10px;overflow:hidden}
+.tut-thumb .play{position:absolute;inset:0;display:grid;place-items:center;color:#fff}
+.tut-thumb .play div{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center;color:var(--ink-deep)}
+.tut-thumb .deco{position:absolute;width:18px;height:18px;border-radius:4px}
+.cal-card{background:#fff;border-radius:8px;padding:14px;box-shadow:rgba(0,0,0,.06) 0 4px 10px;font-size:11px;color:var(--charcoal)}
+.cal-card .day{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.cal-row{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;margin-bottom:3px;font-size:11px}
+.cal-row .clr{width:3px;height:14px;border-radius:2px;flex-shrink:0}
+.quote-card{font-size:18px;line-height:1.5;color:#fff;font-weight:500}
+.quote-attr{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px;color:rgba(255,255,255,.85)}
+.quote-attr .av{width:32px;height:32px;border-radius:50%;background:var(--brand-orange)}
+@media (max-width:1023px){.bring-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:767px){.bring-grid{grid-template-columns:1fr}}
+
+/* Comparison grid override */
+.cmp{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr}
+@media (max-width:767px){.cmp{grid-template-columns:1.4fr repeat(4, 80px);min-width:560px}.emp-compare{overflow-x:auto}}
+
+/* Testi grid */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:900px){.testi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="emp-scroll-prog"></div>
+
+<!-- ═════ PROMO BANNER ═════ -->
+<div class="emp-promo">
+  Nouveau : extension LinkedIn — analysez n'importe quelle offre en 1 clic <span class="arrow">→</span>
+</div>
+
+<!-- ═════ NAV ═════ -->
+<header class="emp-nav">
+  <div class="container emp-nav-inner">
+    <div style="display:flex;align-items:center;gap:36px">
+      <a href="/" class="emp-brand">
+        <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+        EmploiA
+      </a>
+      <nav class="emp-nav-links">
+        <a href="jobs.html">Offres</a>
+        <a href="app.html">Générateur CV</a>
+        <a href="interview.html">Coach IA</a>
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="blog.html">Ressources</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="#contact">Demander une démo</a>
+      </nav>
+    </div>
+    <div class="emp-nav-right">
+      <a href="app.html" class="emp-btn emp-btn-ghost emp-login">Se connecter</a>
+      <a href="app.html" class="emp-btn emp-btn-primary">Essayer gratuitement</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="emp-mobile-nav" id="empMobileNav">
+  <a href="jobs.html">Offres</a>
+  <a href="app.html">Générateur CV</a>
+  <a href="interview.html">Coach IA</a>
+  <a href="dashboard.html">Tableau de bord</a>
+  <a href="blog.html">Ressources</a>
+  <a href="#pricing">Tarifs</a>
+  <a href="app.html">Se connecter</a>
+</nav>
+
+<!-- ═════ HERO ═════ -->
+<section class="emp-hero-dark">
+  <!-- Decorative dots -->
+  <div class="emp-dot lg" style="--r:-8deg;background:var(--brand-pink);top:120px;left:8%"></div>
+  <div class="emp-dot sm" style="--r:14deg;background:var(--brand-orange);top:60px;left:24%"></div>
+  <div class="emp-dot lg" style="--r:6deg;background:var(--brand-yellow);top:90px;right:9%"></div>
+  <div class="emp-dot sm" style="--r:-12deg;background:var(--brand-teal);top:200px;right:22%"></div>
+  <div class="emp-dot sm" style="--r:18deg;background:var(--brand-green);bottom:280px;left:14%"></div>
+  <div class="emp-dot lg" style="--r:-4deg;background:var(--brand-purple);bottom:320px;right:6%"></div>
+  <div class="emp-dot sm" style="--r:8deg;background:var(--brand-pink);bottom:230px;right:34%"></div>
+
+  <!-- Mesh wires -->
+  <svg class="emp-wire" style="top:40px;left:3%;width:240px;height:160px" viewBox="0 0 240 160" fill="none">
+    <path d="M10 80 Q 60 10, 120 80 T 230 80" stroke="#fff" stroke-width="1.2" opacity=".4"/>
+    <path d="M10 100 Q 60 30, 120 100 T 230 100" stroke="#fff" stroke-width="1.2" opacity=".25"/>
+  </svg>
+  <svg class="emp-wire" style="top:140px;right:4%;width:220px;height:200px" viewBox="0 0 220 200" fill="none">
+    <path d="M210 20 Q 140 60, 180 130 T 100 180" stroke="#fff" stroke-width="1.2" opacity=".4"/>
+    <path d="M210 40 Q 130 80, 170 150 T 80 195" stroke="#fff" stroke-width="1.2" opacity=".25"/>
+  </svg>
+
+  <div class="emp-hero-inner">
+    <h1 class="t-hero">Le copilote qui<br/>candidate à votre place.</h1>
+    <p class="emp-hero-sub">Un CV taillé pour chaque offre, des entretiens préparés, un suivi de candidatures — en français, dans un seul espace.</p>
+    <div class="emp-hero-cta">
+      <a href="app.html" class="emp-btn emp-btn-primary">Essayer EmploiA gratuitement</a>
+      <a href="#contact" class="emp-btn emp-btn-sec-on-dark">Demander une démo</a>
+    </div>
+  </div>
+
+  <!-- Workspace mockup card -->
+  <div class="emp-hero-mockup-wrap">
+    <div class="emp-mockup-card">
+      <div class="mk-top">
+        <span class="tl" style="background:#FF5F57"></span>
+        <span class="tl" style="background:#FEBC2E"></span>
+        <span class="tl" style="background:#28C840"></span>
+        <span class="url">emploia.fr/espace/camille-durand</span>
+      </div>
+      <div class="mk-body">
+        <aside class="mk-side">
+          <div class="ws"><span class="av">C</span>Camille Durand</div>
+          <div class="sec">Mon espace</div>
+          <div class="it on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>Tableau de bord</div>
+          <div class="it"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Mes CV</div>
+          <div class="it"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Lettres de motivation</div>
+          <div class="it"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Entretiens</div>
+          <div class="sec">Suivi</div>
+          <div class="it"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Candidatures</div>
+          <div class="it"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Statistiques</div>
+        </aside>
+        <main class="mk-main">
+          <div class="mk-crumb">Mon espace / Candidatures / Printemps 2026</div>
+          <h2 class="mk-title">🎯 Campagne candidatures</h2>
+          <div class="mk-sub">12 offres ciblées · Mise à jour il y a 4 minutes</div>
+          <div class="mk-tabs">
+            <span class="on">Tableau</span>
+            <span>Liste</span>
+            <span>Calendrier</span>
+            <span>Statistiques</span>
+          </div>
+          <div class="kanban">
+            <div class="kcol">
+              <div class="kh">À candidater <span class="pl">4</span></div>
+              <div class="kcard"><span class="emp-tag emp-tag-orange">Product</span><div>Senior PM — Doctolib</div><div class="meta"><span>📍 Paris</span><span class="av" style="background:var(--brand-orange)">M</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-green">Design</span><div>UX Lead — Alan</div><div class="meta"><span>🏡 Remote</span><span class="av" style="background:var(--brand-green)">L</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-purple">Data</span><div>Data Scientist — Qonto</div><div class="meta"><span>📍 Lyon</span><span class="av" style="background:var(--brand-purple)">A</span></div></div>
+            </div>
+            <div class="kcol">
+              <div class="kh">CV en cours <span class="pl">3</span></div>
+              <div class="kcard"><span class="emp-tag emp-tag-sky">Marketing</span><div>Growth — Swile</div><div class="meta"><span>Score ATS 87%</span><span class="av" style="background:var(--brand-teal)">J</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-orange">Product</span><div>PM Junior — Back Market</div><div class="meta"><span>Score ATS 91%</span><span class="av" style="background:var(--brand-orange)">M</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-rose">RH</span><div>Talent — Mirakl</div><div class="meta"><span>Score ATS 78%</span><span class="av" style="background:var(--brand-pink)">S</span></div></div>
+            </div>
+            <div class="kcol">
+              <div class="kh">Envoyées <span class="pl">3</span></div>
+              <div class="kcard"><span class="emp-tag emp-tag-yellow">Sales</span><div>AE — Pennylane</div><div class="meta"><span>Il y a 2 j.</span><span class="av" style="background:var(--brand-yellow)">N</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-purple">Data</span><div>Analyste — Veepee</div><div class="meta"><span>Il y a 5 j.</span><span class="av" style="background:var(--brand-purple)">A</span></div></div>
+            </div>
+            <div class="kcol">
+              <div class="kh">Entretien <span class="pl">2</span></div>
+              <div class="kcard"><span class="emp-tag emp-tag-green">Design</span><div>Product Designer — Payfit</div><div class="meta"><span>Jeu. 14h</span><span class="av" style="background:var(--brand-green)">L</span></div></div>
+              <div class="kcard"><span class="emp-tag emp-tag-sky">Marketing</span><div>Brand Lead — Blablacar</div><div class="meta"><span>Lun. 10h</span><span class="av" style="background:var(--brand-teal)">J</span></div></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ LOGO WALL ═════ -->
+<section class="emp-logo-wall" style="padding-top:160px">
+  <div class="container">
+    <div class="lbl">Approuvé par des candidats reçus chez</div>
+    <div class="row">
+      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ STICKY-NOTE PANEL ═════ -->
+<section class="emp-section">
+  <div class="container">
+    <div class="sticky-panel">
+      <div class="grid">
+        <div>
+          <h2 class="t-h2">Gardez vos candidatures<br/>en mouvement, 24/7.</h2>
+          <p class="t-subtitle mt-4">Chaque offre que vous ajoutez est analysée, scorée et préparée pendant que vous dormez. Au réveil, votre CV est prêt à envoyer.</p>
+          <div class="status-list mt-6">
+            <div class="status-item">
+              <span class="status-ic" style="background:var(--brand-pink)">✓</span>
+              CV adapté à&nbsp;<strong style="font-weight:600">Senior PM — Doctolib</strong>
+              <span class="status-time">Il y a 3 min</span>
+            </div>
+            <div class="status-item">
+              <span class="status-ic" style="background:var(--link-blue)">↻</span>
+              Lettre de motivation générée
+              <span class="status-time">Il y a 12 min</span>
+            </div>
+            <div class="status-item">
+              <span class="status-ic" style="background:var(--brand-green)">▲</span>
+              Score ATS amélioré&nbsp;<strong style="font-weight:600">+14%</strong>
+              <span class="status-time">Cette nuit</span>
+            </div>
+            <div class="status-item">
+              <span class="status-ic" style="background:var(--primary)">✦</span>
+              3 nouvelles offres correspondantes
+              <span class="status-time">Ce matin</span>
+            </div>
+            <div class="status-item">
+              <span class="status-ic" style="background:var(--brand-teal)">◆</span>
+              Préparation d'entretien — Payfit
+              <span class="status-time">Prête</span>
+            </div>
+          </div>
+        </div>
+        <div class="notes-board">
+          <div class="note" style="background:var(--tint-yellow);top:0;left:20px;transform:rotate(-6deg)">
+            <strong>Relancer Doctolib</strong>
+            10 jours sans nouvelle. EmploiA propose un message court et sympa.
+            <div class="who">Reco IA · ce matin</div>
+          </div>
+          <div class="note" style="background:var(--tint-rose);top:30px;right:0;transform:rotate(5deg)">
+            <strong>Question piège possible</strong>
+            "Pourquoi quitter votre poste actuel ?" — 3 réponses préparées.
+            <div class="who">Coach IA</div>
+          </div>
+          <div class="note" style="background:var(--tint-mint);top:200px;left:0;transform:rotate(-3deg)">
+            <strong>Mot-clé manquant</strong>
+            Ajoutez "roadmap discovery" sur le CV Qonto.
+            <div class="who">Optim. ATS</div>
+          </div>
+          <div class="note" style="background:var(--tint-sky);top:180px;right:40px;transform:rotate(7deg)">
+            <strong>Entretien jeudi 14h</strong>
+            Préparation, plan, questions à poser — tout est prêt.
+            <div class="who">Agenda</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ YELLOW BANNER + PASTEL TILES ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head">
+      <h2 class="t-h1">Demandez à vos assistants à la demande.</h2>
+      <p>Un CV à rafraîchir, une lettre à réécrire, une question piège à anticiper — déléguez et reprenez le contrôle quand vous voulez.</p>
+    </div>
+
+    <div class="emp-card-yellow-bold assist-banner">
+      <div>
+        <h3 class="t-h2">Un assistant IA<br/>pour chaque étape.</h3>
+        <p class="t-subtitle mt-4">Du premier brouillon de CV jusqu'à la lettre de remerciement post-entretien, EmploiA orchestre tout en français, avec votre voix.</p>
+        <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
+          <span class="chip-tag">CV ATS</span>
+          <span class="chip-tag">Lettre de motivation</span>
+          <span class="chip-tag">Préparation d'entretien</span>
+          <span class="chip-tag">Relances</span>
+          <span class="chip-tag">Négociation</span>
+        </div>
+      </div>
+      <div class="assist-visual">
+        <div class="assist-row">
+          <span class="av user">C</span>
+          <div class="txt">Réécris mon CV pour l'offre PM Senior chez Doctolib.</div>
+        </div>
+        <div class="assist-row">
+          <span class="av">E</span>
+          <div class="txt"><strong>Très bien.</strong> J'ai ajusté 4 puces, mis en avant ton expérience SaaS B2B et atteint un score ATS de <strong>91%</strong>. Tu veux que je rédige aussi la lettre ?</div>
+        </div>
+        <div class="assist-row">
+          <span class="av user">C</span>
+          <div class="txt">Oui, ton courte, max 200 mots.</div>
+        </div>
+        <div class="assist-row">
+          <span class="av">E</span>
+          <div class="txt">Voilà la lettre — j'ai repris le ton chaleureux de la fiche de poste. Tu peux la modifier en un clic.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tiles">
+      <div class="emp-card-peach tile">
+        <h4>Coach d'entretien</h4>
+        <p>S'entraîne avec vous sur les questions probables, propose des réponses STAR et vous note en temps réel.</p>
+        <div class="viz">
+          <div class="mini-card">
+            <div class="lbl">Question 3 · Comportementale</div>
+            <div class="ttl">Décrivez un échec dont vous avez tiré une leçon.</div>
+            <div class="flex gap-2 mt-2"><span class="emp-tag emp-tag-orange">Structure STAR</span><span class="emp-tag emp-tag-green">Note 8.4/10</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="emp-card-rose tile">
+        <h4>Rédacteur de lettres</h4>
+        <p>Une lettre unique par offre, dans votre voix, calibrée sur la culture de l'entreprise.</p>
+        <div class="viz">
+          <div class="mini-card">
+            <div class="lbl">Lettre · Qonto</div>
+            <div class="ttl">"Madame Reynaud, votre équipe Finance Ops…"</div>
+            <div style="font-size:11px;color:var(--steel);margin-top:6px">187 mots · Ton chaleureux · 2 versions générées</div>
+          </div>
+        </div>
+      </div>
+      <div class="emp-card-mint tile">
+        <h4>Optimiseur ATS</h4>
+        <p>Détecte les mots-clés manquants et reformule pour passer les filtres automatiques sans perdre le sens.</p>
+        <div class="viz">
+          <div class="mini-card">
+            <div class="lbl">Score ATS · Senior PM</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+              <div style="font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.5px">91<span style="font-size:14px;color:var(--steel)">/100</span></div>
+              <div style="flex:1;height:6px;background:var(--hairline);border-radius:3px;overflow:hidden"><div style="width:91%;height:100%;background:var(--brand-green)"></div></div>
+            </div>
+            <div style="font-size:11px;color:var(--steel);margin-top:6px">+14% en une nuit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ BRING TOGETHER ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head">
+      <h2 class="t-h1">Rassemblez toute votre recherche.</h2>
+      <p>Offres, CV, lettres, entretiens, contacts — un seul espace de candidature, à la place de cinq onglets ouverts.</p>
+    </div>
+    <div class="bring-grid">
+
+      <div class="bring-card" style="background:var(--tint-sky)">
+        <h4>Apprenez les bons réflexes.</h4>
+        <p>Tutoriels courts et études de cas pour transformer chaque candidature en entretien.</p>
+        <div class="viz">
+          <div class="tut-card">
+            <div class="tut-thumb">
+              <div class="deco" style="background:var(--brand-yellow);top:14px;left:14px"></div>
+              <div class="deco" style="background:var(--brand-pink);bottom:14px;right:14px"></div>
+              <div class="play"><div><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg></div></div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink)">Rédiger un CV qui passe l'ATS — en 7 minutes</div>
+            <div style="font-size:11px;color:var(--steel);margin-top:3px">EmploiA Academy · 6:48</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bring-card" style="background:var(--tint-cream)">
+        <h4>Votre calendrier de candidatures.</h4>
+        <p>Entretiens, relances et deadlines synchronisés avec Google Calendar et Outlook.</p>
+        <div class="viz">
+          <div class="cal-card">
+            <div class="day">Jeudi 21 mai</div>
+            <div class="cal-row" style="background:var(--tint-mint)"><span class="clr" style="background:var(--brand-green)"></span>10h00 · Entretien — Payfit</div>
+            <div class="cal-row" style="background:var(--tint-sky)"><span class="clr" style="background:var(--link-blue)"></span>14h00 · Visio — Doctolib</div>
+            <div class="cal-row" style="background:var(--tint-peach)"><span class="clr" style="background:var(--brand-orange)"></span>17h30 · Relance Qonto</div>
+            <div class="day" style="margin-top:10px">Vendredi 22 mai</div>
+            <div class="cal-row" style="background:var(--tint-lavender)"><span class="clr" style="background:var(--primary)"></span>09h00 · Coach IA · STAR</div>
+            <div class="cal-row" style="background:var(--tint-rose)"><span class="clr" style="background:var(--brand-pink)"></span>11h00 · Entretien — Alan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bring-card emp-card-brown">
+        <div class="quote-card">"En trois semaines avec EmploiA, j'ai eu plus d'entretiens qu'en six mois en solo. Le coach IA a vraiment changé ma façon de raconter mon parcours."</div>
+        <div class="viz">
+          <div class="quote-attr">
+            <span class="av"></span>
+            <div>
+              <div style="font-weight:600;color:#fff">Camille Durand</div>
+              <div>Product Manager · Embauchée chez Qonto</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ STATS ═════ -->
+<section class="emp-section-sm" style="padding-top:0">
+  <div class="container">
+    <div class="emp-stat-row">
+      <div>
+        <h3 class="t-h2">Plus d'entretiens.<br/>Moins d'onglets.</h3>
+        <p class="t-subtitle mt-4">Les utilisateurs EmploiA passent 4× moins de temps à candidater — et obtiennent 3× plus de réponses positives.</p>
+      </div>
+      <div class="stat-list">
+        <div class="emp-stat-item"><div class="val">3.4×</div><div class="bar"><i style="width:78%"></i></div><div class="lbl">d'entretiens en plus</div></div>
+        <div class="emp-stat-item"><div class="val">−72%</div><div class="bar"><i style="width:62%;background:var(--brand-orange)"></i></div><div class="lbl">de temps par candidature</div></div>
+        <div class="emp-stat-item"><div class="val">91%</div><div class="bar"><i style="width:91%;background:var(--brand-green)"></i></div><div class="lbl">score ATS moyen</div></div>
+        <div class="emp-stat-item"><div class="val">14j</div><div class="bar"><i style="width:38%;background:var(--brand-pink)"></i></div><div class="lbl">jusqu'au premier oui</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ PRICING ═════ -->
+<section class="emp-section" id="pricing">
+  <div class="container">
+    <div class="emp-section-head">
+      <h2 class="t-h1">Tarifs pensés pour la recherche d'emploi.</h2>
+      <p>Commencez gratuitement. Passez au-dessus quand vous êtes prêt à candidater sérieusement.</p>
+    </div>
+
+    <div class="emp-pricing-grid">
+      <div class="emp-pricing-card">
+        <h4>Gratuit</h4>
+        <div class="blurb">Pour tester EmploiA et générer votre premier CV.</div>
+        <div class="price">0€<small> /mois</small></div>
+        <div class="per">À vie · pas de carte bancaire</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>1 CV par mois</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>3 lettres de motivation</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Score ATS basique</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Accès aux 800k offres</li>
+          <li class="muted"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="5" y1="12" x2="19" y2="12"/></svg>Coach d'entretien</li>
+        </ul>
+        <a href="app.html" class="emp-btn emp-btn-secondary">Commencer</a>
+      </div>
+
+      <div class="emp-pricing-card featured">
+        <span class="pop">Le plus populaire</span>
+        <h4>Candidat</h4>
+        <div class="blurb">Pour mener une vraie campagne de candidature.</div>
+        <div class="price">9€<small> /mois</small></div>
+        <div class="per">Facturé annuellement · 12€ mensuel</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>CV &amp; lettres illimités</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coach d'entretien IA</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Suivi candidatures Kanban</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Extension LinkedIn</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Modèles premium</li>
+        </ul>
+        <a href="app.html" class="emp-btn emp-btn-primary">Essayer 14 jours</a>
+      </div>
+
+      <div class="emp-pricing-card">
+        <h4>Pro</h4>
+        <div class="blurb">Pour les transitions de carrière et freelances.</div>
+        <div class="price">19€<small> /mois</small></div>
+        <div class="per">Facturé annuellement</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tout de Candidat</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Profils multiples</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coaching humain (2h/mois)</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Négociation salariale</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Export multilingue</li>
+        </ul>
+        <a href="app.html" class="emp-btn emp-btn-secondary">Choisir Pro</a>
+      </div>
+
+      <div class="emp-pricing-card">
+        <h4>Écoles &amp; RH</h4>
+        <div class="blurb">Pour écoles, missions locales et cabinets de recrutement.</div>
+        <div class="price">Sur devis</div>
+        <div class="per">Tarif par siège</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tableau de bord équipe</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>SSO, contrôle d'accès</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Branding institutionnel</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Analytics agrégés</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Hébergement Europe (RGPD)</li>
+        </ul>
+        <a href="#contact" class="emp-btn emp-btn-dark">Parler à l'équipe</a>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="emp-compare mt-16">
+      <div class="emp-compare-head cmp">
+        <div>Comparer les plans</div>
+        <div>Gratuit</div>
+        <div>Candidat</div>
+        <div>Pro</div>
+        <div>Écoles &amp; RH</div>
+      </div>
+      <div class="emp-compare-section">Création de candidature</div>
+      <div class="emp-compare-row cmp"><div>CV générés par mois</div><div>1</div><div class="yes">Illimités</div><div class="yes">Illimités</div><div class="yes">Illimités</div></div>
+      <div class="emp-compare-row cmp"><div>Lettres de motivation</div><div>3</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
+      <div class="emp-compare-row cmp"><div>Modèles premium</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Export PDF · DOCX · LinkedIn</div><div>PDF</div><div class="yes">Tous</div><div class="yes">Tous</div><div class="yes">Tous</div></div>
+      <div class="emp-compare-section">Préparation &amp; coaching</div>
+      <div class="emp-compare-row cmp"><div>Coach d'entretien IA</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Coaching humain</div><div>—</div><div>—</div><div class="yes">2h / mois</div><div class="yes">Sur devis</div></div>
+      <div class="emp-compare-row cmp"><div>Négociation salariale</div><div>—</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-section">Pour les équipes</div>
+      <div class="emp-compare-row cmp"><div>SSO &amp; contrôle d'accès</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Tableau de bord équipe</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Hébergement France (RGPD)</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ TESTIMONIALS ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head">
+      <h2 class="t-h1">Ils ont décroché.</h2>
+      <p>Quelques voix parmi notre communauté de 24 800 candidats actifs.</p>
+    </div>
+    <div class="testi-grid">
+      <article class="emp-testi">
+        <p class="emp-testi-quote">« En trois semaines avec EmploiA, j'ai eu plus d'entretiens qu'en six mois en solo. Le coach IA a vraiment changé ma façon de raconter mon parcours. »</p>
+        <div class="emp-testi-stat"><span class="v">14</span><span class="l">entretiens en 21 jours</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--brand-orange)">C</div>
+          <div><div class="emp-testi-name">Camille Durand</div><div class="emp-testi-role">Product Manager · Qonto</div></div>
+        </div>
+      </article>
+      <article class="emp-testi">
+        <p class="emp-testi-quote">« J'avais 47 ans, je pensais que le marché ne voulait plus de moi. EmploiA a réécrit mon CV pour chaque offre — j'ai signé chez un éditeur SaaS en 5 semaines. »</p>
+        <div class="emp-testi-stat"><span class="v">+38%</span><span class="l">salaire vs poste précédent</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--primary)">M</div>
+          <div><div class="emp-testi-name">Mehdi Lahlou</div><div class="emp-testi-role">VP Sales · Pennylane</div></div>
+        </div>
+      </article>
+      <article class="emp-testi">
+        <p class="emp-testi-quote">« Le score ATS m'a montré pourquoi mes 80 candidatures partaient dans le vide. Trois ajustements plus tard, premier entretien décroché en 48 heures. »</p>
+        <div class="emp-testi-stat"><span class="v">48h</span><span class="l">jusqu'au 1er entretien</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--brand-green)">L</div>
+          <div><div class="emp-testi-name">Léa Marchetti</div><div class="emp-testi-role">Data Analyst · BlaBlaCar</div></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ FAQ ═════ -->
+<section class="emp-section" style="padding-top:0">
+  <div class="container">
+    <div class="emp-section-head">
+      <h2 class="t-h1">Questions fréquentes.</h2>
+    </div>
+    <div class="emp-faq">
+      <div class="emp-faq-item" data-acc data-open>
+        <button class="emp-faq-head" data-acc-head>EmploiA fonctionne-t-il pour les stages et alternances ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Oui — c'est même un de nos cas d'usage majeurs. Le coach adapte le ton et la structure au niveau d'expérience, et nos modèles intègrent les formats CV étudiants français (Parcoursup, Sciences Po, écoles de commerce et d'ingé).</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>Mes données sont-elles utilisées pour entraîner l'IA ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Jamais. Vos CV, lettres et conversations restent privés, hébergés en France, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic.</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>Quelle différence avec ChatGPT ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">EmploiA est un produit, pas un chatbot. Il connaît les conventions de candidature françaises, suit vos candidatures dans un seul tableau, garde le contexte d'une session à l'autre, et orchestre plusieurs assistants spécialisés (CV, lettre, coach, négo) au lieu d'un seul.</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>Puis-je annuler à tout moment ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Bien sûr. Pas d'engagement, pas de frais cachés. Vous gardez l'accès à tout ce que vous avez créé même après l'annulation.</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>Est-ce que ça marche pour des candidatures à l'étranger ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Oui — l'offre Pro inclut l'export multilingue (anglais, espagnol, allemand, italien) avec adaptation culturelle des formats CV. Le coach d'entretien gère aussi les entretiens en anglais.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ FINAL CTA ═════ -->
+<section class="emp-section-sm" style="padding-top:0">
+  <div class="container">
+    <div class="emp-cta-banner">
+      <h2 class="t-h1">Votre prochain entretien<br/>vous attend.</h2>
+      <p>Rejoignez 24 800 candidats qui ont laissé EmploiA s'occuper du plus pénible.</p>
+      <div class="row">
+        <a href="app.html" class="emp-btn emp-btn-primary emp-btn-lg">Essayer EmploiA gratuitement</a>
+        <a href="#" class="emp-btn emp-btn-secondary emp-btn-lg">Voir une démo (2 min)</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ FOOTER ═════ -->
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div>
+        <div class="emp-brand" style="margin-bottom:14px">
+          <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+          EmploiA
+        </div>
+        <div class="emp-footer-tagline">Le copilote de candidature 100% français.<br/>Fait à Paris · Hébergé en France.</div>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Produit</h5>
+        <a href="app.html">Générateur de CV</a>
+        <a href="app.html">Lettres de motivation</a>
+        <a href="interview.html">Coach d'entretien</a>
+        <a href="dashboard.html">Tableau de bord</a>
+        <a href="#">Extension LinkedIn</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Métiers</h5>
+        <a href="developpeur.html">Développeur</a>
+        <a href="data.html">Data</a>
+        <a href="design.html">Design</a>
+        <a href="marketing.html">Marketing</a>
+        <a href="commercial.html">Commercial</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Villes</h5>
+        <a href="paris.html">Paris</a>
+        <a href="lyon.html">Lyon</a>
+        <a href="marseille.html">Marseille</a>
+        <a href="bordeaux.html">Bordeaux</a>
+        <a href="remote.html">Remote France</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Ressources</h5>
+        <a href="blog.html">Blog</a>
+        <a href="#">Modèles de CV</a>
+        <a href="#">Guides entretien</a>
+        <a href="#">Salaires</a>
+      </div>
+      <div class="emp-footer-col">
+        <h5>Mentions</h5>
+        <a href="legal.html">Confidentialité</a>
+        <a href="legal.html">CGU</a>
+        <a href="legal.html">RGPD</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="emp-footer-bot">
+      <div>© <span data-year></span> EmploiA SAS · Tous droits réservés</div>
+      <div class="soc"><a href="#">LinkedIn</a><a href="#">Twitter</a><a href="#">Instagram</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+</body>
+</html>

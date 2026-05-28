@@ -23,6 +23,8 @@ jobs:
             --exclude "^https://fonts\."
             --exclude "^https://plausible\.io"
             --exclude "^https://js\.stripe\.com"
+            --exclude "^https://instagram\.com"
+            --exclude "^https://emploia-clean\.vercel\.app/api/"
             --timeout 20
             --retry-wait-time 5
             --max-retries 2
