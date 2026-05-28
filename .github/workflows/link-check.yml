@@ -18,7 +18,6 @@ jobs:
         with:
           args: |
             --base https://emploia.fr
-            --exclude-mail
             --exclude "^https://emploia\.fr/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
             --exclude "^https://fonts\."
             --exclude "^https://plausible\.io"
