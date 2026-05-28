@@ -17,10 +17,10 @@ jobs:
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: |
-            https://emploia.fr/
-            https://emploia.fr/blog
-            https://emploia.fr/tools
-            https://emploia.fr/cv-builder
+            https://emploia-clean.vercel.app/
+            https://emploia-clean.vercel.app/blog
+            https://emploia-clean.vercel.app/tools
+            https://emploia-clean.vercel.app/cv-builder
           budgetPath: .github/lighthouse-budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true
