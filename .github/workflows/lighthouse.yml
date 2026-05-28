@@ -1,0 +1,26 @@
+name: Lighthouse Audit
+
+on:
+  schedule:
+    # Every Monday at 8h UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Lighthouse on key pages
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            https://emploia.fr/
+            https://emploia.fr/blog
+            https://emploia.fr/tools
+            https://emploia.fr/cv-builder
+          budgetPath: .github/lighthouse-budget.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
