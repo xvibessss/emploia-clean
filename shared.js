@@ -511,3 +511,154 @@ async function empAuthInit() {
     }
   } catch {}
 }
+
+// ── SUPPORT WIDGET FLOTTANT ─────────────────────────────────────────
+(function empSupportWidget() {
+  if (window.location.pathname === '/chat') return;
+
+  const CSS = `
+#emp-sw-btn{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--primary,#6E48BE);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(110,72,190,.35);display:flex;align-items:center;justify-content:center;z-index:9000;transition:transform .2s,box-shadow .2s}
+#emp-sw-btn:hover{transform:scale(1.07);box-shadow:0 6px 22px rgba(110,72,190,.48)}
+#emp-sw-btn svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#emp-sw-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:#E74C3C;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;animation:empSwPulse 2s infinite}
+@keyframes empSwPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+#emp-sw-panel{position:fixed;bottom:88px;right:24px;width:320px;height:460px;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.16);display:flex;flex-direction:column;z-index:9001;transform:scale(.92) translateY(14px);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease;overflow:hidden;font-family:Inter,system-ui,sans-serif}
+#emp-sw-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+#emp-sw-head{background:var(--primary,#6E48BE);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.emp-sw-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:15px;flex-shrink:0}
+.emp-sw-nm{color:#fff;font-weight:600;font-size:14px;line-height:1.2}
+.emp-sw-st{color:rgba(255,255,255,.75);font-size:11px}
+#emp-sw-cls{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.75);font-size:22px;line-height:1;padding:2px;margin-left:auto}
+#emp-sw-cls:hover{color:#fff}
+#emp-sw-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.emp-sw-msg{max-width:86%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+.emp-sw-msg.bot{background:#F3EFF9;color:#1e1e2e;border-bottom-left-radius:3px;align-self:flex-start}
+.emp-sw-msg.user{background:var(--primary,#6E48BE);color:#fff;border-bottom-right-radius:3px;align-self:flex-end}
+.emp-sw-msg a{color:inherit;text-decoration:underline}
+.emp-sw-dots{display:flex;gap:4px;padding:9px 12px;align-self:flex-start;background:#F3EFF9;border-radius:12px;border-bottom-left-radius:3px}
+.emp-sw-dots span{width:6px;height:6px;border-radius:50%;background:#6E48BE;opacity:.4;animation:empSwDot 1.2s infinite}
+.emp-sw-dots span:nth-child(2){animation-delay:.2s}
+.emp-sw-dots span:nth-child(3){animation-delay:.4s}
+@keyframes empSwDot{0%,60%,100%{opacity:.4;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+#emp-sw-foot{padding:10px 12px 12px;border-top:1px solid #F0ECF9;flex-shrink:0}
+#emp-sw-form{display:flex;gap:6px;align-items:flex-end}
+#emp-sw-inp{flex:1;border:1.5px solid #E2D9F5;border-radius:10px;padding:8px 10px;font-size:13px;outline:none;font-family:inherit;resize:none;line-height:1.4;max-height:80px;overflow-y:auto;transition:border-color .15s;color:#0F172A}
+#emp-sw-inp:focus{border-color:var(--primary,#6E48BE)}
+#emp-sw-sub{background:var(--primary,#6E48BE);border:none;border-radius:10px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+#emp-sw-sub:disabled{opacity:.45;cursor:default}
+#emp-sw-sub svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#emp-sw-esc{text-align:center;margin-top:7px;font-size:11px;color:#94A3B8}
+#emp-sw-esc a{color:var(--primary,#6E48BE);text-decoration:none}
+#emp-sw-esc a:hover{text-decoration:underline}
+@media(max-width:400px){#emp-sw-panel{width:calc(100vw - 20px);right:10px;bottom:78px}#emp-sw-btn{right:12px;bottom:16px}}
+`;
+
+  const style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  const btn = document.createElement('button');
+  btn.id = 'emp-sw-btn';
+  btn.setAttribute('aria-label', 'Support Orion');
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="emp-sw-badge">1</span>`;
+
+  const panel = document.createElement('div');
+  panel.id = 'emp-sw-panel';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-label', 'Support Orion');
+  panel.innerHTML = `
+<div id="emp-sw-head">
+  <div class="emp-sw-av">O</div>
+  <div><div class="emp-sw-nm">Orion Support</div><div class="emp-sw-st">● En ligne · répond en quelques secondes</div></div>
+  <button id="emp-sw-cls" aria-label="Fermer">×</button>
+</div>
+<div id="emp-sw-msgs">
+  <div class="emp-sw-msg bot">Bonjour ! Je suis Orion, le support IA d'Emploia 👋<br>Comment puis-je vous aider ?</div>
+</div>
+<div id="emp-sw-foot">
+  <form id="emp-sw-form">
+    <textarea id="emp-sw-inp" placeholder="Votre question…" rows="1" aria-label="Message"></textarea>
+    <button id="emp-sw-sub" type="submit" aria-label="Envoyer"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </form>
+  <div id="emp-sw-esc">Besoin d'aide humaine ? <a href="mailto:contact@emploia.fr">contact@emploia.fr</a></div>
+</div>`;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.appendChild(btn);
+    document.body.appendChild(panel);
+
+    const msgs = document.getElementById('emp-sw-msgs');
+    const inp = document.getElementById('emp-sw-inp');
+    const sub = document.getElementById('emp-sw-sub');
+    const badge = document.getElementById('emp-sw-badge');
+    let busy = false;
+
+    btn.addEventListener('click', () => {
+      const isOpen = panel.classList.toggle('open');
+      if (isOpen) {
+        badge.style.display = 'none';
+        sessionStorage.setItem('empSwSeen', '1');
+        setTimeout(() => inp.focus(), 230);
+      }
+    });
+    document.getElementById('emp-sw-cls').addEventListener('click', () => panel.classList.remove('open'));
+
+    if (sessionStorage.getItem('empSwSeen')) badge.style.display = 'none';
+
+    inp.addEventListener('input', () => {
+      inp.style.height = 'auto';
+      inp.style.height = Math.min(inp.scrollHeight, 80) + 'px';
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sub.click(); }
+    });
+
+    function addMsg(text, who) {
+      const d = document.createElement('div');
+      d.className = `emp-sw-msg ${who}`;
+      d.innerHTML = text.replace(/\n/g, '<br>');
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    document.getElementById('emp-sw-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const q = inp.value.trim();
+      if (!q || busy) return;
+      busy = true;
+      sub.disabled = true;
+      addMsg(q, 'user');
+      inp.value = '';
+      inp.style.height = 'auto';
+
+      const dots = document.createElement('div');
+      dots.className = 'emp-sw-dots';
+      dots.innerHTML = '<span></span><span></span><span></span>';
+      msgs.appendChild(dots);
+      msgs.scrollTop = msgs.scrollHeight;
+
+      try {
+        const res = await fetch('/api/agent/support', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: q }),
+        });
+        const data = await res.json();
+        dots.remove();
+        if (res.status === 429) {
+          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+        } else {
+          addMsg(data.answer || 'Je n\'ai pas pu répondre. Contactez <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+        }
+      } catch {
+        dots.remove();
+        addMsg('Service indisponible. Écrivez à <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+      } finally {
+        busy = false;
+        sub.disabled = false;
+        inp.focus();
+      }
+    });
+  });
+})();

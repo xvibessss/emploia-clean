@@ -295,6 +295,11 @@
           <a id="prepRelanceLink" href="/tools?tab=relance" class="emp-btn emp-btn-secondary" style="font-size:11px;padding:5px 12px">📧 Email de relance</a>
           <a id="prepNegocLink" href="/tools?tab=negociation" class="emp-btn emp-btn-secondary" style="font-size:11px;padding:5px 12px">💰 Négocier le salaire</a>
         </div>
+        <div id="feedbackBar" style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px 16px;background:var(--surface);border:1.5px solid var(--hairline);border-radius:10px">
+          <span style="font-size:12px;color:var(--slate);flex:1" id="fbLabel">Ce résultat vous a aidé ?</span>
+          <button id="fbUp" onclick="submitFeedback('up')" style="background:none;border:1.5px solid var(--hairline);border-radius:8px;padding:5px 14px;font-size:14px;cursor:pointer;transition:background .15s,border-color .15s" title="Utile">👍</button>
+          <button id="fbDown" onclick="submitFeedback('down')" style="background:none;border:1.5px solid var(--hairline);border-radius:8px;padding:5px 14px;font-size:14px;cursor:pointer;transition:background .15s,border-color .15s" title="À améliorer">👎</button>
+        </div>
       </div>
     </div>
   </div>
@@ -376,6 +381,39 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     document.getElementById('jobInput').value = s;
     document.getElementById('jobInput').focus();
     updateLen();
+  }
+
+  let feedbackSent = false;
+  async function submitFeedback(rating) {
+    if (feedbackSent) return;
+    feedbackSent = true;
+    const typeMap = { cv: 'cv', letter: 'cover-letter', ats: 'ats-score' };
+    const fbLabel = document.getElementById('fbLabel');
+    const fbUp = document.getElementById('fbUp');
+    const fbDown = document.getElementById('fbDown');
+    if (fbUp) fbUp.disabled = true;
+    if (fbDown) fbDown.disabled = true;
+    if (fbLabel) fbLabel.textContent = rating === 'up' ? 'Merci pour votre retour ! 🙏' : 'Merci, on va améliorer ça !';
+    if (rating === 'up' && fbUp) { fbUp.style.background = '#f0ecf9'; fbUp.style.borderColor = 'var(--primary)'; }
+    if (rating === 'down' && fbDown) { fbDown.style.background = '#fef2f2'; fbDown.style.borderColor = 'var(--error,#e74c3c)'; }
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: typeMap[mode] || mode, rating }),
+      });
+    } catch {}
+  }
+
+  function resetFeedback() {
+    feedbackSent = false;
+    const fbLabel = document.getElementById('fbLabel');
+    const fbUp = document.getElementById('fbUp');
+    const fbDown = document.getElementById('fbDown');
+    if (fbLabel) fbLabel.textContent = 'Ce résultat vous a aidé ?';
+    if (fbUp) { fbUp.disabled = false; fbUp.style.background = 'none'; fbUp.style.borderColor = 'var(--hairline)'; }
+    if (fbDown) { fbDown.disabled = false; fbDown.style.background = 'none'; fbDown.style.borderColor = 'var(--hairline)'; }
   }
 
   async function generate() {
@@ -493,6 +531,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     lastResult = result;
     document.getElementById('resultActions').style.display = 'block';
     document.getElementById('resultActionsBottom').style.display = 'block';
+    resetFeedback();
     updateNextStepLinks();
 
     if (mode === 'ats') {

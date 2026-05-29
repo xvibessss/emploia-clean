@@ -306,6 +306,13 @@
     { "source": "/api/nps", "destination": "/api/nps" },
     { "source": "/api/share-score", "destination": "/api/share-score" },
     { "source": "/api/agent/support", "destination": "/api/agent/support" },
+    { "source": "/api/agent/legal", "destination": "/api/agent/legal" },
+    { "source": "/api/agent/sales", "destination": "/api/agent/sales" },
+    { "source": "/api/agent/operation", "destination": "/api/agent/operation" },
+    { "source": "/api/agent/supply-chain", "destination": "/api/agent/supply-chain" },
+    { "source": "/api/agent/compliance", "destination": "/api/agent/compliance" },
+    { "source": "/api/agent/customer-experience", "destination": "/api/agent/customer-experience" },
+    { "source": "/api/feedback", "destination": "/api/feedback" },
     { "source": "/api/agent/recruiting", "destination": "/api/agent/recruiting" },
     { "source": "/api/agent/reporting", "destination": "/api/agent/reporting" }
   ],
