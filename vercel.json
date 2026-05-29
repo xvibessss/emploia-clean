@@ -312,6 +312,8 @@
     { "source": "/api/agent/supply-chain", "destination": "/api/agent/supply-chain" },
     { "source": "/api/agent/compliance", "destination": "/api/agent/compliance" },
     { "source": "/api/agent/customer-experience", "destination": "/api/agent/customer-experience" },
+    { "source": "/api/agent/finance", "destination": "/api/agent/finance" },
+    { "source": "/api/agent/marketing", "destination": "/api/agent/marketing" },
     { "source": "/api/feedback", "destination": "/api/feedback" },
     { "source": "/api/agent/recruiting", "destination": "/api/agent/recruiting" },
     { "source": "/api/agent/reporting", "destination": "/api/agent/reporting" }
