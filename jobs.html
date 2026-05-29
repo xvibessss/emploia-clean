@@ -108,13 +108,13 @@
     .jb-card-date { font-size: 11px; color: var(--stone); }
     .jb-card-src { font-size: 10px; color: var(--slate); background: var(--surface); padding: 2px 8px; border-radius: var(--r-xs); }
     .jb-card-actions { display: flex; gap: 6px; }
-    .jb-btn-cv { padding: 6px 12px; border-radius: var(--r-md); font-size: 12px; font-weight: 600; color: var(--brand-green); background: var(--tint-mint); border: 1px solid #c8e6ca; cursor: pointer; transition: all .15s; white-space: nowrap; }
-    .jb-btn-cv:hover { background: #c8e6ca; }
+    .jb-btn-cv { padding: 6px 14px; border-radius: var(--r-md); font-size: 12px; font-weight: 600; color: #fff; background: var(--primary); border: none; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .jb-btn-cv:hover { background: var(--primary-pressed); }
     .jb-btn-track { padding: 6px 12px; border-radius: var(--r-md); font-size: 12px; font-weight: 600; color: var(--slate); background: var(--surface); border: 1.5px solid var(--hairline); cursor: pointer; transition: all .15s; white-space: nowrap; }
     .jb-btn-track:hover { border-color: var(--primary); color: var(--primary); }
     .jb-btn-track.tracked { color: var(--success); border-color: #c8e6ca; background: var(--tint-mint); }
-    .jb-btn-apply { padding: 6px 14px; border-radius: var(--r-md); font-size: 12px; font-weight: 600; color: #fff; background: var(--primary); border: none; cursor: pointer; transition: all .15s; white-space: nowrap; }
-    .jb-btn-apply:hover { background: var(--primary-pressed); }
+    .jb-btn-apply { padding: 6px 12px; border-radius: var(--r-md); font-size: 12px; font-weight: 600; color: var(--slate); background: var(--surface); border: 1.5px solid var(--hairline); cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .jb-btn-apply:hover { border-color: var(--primary); color: var(--primary); }
     .jb-btn-save { width: 30px; height: 30px; border-radius: var(--r-md); border: 1.5px solid var(--hairline); background: transparent; cursor: pointer; color: var(--stone); font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
     .jb-btn-save:hover { background: var(--tint-yellow); color: var(--brand-yellow); border-color: var(--brand-yellow); }
     .jb-btn-save.saved { color: var(--brand-yellow); border-color: var(--brand-yellow); }
@@ -472,15 +472,17 @@
     if (scoreCache[jobId]) { showScore(pillEl, scoreCache[jobId]); return; }
     const _j = allJobs.find(j => String(j.id) === String(jobId));
     const jobTitle = _j?.title || '', jobDescription = (_j?.description || '').slice(0, 800);
-    pillEl.textContent = '⏳'; pillEl.style.pointerEvents = 'none';
+    const originalText = pillEl.textContent;
+    pillEl.textContent = '⏳ Analyse…'; pillEl.style.pointerEvents = 'none'; pillEl.style.opacity = '.7';
     try {
       const userProfile = localStorage.getItem('emploia_profile_text') || '';
       const res = await fetch('/api/match-score', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jobTitle, jobDescription, userProfile }) });
       if (!res.ok) throw new Error();
       const data = await res.json();
       persistScore(jobId, data); showScore(pillEl, data);
+      pillEl.style.opacity = '';
       try { const KEY = 'emploia_scores_history'; const hist = JSON.parse(localStorage.getItem(KEY) || '[]'); hist.push({ type: 'match', ts: Date.now(), score: data.score }); localStorage.setItem(KEY, JSON.stringify(hist.slice(-50))); } catch {}
-    } catch { pillEl.textContent = 'Score IA'; pillEl.style.pointerEvents = ''; }
+    } catch { pillEl.textContent = originalText; pillEl.style.pointerEvents = ''; pillEl.style.opacity = ''; }
   }
 
   function showScore(pillEl, data) {

@@ -910,6 +910,17 @@
     </div>
   </div>
 
+  <!-- EMPTY STATE -->
+  <div id="dashEmptyState" style="text-align:center;padding:32px;background:var(--surface);border:1.5px dashed var(--hairline);border-radius:16px;margin-bottom:24px;display:none">
+    <div style="font-size:32px;margin-bottom:12px">🚀</div>
+    <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px">Commencez votre recherche d'emploi</div>
+    <div style="font-size:14px;color:var(--slate);margin-bottom:20px">Générez votre premier CV adapté à une offre, puis suivez vos candidatures ici.</div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/app" class="emp-btn emp-btn-primary">✨ Générer un CV →</a>
+      <a href="/jobs" class="emp-btn emp-btn-ghost">Parcourir les offres</a>
+    </div>
+  </div>
+
   <!-- ACTIVITY CHART -->
   <div id="activityChart" style="background:var(--surface);border:1px solid var(--hairline);border-radius:18px;padding:20px 24px;margin-bottom:24px;display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -1777,7 +1788,7 @@
       .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
       .slice(0, 4);
     if (!recent.length) {
-      el.innerHTML = '<div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Aucune candidature récente.<br><a href="/jobs" style="color:var(--inb)">Chercher des offres →</a></div>';
+      el.innerHTML = '<div id="activityEmpty" style="text-align:center;padding:24px;color:var(--slate);font-size:14px">Votre activité apparaîtra ici après vos premières actions.</div>';
       return;
     }
     const STATUS_ICON = { wishlist: '📋', applied: '📤', interview: '🎤', offer: '🎉', rejected: '❌' };
@@ -1869,6 +1880,12 @@
     updateConseilDuJour(apps);
     renderActivityChart(apps);
     computeSkillsGap(apps);
+    updateEmptyState(total);
+  }
+
+  function updateEmptyState(total) {
+    const el = document.getElementById('dashEmptyState');
+    if (el) el.style.display = total === 0 ? 'block' : 'none';
   }
 
   function renderActivityChart(apps) {

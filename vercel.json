@@ -5,6 +5,15 @@
   "outputDirectory": ".",
   "installCommand": "echo ok",
   "functions": {
+    "api/agent/recruiting.js": {
+      "maxDuration": 60
+    },
+    "api/agent/reporting.js": {
+      "maxDuration": 45
+    },
+    "api/agent/support.js": {
+      "maxDuration": 15
+    },
     "api/generate/cv.js": {
       "maxDuration": 60
     },
@@ -157,6 +166,14 @@
     }
   },
   "crons": [
+    {
+      "path": "/api/agent/recruiting",
+      "schedule": "0 8 * * 2"
+    },
+    {
+      "path": "/api/agent/reporting",
+      "schedule": "0 18 * * 0"
+    },
     {
       "path": "/api/cron/send-alerts",
       "schedule": "0 7 * * *"
@@ -445,7 +462,10 @@
     { "source": "/admin/stats", "destination": "/api/admin/stats" },
     { "source": "/api/track", "destination": "/api/track" },
     { "source": "/api/nps", "destination": "/api/nps" },
-    { "source": "/api/share-score", "destination": "/api/share-score" }
+    { "source": "/api/share-score", "destination": "/api/share-score" },
+    { "source": "/api/agent/support", "destination": "/api/agent/support" },
+    { "source": "/api/agent/recruiting", "destination": "/api/agent/recruiting" },
+    { "source": "/api/agent/reporting", "destination": "/api/agent/reporting" }
   ],
   "headers": [
     {
