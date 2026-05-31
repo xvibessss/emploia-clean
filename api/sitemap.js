@@ -5,6 +5,7 @@ export default function handler(req, res) {
     { loc: `${base}/`,                    changefreq: 'weekly',  priority: '1.0', lastmod: today },
     { loc: `${base}/jobs`,                changefreq: 'daily',   priority: '0.9', lastmod: today },
     { loc: `${base}/tools`,               changefreq: 'monthly', priority: '0.8', lastmod: today },
+    { loc: `${base}/agents`,              changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/blog`,                changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/employeurs`,          changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/about`,              changefreq: 'monthly', priority: '0.7' },
