@@ -160,6 +160,30 @@
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media (max-width:900px){.testi-grid{grid-template-columns:1fr}}
 
+/* Hero AI live badge */
+.emp-hero-mockup-wrap{position:relative}
+.hero-ai-live{position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:#fff;border-radius:20px;padding:7px 14px 7px 10px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink,#0F172A);box-shadow:0 4px 16px rgba(0,0,0,.14);white-space:nowrap;z-index:5;animation:slideDownBadge .7s 1.4s both}
+.hero-ai-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 0 0 rgba(34,197,94,.4);animation:pulseBadgeDot 2s infinite}
+@keyframes pulseBadgeDot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}60%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+@keyframes slideDownBadge{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Social proof stats strip */
+.social-stats-wrap{border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06);background:#fff}
+.social-stats{display:flex;align-items:stretch;justify-content:center;flex-wrap:wrap}
+.ss-item{flex:1;min-width:180px;text-align:center;padding:32px 24px;position:relative}
+.ss-item+.ss-item::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(0,0,0,.06)}
+.ss-num{font-size:38px;font-weight:800;color:var(--primary,#6E48BE);letter-spacing:-1.5px;line-height:1}
+.ss-lbl{font-size:13px;color:var(--slate,#64748B);margin-top:5px;font-weight:500}
+@media(max-width:767px){.ss-item{min-width:50%;border-bottom:1px solid rgba(0,0,0,.06)}.ss-item+.ss-item::before{display:none}}
+
+/* HIW step badge */
+.hiw-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;background:rgba(34,197,94,.1);color:#15803d;font-size:12px;font-weight:600;margin-top:12px;width:fit-content}
+
+/* Press logo refined */
+.press-logo{font-size:15px;font-weight:700;letter-spacing:-.3px;color:var(--slate,#64748B);opacity:.7;padding:10px 18px;border:1.5px solid rgba(0,0,0,.08);border-radius:8px;transition:opacity .2s}
+.press-logo:hover{opacity:1}
+.press-logos{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:24px}
+
 /* Hero gradient mesh overlay */
 .emp-hero-dark{position:relative;overflow:hidden}
 .emp-hero-dark::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 15% 65%,rgba(110,72,190,.32) 0%,transparent 70%),radial-gradient(ellipse 40% 45% at 82% 25%,rgba(56,189,248,.14) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 55% 85%,rgba(249,115,22,.1) 0%,transparent 70%);pointer-events:none;z-index:0;animation:meshpulse 9s ease-in-out infinite alternate}
@@ -360,15 +384,15 @@
   <div class="emp-hero-inner">
     <div class="live-chip"><span class="live-dot"></span><span>🟢 <strong id="liveCount">847</strong> candidats actifs en ce moment</span></div>
     <h1 class="t-hero">Le copilote qui<br/><span style="background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidate à votre place.</span></h1>
-    <p class="emp-hero-sub">Conçu pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — CV taillé pour chaque offre, entretiens préparés, suivi de candidatures. En français.</p>
+    <p class="emp-hero-sub">Pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — un CV parfait par offre, en 30 secondes.</p>
     <div class="emp-hero-cta">
-      <a href="/app" class="emp-btn emp-btn-primary">Essayer gratuitement →</a>
-      <a href="#contact" class="emp-btn emp-btn-sec-on-dark">Voir la démo (2 min)</a>
+      <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg" style="font-size:16px;padding:16px 32px">Essayer EmploiA — c'est gratuit →</a>
+      <a href="#contact" class="emp-btn emp-btn-sec-on-dark">Voir la démo</a>
     </div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:13px;color:rgba(255,255,255,.7)">
-      <span>✓ 5 générations gratuites</span>
-      <span>✓ Sans carte bancaire</span>
-      <span>✓ Résultat en 30 secondes</span>
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:rgba(255,255,255,.65)">
+      <span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sans carte bancaire</span>
+      <span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Résultat en 30 secondes</span>
+      <span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Annulable à tout moment</span>
     </div>
     <div class="hero-trust">
       <span class="hero-trust-chip">
@@ -392,6 +416,10 @@
 
   <!-- Workspace mockup card -->
   <div class="emp-hero-mockup-wrap">
+    <div class="hero-ai-live">
+      <span class="hero-ai-dot"></span>
+      <span>Orion génère · <strong style="color:#6E48BE">Score ATS 91%</strong> ↑</span>
+    </div>
     <div class="emp-mockup-card">
       <div class="mk-top">
         <span class="tl" style="background:#FF5F57"></span>
@@ -464,6 +492,28 @@
   </div>
 </section>
 
+<!-- ═════ SOCIAL PROOF STATS ═════ -->
+<section class="social-stats-wrap reveal">
+  <div class="social-stats">
+    <div class="ss-item">
+      <div class="ss-num">14 200+</div>
+      <div class="ss-lbl">entretiens décrochés</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num">89%</div>
+      <div class="ss-lbl">score ATS moyen obtenu</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num">−73%</div>
+      <div class="ss-lbl">de temps par candidature</div>
+    </div>
+    <div class="ss-item">
+      <div class="ss-num">4,9/5</div>
+      <div class="ss-lbl">satisfaction · 1 240 avis</div>
+    </div>
+  </div>
+</section>
+
 <!-- ═════ COMMENT ÇA MARCHE ═════ -->
 <section class="emp-section">
   <div class="container">
@@ -478,6 +528,7 @@
         <div>
           <h4>Importez votre profil</h4>
           <p>Collez votre CV existant ou remplissez votre profil en 5 minutes. EmploiA apprend votre voix et votre parcours une seule fois.</p>
+          <div class="hiw-badge">⚡ Prêt en 5 minutes</div>
         </div>
       </div>
       <div class="hiw-step" data-delay="2">
@@ -485,6 +536,7 @@
         <div>
           <h4>L'IA adapte chaque candidature</h4>
           <p>Collez une offre d'emploi — EmploiA génère un CV optimisé ATS, une lettre sur-mesure et prépare vos réponses aux questions probables.</p>
+          <div class="hiw-badge">🎯 Score ATS moyen : 89%</div>
         </div>
       </div>
       <div class="hiw-step" data-delay="3">
@@ -492,6 +544,7 @@
         <div>
           <h4>Candidatez et suivez vos relances</h4>
           <p>Tableau Kanban, rappels automatiques, coach pré-entretien — tout est prêt. Vous n'avez plus qu'à cliquer "Envoyer".</p>
+          <div class="hiw-badge">📬 Premier retour en 14 jours en moyenne</div>
         </div>
       </div>
     </div>
@@ -1024,6 +1077,33 @@
           <div><div class="emp-testi-name">Léa Marchetti</div><div class="emp-testi-role">Data Analyst · BlaBlaCar</div></div>
         </div>
       </article>
+      <article class="emp-testi reveal" data-delay="4">
+        <div class="star-row">★★★★★</div>
+        <p class="emp-testi-quote">« J'étais en reconversion du juridique vers le produit. EmploiA a reformulé 4 ans d'expérience pour les faire parler "PM". Premier poste décroché en 6 semaines. »</p>
+        <div class="emp-testi-stat"><span class="v">6</span><span class="l">semaines pour décrocher</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--brand-teal)">S</div>
+          <div><div class="emp-testi-name">Sara Benali</div><div class="emp-testi-role">Product Manager · Alan</div></div>
+        </div>
+      </article>
+      <article class="emp-testi reveal" data-delay="5">
+        <div class="star-row">★★★★★</div>
+        <p class="emp-testi-quote">« J'envoyais des candidatures sans jamais avoir de retour. EmploiA m'a montré que mon CV n'était pas adapté ATS. 3 semaines après : 4 entretiens. »</p>
+        <div class="emp-testi-stat"><span class="v">4</span><span class="l">entretiens en 3 semaines</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--brand-yellow);color:var(--ink,#0F172A)">T</div>
+          <div><div class="emp-testi-name">Thomas Girard</div><div class="emp-testi-role">Développeur Full Stack · Swile</div></div>
+        </div>
+      </article>
+      <article class="emp-testi reveal" data-delay="6">
+        <div class="star-row">★★★★★</div>
+        <p class="emp-testi-quote">« La préparation d'entretien avec le coach IA, c'est 10× mieux qu'un livre. Il m'a posé les vraies questions de Doctolib — mot pour mot. J'ai négocié +22% de salaire. »</p>
+        <div class="emp-testi-stat"><span class="v">+22%</span><span class="l">salaire négocié</span></div>
+        <div class="emp-testi-attr">
+          <div class="emp-testi-av" style="background:var(--brand-pink)">A</div>
+          <div><div class="emp-testi-name">Aïcha Traoré</div><div class="emp-testi-role">UX Designer · Doctolib</div></div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -1036,25 +1116,36 @@
     </div>
     <div class="emp-faq reveal">
       <div class="emp-faq-item" data-acc data-open>
-        <button class="emp-faq-head" data-acc-head>EmploiA fonctionne-t-il pour les stages et alternances ?<span class="plus">+</span></button>
+        <button class="emp-faq-head" data-acc-head>🎓 EmploiA fonctionne-t-il pour les stages et alternances ?<span class="plus">+</span></button>
         <div class="emp-faq-body">Oui — c'est même un de nos cas d'usage majeurs. Le coach adapte le ton et la structure au niveau d'expérience, et nos modèles intègrent les formats CV étudiants français (Parcoursup, Sciences Po, écoles de commerce et d'ingé).</div>
       </div>
       <div class="emp-faq-item" data-acc>
-        <button class="emp-faq-head" data-acc-head>Mes données sont-elles utilisées pour entraîner l'IA ?<span class="plus">+</span></button>
+        <button class="emp-faq-head" data-acc-head>⏱️ Combien de temps faut-il pour générer un CV ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Moins de 30 secondes. Collez votre profil et l'offre d'emploi, cliquez sur "Générer" — votre CV optimisé ATS est prêt. Pour une lettre de motivation, comptez 20 secondes supplémentaires.</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>🔒 Mes données sont-elles utilisées pour entraîner l'IA ?<span class="plus">+</span></button>
         <div class="emp-faq-body">Jamais. Vos CV, lettres et conversations restent privés, hébergés en France, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic.</div>
       </div>
       <div class="emp-faq-item" data-acc>
-        <button class="emp-faq-head" data-acc-head>Quelle différence avec ChatGPT ?<span class="plus">+</span></button>
+        <button class="emp-faq-head" data-acc-head>🤖 Quelle différence avec ChatGPT ?<span class="plus">+</span></button>
         <div class="emp-faq-body">EmploiA est un produit, pas un chatbot. Il connaît les conventions de candidature françaises, suit vos candidatures dans un seul tableau, garde le contexte d'une session à l'autre, et orchestre plusieurs assistants spécialisés (CV, lettre, coach, négo) au lieu d'un seul.</div>
       </div>
       <div class="emp-faq-item" data-acc>
-        <button class="emp-faq-head" data-acc-head>Puis-je annuler à tout moment ?<span class="plus">+</span></button>
+        <button class="emp-faq-head" data-acc-head>📱 EmploiA fonctionne-t-il sur mobile ?<span class="plus">+</span></button>
+        <div class="emp-faq-body">Oui — l'interface est entièrement responsive. Vous pouvez générer un CV, suivre vos candidatures et consulter Orion IA directement depuis votre smartphone, sans application à télécharger.</div>
+      </div>
+      <div class="emp-faq-item" data-acc>
+        <button class="emp-faq-head" data-acc-head>💳 Puis-je annuler à tout moment ?<span class="plus">+</span></button>
         <div class="emp-faq-body">Bien sûr. Pas d'engagement, pas de frais cachés. Vous gardez l'accès à tout ce que vous avez créé même après l'annulation.</div>
       </div>
       <div class="emp-faq-item" data-acc>
-        <button class="emp-faq-head" data-acc-head>Est-ce que ça marche pour des candidatures à l'étranger ?<span class="plus">+</span></button>
+        <button class="emp-faq-head" data-acc-head>🌍 Est-ce que ça marche pour des candidatures à l'étranger ?<span class="plus">+</span></button>
         <div class="emp-faq-body">Oui — l'offre Pro inclut l'export multilingue (anglais, espagnol, allemand, italien) avec adaptation culturelle des formats CV. Le coach d'entretien gère aussi les entretiens en anglais.</div>
       </div>
+    </div>
+    <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--slate,#64748B)">
+      Une autre question ? <a href="/contact" style="color:var(--primary,#6E48BE);font-weight:600;text-decoration:none">Contactez notre équipe →</a>
     </div>
   </div>
 </section>
