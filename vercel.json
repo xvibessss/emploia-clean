@@ -316,7 +316,11 @@
     { "source": "/api/agent/marketing", "destination": "/api/agent/marketing" },
     { "source": "/api/feedback", "destination": "/api/feedback" },
     { "source": "/api/agent/recruiting", "destination": "/api/agent/recruiting" },
-    { "source": "/api/agent/reporting", "destination": "/api/agent/reporting" }
+    { "source": "/api/agent/reporting", "destination": "/api/agent/reporting" },
+    { "source": "/api/agent/hr", "destination": "/api/agent/hr" },
+    { "source": "/api/agent/tech", "destination": "/api/agent/tech" },
+    { "source": "/api/agent/data", "destination": "/api/agent/data" },
+    { "source": "/agents", "destination": "/agents.html" }
   ],
   "headers": [
     {

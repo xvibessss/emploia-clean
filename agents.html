@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Agents IA Experts — 12 spécialistes pour votre carrière · EmploiA</title>
+  <meta name="description" content="12 agents IA spécialisés : droit du travail, finance, marketing, supply chain, conformité, RH, tech, data et plus. Posez vos questions professionnelles en français."/>
+  <link rel="canonical" href="https://emploia.fr/agents"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#0E1830"/>
+  <meta property="og:title" content="Agents IA Experts · EmploiA"/>
+  <meta property="og:description" content="12 experts IA spécialisés pour votre carrière — droit, finance, marketing, tech, data et plus."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.fr/agents"/>
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+    body { background: var(--canvas); }
+
+    /* ── Hero ── */
+    .agents-hero { background: #0E1830; color: #fff; padding: 120px 24px 64px; text-align: center; position: relative; overflow: hidden; }
+    .agents-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% -5%, rgba(139,92,246,.4) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 85% 70%, rgba(56,189,248,.15) 0%, transparent 60%); pointer-events: none; }
+    .agents-hero-inner { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+    .agents-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 9999px; padding: 6px 16px; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.85); margin-bottom: 22px; letter-spacing: .4px; text-transform: uppercase; }
+    .agents-hero h1 { font-size: clamp(28px,4.5vw,46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .agents-hero p { font-size: 17px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 540px; margin: 0 auto 28px; }
+    .agents-stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+    .agents-stat { font-size: 13px; color: rgba(255,255,255,.65); display: flex; align-items: center; gap: 6px; }
+    .agents-stat strong { color: #fff; }
+
+    /* ── Filter bar ── */
+    .agents-filter { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 32px 24px 0; }
+    .filter-btn { padding: 8px 18px; border-radius: 9999px; border: 1.5px solid var(--hairline); background: var(--surface); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--slate); }
+    .filter-btn.active, .filter-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ── Grid ── */
+    .agents-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
+    .agents-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    @media (max-width: 1100px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .agents-grid { grid-template-columns: 1fr; } }
+
+    /* ── Agent card ── */
+    .agent-wrap { grid-column: span 1; }
+    .agent-wrap.expanded { grid-column: span 1; }
+
+    .agent-card { background: var(--surface); border: 1.5px solid var(--hairline); border-radius: 16px; padding: 22px 20px 18px; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .15s; position: relative; user-select: none; }
+    .agent-card:hover { border-color: var(--primary); box-shadow: 0 4px 20px rgba(110,72,190,.12); transform: translateY(-2px); }
+    .agent-card.open { border-color: var(--primary); box-shadow: 0 4px 20px rgba(110,72,190,.15); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+    .agent-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; flex-shrink: 0; }
+    .agent-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .agent-tagline { font-size: 12px; color: var(--slate); margin-bottom: 14px; line-height: 1.4; }
+    .agent-topics { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+    .agent-topic { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: var(--canvas); color: var(--slate); border: 1px solid var(--hairline); }
+    .agent-cta { display: flex; align-items: center; justify-content: space-between; }
+    .agent-cta span { font-size: 12px; font-weight: 700; color: var(--primary); }
+    .agent-cta .agent-chevron { font-size: 16px; color: var(--slate); transition: transform .2s; }
+    .agent-card.open .agent-chevron { transform: rotate(180deg); }
+    .agent-limit { font-size: 11px; color: var(--slate); opacity: .7; }
+
+    /* ── Inline chat panel ── */
+    .agent-chat { display: none; background: var(--surface); border: 1.5px solid var(--primary); border-top: none; border-radius: 0 0 16px 16px; padding: 0; overflow: hidden; }
+    .agent-chat.open { display: flex; flex-direction: column; }
+
+    .chat-context { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 16px 0; }
+    .chat-context input { border: 1.5px solid var(--hairline); border-radius: 8px; padding: 7px 10px; font-size: 12px; font-family: inherit; color: var(--ink); outline: none; transition: border-color .15s; background: var(--canvas); }
+    .chat-context input:focus { border-color: var(--primary); }
+    .chat-context input::placeholder { color: var(--slate); opacity: .7; }
+
+    .chat-messages { flex: 1; max-height: 280px; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 60px; }
+    .chat-empty { font-size: 13px; color: var(--slate); text-align: center; padding: 16px 0; opacity: .7; }
+
+    .chat-msg { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .chat-msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+    .chat-msg.bot { background: var(--canvas); color: var(--ink); align-self: flex-start; border-bottom-left-radius: 3px; border: 1px solid var(--hairline); }
+    .chat-typing { align-self: flex-start; display: flex; gap: 4px; padding: 9px 12px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: 12px; border-bottom-left-radius: 3px; }
+    .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); opacity: .4; animation: chatDot 1.2s infinite; }
+    .chat-typing span:nth-child(2) { animation-delay: .2s; }
+    .chat-typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes chatDot { 0%,60%,100%{opacity:.4;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)} }
+
+    .chat-form { display: flex; gap: 8px; align-items: flex-end; padding: 10px 16px 14px; border-top: 1px solid var(--hairline); }
+    .chat-input { flex: 1; border: 1.5px solid var(--hairline); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-family: inherit; resize: none; outline: none; line-height: 1.4; max-height: 80px; overflow-y: auto; transition: border-color .15s; color: var(--ink); background: var(--canvas); }
+    .chat-input:focus { border-color: var(--primary); }
+    .chat-send { background: var(--primary); border: none; border-radius: 10px; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .15s; }
+    .chat-send:disabled { opacity: .4; cursor: default; }
+    .chat-send svg { width: 15px; height: 15px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .chat-footer { text-align: center; padding: 0 16px 10px; font-size: 11px; color: var(--slate); }
+
+    /* ── CTA banner ── */
+    .agents-cta { background: linear-gradient(135deg, #0E1830 0%, #1a1060 100%); color: #fff; border-radius: 20px; padding: 48px 40px; text-align: center; margin-top: 48px; }
+    .agents-cta h2 { font-size: clamp(22px,3vw,32px); font-weight: 800; letter-spacing: -.5px; margin-bottom: 12px; }
+    .agents-cta p { font-size: 15px; color: rgba(255,255,255,.7); margin-bottom: 24px; }
+    @media (max-width: 600px) { .agents-cta { padding: 32px 20px; } .chat-context { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-to-main">Aller au contenu principal</a>
+<div id="emp-scroll-prog"></div>
+
+<header class="emp-nav">
+  <div class="container emp-nav-inner">
+    <div style="display:flex;align-items:center;gap:36px">
+      <a href="/" class="emp-brand">
+        <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+        EmploiA
+      </a>
+      <nav class="emp-nav-links">
+        <a href="/jobs">Offres</a>
+        <a href="/app">Générateur CV</a>
+        <a href="/agents" style="color:var(--primary);font-weight:700">Agents IA</a>
+        <a href="/tools">Outils</a>
+        <a href="/chat">Orion IA</a>
+        <a href="/#pricing">Tarifs</a>
+      </nav>
+    </div>
+    <div class="emp-nav-right" style="display:flex;align-items:center;gap:10px">
+      <a href="/app" class="emp-btn emp-btn-ghost" style="display:none" id="navLoginBtn">Se connecter</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres</a>
+  <a href="/app">Générateur CV</a>
+  <a href="/agents">Agents IA</a>
+  <a href="/tools">Outils</a>
+  <a href="/chat">Orion IA</a>
+  <a href="/#pricing">Tarifs</a>
+</nav>
+
+<main id="main-content">
+<section class="agents-hero">
+  <div class="agents-hero-inner">
+    <div class="agents-eyebrow">✦ 12 experts IA spécialisés</div>
+    <h1>Votre équipe d'experts,<br/>disponible <span style="background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">24h/24.</span></h1>
+    <p>Droit du travail, finance, marketing, tech, data, RH — chaque domaine a son expert IA. Posez vos questions professionnelles en français, obtenez des réponses en 30 secondes.</p>
+    <div class="agents-stats">
+      <span class="agents-stat"><strong>12</strong> spécialistes</span>
+      <span class="agents-stat">·</span>
+      <span class="agents-stat"><strong>30s</strong> de réponse</span>
+      <span class="agents-stat">·</span>
+      <span class="agents-stat"><strong>100%</strong> en français</span>
+      <span class="agents-stat">·</span>
+      <span class="agents-stat"><strong>RGPD</strong> conforme</span>
+    </div>
+  </div>
+</section>
+
+<div class="agents-filter">
+  <button class="filter-btn active" data-filter="all">Tous</button>
+  <button class="filter-btn" data-filter="juridique">Juridique</button>
+  <button class="filter-btn" data-filter="finance">Finance</button>
+  <button class="filter-btn" data-filter="marketing">Marketing</button>
+  <button class="filter-btn" data-filter="operations">Opérations</button>
+  <button class="filter-btn" data-filter="tech">Tech & Data</button>
+  <button class="filter-btn" data-filter="people">RH & CX</button>
+</div>
+
+<div class="agents-container">
+  <div class="agents-grid" id="agentsGrid"></div>
+
+  <div class="agents-cta">
+    <h2>Générations illimitées avec Pro</h2>
+    <p>Les utilisateurs gratuits peuvent poser 5 questions par heure par agent. Passez Pro pour 20 questions/heure sans limite.</p>
+    <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Essayer Pro gratuitement 14 jours →</a>
+    <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.5)">Sans carte bancaire · Annulable à tout moment</div>
+  </div>
+</div>
+</main>
+
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div>
+        <div class="emp-brand" style="margin-bottom:14px">
+          <span class="emp-brand-mark"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+          EmploiA
+        </div>
+        <div class="emp-footer-tagline">Le copilote de candidature 100% français.<br/>Fait à Paris · Hébergé en France.</div>
+      </div>
+      <div class="emp-footer-col"><h5>Agents IA</h5><a href="/agents">Tous les agents</a><a href="/agents#legal">Droit du travail</a><a href="/agents#finance">Finance</a><a href="/agents#marketing">Marketing</a><a href="/agents#tech">Tech</a></div>
+      <div class="emp-footer-col"><h5>Produit</h5><a href="/app">Générateur CV</a><a href="/tools">Outils IA</a><a href="/chat">Orion IA Chat</a><a href="/jobs">800k offres</a></div>
+      <div class="emp-footer-col"><h5>Mentions</h5><a href="/legal">Confidentialité</a><a href="/legal">CGU</a><a href="/contact">Contact</a></div>
+    </div>
+    <div class="emp-footer-bot"><div>© <span data-year></span> EmploiA SAS · Tous droits réservés</div></div>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
+<script>
+const AGENTS = [
+  {
+    id: 'legal', name: 'Maître Orion', icon: '⚖️', color: '#FEE2E2', iconColor: '#DC2626',
+    tagline: 'Droit du travail français', category: 'juridique',
+    topics: ['CDI / CDD / rupture', 'Conventions collectives', 'Prud\'hommes & indemnités'],
+    params: [
+      { key: 'contractType', placeholder: 'Type de contrat (ex: CDI)' },
+      { key: 'sector', placeholder: 'Secteur (ex: Tech)' }
+    ],
+    tip: 'Ex : "Quelle est mon indemnité de rupture conventionnelle après 4 ans ?"'
+  },
+  {
+    id: 'finance', name: 'Orion Finance', icon: '📊', color: '#DCFCE7', iconColor: '#16A34A',
+    tagline: 'Finance, comptabilité & marchés', category: 'finance',
+    topics: ['Analyse financière & ratios', 'M&A · DCF · LBO', 'Contrôle de gestion'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'role', placeholder: 'Poste visé' }
+    ],
+    tip: 'Ex : "Comment calculer l\'EV/EBITDA et l\'interpréter pour une biotech ?"'
+  },
+  {
+    id: 'marketing', name: 'Orion Marketing', icon: '📣', color: '#FEF3C7', iconColor: '#D97706',
+    tagline: 'Marketing, growth & acquisition', category: 'marketing',
+    topics: ['SEO / SEA / Paid', 'Growth & AARRR', 'Analytics & CRO'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'channel', placeholder: 'Canal principal' }
+    ],
+    tip: 'Ex : "Comment réduire mon CAC Google Ads de 30% sans couper le budget ?"'
+  },
+  {
+    id: 'operation', name: 'Orion Ops', icon: '⚙️', color: '#F3E8FF', iconColor: '#7C3AED',
+    tagline: 'Opérations, Lean & excellence', category: 'operations',
+    topics: ['Lean · Six Sigma · PDCA', 'KPIs opérationnels', 'Budget & make-or-buy'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur (ex: Industrie)' },
+      { key: 'role', placeholder: 'Poste visé' }
+    ],
+    tip: 'Ex : "Comment implémenter un système Kanban pour une équipe de 15 personnes ?"'
+  },
+  {
+    id: 'supply-chain', name: 'Orion Supply', icon: '🚚', color: '#CFFAFE', iconColor: '#0891B2',
+    tagline: 'Supply chain & logistique', category: 'operations',
+    topics: ['MRP / DDMRP / stocks', 'Achats & incoterms', 'OTIF · fill rate · TCO'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'scope', placeholder: 'Périmètre (ex: Achats)' }
+    ],
+    tip: 'Ex : "Quelle méthode de gestion des stocks pour un produit saisonnier à forte variabilité ?"'
+  },
+  {
+    id: 'compliance', name: 'Orion Comply', icon: '🛡️', color: '#F1F5F9', iconColor: '#334155',
+    tagline: 'Conformité & réglementation', category: 'juridique',
+    topics: ['RGPD · CNIL · DPO', 'Sapin II · ISO 27001', 'CSRD · NIS2 · DORA'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'regulation', placeholder: 'Réglementation (ex: RGPD)' }
+    ],
+    tip: 'Ex : "Quelles sont les obligations RGPD pour une startup SaaS B2B qui traite des données de ses clients ?"'
+  },
+  {
+    id: 'customer-experience', name: 'Orion CX', icon: '⭐', color: '#FEF9C3', iconColor: '#CA8A04',
+    tagline: 'Expérience client & satisfaction', category: 'people',
+    topics: ['NPS · CSAT · CES', 'Customer journey', 'Churn & rétention'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'channel', placeholder: 'Canal CX principal' }
+    ],
+    tip: 'Ex : "Comment interpréter un NPS de 32 dans le SaaS B2C et quelles actions prioriser ?"'
+  },
+  {
+    id: 'hr', name: 'Orion RH', icon: '👥', color: '#FCE7F3', iconColor: '#BE185D',
+    tagline: 'Ressources humaines & talents', category: 'people',
+    topics: ['Recrutement & sourcing', 'GEPP · formation · CPF', 'Droit social employeur'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur' },
+      { key: 'companySize', placeholder: 'Taille entreprise' }
+    ],
+    tip: 'Ex : "Comment structurer un entretien comportemental en méthode STAR pour un poste de manager ?"'
+  },
+  {
+    id: 'tech', name: 'Orion Tech', icon: '💻', color: '#EFF6FF', iconColor: '#1D4ED8',
+    tagline: 'Architecture, dev & DevOps', category: 'tech',
+    topics: ['Architecture & design patterns', 'Cloud · Docker · K8s', 'Sécurité & OWASP'],
+    params: [
+      { key: 'stack', placeholder: 'Stack (ex: Node.js, AWS)' },
+      { key: 'role', placeholder: 'Poste visé' }
+    ],
+    tip: 'Ex : "Quels trade-offs entre microservices et monolithe modulaire pour une équipe de 5 devs ?"'
+  },
+  {
+    id: 'data', name: 'Orion Data', icon: '📈', color: '#FFF7ED', iconColor: '#C2410C',
+    tagline: 'Data science, BI & analytics', category: 'tech',
+    topics: ['ML · NLP · Deep learning', 'SQL · dbt · BigQuery', 'A/B testing & stats'],
+    params: [
+      { key: 'domain', placeholder: 'Domaine data' },
+      { key: 'stack', placeholder: 'Stack (ex: Python, dbt)' }
+    ],
+    tip: 'Ex : "Comment détecter et corriger le data drift sur un modèle de scoring de crédit en production ?"'
+  },
+  {
+    id: 'sales', name: 'Orion Sales', icon: '💰', color: '#ECFDF5', iconColor: '#059669',
+    tagline: 'Sales, conversion & négociation', category: 'marketing',
+    topics: ['Emails de conversion', 'Argumentaire & objections', 'Négociation & closing'],
+    params: [
+      { key: 'sector', placeholder: 'Secteur cible' },
+      { key: 'role', placeholder: 'Poste visé' }
+    ],
+    tip: 'Ex : "Rédige un email de relance pour un prospect SaaS qui n\'a pas répondu depuis 10 jours."'
+  },
+  {
+    id: 'support', name: 'Orion Support', icon: '💬', color: '#F5F3FF', iconColor: '#6E48BE',
+    tagline: 'Aide sur EmploiA', category: 'people',
+    topics: ['Fonctionnalités EmploiA', 'Plans & abonnements', 'Problèmes techniques'],
+    params: [],
+    tip: 'Ex : "Comment fonctionne le score ATS et comment l\'améliorer ?"'
+  },
+];
+
+let openId = null;
+const chats = {};
+
+function buildGrid(filter) {
+  const grid = document.getElementById('agentsGrid');
+  grid.innerHTML = '';
+  const filtered = filter === 'all' ? AGENTS : AGENTS.filter(a => a.category === filter);
+  filtered.forEach(agent => {
+    const wrap = document.createElement('div');
+    wrap.className = 'agent-wrap';
+    wrap.id = `wrap-${agent.id}`;
+
+    const contextInputs = agent.params.map(p =>
+      `<input type="text" id="ctx-${agent.id}-${p.key}" placeholder="${p.placeholder}" maxlength="80" autocomplete="off"/>`
+    ).join('');
+
+    wrap.innerHTML = `
+      <div class="agent-card" id="card-${agent.id}" onclick="toggleChat('${agent.id}')" role="button" aria-expanded="false" tabindex="0">
+        <div class="agent-icon" style="background:${agent.color}"><span style="font-size:22px">${agent.icon}</span></div>
+        <div class="agent-name">${agent.name}</div>
+        <div class="agent-tagline">${agent.tagline}</div>
+        <div class="agent-topics">${agent.topics.map(t => `<span class="agent-topic">${t}</span>`).join('')}</div>
+        <div class="agent-cta">
+          <span>Consulter →</span>
+          <span class="agent-chevron">▾</span>
+        </div>
+      </div>
+      <div class="agent-chat" id="chat-${agent.id}">
+        ${agent.params.length ? `<div class="chat-context">${contextInputs}</div>` : ''}
+        <div class="chat-messages" id="msgs-${agent.id}">
+          <div class="chat-empty" id="empty-${agent.id}">${agent.tip}</div>
+        </div>
+        <form class="chat-form" onsubmit="sendMsg(event,'${agent.id}')">
+          <textarea class="chat-input" id="inp-${agent.id}" placeholder="Votre question…" rows="1" aria-label="Question"></textarea>
+          <button type="submit" class="chat-send" id="send-${agent.id}" aria-label="Envoyer">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+        <div class="chat-footer">
+          <span id="limit-${agent.id}" style="color:var(--slate);opacity:.7">5 questions/h · <a href="/app" style="color:var(--primary);text-decoration:none;font-weight:600">Pro : 20/h illimités</a></span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(wrap);
+
+    const inp = document.getElementById(`inp-${agent.id}`);
+    if (inp) {
+      inp.addEventListener('input', () => {
+        inp.style.height = 'auto';
+        inp.style.height = Math.min(inp.scrollHeight, 80) + 'px';
+      });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById(`send-${agent.id}`)?.click(); }
+      });
+    }
+  });
+}
+
+function toggleChat(id) {
+  const card = document.getElementById(`card-${id}`);
+  const chat = document.getElementById(`chat-${id}`);
+  if (!card || !chat) return;
+  const isOpen = card.classList.contains('open');
+
+  if (openId && openId !== id) {
+    const prevCard = document.getElementById(`card-${openId}`);
+    const prevChat = document.getElementById(`chat-${openId}`);
+    prevCard?.classList.remove('open');
+    prevChat?.classList.remove('open');
+    prevCard?.setAttribute('aria-expanded', 'false');
+  }
+
+  card.classList.toggle('open', !isOpen);
+  chat.classList.toggle('open', !isOpen);
+  card.setAttribute('aria-expanded', String(!isOpen));
+  openId = !isOpen ? id : null;
+
+  if (!isOpen) {
+    setTimeout(() => {
+      document.getElementById(`inp-${id}`)?.focus();
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+}
+
+function addMsg(agentId, text, who) {
+  const msgs = document.getElementById(`msgs-${agentId}`);
+  const empty = document.getElementById(`empty-${agentId}`);
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = `chat-msg ${who}`;
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendMsg(e, agentId) {
+  e.preventDefault();
+  const inp = document.getElementById(`inp-${agentId}`);
+  const send = document.getElementById(`send-${agentId}`);
+  const msgs = document.getElementById(`msgs-${agentId}`);
+  const q = inp.value.trim();
+  if (!q || send.disabled) return;
+
+  send.disabled = true;
+  addMsg(agentId, q, 'user');
+  inp.value = '';
+  inp.style.height = 'auto';
+
+  const agent = AGENTS.find(a => a.id === agentId);
+  const body = { question: q };
+  agent?.params.forEach(p => {
+    const val = document.getElementById(`ctx-${agentId}-${p.key}`)?.value.trim();
+    if (val) body[p.key] = val;
+  });
+
+  const typing = document.createElement('div');
+  typing.className = 'chat-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res = await fetch(`/api/agent/${agentId}`, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    typing.remove();
+    if (res.status === 429) {
+      addMsg(agentId, '⚠️ Limite atteinte. <a href="/app" style="color:var(--primary)">Passez Pro</a> pour 20 questions/heure.', 'bot');
+    } else {
+      addMsg(agentId, data.answer || 'Impossible de répondre. Réessayez.', 'bot');
+    }
+  } catch {
+    typing.remove();
+    addMsg(agentId, 'Service momentanément indisponible. Réessayez dans quelques secondes.', 'bot');
+  } finally {
+    send.disabled = false;
+    inp.focus();
+  }
+}
+
+/* Filter */
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    openId = null;
+    buildGrid(btn.dataset.filter);
+  });
+});
+
+/* Init */
+buildGrid('all');
+
+/* Update limit label when user is Pro */
+window.addEventListener('empUserLoaded', e => {
+  const u = e.detail;
+  if (u && u.plan && u.plan !== 'free') {
+    document.querySelectorAll('[id^="limit-"]').forEach(el => {
+      el.innerHTML = `<span style="color:var(--brand-green);font-weight:600">✓ Pro · 20 questions/heure</span>`;
+    });
+  }
+});
+
+/* Keyboard nav on cards */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.classList.contains('agent-card')) {
+    const id = e.target.id.replace('card-', '');
+    toggleChat(id);
+  }
+});
+</script>
+</body>
+</html>
