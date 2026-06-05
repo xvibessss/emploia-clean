@@ -662,3 +662,40 @@ async function empAuthInit() {
     });
   });
 })();
+
+// ── SCROLL TO TOP ────────────────────────────────────────────────────
+(function(){
+  const btn = document.createElement('button');
+  btn.id = 'emp-scroll-top';
+  btn.setAttribute('aria-label', 'Retour en haut');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="18 15 12 9 6 15"/></svg>';
+  btn.style.cssText = 'position:fixed;bottom:24px;left:20px;z-index:9000;width:40px;height:40px;border-radius:50%;background:var(--primary,#6E48BE);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(110,72,190,.35);opacity:0;transform:translateY(12px) scale(.9);transition:opacity .2s,transform .2s;pointer-events:none;';
+  document.body.appendChild(btn);
+  window.addEventListener('scroll', function(){
+    const visible = window.scrollY > 320;
+    btn.style.opacity = visible ? '1' : '0';
+    btn.style.transform = visible ? 'translateY(0) scale(1)' : 'translateY(12px) scale(.9)';
+    btn.style.pointerEvents = visible ? 'auto' : 'none';
+  }, { passive: true });
+  btn.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+// ── CTRL+ENTER / CMD+ENTER → SUBMIT ─────────────────────────────────
+(function(){
+  document.addEventListener('keydown', function(e){
+    if (!(e.ctrlKey || e.metaKey) || e.key !== 'Enter') return;
+    const active = document.activeElement;
+    if (!active || active.tagName !== 'TEXTAREA') return;
+    // Look for the nearest submit button
+    const form = active.closest('form');
+    if (form) {
+      const submit = form.querySelector('[type="submit"], button:not([type="button"])');
+      if (submit && !submit.disabled) { e.preventDefault(); submit.click(); return; }
+    }
+    // Fallback: look for a prominent generate/send button in the page
+    const gen = document.querySelector('#generateBtn, #genBtn, [data-action="generate"], .chat-send, button[onclick*="generate"], button[onclick*="send"]');
+    if (gen && !gen.disabled) { e.preventDefault(); gen.click(); }
+  });
+})();
