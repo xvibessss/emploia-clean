@@ -395,6 +395,41 @@ export default function handler(req, res) {
       pubDate: 'Mon, 25 May 2026 09:00:00 +0200',
       category: 'Salaire & Négociation',
     },
+    {
+      title: 'CV Product Manager 2026 : modèle, compétences et exemples',
+      link: `${base}/blog/cv-product-manager-2026`,
+      description: 'Structure idéale, compétences différenciantes par type de PM (Technique, Growth, B2B), formulations avant/après avec KPIs et erreurs fréquentes à éviter.',
+      pubDate: 'Tue, 03 Jun 2026 09:00:00 +0200',
+      category: 'CV & Candidature',
+    },
+    {
+      title: 'CV Chef de Projet 2026 : guide complet + exemples',
+      link: `${base}/blog/cv-chef-de-projet-2026`,
+      description: 'Sections indispensables, certifications PMP/Prince2/PSM, formulations avec budget/équipe/délai et tableau comparatif CDP IT / Marketing / BTP / DSI.',
+      pubDate: 'Tue, 03 Jun 2026 10:00:00 +0200',
+      category: 'CV & Candidature',
+    },
+    {
+      title: 'CV Marketing Digital 2026 : modèle, compétences et exemples',
+      link: `${base}/blog/cv-marketing-digital-2026`,
+      description: 'SEO, SEA, Social, Growth — les 4 profils marketing digital, les outils à mentionner, les KPIs qui convainquent et les certifications qui comptent.',
+      pubDate: 'Tue, 03 Jun 2026 11:00:00 +0200',
+      category: 'CV & Candidature',
+    },
+    {
+      title: "Questions d'entretien de stage : les 25 plus posées avec réponses (2026)",
+      link: `${base}/blog/questions-entretien-stage`,
+      description: "Les 25 questions les plus posées en entretien de stage — avec réponses types, exemples, guide de préparation en 3 étapes et erreurs qui font recaler.",
+      pubDate: 'Tue, 03 Jun 2026 12:00:00 +0200',
+      category: 'Entretien',
+    },
+    {
+      title: 'Salaires dans la tech en France 2026 : le guide complet par métier',
+      link: `${base}/blog/salaires-tech-2026`,
+      description: 'Développeur, Data Scientist, DevOps, Product Manager — les salaires réels dans la tech française en 2026, par niveau, par ville et par type d\'entreprise.',
+      pubDate: 'Tue, 03 Jun 2026 13:00:00 +0200',
+      category: 'Salaire & Négociation',
+    },
   ];
 
   const items = articles.map(a => `
