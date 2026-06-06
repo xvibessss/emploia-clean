@@ -629,14 +629,7 @@
       <div class="sc-body">
         <label class="emp-label" style="margin-bottom:10px">Compétences techniques</label>
         <div class="skills-wrap" id="skillsWrap">
-          <span class="skill-tag"><span class="skill-level-dot level-expert"></span>React<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-expert"></span>TypeScript<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Node.js<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>PostgreSQL<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Docker<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>GraphQL<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>AWS<span class="remove" onclick="removeSkill(this)">✕</span></span>
-          <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>Git<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <span id="skillsEmpty" style="font-size:12px;color:var(--slate);padding:4px 0">Aucune compétence — tapez ci-dessous pour en ajouter.</span>
         </div>
         <div class="skill-input-row">
           <input type="text" class="emp-input" id="skillInput" placeholder="Ajouter une compétence..." style="flex:1"/>
@@ -645,10 +638,12 @@
 
         <div style="margin-top:24px">
           <label class="emp-label" style="margin-bottom:10px">Langues</label>
-          <div class="skills-wrap">
-            <span class="skill-tag"><span class="skill-level-dot level-expert"></span>Français (natif)<span class="remove" onclick="removeSkill(this)">✕</span></span>
-            <span class="skill-tag"><span class="skill-level-dot level-advanced"></span>Anglais (C1)<span class="remove" onclick="removeSkill(this)">✕</span></span>
-            <span class="skill-tag"><span class="skill-level-dot level-intermediate"></span>Espagnol (B2)<span class="remove" onclick="removeSkill(this)">✕</span></span>
+          <div class="skills-wrap" id="langWrap">
+            <span id="langEmpty" style="font-size:12px;color:var(--slate);padding:4px 0">Aucune langue — tapez ci-dessous pour en ajouter.</span>
+          </div>
+          <div class="skill-input-row">
+            <input type="text" class="emp-input" id="langInput" placeholder="ex. Anglais (C1), Espagnol (B2)..." style="flex:1"/>
+            <button class="btn btn-secondary" onclick="addLang()">Ajouter</button>
           </div>
         </div>
 
@@ -671,50 +666,51 @@
     <div class="section-card" id="sec-preferences" style="display:none">
       <div class="sc-header">
         <div class="sc-title">🎯 Préférences de recherche</div>
+        <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="openPrefsModal()">✏️ Modifier</button>
       </div>
       <div class="sc-body">
         <div class="pref-grid">
           <div class="pref-item">
             <div>
               <div class="pref-label">Type de contrat</div>
-              <div class="pref-value">CDI · CDD</div>
+              <div class="pref-value" id="prefContrat">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
           <div class="pref-item">
             <div>
               <div class="pref-label">Salaire souhaité</div>
-              <div class="pref-value">45 000 — 60 000 €</div>
+              <div class="pref-value" id="prefSalaire">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
           <div class="pref-item">
             <div>
               <div class="pref-label">Localisation</div>
-              <div class="pref-value">Paris · Remote</div>
+              <div class="pref-value" id="prefLoc">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
           <div class="pref-item">
             <div>
               <div class="pref-label">Secteur</div>
-              <div class="pref-value">Tech · SaaS · FinTech</div>
+              <div class="pref-value" id="prefSecteur">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
           <div class="pref-item">
             <div>
               <div class="pref-label">Disponibilité</div>
-              <div class="pref-value">Dans 1 mois</div>
+              <div class="pref-value" id="prefDispo">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
           <div class="pref-item">
             <div>
               <div class="pref-label">Niveau d'expérience</div>
-              <div class="pref-value">Junior · Confirmé</div>
+              <div class="pref-value" id="prefNiveau">—</div>
             </div>
-            <button class="icon-btn">✏️</button>
+            <button class="icon-btn" onclick="openPrefsModal()">✏️</button>
           </div>
         </div>
 
@@ -724,7 +720,7 @@
               <div style="font-size:13px;font-weight:600;color:var(--ink)">Alertes email nouvelles offres</div>
               <div style="font-size:11px;color:var(--steel);margin-top:2px">Recevez les offres correspondant à vos critères</div>
             </div>
-            <div class="emp-toggle on" id="alertToggle" onclick="this.classList.toggle('on')">
+            <div class="emp-toggle" id="alertToggle" onclick="togglePref('alertToggle','alertEmails')">
               <div class="emp-toggle-knob"></div>
             </div>
           </div>
@@ -733,7 +729,7 @@
               <div style="font-size:13px;font-weight:600;color:var(--ink)">Profil visible aux recruteurs</div>
               <div style="font-size:11px;color:var(--steel);margin-top:2px">Les recruteurs peuvent vous contacter directement</div>
             </div>
-            <div class="emp-toggle" id="visibleToggle" onclick="this.classList.toggle('on')">
+            <div class="emp-toggle" id="visibleToggle" onclick="togglePref('visibleToggle','profileVisible')">
               <div class="emp-toggle-knob"></div>
             </div>
           </div>
@@ -811,6 +807,69 @@
 
 <!-- BOTTOM NAV -->
 
+
+<!-- ── MODAL: Préférences ────────────────────────────────────── -->
+<dialog id="prefsModal" style="border:none;border-radius:16px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(0,0,0,.18);background:var(--surface)">
+  <div style="padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:16px;font-weight:700;color:var(--ink)">🎯 Préférences de recherche</div>
+    <button type="button" onclick="document.getElementById('prefsModal').close()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--slate);padding:4px">✕</button>
+  </div>
+  <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+    <div class="form-group" style="margin:0">
+      <label class="emp-label">Type de contrat</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="contractTypes">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="CDI"/> CDI</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="CDD"/> CDD</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Stage"/> Stage</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Alternance"/> Alternance</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Freelance"/> Freelance</label>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group" style="margin:0">
+        <label class="emp-label">Salaire min (€/an)</label>
+        <input type="number" class="emp-input" id="prefSalaireMin" placeholder="ex. 40000" step="1000"/>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="emp-label">Salaire max (€/an)</label>
+        <input type="number" class="emp-input" id="prefSalaireMax" placeholder="ex. 60000" step="1000"/>
+      </div>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="emp-label">Localisation</label>
+      <input type="text" class="emp-input" id="prefLocInput" placeholder="ex. Paris, Lyon, Remote…"/>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="emp-label">Secteur(s)</label>
+      <input type="text" class="emp-input" id="prefSecteurInput" placeholder="ex. Tech, Finance, Santé…"/>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="emp-label">Disponibilité</label>
+      <select class="emp-input" id="prefDispoSelect">
+        <option value="">— Sélectionner —</option>
+        <option>Immédiatement</option>
+        <option>Dans 1 mois</option>
+        <option>Dans 2 mois</option>
+        <option>Dans 3 mois</option>
+        <option>Dans 6 mois</option>
+        <option>En poste, ouvert aux opportunités</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0">
+      <label class="emp-label">Niveau d'expérience</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="expLevels">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Junior"/> Junior (0–3 ans)</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Confirmé"/> Confirmé (3–7 ans)</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Senior"/> Senior (7+ ans)</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" value="Expert"/> Expert / Lead</label>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 24px 24px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--hairline)">
+    <button type="button" class="emp-btn emp-btn-ghost emp-btn-sm" onclick="document.getElementById('prefsModal').close()">Annuler</button>
+    <button type="button" class="emp-btn emp-btn-primary emp-btn-sm" onclick="savePrefs()">Enregistrer</button>
+  </div>
+</dialog>
 
 <!-- ── MODAL: Expérience ─────────────────────────────────────── -->
 <dialog id="expModal" style="border:none;border-radius:16px;padding:0;max-width:540px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(0,0,0,.18);background:var(--surface)">
@@ -948,6 +1007,8 @@
     const input = document.getElementById('skillInput');
     const val = input.value.trim();
     if (!val) return;
+    const empty = document.getElementById('skillsEmpty');
+    if (empty) empty.remove();
     const tag = document.createElement('span');
     tag.className = 'skill-tag';
     tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${esc(val)}<span class="remove" onclick="removeSkill(this)">✕</span>`;
@@ -1066,6 +1127,28 @@
       }
     }
 
+    if (Array.isArray(data.langs) && data.langs.length) {
+      const wrap = document.getElementById('langWrap');
+      if (wrap) {
+        wrap.innerHTML = '';
+        data.langs.forEach(lang => {
+          const tag = document.createElement('span');
+          tag.className = 'skill-tag';
+          tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${esc(lang)}<span class="remove" onclick="removeSkill(this)">✕</span>`;
+          wrap.appendChild(tag);
+        });
+      }
+    }
+    if (data.preferences && typeof data.preferences === 'object') {
+      _prefs = data.preferences;
+      localStorage.setItem('emploia_prefs', JSON.stringify(_prefs));
+      renderPrefs();
+    }
+    if (data.toggles && typeof data.toggles === 'object') {
+      _toggles = data.toggles;
+      localStorage.setItem('emploia_toggles', JSON.stringify(_toggles));
+      renderToggles();
+    }
     if (Array.isArray(data.experiences) && data.experiences.length) {
       _exps = data.experiences;
       saveExpsToStorage();
@@ -1087,7 +1170,8 @@
   }
 
   function collectProfile() {
-    const skills = [...document.querySelectorAll('.skill-tag')].map(t => (t.querySelector('.skill-name') || t.childNodes[1])?.textContent.trim()).filter(Boolean);
+    const skills = [...document.querySelectorAll('#skillsWrap .skill-tag')].map(t => (t.querySelector('.skill-name') || t.childNodes[1])?.textContent.trim()).filter(Boolean);
+    const langs  = [...document.querySelectorAll('#langWrap .skill-tag')].map(t => (t.querySelector('.skill-name') || t.childNodes[1])?.textContent.trim()).filter(Boolean);
     return {
       firstName:   document.getElementById('prfFirstName')?.value.trim() || '',
       lastName:    document.getElementById('prfLastName')?.value.trim() || '',
@@ -1098,8 +1182,11 @@
       linkedin:    document.getElementById('prfLinkedin')?.value.trim() || '',
       portfolio:   document.getElementById('prfPortfolio')?.value.trim() || '',
       skills,
+      langs,
       experiences: _exps,
       formations:  _forms,
+      preferences: typeof _prefs   !== 'undefined' ? _prefs   : {},
+      toggles:     typeof _toggles !== 'undefined' ? _toggles : {},
     };
   }
 
@@ -1311,6 +1398,94 @@
     }
     btn.disabled = false; btn.textContent = '✨ Importer dans mon profil';
   }
+
+  // ── Langues ──────────────────────────────────────────────────────────────
+  function addLang() {
+    const input = document.getElementById('langInput');
+    const val = input.value.trim();
+    if (!val) return;
+    const wrap = document.getElementById('langWrap');
+    const empty = document.getElementById('langEmpty');
+    if (empty) empty.remove();
+    const tag = document.createElement('span');
+    tag.className = 'skill-tag';
+    tag.innerHTML = `<span class="skill-level-dot level-beginner"></span>${esc(val)}<span class="remove" onclick="removeSkill(this)">✕</span>`;
+    wrap.appendChild(tag);
+    input.value = '';
+    empToast('Langue ajoutée', 'success');
+  }
+  document.getElementById('langInput').addEventListener('keydown', e => { if (e.key === 'Enter') addLang(); });
+
+  // ── Préférences ──────────────────────────────────────────────────────────
+  let _prefs = JSON.parse(localStorage.getItem('emploia_prefs') || '{}');
+  let _toggles = JSON.parse(localStorage.getItem('emploia_toggles') || '{}');
+
+  function renderPrefs() {
+    const p = _prefs;
+    const contracts = Array.isArray(p.contracts) && p.contracts.length ? p.contracts.join(' · ') : '—';
+    const salaire = p.salaireMin || p.salaireMax
+      ? [(p.salaireMin ? p.salaireMin.toLocaleString('fr-FR') + ' €' : ''), (p.salaireMax ? p.salaireMax.toLocaleString('fr-FR') + ' €' : '')].filter(Boolean).join(' — ')
+      : '—';
+    const levels = Array.isArray(p.levels) && p.levels.length ? p.levels.join(' · ') : '—';
+    document.getElementById('prefContrat').textContent  = contracts;
+    document.getElementById('prefSalaire').textContent  = salaire;
+    document.getElementById('prefLoc').textContent      = p.location   || '—';
+    document.getElementById('prefSecteur').textContent  = p.secteur    || '—';
+    document.getElementById('prefDispo').textContent    = p.dispo      || '—';
+    document.getElementById('prefNiveau').textContent   = levels;
+  }
+
+  function renderToggles() {
+    const at = document.getElementById('alertToggle');
+    const vt = document.getElementById('visibleToggle');
+    if (at) at.classList.toggle('on', !!_toggles.alertEmails);
+    if (vt) vt.classList.toggle('on', !!_toggles.profileVisible);
+  }
+
+  function togglePref(elId, key) {
+    _toggles[key] = !_toggles[key];
+    document.getElementById(elId).classList.toggle('on', _toggles[key]);
+    localStorage.setItem('emploia_toggles', JSON.stringify(_toggles));
+  }
+
+  function openPrefsModal() {
+    const p = _prefs;
+    // Contracts checkboxes
+    document.querySelectorAll('#contractTypes input[type=checkbox]').forEach(cb => {
+      cb.checked = Array.isArray(p.contracts) && p.contracts.includes(cb.value);
+    });
+    // Levels checkboxes
+    document.querySelectorAll('#expLevels input[type=checkbox]').forEach(cb => {
+      cb.checked = Array.isArray(p.levels) && p.levels.includes(cb.value);
+    });
+    document.getElementById('prefSalaireMin').value  = p.salaireMin  || '';
+    document.getElementById('prefSalaireMax').value  = p.salaireMax  || '';
+    document.getElementById('prefLocInput').value    = p.location    || '';
+    document.getElementById('prefSecteurInput').value = p.secteur    || '';
+    document.getElementById('prefDispoSelect').value = p.dispo       || '';
+    document.getElementById('prefsModal').showModal();
+  }
+
+  function savePrefs() {
+    _prefs = {
+      contracts:  [...document.querySelectorAll('#contractTypes input:checked')].map(c => c.value),
+      salaireMin: parseInt(document.getElementById('prefSalaireMin').value) || null,
+      salaireMax: parseInt(document.getElementById('prefSalaireMax').value) || null,
+      location:   document.getElementById('prefLocInput').value.trim(),
+      secteur:    document.getElementById('prefSecteurInput').value.trim(),
+      dispo:      document.getElementById('prefDispoSelect').value,
+      levels:     [...document.querySelectorAll('#expLevels input:checked')].map(c => c.value),
+    };
+    localStorage.setItem('emploia_prefs', JSON.stringify(_prefs));
+    renderPrefs();
+    document.getElementById('prefsModal').close();
+    empToast('Préférences enregistrées', 'success');
+  }
+
+  document.getElementById('prefsModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+
+  renderPrefs();
+  renderToggles();
 
   // ── Expériences & Formations ─────────────────────────────────────────────
   let _exps  = JSON.parse(localStorage.getItem('emploia_exps')  || '[]');
