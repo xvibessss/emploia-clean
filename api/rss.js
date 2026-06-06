@@ -430,6 +430,27 @@ export default function handler(req, res) {
       pubDate: 'Tue, 03 Jun 2026 13:00:00 +0200',
       category: 'Salaire & Négociation',
     },
+    {
+      title: 'CV infirmier / infirmière 2026 : modèle, compétences et erreurs à éviter',
+      link: `${base}/blog/cv-infirmier-2026`,
+      description: 'Modèle de CV infirmier(e) optimisé pour hôpitaux, cliniques et EHPAD. RPPS, certifications AFGSU, logiciels de soins (Crossway, DXCare) et formulations avec impact mesurable.',
+      pubDate: 'Sat, 06 Jun 2026 10:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: 'CV comptable 2026 : modèle, compétences et conseils pour décrocher un poste',
+      link: `${base}/blog/cv-comptable-2026`,
+      description: 'Logiciels (SAP, Sage, Cegid), certifications (DCG/DSCG), tableau junior→DAF et formulations avec volume financier. Tout ce qu\'un recruteur comptabilité cherche en 20 secondes.',
+      pubDate: 'Sat, 06 Jun 2026 11:00:00 +0200',
+      category: 'CV & ATS',
+    },
+    {
+      title: 'Lettre de motivation contrat d\'apprentissage 2026 : modèle annoté et conseils',
+      link: `${base}/blog/lettre-motivation-apprentissage`,
+      description: 'Modèle de lettre annoté paragraphe par paragraphe, exemples par secteur (finance, commerce, dev), erreurs qui font rejeter la candidature et conseils pour se démarquer.',
+      pubDate: 'Sat, 06 Jun 2026 12:00:00 +0200',
+      category: 'Lettre de motivation',
+    },
   ];
 
   const items = articles.map(a => `

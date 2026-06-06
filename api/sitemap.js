@@ -117,6 +117,9 @@ export default function handler(req, res) {
     { loc: `${base}/blog/meilleurs-sites-emploi-france-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
     { loc: `${base}/blog/cv-data-scientist-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
     { loc: `${base}/blog/lettre-motivation-bts`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-05-27' },
+    { loc: `${base}/blog/cv-infirmier-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-06-06' },
+    { loc: `${base}/blog/cv-comptable-2026`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-06-06' },
+    { loc: `${base}/blog/lettre-motivation-apprentissage`, changefreq: 'monthly', priority: '0.9', lastmod: '2026-06-06' },
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
