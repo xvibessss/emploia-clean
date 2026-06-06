@@ -460,7 +460,7 @@ export default function handler(req, res) {
       <guid isPermaLink="true">${a.link}</guid>
       <description><![CDATA[${a.description}]]></description>
       <pubDate>${a.pubDate}</pubDate>
-      <category>${a.category}</category>
+      <category>${a.category.replace(/&/g, '&amp;')}</category>
       <author>contact@emploia.fr (Emploia)</author>
     </item>`).join('');
 
