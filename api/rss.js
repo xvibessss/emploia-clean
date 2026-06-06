@@ -453,13 +453,25 @@ export default function handler(req, res) {
     },
   ];
 
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+  const toRFC822 = raw => {
+    const cleaned = raw.replace(/^\w+,\s*/, '');
+    // Parse date components directly to avoid timezone drift
+    const m = cleaned.match(/^(\d{1,2})\s+(\w{3})\s+(\d{4})/);
+    if (!m) return raw;
+    const utcDate = Date.UTC(parseInt(m[3]), MONTHS[m[2]], parseInt(m[1]));
+    if (isNaN(utcDate)) return raw;
+    return `${DAYS[new Date(utcDate).getUTCDay()]}, ${cleaned}`;
+  };
+
   const items = articles.map(a => `
     <item>
       <title><![CDATA[${a.title}]]></title>
       <link>${a.link}</link>
       <guid isPermaLink="true">${a.link}</guid>
       <description><![CDATA[${a.description}]]></description>
-      <pubDate>${a.pubDate}</pubDate>
+      <pubDate>${toRFC822(a.pubDate)}</pubDate>
       <category>${a.category.replace(/&/g, '&amp;')}</category>
       <author>contact@emploia.fr (Emploia)</author>
     </item>`).join('');
