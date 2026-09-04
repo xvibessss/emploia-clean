@@ -322,9 +322,15 @@ const ALLOWED_ORIGINS = [
   'https://emploia-clean.vercel.app',
 ];
 
+// Only THIS project's Vercel preview deployments, e.g.
+// https://emploia-clean-<hash>-xvibessss-projects.vercel.app
+const PREVIEW_ORIGIN = /^https:\/\/emploia-clean[a-z0-9-]*\.vercel\.app$/;
+
 export function getAllowedOrigin(req) {
   const origin = req.headers.get('origin') || '';
-  // Allow any *.vercel.app preview deployment
-  if (origin.endsWith('.vercel.app') || ALLOWED_ORIGINS.includes(origin)) return origin;
+  // Reflect credentialed CORS only for our own origins + our own preview deploys.
+  // (Previously any *.vercel.app was reflected — anyone can deploy there, so with
+  // Allow-Credentials that was a needless cross-origin exposure.)
+  if (ALLOWED_ORIGINS.includes(origin) || PREVIEW_ORIGIN.test(origin)) return origin;
   return ALLOWED_ORIGINS[0]; // default to production
 }
