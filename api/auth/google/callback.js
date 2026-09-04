@@ -56,6 +56,11 @@ export default async function handler(req) {
 
     const email = googleUser.email?.toLowerCase();
     if (!email) throw new Error('No email returned by Google');
+    // Reject an explicitly-unverified Google email: otherwise someone could sign in
+    // (and be matched onto an existing account) with an email they don't actually own.
+    if (googleUser.verified_email === false) {
+      return new Response(null, { status: 302, headers: { Location: '/?error=email_unverified' } });
+    }
 
     // Find or create user
     let user = await kvGet(`user:${email}`);
