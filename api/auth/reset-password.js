@@ -46,7 +46,10 @@ export default async function handler(req) {
 
   const salt = await generateSalt();
   const passwordHash = await hashPassword(password, salt);
-  await kvSet(`user:${resetData.email}`, { ...user, passwordHash, passwordSalt: salt });
+  // passwordChangedAt invalidates any pre-existing JWT (getCurrentUser rejects tokens
+  // issued before it) — a reset is the recovery path after compromise, so it must kick
+  // out an attacker's active session, exactly like change-password already does.
+  await kvSet(`user:${resetData.email}`, { ...user, passwordHash, passwordSalt: salt, passwordChangedAt: new Date().toISOString() });
   await kvDel(`reset:${token}`);
 
   const authToken = await signToken(user.id);
