@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser, incrementGenerations, FREE_LIMIT } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, withTimeout, getCurrentUser, incrementGenerations, refundGeneration, FREE_LIMIT } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -91,6 +91,7 @@ Réponds UNIQUEMENT en JSON valide :
     if (!result?.direct) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
+    await refundGeneration(user);
     return new Response(JSON.stringify({ error: 'Erreur réseau' }), { status: 500, headers: H });
   }
 }

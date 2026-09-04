@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, claimFreeGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, htmlEscape } from "../_lib/auth.js";
+import { getCurrentUser, claimFreeGeneration, refundGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -64,6 +64,7 @@ export default async function handler(req) {
     if (!res.ok) {
       const err = await res.text();
       console.error("Cover letter error:", res.status, err.slice(0, 200));
+      await refundGeneration(user);
       return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 502, headers: H_JSON });
     }
 
@@ -123,6 +124,7 @@ export default async function handler(req) {
     return new Response(readable, { status: 200, headers: H_STREAM });
   } catch (err) {
     console.error("Cover letter error:", err);
+    await refundGeneration(user);
     return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H_JSON });
   }
 }
