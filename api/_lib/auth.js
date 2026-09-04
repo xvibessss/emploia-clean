@@ -240,6 +240,16 @@ export async function claimFreeGeneration(user) {
   return { allowed: true, count: newCount };
 }
 
+// Give a free user's generation credit back when the AI call fails AFTER it was
+// claimed/incremented — so a provider error or timeout doesn't burn one of their 5.
+// No-op for paid users (they aren't metered on this counter). Call it only on an
+// error path, never after a successful generation.
+export async function refundGeneration(user) {
+  if (user && (!user.plan || user.plan === 'free')) {
+    try { await kvDecr(`gen:${user.email}`); } catch {}
+  }
+}
+
 // ── INPUT VALIDATION ────────────────────────────────────────────────────────
 export function validateEmail(email) {
   return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email) && email.length <= 254;

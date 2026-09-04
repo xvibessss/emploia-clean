@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, claimFreeGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout, htmlEscape } from "../_lib/auth.js";
+import { getCurrentUser, claimFreeGeneration, refundGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -94,6 +94,7 @@ Règles : score entre 40 et 97. Tous les champs en texte simple sans HTML. Sois 
 
     if (!res.ok) {
       console.error("ATS score error:", res.status);
+      await refundGeneration(user);
       return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 502, headers: H });
     }
 
@@ -126,6 +127,7 @@ Règles : score entre 40 et 97. Tous les champs en texte simple sans HTML. Sois 
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch (err) {
     console.error("ATS score error:", err);
+    await refundGeneration(user);
     return new Response(JSON.stringify({ error: "Erreur lors de la génération" }), { status: 500, headers: H });
   }
 }
