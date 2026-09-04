@@ -980,7 +980,7 @@
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Orion IA Copilote chat</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Modèles premium</li>
         </ul>
-        <a href="/app" class="emp-btn emp-btn-primary">Essayer 14 jours gratuits</a>
+        <a href="/app" data-checkout="pro" class="emp-btn emp-btn-primary">Essayer 14 jours gratuits</a>
         <div style="text-align:center;font-size:12px;color:var(--slate);margin-top:8px">Sans carte bancaire</div>
       </div>
 
@@ -996,7 +996,7 @@
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Négociation salariale</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Export multilingue</li>
         </ul>
-        <a href="/app" class="emp-btn emp-btn-secondary">Choisir Intensif</a>
+        <a href="/app" data-checkout="intensif" class="emp-btn emp-btn-secondary">Choisir Intensif</a>
       </div>
 
       <div class="emp-pricing-card reveal" data-delay="4">
@@ -1257,6 +1257,44 @@
 </div>
 
 <script src="/shared.js"></script>
+<script>
+/* Pricing → Stripe Checkout. Wires the Pro/Intensif cards (data-checkout) to
+   /api/stripe-checkout with the right plan key, honoring the annual/monthly
+   toggle. Amounts are whatever the STRIPE_PRICE_* env vars point to — this only
+   chooses which plan. Falls back to /app (the href) if JS/checkout is unavailable. */
+(function () {
+  function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
+  async function startCheckout(plan, btn) {
+    const label = btn.textContent;
+    btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
+    try {
+      const res = await fetch('/api/stripe-checkout', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) { window.location.href = data.url; return; }
+      toast(data.error || 'Le paiement est momentanément indisponible. Réessayez.');
+    } catch (e) {
+      toast('Le paiement est momentanément indisponible. Réessayez.');
+    }
+    btn.style.pointerEvents = ''; btn.removeAttribute('aria-busy'); btn.textContent = label;
+  }
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-checkout]');
+    if (!btn) return;
+    e.preventDefault();
+    const base = btn.getAttribute('data-checkout'); // 'pro' | 'intensif'
+    const track = document.getElementById('billingTrack');
+    const annual = !(track && track.classList.contains('monthly')); // default = annual
+    const plan = annual ? base + '_annual' : base;
+    // Prefer an authenticated checkout so the subscription binds to the account.
+    if (!window.empUser && typeof window.empShowAuth === 'function') { window.empShowAuth('signup'); return; }
+    startCheckout(plan, btn);
+  });
+})();
+</script>
 <script>
 /* ── Scroll progress bar ── */
 (function(){
