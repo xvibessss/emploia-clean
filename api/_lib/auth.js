@@ -204,6 +204,12 @@ export async function getCurrentUser(req) {
   // Falls back to user.generationsUsed for legacy accounts with no gen: key.
   const atomicCount = await kvGet(`gen:${email}`);
   if (typeof atomicCount === 'number') user.generationsUsed = atomicCount;
+  // Time-limited Pro granted internally (e.g. referral rewards) — no Stripe sub.
+  // Computed at read-time so it auto-expires; only ever upgrades a free account.
+  if ((!user.plan || user.plan === 'free') && user.proUntil && new Date(user.proUntil).getTime() > Date.now()) {
+    user.plan = 'pro';
+    user.proGranted = true; // effective Pro from a grant, not a Stripe subscription
+  }
   return user;
 }
 

@@ -224,6 +224,14 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
 
+// ── REFERRAL CAPTURE ────────────────────────────────────────────────
+// Referral links point at the landing (/?ref=CODE), so capture the code on
+// EVERY page (not just /referral) and keep it until the visitor registers.
+try {
+  const _ref = new URLSearchParams(window.location.search).get('ref');
+  if (_ref && /^[A-Z0-9]{6,10}$/i.test(_ref)) sessionStorage.setItem('emploia_ref', _ref.toUpperCase());
+} catch (e) {}
+
 // ── AUTH SYSTEM ─────────────────────────────────────────────────────
 window.empUser = null;
 

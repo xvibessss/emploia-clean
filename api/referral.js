@@ -93,20 +93,37 @@ export default async function handler(req) {
     }
 
     const signups = [...(refData.signups || []), normalizedNewEmail];
-    const monthsEarned = Math.min(6, Math.floor(signups.length)); // max 6 months
+    const monthsEarned = Math.min(6, signups.length); // max 6 months
     await kvSet(`ref:${code}`, { ...refData, signups, monthsEarned });
 
-    // Update referrer's plan if they've earned a free month (simplified — real impl needs Stripe)
+    // Reward = internally-granted free Pro time (proUntil), honored by getCurrentUser.
+    // No Stripe subscription is created; it simply auto-expires.
+    const DAY = 86400000;
+    const extendPro = (current, days) => {
+      const base = Math.max(Date.now(), current ? new Date(current).getTime() : 0);
+      return new Date(base + days * DAY).toISOString();
+    };
+
+    // Referrer: +30 days per new signup, capped at 6 rewarded signups (≈6 months).
     const referrerUser = await kvGet(`user:${refData.email}`);
     if (referrerUser) {
-      await kvSet(`user:${refData.email}`, {
-        ...referrerUser,
-        referralMonths: monthsEarned,
-        referralSignups: signups.length,
+      const patch = { ...referrerUser, referralMonths: monthsEarned, referralSignups: signups.length };
+      if (signups.length <= 6) patch.proUntil = extendPro(referrerUser.proUntil, 30);
+      await kvSet(`user:${refData.email}`, patch);
+    }
+
+    // Referee: +14 days of Pro as a welcome bonus (makes the invite worth accepting).
+    let refereeDays = 0;
+    if (!newUser.referredBy) {
+      refereeDays = 14;
+      await kvSet(`user:${normalizedNewEmail}`, {
+        ...newUser,
+        referredBy: code,
+        proUntil: extendPro(newUser.proUntil, refereeDays),
       });
     }
 
-    return new Response(JSON.stringify({ ok: true, signups: signups.length, monthsEarned }), { status: 200, headers: H });
+    return new Response(JSON.stringify({ ok: true, signups: signups.length, monthsEarned, refereeDays }), { status: 200, headers: H });
   }
 
   return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
