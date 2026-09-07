@@ -103,6 +103,7 @@ export default async function handler(req) {
     if (body.salary        !== undefined) apps[idx].salary        = String(body.salary).slice(0, 100);
     if (body.contact       !== undefined) apps[idx].contact       = String(body.contact).slice(0, 200);
     if (body.interviewDate !== undefined) apps[idx].interviewDate = body.interviewDate ? String(body.interviewDate).slice(0, 30) : null;
+    if (body.lastFollowUpAt !== undefined) apps[idx].lastFollowUpAt = body.lastFollowUpAt ? Number(body.lastFollowUpAt) : null;
     apps[idx].updatedAt = Date.now();
 
     await kvSet(key, apps);
