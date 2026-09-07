@@ -55,7 +55,24 @@
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
     .skills-cloud { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Besançon ?","acceptedAnswer":{"@type":"Answer","text":"Les microtechniques et l'horlogerie, la santé et le biomédical, l'industrie de précision et la recherche sont les principaux secteurs qui recrutent à Besançon."}},{"@type":"Question","name":"Quel salaire espérer à Besançon ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires sont proches de la moyenne des villes régionales de l'est, avec un coût de la vie modéré."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Besançon ?","acceptedAnswer":{"@type":"Answer","text":"Maty, le CHU de Besançon, Alstom et l'Université de Franche-Comté comptent parmi les plus gros employeurs."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -103,15 +120,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Besançon</span> — Guide complet</h2>
-    <p>Berceau de l'horlogerie et des microtechniques, Besançon excelle dans le biomédical, les microtechnologies et la santé. Capitale verte reconnue, elle recrute des ingénieurs, techniciens de précision et profils R&D dans un écosystème industriel innovant.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre à Besançon.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Besançon</span></h2>
+    <p>Berceau de l'horlogerie française, Besançon est aujourd'hui la capitale des microtechniques et du biomédical, portée par le pôle FEMTO-ST et un CHU de référence. L'industrie de précision et la recherche y offrent de nombreux débouchés qualifiés.</p>
   </div>
 
-  <div class="seo-related">
-    <h2>Autres villes</h2>
-    <div class="seo-related-links"><a href="/emploi/paris">Paris</a><a href="/emploi/lyon">Lyon</a><a href="/emploi/nantes">Nantes</a><a href="/emploi/bordeaux">Bordeaux</a><a href="/emploi/lille">Lille</a><a href="/emploi/remote">Télétravail</a></div>
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Besançon</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Besançon et dans Bourgogne-Franche-Comté, dans les secteurs les plus dynamiques : Microtechniques &amp; horlogerie, Santé &amp; biomédical, Industrie, Recherche, Enseignement.</p>
+    <div class="emp-chips"><span class="emp-chip">Maty</span><span class="emp-chip">CHU de Besançon</span><span class="emp-chip">Alstom</span><span class="emp-chip">Cheval Frères</span><span class="emp-chip">Smoby</span><span class="emp-chip">Université de Franche-Comté</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Besançon — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Besançon, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>30 000 – 44 000 €</td></tr><tr><td>Comptable</td><td>26 000 – 38 000 €</td></tr><tr><td>Ingénieur microtechniques</td><td>33 000 – 48 000 €</td></tr><tr><td>Technicien</td><td>25 000 – 37 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Besançon</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Besançon ?</h3><p>Les microtechniques et l'horlogerie, la santé et le biomédical, l'industrie de précision et la recherche sont les principaux secteurs qui recrutent à Besançon.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Besançon ?</h3><p>Les salaires sont proches de la moyenne des villes régionales de l'est, avec un coût de la vie modéré.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Besançon ?</h3><p>Maty, le CHU de Besançon, Alstom et l'Université de Franche-Comté comptent parmi les plus gros employeurs.</p></div>
   </div>
 </div>
 
