@@ -52,7 +52,24 @@
     .seo-related-links a:hover{border-color:var(--ind);color:var(--inb);background:var(--ind2)}
     .rech-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:13px;color:var(--t3);flex-wrap:wrap;gap:8px}
     .loading-state{display:flex;align-items:center;justify-content:center;padding:60px 24px;color:var(--t3);gap:12px}
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Nancy ?","acceptedAnswer":{"@type":"Answer","text":"La santé et la recherche médicale, l'industrie des matériaux, le numérique et l'enseignement sont les principaux secteurs qui recrutent à Nancy."}},{"@type":"Question","name":"Quel salaire espérer à Nancy ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires sont légèrement inférieurs à la moyenne des grandes métropoles, en cohérence avec un coût de la vie plus modéré."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Nancy ?","acceptedAnswer":{"@type":"Answer","text":"Saint-Gobain, Alstom, le CHRU de Nancy et l'Université de Lorraine comptent parmi les plus gros employeurs de l'agglomération."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav"><div class="emp-nav-inner">
@@ -88,12 +105,33 @@
     <p>Notre IA adapte votre CV à chaque offre — mots-clés ATS, format optimisé, lettre de motivation incluse.</p>
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
-  <div class="seo-info">
-    <h2>Marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nancy</span></h2>
-    <p>Nancy est une ville universitaire dynamique avec ses grandes écoles d'ingénieurs (Mines de Nancy, École des Mines, ENSEM). Son tissu industriel historique se renouvelle autour du numérique et des cleantech. La proximité avec le Luxembourg (45 min) ouvre aussi des opportunités transfrontalières très bien rémunérées.</p><p>Les secteurs clés : ingénierie et industrie, numérique et IA, santé (CHU), formation et enseignement. Nancy offre un coût de la vie bien inférieur à Paris pour des salaires compétitifs dans le Grand Est.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nancy</span></h2>
+    <p>Ville universitaire majeure du Grand Est, Nancy s'appuie sur la santé et la recherche médicale (CHRU, université), une industrie des matériaux historique (Saint-Gobain) et un secteur numérique en développement.</p>
   </div>
-  <div class="seo-related"><h2>Autres villes</h2><div class="seo-related-links"><a href="/emploi/strasbourg">Strasbourg</a><a href="/emploi/paris">Paris</a><a href="/emploi/lille">Lille</a><a href="/emploi/remote">Remote</a></div></div>
-  <div class="seo-related" style="margin-top:24px"><h2>Par métier</h2><div class="seo-related-links"><a href="/metier/ingenieur">Ingénieur</a><a href="/metier/developpeur">Développeur</a><a href="/metier/data">Data</a><a href="/metier/chef-projet">Chef de Projet</a></div></div>
+
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Nancy</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Nancy et dans Grand Est, dans les secteurs les plus dynamiques : Santé &amp; recherche médicale, Industrie, Matériaux, Numérique, Enseignement.</p>
+    <div class="emp-chips"><span class="emp-chip">Saint-Gobain</span><span class="emp-chip">Alstom</span><span class="emp-chip">Trane</span><span class="emp-chip">CHRU de Nancy</span><span class="emp-chip">Université de Lorraine</span><span class="emp-chip">Novacarb</span><span class="emp-chip">Bata</span><span class="emp-chip">ArcelorMittal</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Nancy — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Nancy, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>31 000 – 46 000 €</td></tr><tr><td>Comptable</td><td>27 000 – 39 000 €</td></tr><tr><td>Infirmier</td><td>28 000 – 40 000 €</td></tr><tr><td>Technicien</td><td>26 000 – 38 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Nancy</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Nancy ?</h3><p>La santé et la recherche médicale, l'industrie des matériaux, le numérique et l'enseignement sont les principaux secteurs qui recrutent à Nancy.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Nancy ?</h3><p>Les salaires sont légèrement inférieurs à la moyenne des grandes métropoles, en cohérence avec un coût de la vie plus modéré.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Nancy ?</h3><p>Saint-Gobain, Alstom, le CHRU de Nancy et l'Université de Lorraine comptent parmi les plus gros employeurs de l'agglomération.</p></div>
+  </div>
 </div>
 <nav class="emp-bottom-nav">
   <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>

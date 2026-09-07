@@ -54,7 +54,24 @@
     .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Nice ?","acceptedAnswer":{"@type":"Answer","text":"Le tourisme et l'hôtellerie (forte saisonnalité), la tech à Sophia Antipolis, la santé/pharma et le commerce sont les principaux secteurs qui recrutent sur la Côte d'Azur."}},{"@type":"Question","name":"Quel salaire espérer à Nice ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires varient fortement selon le secteur : modérés dans l'hôtellerie, plus élevés dans la tech de Sophia Antipolis où un ingénieur peut atteindre 54 000 € brut/an."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Nice ?","acceptedAnswer":{"@type":"Answer","text":"Amadeus, IBM, NXP et ST Microelectronics à Sophia Antipolis, ainsi qu'Arkopharma, Virbac et Galderma dans la santé."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -102,18 +119,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nice</span></h2>
-    <p>Nice et la Côte d'Azur offrent un marché de l'emploi diversifié. La métropole Nice Côte d'Azur est la 5e ville de France et un hub important pour le tourisme haut de gamme, la santé et l'ingénierie (Sophia Antipolis, la Silicon Valley européenne). Le parc technologique de Sophia Antipolis concentre plus de 2 500 entreprises tech.</p><p>Les secteurs porteurs : IT et tech (Sophia Antipolis), tourisme et hôtellerie de luxe, santé, construction, commerce. La saisonnalité crée aussi de nombreuses opportunités en CDD et contrats saisonniers.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Nice</span></h2>
+    <p>Entre tourisme haut de gamme sur la Côte d'Azur et technopôle de Sophia Antipolis (première technopole d'Europe), Nice offre un marché de l'emploi contrasté : forte saisonnalité dans l'hôtellerie, postes qualifiés dans la tech et la santé.</p>
   </div>
 
-  <div class="seo-related">
-    <h2>Autres villes</h2>
-    <div class="seo-related-links"><a href="/emploi/marseille">Marseille</a><a href="/emploi/toulouse">Toulouse</a><a href="/emploi/paris">Paris</a><a href="/emploi/remote">Remote</a></div>
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Nice</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Nice et dans Provence-Alpes-Côte d'Azur, dans les secteurs les plus dynamiques : Tourisme &amp; hôtellerie, Tech (Sophia Antipolis), Santé &amp; pharma, Commerce, Immobilier.</p>
+    <div class="emp-chips"><span class="emp-chip">Amadeus</span><span class="emp-chip">Arkopharma</span><span class="emp-chip">Virbac</span><span class="emp-chip">IBM</span><span class="emp-chip">Thales</span><span class="emp-chip">NXP</span><span class="emp-chip">Galderma</span><span class="emp-chip">ST Microelectronics</span></div>
   </div>
-  <div class="seo-related" style="margin-top:24px">
-    <h2>Par métier</h2>
-    <div class="seo-related-links"><a href="/metier/developpeur">Développeur</a><a href="/metier/marketing">Marketing</a><a href="/metier/commercial">Commercial</a><a href="/metier/design">Design</a></div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Nice — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Nice, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>34 000 – 50 000 €</td></tr><tr><td>Réceptionniste hôtellerie</td><td>24 000 – 32 000 €</td></tr><tr><td>Comptable</td><td>28 000 – 42 000 €</td></tr><tr><td>Ingénieur</td><td>36 000 – 54 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Nice</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Nice ?</h3><p>Le tourisme et l'hôtellerie (forte saisonnalité), la tech à Sophia Antipolis, la santé/pharma et le commerce sont les principaux secteurs qui recrutent sur la Côte d'Azur.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Nice ?</h3><p>Les salaires varient fortement selon le secteur : modérés dans l'hôtellerie, plus élevés dans la tech de Sophia Antipolis où un ingénieur peut atteindre 54 000 € brut/an.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Nice ?</h3><p>Amadeus, IBM, NXP et ST Microelectronics à Sophia Antipolis, ainsi qu'Arkopharma, Virbac et Galderma dans la santé.</p></div>
   </div>
 </div>
 

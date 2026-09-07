@@ -52,7 +52,24 @@
     .seo-related-links a:hover{border-color:var(--ind);color:var(--inb);background:var(--ind2)}
     .rech-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:13px;color:var(--t3);flex-wrap:wrap;gap:8px}
     .loading-state{display:flex;align-items:center;justify-content:center;padding:60px 24px;color:var(--t3);gap:12px}
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Dijon ?","acceptedAnswer":{"@type":"Answer","text":"L'agroalimentaire, la pharma/santé, la logistique et la recherche liée au goût et à la nutrition sont les principaux secteurs qui recrutent à Dijon."}},{"@type":"Question","name":"Quel salaire espérer à Dijon ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires sont proches de la moyenne des villes régionales, avec un coût de la vie modéré."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Dijon ?","acceptedAnswer":{"@type":"Answer","text":"SEB, Urgo, Amora Maille, la SNCF et le CHU de Dijon comptent parmi les plus gros employeurs de l'agglomération."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav"><div class="emp-nav-inner">
@@ -88,12 +105,33 @@
     <p>Notre IA adapte votre CV à chaque offre — mots-clés ATS, format optimisé, lettre de motivation incluse.</p>
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
-  <div class="seo-info">
-    <h2>Marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Dijon</span></h2>
-    <p>Dijon est une ville à taille humaine (150 000 habitants) avec une économie diversifiée. Chef-lieu de région, elle abrite de nombreuses collectivités et administrations qui recrutent régulièrement. Le secteur agroalimentaire (Moutarde de Dijon, vins de Bourgogne) est un employeur traditionnel.</p><p>Les secteurs dynamiques : numérique et startups (Dijon est labellisée French Tech), santé et biotech, agroalimentaire, collectivités territoriales, enseignement supérieur. Dijon attire de plus en plus de télétravailleurs parisiens grâce à sa qualité de vie et ses prix de l'immobilier abordables.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Dijon</span></h2>
+    <p>Capitale de la gastronomie et de l'agroalimentaire (pôle Vitagora), Dijon s'appuie sur des marques emblématiques (Amora, Maille), la pharma (Urgo), la santé et une position logistique stratégique au cœur de la France.</p>
   </div>
-  <div class="seo-related"><h2>Autres villes</h2><div class="seo-related-links"><a href="/emploi/lyon">Lyon</a><a href="/emploi/paris">Paris</a><a href="/emploi/grenoble">Grenoble</a><a href="/emploi/remote">Remote</a></div></div>
-  <div class="seo-related" style="margin-top:24px"><h2>Par métier</h2><div class="seo-related-links"><a href="/metier/developpeur">Développeur</a><a href="/metier/marketing">Marketing</a><a href="/metier/rh">RH</a><a href="/metier/commercial">Commercial</a></div></div>
+
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Dijon</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Dijon et dans Bourgogne-Franche-Comté, dans les secteurs les plus dynamiques : Agroalimentaire, Pharma &amp; santé, Logistique, Recherche (goût/nutrition), Industrie.</p>
+    <div class="emp-chips"><span class="emp-chip">SEB</span><span class="emp-chip">Urgo</span><span class="emp-chip">Amora Maille</span><span class="emp-chip">SNCF</span><span class="emp-chip">Vitagora</span><span class="emp-chip">CHU de Dijon</span><span class="emp-chip">Nexans</span><span class="emp-chip">Crédit Agricole</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Dijon — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Dijon, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>30 000 – 45 000 €</td></tr><tr><td>Comptable</td><td>27 000 – 39 000 €</td></tr><tr><td>Ingénieur agroalimentaire</td><td>32 000 – 47 000 €</td></tr><tr><td>Technicien</td><td>26 000 – 38 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Dijon</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Dijon ?</h3><p>L'agroalimentaire, la pharma/santé, la logistique et la recherche liée au goût et à la nutrition sont les principaux secteurs qui recrutent à Dijon.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Dijon ?</h3><p>Les salaires sont proches de la moyenne des villes régionales, avec un coût de la vie modéré.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Dijon ?</h3><p>SEB, Urgo, Amora Maille, la SNCF et le CHU de Dijon comptent parmi les plus gros employeurs de l'agglomération.</p></div>
+  </div>
 </div>
 <nav class="emp-bottom-nav">
   <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>

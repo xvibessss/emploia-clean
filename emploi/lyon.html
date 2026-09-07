@@ -54,7 +54,24 @@
     .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Lyon ?","acceptedAnswer":{"@type":"Answer","text":"La santé, la pharma, la chimie/biotech, le numérique et la banque-assurance sont les moteurs de l'emploi lyonnais. La Vallée de la chimie et le pôle santé génèrent une forte demande d'ingénieurs et de techniciens."}},{"@type":"Question","name":"Quel salaire espérer à Lyon ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires lyonnais sont proches de la moyenne des grandes métropoles, légèrement sous Paris. Un ingénieur confirmé se situe entre 42 000 et 62 000 € brut/an."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Lyon ?","acceptedAnswer":{"@type":"Answer","text":"Sanofi, bioMérieux, EDF, SEB, Renault Trucks et Boiron comptent parmi les plus gros employeurs de la métropole lyonnaise."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -109,10 +126,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Lyon</span> — Guide complet</h2>
-    <p>Offres d'emploi à Lyon et en région Auvergne-Rhône-Alpes. Générez votre CV adapté à chaque poste avec l'IA Emploia.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Lyon</span></h2>
+    <p>Deuxième métropole économique française, Lyon s'appuie sur un tissu industriel puissant (pharma, chimie, biotech avec la « Vallée de la chimie ») et un secteur numérique en pleine croissance. La ville attire aussi banque, assurance et logistique.</p>
+  </div>
+
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Lyon</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Lyon et dans Auvergne-Rhône-Alpes, dans les secteurs les plus dynamiques : Santé &amp; pharma, Chimie &amp; biotech, Banque &amp; assurance, Numérique, Industrie.</p>
+    <div class="emp-chips"><span class="emp-chip">Sanofi</span><span class="emp-chip">EDF</span><span class="emp-chip">bioMérieux</span><span class="emp-chip">SEB</span><span class="emp-chip">Renault Trucks</span><span class="emp-chip">Boiron</span><span class="emp-chip">April</span><span class="emp-chip">GL Events</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Lyon — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Lyon, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>35 000 – 52 000 €</td></tr><tr><td>Comptable</td><td>30 000 – 44 000 €</td></tr><tr><td>Chef de projet</td><td>42 000 – 62 000 €</td></tr><tr><td>Ingénieur qualité</td><td>34 000 – 50 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Lyon</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Lyon ?</h3><p>La santé, la pharma, la chimie/biotech, le numérique et la banque-assurance sont les moteurs de l'emploi lyonnais. La Vallée de la chimie et le pôle santé génèrent une forte demande d'ingénieurs et de techniciens.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Lyon ?</h3><p>Les salaires lyonnais sont proches de la moyenne des grandes métropoles, légèrement sous Paris. Un ingénieur confirmé se situe entre 42 000 et 62 000 € brut/an.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Lyon ?</h3><p>Sanofi, bioMérieux, EDF, SEB, Renault Trucks et Boiron comptent parmi les plus gros employeurs de la métropole lyonnaise.</p></div>
   </div>
 </div>
 
