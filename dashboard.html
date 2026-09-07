@@ -1405,7 +1405,8 @@
     const extra = app.status === 'offer'     ? ' style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)"'
                 : app.status === 'interview'  ? ' style="border-color:rgba(245,158,11,.2)"'
                 : app.status === 'rejected'   ? ' style="opacity:.65"' : '';
-    const showRelance = app.status === 'applied' && daysAgo >= 7;
+    const followedRecently = app.status === 'applied' && app.lastFollowUpAt && (Date.now() - app.lastFollowUpAt) < 7 * 86400000;
+    const showRelance = app.status === 'applied' && daysAgo >= 7 && !followedRecently;
     const noteSnippet = app.notes ? `<div class="kcard-note">${esc(app.notes.slice(0, 80))}</div>` : '';
 
     // Interview countdown
@@ -1433,6 +1434,7 @@
         </div>
       </div>
       ${showRelance ? `<button class="kcard-relance" onclick="event.stopPropagation();openRelanceModal('${esc(app.id)}')">📧 Relancer (+${daysAgo}j)</button>` : ''}
+      ${followedRecently ? `<div style="font-size:10px;color:var(--gnb);margin-top:6px;font-weight:600">✓ Relancé il y a ${Math.floor((Date.now() - app.lastFollowUpAt) / 86400000)}j</div>` : ''}
     </div>`;
   }
 
@@ -1841,7 +1843,7 @@
     const pending = apps.filter(a => a.status === 'applied').length;
     const thisWeek = apps.filter(a => Date.now() - (a.createdAt || 0) < 7 * 86400000).length;
     const interviewRate = total > 0 ? Math.round((interviewsAndOffers / total) * 100) : 0;
-    const overdue = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000).length;
+    const overdue = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000 && !(a.lastFollowUpAt && Date.now() - a.lastFollowUpAt < 14 * 86400000)).length;
 
     const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     const cls = (id, c) => { const el = document.getElementById(id); if (el) el.className = 'sc-delta ' + c; };
@@ -1945,7 +1947,7 @@
     const el = document.getElementById('conseilBody');
     if (!el) return;
     const interviewApps = apps.filter(a => a.status === 'interview');
-    const overdueApps = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000);
+    const overdueApps = apps.filter(a => a.status === 'applied' && Date.now() - (a.updatedAt || a.createdAt || 0) > 14 * 86400000 && !(a.lastFollowUpAt && Date.now() - a.lastFollowUpAt < 14 * 86400000));
     const wishlistApps = apps.filter(a => a.status === 'wishlist');
 
     if (interviewApps.length > 0) {
@@ -2151,9 +2153,9 @@
           </div>
           <div class="relance-content" id="relanceContent">⏳ Génération…</div>
           <div class="relance-tips" id="relanceTips"></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-primary" style="flex:1" onclick="copyRelance()">📋 Copier l'email</button>
-            <button class="btn btn-ghost" onclick="closeRelanceModal()">Fermer</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" style="flex:1 1 140px" onclick="copyRelance()">📋 Copier l'email</button>
+            <button class="btn btn-ghost" style="flex:1 1 140px" onclick="markFollowedUp()">✅ Relance envoyée</button>
           </div>
         </div>`;
       document.body.appendChild(m);
@@ -2213,6 +2215,24 @@
   function closeRelanceModal() {
     const m = document.getElementById('relanceModal');
     if (m) m.style.display = 'none';
+  }
+
+  // Mark the application as followed-up: silences the reminder for 7 days (14 for the
+  // "en retard" banner) and shows a "Relancé il y a Xj" badge. Optimistic + PATCH.
+  async function markFollowedUp() {
+    if (!relanceApp) return;
+    const id = relanceApp.id;
+    const app = allApps.find(a => a.id === id);
+    if (app) { app.lastFollowUpAt = Date.now(); refresh(); }
+    closeRelanceModal();
+    empToast('Relance marquée comme envoyée ✓', 'success');
+    try {
+      await fetch(`/api/applications?id=${encodeURIComponent(id)}`, {
+        method: 'PATCH', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lastFollowUpAt: Date.now() }),
+      });
+    } catch { /* optimistic — local state already updated */ }
   }
 
   // ── SCORE PROGRESSION CHART ───────────────────────────────────────────────
