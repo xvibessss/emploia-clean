@@ -231,6 +231,15 @@ try {
   const _ref = new URLSearchParams(window.location.search).get('ref');
   if (_ref && /^[A-Z0-9]{6,10}$/i.test(_ref)) sessionStorage.setItem('emploia_ref', _ref.toUpperCase());
 } catch (e) {}
+// Announce the referral welcome bonus once, after the post-signup redirect.
+window.addEventListener('load', () => {
+  try {
+    if (sessionStorage.getItem('emploia_ref_bonus')) {
+      sessionStorage.removeItem('emploia_ref_bonus');
+      setTimeout(() => window.empToast && window.empToast('🎁 14 jours Pro offerts grâce à votre invitation !', 'success'), 900);
+    }
+  } catch (e) {}
+});
 
 // ── AUTH SYSTEM ─────────────────────────────────────────────────────
 window.empUser = null;
@@ -367,6 +376,9 @@ window.empSubmitRegister = async function(e) {
     const res = await fetch('/api/auth/register', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:document.getElementById('empRegisterName').value.trim(), email:document.getElementById('empRegisterEmail').value.trim(), password:document.getElementById('empRegisterPassword').value, ref:sessionStorage.getItem('emploia_ref')||undefined }) });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Erreur d'inscription");
+    // Signed up via a referral link → flag the Pro welcome bonus so it can be
+    // announced after the redirect (referral grants the referee free Pro).
+    if (sessionStorage.getItem('emploia_ref')) sessionStorage.setItem('emploia_ref_bonus', '1');
     sessionStorage.removeItem('emploia_ref');
     if (window.plausible) plausible('signup');
     window.empUser = data.user;
