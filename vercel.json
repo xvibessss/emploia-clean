@@ -166,6 +166,19 @@
       "source": "/emploi/paris",
       "destination": "/emploi/paris.html"
     },
+    { "source": "/emploi/angers", "destination": "/emploi/angers.html" },
+    { "source": "/emploi/le-havre", "destination": "/emploi/le-havre.html" },
+    { "source": "/emploi/reims", "destination": "/emploi/reims.html" },
+    { "source": "/emploi/saint-etienne", "destination": "/emploi/saint-etienne.html" },
+    { "source": "/emploi/toulon", "destination": "/emploi/toulon.html" },
+    { "source": "/emploi/tours", "destination": "/emploi/tours.html" },
+    { "source": "/emploi/metz", "destination": "/emploi/metz.html" },
+    { "source": "/emploi/besancon", "destination": "/emploi/besancon.html" },
+    { "source": "/metier/infirmier", "destination": "/metier/infirmier.html" },
+    { "source": "/metier/enseignant", "destination": "/metier/enseignant.html" },
+    { "source": "/metier/cybersecurite", "destination": "/metier/cybersecurite.html" },
+    { "source": "/metier/chef-cuisine", "destination": "/metier/chef-cuisine.html" },
+    { "source": "/metier/aide-soignant", "destination": "/metier/aide-soignant.html" },
     {
       "source": "/emploi/lyon",
       "destination": "/emploi/lyon.html"
