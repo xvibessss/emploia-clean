@@ -55,7 +55,24 @@
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
     .skills-cloud { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Roubaix ?","acceptedAnswer":{"@type":"Answer","text":"Le numérique et le cloud (OVHcloud), l'e-commerce et la vente à distance, le jeu vidéo et le textile sont les principaux secteurs qui recrutent à Roubaix."}},{"@type":"Question","name":"Quel salaire espérer à Roubaix ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires suivent le niveau de la métropole lilloise, avec de bonnes opportunités dans la tech et l'e-commerce."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Roubaix ?","acceptedAnswer":{"@type":"Answer","text":"OVHcloud, La Redoute, Ankama et Showroomprivé comptent parmi les plus gros employeurs."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -103,15 +120,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Roubaix</span> — Guide complet</h2>
-    <p>Capitale française du e-commerce (OVHcloud, Showroomprivé, La Redoute), Roubaix a transformé son héritage textile en pôle numérique et retail. La ville recrute massivement dans la tech, le e-commerce et la relation client.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre à Roubaix.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Roubaix</span></h2>
+    <p>Ancienne capitale du textile, Roubaix s'est réinventée en pôle du numérique et de l'e-commerce, avec le siège mondial d'OVHcloud, La Redoute et le studio Ankama (Dofus). Un des écosystèmes tech et VAD les plus denses de France.</p>
   </div>
 
-  <div class="seo-related">
-    <h2>Autres villes</h2>
-    <div class="seo-related-links"><a href="/emploi/paris">Paris</a><a href="/emploi/lyon">Lyon</a><a href="/emploi/nantes">Nantes</a><a href="/emploi/bordeaux">Bordeaux</a><a href="/emploi/lille">Lille</a><a href="/emploi/remote">Télétravail</a></div>
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Roubaix</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Roubaix et dans Hauts-de-France, dans les secteurs les plus dynamiques : Numérique &amp; cloud, E-commerce &amp; VAD, Jeux vidéo, Textile, Commerce.</p>
+    <div class="emp-chips"><span class="emp-chip">OVHcloud</span><span class="emp-chip">La Redoute</span><span class="emp-chip">Ankama</span><span class="emp-chip">Showroomprivé</span><span class="emp-chip">Auchan</span><span class="emp-chip">Ville de Roubaix</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Roubaix — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Roubaix, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>33 000 – 49 000 €</td></tr><tr><td>Chef de produit e-commerce</td><td>32 000 – 48 000 €</td></tr><tr><td>Comptable</td><td>27 000 – 40 000 €</td></tr><tr><td>Game designer</td><td>30 000 – 46 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Roubaix</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Roubaix ?</h3><p>Le numérique et le cloud (OVHcloud), l'e-commerce et la vente à distance, le jeu vidéo et le textile sont les principaux secteurs qui recrutent à Roubaix.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Roubaix ?</h3><p>Les salaires suivent le niveau de la métropole lilloise, avec de bonnes opportunités dans la tech et l'e-commerce.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Roubaix ?</h3><p>OVHcloud, La Redoute, Ankama et Showroomprivé comptent parmi les plus gros employeurs.</p></div>
   </div>
 </div>
 

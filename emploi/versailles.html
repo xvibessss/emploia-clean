@@ -55,7 +55,24 @@
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
     .skills-cloud { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Versailles ?","acceptedAnswer":{"@type":"Answer","text":"Le tourisme et le patrimoine, le secteur public, l'enseignement et la recherche, et le tertiaire sont les principaux secteurs qui recrutent à Versailles."}},{"@type":"Question","name":"Quel salaire espérer à Versailles ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires suivent le niveau francilien, supérieur à la moyenne nationale, notamment vers le pôle tertiaire de Vélizy."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Versailles ?","acceptedAnswer":{"@type":"Answer","text":"Le Château de Versailles, l'Université de Versailles Saint-Quentin et le Centre hospitalier comptent parmi les plus gros employeurs, en plus des opportunités parisiennes."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -103,15 +120,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Versailles</span> — Guide complet</h2>
-    <p>Ville royale et pôle tertiaire des Yvelines, Versailles conjugue tourisme, administration, défense, santé et services aux entreprises. Bien reliée à Paris, elle offre des opportunités variées dans le tertiaire et les fonctions publiques.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre à Versailles.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Versailles</span></h2>
+    <p>Ville royale et destination touristique mondiale, Versailles vit du patrimoine (le Château est un employeur majeur), d'un fort secteur public et de l'enseignement supérieur. La proximité de Paris et du pôle tertiaire de Vélizy élargit les opportunités.</p>
   </div>
 
-  <div class="seo-related">
-    <h2>Autres villes</h2>
-    <div class="seo-related-links"><a href="/emploi/paris">Paris</a><a href="/emploi/lyon">Lyon</a><a href="/emploi/nantes">Nantes</a><a href="/emploi/bordeaux">Bordeaux</a><a href="/emploi/lille">Lille</a><a href="/emploi/remote">Télétravail</a></div>
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Versailles</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Versailles et dans Île-de-France, dans les secteurs les plus dynamiques : Tourisme &amp; patrimoine, Secteur public, Enseignement &amp; recherche, Tertiaire, Santé.</p>
+    <div class="emp-chips"><span class="emp-chip">Château de Versailles</span><span class="emp-chip">Nexity</span><span class="emp-chip">CH de Versailles</span><span class="emp-chip">Université de Versailles</span><span class="emp-chip">Sanef</span><span class="emp-chip">Ville de Versailles</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Versailles — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Versailles, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>36 000 – 54 000 €</td></tr><tr><td>Comptable</td><td>29 000 – 43 000 €</td></tr><tr><td>Chargé de tourisme</td><td>26 000 – 37 000 €</td></tr><tr><td>Chef de projet</td><td>40 000 – 60 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Versailles</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Versailles ?</h3><p>Le tourisme et le patrimoine, le secteur public, l'enseignement et la recherche, et le tertiaire sont les principaux secteurs qui recrutent à Versailles.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Versailles ?</h3><p>Les salaires suivent le niveau francilien, supérieur à la moyenne nationale, notamment vers le pôle tertiaire de Vélizy.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Versailles ?</h3><p>Le Château de Versailles, l'Université de Versailles Saint-Quentin et le Centre hospitalier comptent parmi les plus gros employeurs, en plus des opportunités parisiennes.</p></div>
   </div>
 </div>
 
