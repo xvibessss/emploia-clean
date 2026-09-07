@@ -4,94 +4,182 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta name="robots" content="noindex,nofollow"/>
-  <title>Admin — Emploia</title>
+  <title>Console Growth — Emploia</title>
   <style>
     :root{
-      --bg:#0b0e14; --s1:#111725; --s2:#161d2e; --s3:#1d2740; --brd:#232d44;
-      --t1:#e8edf7; --t2:#9aa7bd; --t3:#66748f; --ind:#6366f1; --ind2:#818cf8;
-      --grn:#34d399; --red:#f87171; --amb:#fbbf24; --blu:#60a5fa;
+      --bg:#0a0e1a; --side:#0d1424; --card:#121b30; --card2:#0f172a; --brd:#1f2b47; --brd2:#172236;
+      --t1:#eaf0fb; --t2:#94a3bd; --t3:#5f6f8c; --ind:#6366f1; --ind2:#818cf8;
+      --grn:#34d399; --red:#f87171; --amb:#fbbf24; --blu:#60a5fa; --vio:#a78bfa;
       --grad:linear-gradient(135deg,#6366f1,#3b82f6);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--t1);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
-    a{color:var(--ind2)}
-    .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
-    /* Gate */
-    .gate{max-width:400px;margin:14vh auto;padding:0 20px;text-align:center}
+    html,body{margin:0}
+    body{background:var(--bg);color:var(--t1);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+    a{color:var(--ind2);text-decoration:none}
+    code{background:var(--card2);border:1px solid var(--brd);border-radius:5px;padding:1px 5px;font-size:12px;color:var(--ind2)}
+    /* ── Gate ── */
+    .gate{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+    .gate-box{max-width:400px;width:100%;text-align:center}
     .gate .logo{width:52px;height:52px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;margin:0 auto 18px}
     .gate h1{font-size:20px;font-weight:800;margin:0 0 6px}
     .gate p{color:var(--t2);font-size:13px;margin:0 0 22px}
-    .gate input{width:100%;background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;color:var(--t1);font-size:15px;margin-bottom:12px}
+    .gate input{width:100%;background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;color:var(--t1);font-size:15px;margin-bottom:12px}
     .gate input:focus{outline:none;border-color:var(--ind)}
-    .btn{background:var(--grad);color:#fff;border:0;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;width:100%;letter-spacing:-.2px}
-    .btn.ghost{background:var(--s2);border:1px solid var(--brd);color:var(--t2);width:auto;padding:9px 16px;font-size:13px}
     .gate .err{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
-    /* Header */
-    .hd{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px;flex-wrap:wrap}
-    .hd h1{font-size:22px;font-weight:900;letter-spacing:-.6px;margin:0;display:flex;align-items:center;gap:10px}
-    .hd .mark{width:32px;height:32px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff}
-    .hd .meta{color:var(--t3);font-size:12px}
-    .hd .actions{display:flex;gap:8px;align-items:center}
-    /* Sections */
-    .sec{margin-bottom:30px}
-    .sec-h{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:700;margin:0 0 12px}
+    /* ── Shell ── */
+    .shell{display:grid;grid-template-columns:238px 1fr;min-height:100vh}
+    .side{background:var(--side);border-right:1px solid var(--brd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+    .side-top{padding:20px 18px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--brd2)}
+    .side-top .mark{width:30px;height:30px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff}
+    .side-top .nm{font-weight:800;letter-spacing:-.3px}
+    .side-top .tag{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ind2);background:rgba(99,102,241,.14);border:1px solid rgba(99,102,241,.25);padding:3px 8px;border-radius:100px}
+    .nav{flex:1;overflow-y:auto;padding:14px 12px}
+    .nav-group{margin-bottom:16px}
+    .nav-h{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);font-weight:700;padding:0 10px 7px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;color:var(--t2);font-size:13.5px;font-weight:600;cursor:pointer;transition:.12s;user-select:none}
+    .nav-item svg{width:17px;height:17px;flex-shrink:0}
+    .nav-item:hover{background:var(--card);color:var(--t1)}
+    .nav-item.on{background:rgba(99,102,241,.15);color:var(--ind2)}
+    .nav-item .badge{margin-left:auto;font-size:11px;background:var(--card2);border:1px solid var(--brd);border-radius:100px;padding:1px 7px;color:var(--t3)}
+    .side-foot{padding:12px;border-top:1px solid var(--brd2)}
+    .side-foot .btn.ghost{width:100%;justify-content:center}
+    /* ── Main ── */
+    .main{min-width:0;display:flex;flex-direction:column}
+    .top{position:sticky;top:0;z-index:10;background:rgba(10,14,26,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--brd);padding:16px 26px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .top h1{font-size:19px;font-weight:800;letter-spacing:-.4px;margin:0}
+    .top .r{display:flex;align-items:center;gap:8px}
+    .meta{color:var(--t3);font-size:12px}
+    .btn{background:var(--grad);color:#fff;border:0;border-radius:11px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.2px}
+    .btn.ghost{background:var(--card);border:1px solid var(--brd);color:var(--t2);padding:9px 14px;font-size:13px}
+    .btn.ghost:hover{color:var(--t1);border-color:var(--ind)}
+    .hamb{display:none;background:var(--card);border:1px solid var(--brd);color:var(--t1);border-radius:9px;width:38px;height:38px;font-size:17px;cursor:pointer}
+    .body{padding:24px 26px 80px}
+    section[data-sec]{display:none}
+    section[data-sec].active{display:block}
+    /* ── Cards / grids ── */
     .grid{display:grid;gap:14px}
     .kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
-    .card{background:var(--s1);border:1px solid var(--brd);border-radius:16px;padding:18px 20px}
+    .two{grid-template-columns:1fr 1fr}
+    .charts{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    @media(max-width:720px){.two{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:18px 20px}
+    .sec-h{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:700;margin:26px 0 12px}
+    .sec-h:first-child{margin-top:0}
     .kpi .lbl{color:var(--t2);font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
     .kpi .val{font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1}
     .kpi .sub{color:var(--t3);font-size:12px;margin-top:6px}
-    .val.grn{color:var(--grn)} .val.blu{color:var(--blu)} .val.amb{color:var(--amb)}
-    /* Funnel */
+    .val.grn{color:var(--grn)} .val.blu{color:var(--blu)} .val.amb{color:var(--amb)} .val.vio{color:var(--vio)}
+    /* funnel */
     .funnel{display:flex;flex-direction:column;gap:10px}
     .fstep{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center}
     .fstep .fl{color:var(--t2);font-size:13px;font-weight:600}
-    .fbar-track{background:var(--s3);border-radius:8px;height:34px;overflow:hidden;position:relative}
-    .fbar{height:100%;background:var(--grad);border-radius:8px;min-width:2px;transition:width .5s ease;display:flex;align-items:center;padding-left:12px;color:#fff;font-weight:800;font-size:13px}
-    .fstep .fconv{font-size:12px;color:var(--t3);white-space:nowrap;min-width:74px;text-align:right}
+    .fbar-track{background:var(--card2);border-radius:8px;height:34px;overflow:hidden}
+    .fbar{height:100%;background:var(--grad);border-radius:8px;min-width:2px;display:flex;align-items:center;padding-left:12px;color:#fff;font-weight:800;font-size:13px;transition:width .5s ease}
+    .fstep .fconv{font-size:12px;color:var(--t3);white-space:nowrap;min-width:80px;text-align:right}
     .fconv b{color:var(--grn)}
-    /* Daily charts */
-    .charts{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    @media(max-width:640px){.fstep{grid-template-columns:110px 1fr}.fstep .fconv{grid-column:2;text-align:left}}
+    /* charts */
     .chart .ct{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
-    .chart .ct .nm{font-size:13px;font-weight:700;color:var(--t1)}
+    .chart .ct .nm{font-size:13px;font-weight:700}
     .chart .ct .tot{font-size:12px;color:var(--t3)}
     .bars{display:flex;align-items:flex-end;gap:3px;height:64px}
-    .bars .b{flex:1;background:var(--s3);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+    .bars .b{flex:1;background:var(--card2);border-radius:3px 3px 0 0;min-height:2px}
     .bars .b.on{background:var(--ind)}
     .bars .b:last-child.on{background:var(--ind2)}
-    .chart .xr{display:flex;justify-content:space-between;color:var(--t3);font-size:10px;margin-top:6px}
-    /* mini tables */
-    .rows{display:flex;flex-direction:column;gap:0}
-    .row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--brd);font-size:13px}
+    .xr{display:flex;justify-content:space-between;color:var(--t3);font-size:10px;margin-top:6px}
+    /* rows */
+    .rows{display:flex;flex-direction:column}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--brd2);font-size:13px}
     .row:last-child{border-bottom:0}
     .row .k{color:var(--t2)} .row .v{font-weight:700;font-variant-numeric:tabular-nums}
-    .note{color:var(--t3);font-size:12px;margin-top:10px;font-style:italic}
-    .two{grid-template-columns:1fr 1fr}
-    @media(max-width:640px){.two{grid-template-columns:1fr}.fstep{grid-template-columns:100px 1fr;grid-template-rows:auto auto}.fstep .fconv{grid-column:2;text-align:left}}
+    .pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:100px}
+    .pill.ok{background:rgba(52,211,153,.14);color:var(--grn)}
+    .pill.soon{background:rgba(251,191,36,.14);color:var(--amb)}
+    .note{color:var(--t3);font-size:12px;margin-top:10px;line-height:1.6}
+    .empty{text-align:center;padding:30px 20px;color:var(--t3)}
+    .empty .ei{font-size:26px;margin-bottom:8px}
+    .lead{color:var(--t2);font-size:13px;margin:0 0 16px;max-width:640px;line-height:1.6}
+    .backdrop{display:none}
+    @media(max-width:900px){
+      .shell{grid-template-columns:1fr}
+      .side{position:fixed;left:0;top:0;bottom:0;width:238px;z-index:40;transform:translateX(-100%);transition:transform .2s}
+      .side.open{transform:none}
+      .hamb{display:block}
+      .backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30}
+    }
     [hidden]{display:none!important}
   </style>
 </head>
 <body>
 
+<!-- Gate -->
 <div class="gate" id="gate">
-  <div class="logo">E</div>
-  <h1>Console Admin</h1>
-  <p>Accès réservé. Entre le secret admin (variable <code>ADMIN_SECRET</code>).</p>
-  <input type="password" id="secret" placeholder="ADMIN_SECRET" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
-  <button class="btn" onclick="login()">Se connecter</button>
-  <div class="err" id="gateErr"></div>
+  <div class="gate-box">
+    <div class="logo">E</div>
+    <h1>Console Growth</h1>
+    <p>Accès réservé. Entre le secret admin (variable <code>ADMIN_SECRET</code>).</p>
+    <input type="password" id="secret" placeholder="ADMIN_SECRET" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="btn" style="width:100%" onclick="login()">Se connecter</button>
+    <div class="err" id="gateErr"></div>
+  </div>
 </div>
 
-<div class="wrap" id="dash" hidden>
-  <div class="hd">
-    <h1><span class="mark">E</span> Console Admin</h1>
-    <div class="actions">
-      <span class="meta" id="genAt"></span>
-      <button class="btn ghost" onclick="load()">↻ Rafraîchir</button>
+<!-- Shell -->
+<div class="shell" id="shell" hidden>
+  <div class="backdrop" id="backdrop" onclick="toggleSide(false)"></div>
+  <aside class="side" id="side">
+    <div class="side-top">
+      <span class="mark">E</span><span class="nm">Emploia</span><span class="tag">Growth</span>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-group">
+        <div class="nav-h">Pilotage</div>
+        <div class="nav-item on" data-nav="overview">📊 Vue d'ensemble</div>
+        <div class="nav-item" data-nav="revenue">💰 Revenus &amp; facturation</div>
+        <div class="nav-item" data-nav="acquisition">📈 Acquisition &amp; canaux</div>
+        <div class="nav-item" data-nav="seo">🔎 SEO</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-h">Rétention</div>
+        <div class="nav-item" data-nav="retention">🔁 Cohortes &amp; rétention</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-h">Activation</div>
+        <div class="nav-item" data-nav="product">⚡ Produit &amp; engagement</div>
+        <div class="nav-item" data-nav="automations">🤖 Automatisations</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-h">Croissance</div>
+        <div class="nav-item" data-nav="referral">🎁 Parrainage</div>
+      </div>
+    </nav>
+    <div class="side-foot">
       <button class="btn ghost" onclick="logout()">Déconnexion</button>
     </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamb" onclick="toggleSide()">☰</button>
+        <h1 id="secTitle">Vue d'ensemble</h1>
+      </div>
+      <div class="r">
+        <span class="meta" id="genAt"></span>
+        <button class="btn ghost" onclick="load()">↻ Rafraîchir</button>
+      </div>
+    </div>
+    <div class="body">
+      <section data-sec="overview" class="active" id="sec-overview"></section>
+      <section data-sec="revenue" id="sec-revenue"></section>
+      <section data-sec="acquisition" id="sec-acquisition"></section>
+      <section data-sec="seo" id="sec-seo"></section>
+      <section data-sec="retention" id="sec-retention"></section>
+      <section data-sec="product" id="sec-product"></section>
+      <section data-sec="automations" id="sec-automations"></section>
+      <section data-sec="referral" id="sec-referral"></section>
+    </div>
   </div>
-  <div id="content"></div>
 </div>
 
 <script>
@@ -99,119 +187,124 @@ const SKEY = 'emploia_admin_secret';
 const $ = (id) => document.getElementById(id);
 const nf = (n) => (Number(n) || 0).toLocaleString('fr-FR');
 const eur = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' €';
+const TITLES = { overview:"Vue d'ensemble", revenue:"Revenus & facturation", acquisition:"Acquisition & canaux", seo:"SEO", retention:"Cohortes & rétention", product:"Produit & engagement", automations:"Automatisations", referral:"Parrainage" };
+let DATA = null;
 
-function login() {
-  const v = $('secret').value.trim();
-  if (!v) { $('gateErr').textContent = 'Entre le secret.'; return; }
-  try { sessionStorage.setItem(SKEY, v); } catch {}
-  load();
-}
-function logout() {
-  try { sessionStorage.removeItem(SKEY); } catch {}
-  $('dash').hidden = true; $('gate').hidden = false; $('secret').value = ''; $('gateErr').textContent = '';
-}
+/* ── Auth ── */
+function login(){ const v=$('secret').value.trim(); if(!v){$('gateErr').textContent='Entre le secret.';return;} try{sessionStorage.setItem(SKEY,v);}catch{} load(); }
+function logout(){ try{sessionStorage.removeItem(SKEY);}catch{} DATA=null; $('shell').hidden=true; $('gate').hidden=false; $('secret').value=''; $('gateErr').textContent=''; }
 
-async function load() {
-  let secret = '';
-  try { secret = sessionStorage.getItem(SKEY) || ''; } catch {}
-  if (!secret) { logout(); return; }
-  try {
-    const r = await fetch('/api/admin/stats', { headers: { 'x-admin-secret': secret }, cache: 'no-store' });
-    if (r.status === 403) { $('gateErr').textContent = 'Secret invalide.'; $('gate').hidden = false; $('dash').hidden = true; return; }
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
-    $('gate').hidden = true; $('dash').hidden = false; $('gateErr').textContent = '';
-    render(data);
-  } catch (e) {
-    if ($('dash').hidden) { $('gateErr').textContent = 'Erreur de chargement. Réessaie.'; }
-    else { $('content').insertAdjacentHTML('afterbegin', '<div class="card" style="border-color:var(--red);margin-bottom:14px">⚠️ Erreur de rafraîchissement.</div>'); }
+async function load(){
+  let secret=''; try{secret=sessionStorage.getItem(SKEY)||'';}catch{}
+  if(!secret){logout();return;}
+  try{
+    const r=await fetch('/api/admin/stats',{headers:{'x-admin-secret':secret},cache:'no-store'});
+    if(r.status===403){$('gateErr').textContent='Secret invalide.'; $('gate').hidden=false; $('shell').hidden=true; return;}
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    DATA=await r.json();
+    $('gate').hidden=true; $('shell').hidden=false; $('gateErr').textContent='';
+    $('genAt').textContent = DATA.generatedAt ? 'MàJ '+new Date(DATA.generatedAt).toLocaleString('fr-FR') : '';
+    renderAll();
+  }catch(e){
+    if(!$('shell').hidden){ /* keep view */ }
+    else $('gateErr').textContent='Erreur de chargement. Réessaie.';
   }
 }
 
-function kpi(lbl, val, cls, sub) {
-  return `<div class="card kpi"><div class="lbl">${lbl}</div><div class="val ${cls||''}">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+/* ── Nav ── */
+function toggleSide(force){ const s=$('side'),b=$('backdrop'); const open=force===undefined?!s.classList.contains('open'):force; s.classList.toggle('open',open); b.classList.toggle('show',open); }
+document.getElementById('nav').addEventListener('click',(e)=>{
+  const it=e.target.closest('.nav-item'); if(!it) return;
+  const k=it.dataset.nav;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n===it));
+  document.querySelectorAll('section[data-sec]').forEach(s=>s.classList.toggle('active',s.dataset.sec===k));
+  $('secTitle').textContent=TITLES[k]||'';
+  toggleSide(false);
+});
+
+/* ── Helpers ── */
+function kpi(lbl,val,cls,sub){ return `<div class="card kpi"><div class="lbl">${lbl}</div><div class="val ${cls||''}">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`; }
+function chart(name,days,series){
+  series=series||[]; const max=Math.max(1,...series); const total=series.reduce((a,b)=>a+b,0);
+  const bars=series.map((v,i)=>`<div class="b ${v>0?'on':''}" style="height:${Math.max(Math.round(v/max*100),2)}%" title="${days[i]}: ${nf(v)}"></div>`).join('');
+  return `<div class="card chart"><div class="ct"><span class="nm">${name}</span><span class="tot">${nf(total)} sur 14 j</span></div><div class="bars">${bars}</div><div class="xr"><span>${(days[0]||'').slice(5)}</span><span>${(days[days.length-1]||'').slice(5)}</span></div></div>`;
 }
+function soonCard(title,what){ return `<div class="card"><div class="empty"><div class="ei">🔌</div><div style="color:var(--t1);font-weight:700;margin-bottom:6px">${title}</div><div class="note" style="max-width:520px;margin:0 auto">${what}</div></div></div>`; }
 
-function chart(name, days, series, color) {
-  const max = Math.max(1, ...series);
-  const total = series.reduce((a, b) => a + b, 0);
-  const bars = series.map((v, i) => {
-    const h = Math.round((v / max) * 100);
-    const on = v > 0 ? 'on' : '';
-    return `<div class="b ${on}" style="height:${Math.max(h,2)}%" title="${days[i]}: ${nf(v)}"></div>`;
-  }).join('');
-  const first = days[0]?.slice(5), last = days[days.length - 1]?.slice(5);
-  return `<div class="card chart"><div class="ct"><span class="nm">${name}</span><span class="tot">${nf(total)} sur 14 j</span></div><div class="bars">${bars}</div><div class="xr"><span>${first}</span><span>${last}</span></div></div>`;
-}
+/* ── Sections ── */
+function renderAll(){
+  const d=DATA, u=d.users||{}, rev=d.revenue||{}, ev=d.events||{}, oth=d.other||{}, plan=u.byPlan||{}, dd=(d.daily&&Array.isArray(d.daily.days))?d.daily:null;
+  const paid=(plan.pro||0)+(plan.intensif||0);
 
-function render(d) {
-  const u = d.users || {}, rev = d.revenue || {}, ev = d.events || {}, oth = d.other || {}, plan = u.byPlan || {};
-  $('genAt').textContent = d.generatedAt ? 'MàJ ' + new Date(d.generatedAt).toLocaleString('fr-FR') : '';
-  let h = '';
+  // Overview
+  let h=`<div class="grid kpis">`;
+  h+=kpi('👥 Utilisateurs',nf(u.total),'',`${nf(u.newThisWeek)} cette semaine`);
+  h+=kpi('💰 MRR',eur(rev.mrr),'grn',`ARR ${eur(rev.arr)}`);
+  h+=kpi('📈 Conversion',u.conversionRate||'—','blu',`${nf(paid)} payants`);
+  h+=kpi('⚡ Actifs 7 j',nf(u.activeLast7d),'amb',`${nf(u.activeLast30d)} sur 30 j`);
+  h+=`</div>`;
+  if(Array.isArray(d.funnel)&&d.funnel.length){
+    const top=Math.max(1,...d.funnel.map(s=>s.count||0));
+    h+=`<div class="sec-h">Entonnoir de conversion</div><div class="card"><div class="funnel">`;
+    for(const s of d.funnel){ const w=Math.round((s.count||0)/top*100); const c=(s.conversionFromPrev==null)?'':`<b>${s.conversionFromPrev}%</b> vs préc.`;
+      h+=`<div class="fstep"><div class="fl">${s.label}</div><div class="fbar-track"><div class="fbar" style="width:${Math.max(w,3)}%">${nf(s.count)}</div></div><div class="fconv">${c}</div></div>`; }
+    h+=`</div><div class="note">Volumes d'événements (pas utilisateurs uniques). % = étape / étape précédente.</div></div>`;
+  } else { h+=`<div class="sec-h">Entonnoir</div>`+soonCard('Entonnoir indisponible','Déploie la PR d\'instrumentation (#20) pour activer <code>funnel</code> et <code>daily</code> dans <code>/api/admin/stats</code>.'); }
+  if(dd){ h+=`<div class="sec-h">14 derniers jours</div><div class="grid charts">`+chart('Inscriptions',dd.days,dd.user_registered)+chart('CV générés',dd.days,dd.cv_generated)+chart('Checkout lancés',dd.days,dd.checkout_started)+chart('Abonnements',dd.days,dd.plan_upgraded)+`</div>`; }
+  $('sec-overview').innerHTML=h;
 
-  // KPIs
-  h += `<div class="sec"><div class="grid kpis">`;
-  h += kpi('👥 Utilisateurs', nf(u.total), '', `${nf(u.newThisWeek)} cette semaine`);
-  h += kpi('💰 MRR', eur(rev.mrr), 'grn', `ARR ${eur(rev.arr)}`);
-  h += kpi('📈 Conversion', u.conversionRate || '—', 'blu', `${nf((plan.pro||0)+(plan.intensif||0))} payants`);
-  h += kpi('⚡ Actifs 7 j', nf(u.activeLast7d), 'amb', `${nf(u.activeLast30d)} sur 30 j`);
-  h += `</div></div>`;
-
-  // Funnel
-  if (Array.isArray(d.funnel) && d.funnel.length) {
-    const top = Math.max(1, ...d.funnel.map(s => s.count || 0));
-    h += `<div class="sec"><div class="sec-h">Entonnoir de conversion</div><div class="card"><div class="funnel">`;
-    for (const s of d.funnel) {
-      const w = Math.round(((s.count || 0) / top) * 100);
-      const conv = (s.conversionFromPrev == null) ? '' : `<b>${s.conversionFromPrev}%</b> vs préc.`;
-      h += `<div class="fstep"><div class="fl">${s.label}</div><div class="fbar-track"><div class="fbar" style="width:${Math.max(w,3)}%">${nf(s.count)}</div></div><div class="fconv">${conv}</div></div>`;
-    }
-    h += `</div><div class="note">Volumes d'événements (pas utilisateurs uniques). Les % = étape / étape précédente.</div></div></div>`;
-  } else {
-    h += `<div class="sec"><div class="card note">Entonnoir indisponible — déploie la PR d'instrumentation (#20) pour activer <code>funnel</code> et <code>daily</code>.</div></div>`;
-  }
-
-  // Daily charts
-  if (d.daily && Array.isArray(d.daily.days)) {
-    const dd = d.daily;
-    h += `<div class="sec"><div class="sec-h">14 derniers jours</div><div class="grid charts">`;
-    h += chart('Inscriptions', dd.days, dd.user_registered || []);
-    h += chart('CV générés', dd.days, dd.cv_generated || []);
-    h += chart('Checkout lancés', dd.days, dd.checkout_started || []);
-    h += chart('Abonnements', dd.days, dd.plan_upgraded || []);
-    h += `</div></div>`;
-  }
-
-  // Plans + Engagement
-  h += `<div class="sec"><div class="grid two">`;
-  h += `<div class="card"><div class="sec-h">Répartition des plans</div><div class="rows">
+  // Revenue
+  h=`<div class="grid kpis">`+kpi('💰 MRR',eur(rev.mrr),'grn')+kpi('📅 ARR',eur(rev.arr),'grn')+kpi('👤 Payants',nf(paid),'blu',u.conversionRate?`${u.conversionRate} conversion`:'' )+kpi('🧮 ARPU',paid>0?eur((rev.mrr/paid).toFixed(1)):'—','vio','par abonné/mois')+`</div>`;
+  h+=`<div class="sec-h">Détail par plan</div><div class="card"><div class="rows">
+    <div class="row"><span class="k">Pro — 9 €/mois</span><span class="v">${nf(plan.pro)} · ${eur(rev.proRevenue)}</span></div>
+    <div class="row"><span class="k">Intensif — 19 €/mois</span><span class="v">${nf(plan.intensif)} · ${eur(rev.intensifRevenue)}</span></div>
     <div class="row"><span class="k">Gratuit</span><span class="v">${nf(plan.free)}</span></div>
-    <div class="row"><span class="k">Pro (9€)</span><span class="v">${nf(plan.pro)}</span></div>
-    <div class="row"><span class="k">Intensif (19€)</span><span class="v">${nf(plan.intensif)}</span></div>
-  </div>${u.sampleSize?`<div class="note">Échantillon ${nf(u.sampleSize)}/${nf(u.sampleOf)} users.</div>`:''}</div>`;
-  h += `<div class="card"><div class="sec-h">Engagement (cumulé)</div><div class="rows">
-    <div class="row"><span class="k">CV générés</span><span class="v">${nf(ev.cvGenerated)}</span></div>
-    <div class="row"><span class="k">Lettres générées</span><span class="v">${nf(ev.letterGenerated)}</span></div>
-    <div class="row"><span class="k">Scores ATS</span><span class="v">${nf(ev.atsChecked)}</span></div>
-    <div class="row"><span class="k">Entretiens lancés</span><span class="v">${nf(ev.interviewStarted)}</span></div>
-    <div class="row"><span class="k">Paywall vus</span><span class="v">${nf(ev.paywallViewed)}</span></div>
-    <div class="row"><span class="k">Checkout lancés</span><span class="v">${nf(ev.checkoutStarted)}</span></div>
-  </div></div>`;
-  h += `</div></div>`;
+  </div>${u.sampleSize?`<div class="note">Réparti sur un échantillon de ${nf(u.sampleSize)}/${nf(u.sampleOf)} utilisateurs.</div>`:''}</div>`;
+  $('sec-revenue').innerHTML=h;
 
-  // Other
-  h += `<div class="sec"><div class="card"><div class="sec-h">Canaux</div><div class="rows">
-    <div class="row"><span class="k">Abonnés alertes</span><span class="v">${nf(oth.alertSubscribers)}</span></div>
-    <div class="row"><span class="k">Abonnés newsletter</span><span class="v">${nf(oth.newsletterSubscribers)}</span></div>
-    <div class="row"><span class="k">Réponses NPS</span><span class="v">${nf(oth.npsEntries)}</span></div>
-  </div></div></div>`;
+  // Acquisition
+  h=`<p class="lead">Nouveaux inscrits et canaux d'audience détenus. Les sources de trafic détaillées (organique/référents) se lisent dans Plausible.</p>`;
+  h+=`<div class="grid kpis">`+kpi('🆕 Aujourd\'hui',nf(u.newToday))+kpi('🗓️ Cette semaine',nf(u.newThisWeek))+kpi('📨 Alertes',nf(oth.alertSubscribers),'blu')+kpi('✉️ Newsletter',nf(oth.newsletterSubscribers),'blu')+`</div>`;
+  if(dd) h+=`<div class="sec-h">Inscriptions — 14 derniers jours</div><div class="grid charts">`+chart('Inscriptions',dd.days,dd.user_registered)+`</div>`;
+  $('sec-acquisition').innerHTML=h;
 
-  if (d._note) h += `<div class="note">${d._note}</div>`;
+  // SEO (no owned data source server-side)
+  $('sec-seo').innerHTML=`<p class="lead">Le SEO est le principal levier d'acquisition d'Emploia (85 pages villes/métiers enrichies). Les métriques de positionnement et de clics viennent d'outils externes — à connecter.</p>`+soonCard('Brancher les données SEO','Connecte <b>Google Search Console</b> (impressions, clics, position moyenne) et <b>Plausible</b> (pages vues, sources). Une fois l\'API Search Console branchée, cette section affichera les requêtes et pages qui performent.');
 
-  $('content').innerHTML = h;
+  // Retention
+  const dau=u.activeLast7d||0, mau=u.activeLast30d||0;
+  h=`<div class="grid kpis">`+kpi('⚡ Actifs 7 j',nf(u.activeLast7d),'amb')+kpi('📆 Actifs 30 j',nf(u.activeLast30d),'amb')+kpi('🔁 Ratio 7j/30j',mau>0?Math.round(dau/mau*100)+'%':'—','vio','proxy de rétention')+kpi('👥 Total',nf(u.total))+`</div>`;
+  h+=`<div class="note">Basé sur <code>lastLoginAt</code> / <code>createdAt</code>. Les cohortes détaillées (rétention J1/J7/J30 par semaine d'inscription) nécessitent un historisation d'événements par utilisateur — à ajouter si besoin.</div>`;
+  $('sec-retention').innerHTML=h;
+
+  // Product & engagement
+  h=`<div class="grid kpis">`+kpi('📄 CV',nf(ev.cvGenerated))+kpi('✉️ Lettres',nf(ev.letterGenerated))+kpi('🎯 Scores ATS',nf(ev.atsChecked))+kpi('🎤 Entretiens',nf(ev.interviewStarted))+`</div>`;
+  h+=`<div class="sec-h">Vers la conversion</div><div class="grid kpis">`+kpi('🚧 Paywall vus',nf(ev.paywallViewed),'amb')+kpi('🛒 Checkout lancés',nf(ev.checkoutStarted),'amb')+kpi('✅ Abonnements',nf(ev.plansUpgraded),'grn')+`</div>`;
+  if(dd) h+=`<div class="sec-h">14 derniers jours</div><div class="grid charts">`+chart('CV générés',dd.days,dd.cv_generated)+chart('Checkout lancés',dd.days,dd.checkout_started)+`</div>`;
+  $('sec-product').innerHTML=h;
+
+  // Automations (real config = the scheduled crons)
+  const CRONS=[
+    ['Alertes emploi quotidiennes','Tous les jours · 7h','send-alerts'],
+    ['Nurture (onboarding)','Tous les jours · 11h','send-nurture'],
+    ['Réactivation','Tous les jours · 12h','send-reactivation'],
+    ['Réengagement','Tous les jours · 10h','send-reengagement'],
+    ['Rappel fin d\'essai','Tous les jours · 9h','trial-reminder'],
+    ['Digest hebdo (offres)','Lundi · 7h','send-weekly-digest'],
+    ['Rapport hebdo utilisateur','Dimanche · 8h','send-weekly-user-report'],
+    ['Agent recrutement','Mardi · 8h','agent/recruiting'],
+    ['Agent reporting','Dimanche · 18h','agent/reporting'],
+  ];
+  h=`<p class="lead">Tâches planifiées réellement configurées (Vercel Cron). Elles tournent automatiquement en production. Les taux d'ouverture/clic par email se brancheront via les webhooks Resend.</p>`;
+  h+=`<div class="card"><div class="rows">`+CRONS.map(c=>`<div class="row"><span class="k">${c[0]} <span style="color:var(--t3)">· <code>${c[2]}</code></span></span><span style="display:flex;gap:10px;align-items:center"><span class="v" style="color:var(--t2);font-weight:600">${c[1]}</span><span class="pill ok">actif</span></span></div>`).join('')+`</div></div>`;
+  h+=`<div class="sec-h">À brancher</div>`+soonCard('Performance des emails','Ajoute les <b>webhooks Resend</b> (delivered / opened / clicked) → un endpoint <code>/api/resend-webhook</code> qui incrémente des compteurs, puis affiche ici l\'ouverture et le clic par automatisation.');
+  $('sec-automations').innerHTML=h;
+
+  // Referral
+  $('sec-referral').innerHTML=`<p class="lead">Le parrainage est actif côté produit : chaque utilisateur a un code, le parrain gagne des jours Pro (max 6 mois) et le filleul un bonus. Voir <code>/api/referral</code>.</p>`+soonCard('Métrique agrégée à brancher','Les données de parrainage sont stockées par code (<code>ref:{code}</code>), sans compteur global. Pour afficher ici le nombre de parrainages et de conversions, j\'ajoute un compteur <code>track:referral_signup</code> (comme le funnel) — dis-moi et je le fais.');
 }
 
-// Auto-load if a secret is already in this session.
+/* auto-load if secret present */
 (function(){ let s=''; try{s=sessionStorage.getItem(SKEY)||'';}catch{} if(s) load(); })();
 </script>
 </body>
