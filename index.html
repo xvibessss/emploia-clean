@@ -1266,6 +1266,7 @@
   function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
   async function startCheckout(plan, btn) {
     const label = btn.textContent;
+    if (window.trackEvent) window.trackEvent('checkout_started', { plan });
     btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
     try {
       const res = await fetch('/api/stripe-checkout', {

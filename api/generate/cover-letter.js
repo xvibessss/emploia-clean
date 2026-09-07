@@ -91,6 +91,9 @@ export default async function handler(req) {
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`));
               }
               if (parsed.type === 'message_stop') {
+                // Track event (fire and forget)
+                const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+                fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'letter_generated', props: { plan: user.plan } }) }).catch(() => {});
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                 if (gen.count === FREE_LIMIT) {
                   const resendKey = process.env.RESEND_API_KEY;

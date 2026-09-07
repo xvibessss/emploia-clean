@@ -107,6 +107,12 @@ Règles : score entre 40 et 97. Tous les champs en texte simple sans HTML. Sois 
 
     if (result?.score == null) return new Response(JSON.stringify({ error: "Réponse invalide" }), { status: 500, headers: H });
 
+    // Track event (fire and forget)
+    {
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'ats_checked', props: { plan: user.plan } }) }).catch(() => {});
+    }
+
     if (gen.count === FREE_LIMIT) {
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {

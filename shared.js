@@ -447,6 +447,7 @@ window.empShowUpgrade = function() {
   }
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (window.trackEvent) window.trackEvent('paywall_viewed');
 };
 
 // Change password modal

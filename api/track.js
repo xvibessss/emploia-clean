@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvIncr, kvZadd, kvZcard, kvZremrangebyrank } from './_lib/auth.js';
+import { kvIncr, kvZadd, kvZcard, kvZremrangebyrank, kvExpire } from './_lib/auth.js';
 
 const VALID_EVENTS = [
   'cv_generated',
@@ -9,10 +9,18 @@ const VALID_EVENTS = [
   'interview_started',
   'ats_checked',
   'letter_generated',
+  'paywall_viewed',
+  'checkout_started',
 ];
 
 const MAX_TIMELINE_SIZE = 10000;
 const MAX_BODY_SIZE = 1024;
+// Daily per-event buckets self-expire so the keyspace stays bounded.
+const DAILY_BUCKET_TTL = 120 * 86400; // ~120 days
+
+function dayKey(ts) {
+  return new Date(ts).toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -39,6 +47,10 @@ export default async function handler(req, res) {
   try {
     await kvIncr(`track:${event}`);
     const now = Date.now();
+    // Per-day bucket for time-series / trend charts (self-expiring).
+    const bucketKey = `track:${event}:${dayKey(now)}`;
+    const { result: bucketCount } = await kvIncr(bucketKey);
+    if (Number(bucketCount) === 1) await kvExpire(bucketKey, DAILY_BUCKET_TTL);
     const member = JSON.stringify({ event, props: props || {}, ts: now });
     await kvZadd('track:events', now, member);
     const size = await kvZcard('track:events');
