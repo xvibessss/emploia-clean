@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>Admin — Emploia</title>
+  <style>
+    :root{
+      --bg:#0b0e14; --s1:#111725; --s2:#161d2e; --s3:#1d2740; --brd:#232d44;
+      --t1:#e8edf7; --t2:#9aa7bd; --t3:#66748f; --ind:#6366f1; --ind2:#818cf8;
+      --grn:#34d399; --red:#f87171; --amb:#fbbf24; --blu:#60a5fa;
+      --grad:linear-gradient(135deg,#6366f1,#3b82f6);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--t1);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+    a{color:var(--ind2)}
+    .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+    /* Gate */
+    .gate{max-width:400px;margin:14vh auto;padding:0 20px;text-align:center}
+    .gate .logo{width:52px;height:52px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;margin:0 auto 18px}
+    .gate h1{font-size:20px;font-weight:800;margin:0 0 6px}
+    .gate p{color:var(--t2);font-size:13px;margin:0 0 22px}
+    .gate input{width:100%;background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;color:var(--t1);font-size:15px;margin-bottom:12px}
+    .gate input:focus{outline:none;border-color:var(--ind)}
+    .btn{background:var(--grad);color:#fff;border:0;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;width:100%;letter-spacing:-.2px}
+    .btn.ghost{background:var(--s2);border:1px solid var(--brd);color:var(--t2);width:auto;padding:9px 16px;font-size:13px}
+    .gate .err{color:var(--red);font-size:13px;min-height:18px;margin-top:4px}
+    /* Header */
+    .hd{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+    .hd h1{font-size:22px;font-weight:900;letter-spacing:-.6px;margin:0;display:flex;align-items:center;gap:10px}
+    .hd .mark{width:32px;height:32px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff}
+    .hd .meta{color:var(--t3);font-size:12px}
+    .hd .actions{display:flex;gap:8px;align-items:center}
+    /* Sections */
+    .sec{margin-bottom:30px}
+    .sec-h{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:700;margin:0 0 12px}
+    .grid{display:grid;gap:14px}
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+    .card{background:var(--s1);border:1px solid var(--brd);border-radius:16px;padding:18px 20px}
+    .kpi .lbl{color:var(--t2);font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .kpi .val{font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1}
+    .kpi .sub{color:var(--t3);font-size:12px;margin-top:6px}
+    .val.grn{color:var(--grn)} .val.blu{color:var(--blu)} .val.amb{color:var(--amb)}
+    /* Funnel */
+    .funnel{display:flex;flex-direction:column;gap:10px}
+    .fstep{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center}
+    .fstep .fl{color:var(--t2);font-size:13px;font-weight:600}
+    .fbar-track{background:var(--s3);border-radius:8px;height:34px;overflow:hidden;position:relative}
+    .fbar{height:100%;background:var(--grad);border-radius:8px;min-width:2px;transition:width .5s ease;display:flex;align-items:center;padding-left:12px;color:#fff;font-weight:800;font-size:13px}
+    .fstep .fconv{font-size:12px;color:var(--t3);white-space:nowrap;min-width:74px;text-align:right}
+    .fconv b{color:var(--grn)}
+    /* Daily charts */
+    .charts{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .chart .ct{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+    .chart .ct .nm{font-size:13px;font-weight:700;color:var(--t1)}
+    .chart .ct .tot{font-size:12px;color:var(--t3)}
+    .bars{display:flex;align-items:flex-end;gap:3px;height:64px}
+    .bars .b{flex:1;background:var(--s3);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+    .bars .b.on{background:var(--ind)}
+    .bars .b:last-child.on{background:var(--ind2)}
+    .chart .xr{display:flex;justify-content:space-between;color:var(--t3);font-size:10px;margin-top:6px}
+    /* mini tables */
+    .rows{display:flex;flex-direction:column;gap:0}
+    .row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--brd);font-size:13px}
+    .row:last-child{border-bottom:0}
+    .row .k{color:var(--t2)} .row .v{font-weight:700;font-variant-numeric:tabular-nums}
+    .note{color:var(--t3);font-size:12px;margin-top:10px;font-style:italic}
+    .two{grid-template-columns:1fr 1fr}
+    @media(max-width:640px){.two{grid-template-columns:1fr}.fstep{grid-template-columns:100px 1fr;grid-template-rows:auto auto}.fstep .fconv{grid-column:2;text-align:left}}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="logo">E</div>
+  <h1>Console Admin</h1>
+  <p>Accès réservé. Entre le secret admin (variable <code>ADMIN_SECRET</code>).</p>
+  <input type="password" id="secret" placeholder="ADMIN_SECRET" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+  <button class="btn" onclick="login()">Se connecter</button>
+  <div class="err" id="gateErr"></div>
+</div>
+
+<div class="wrap" id="dash" hidden>
+  <div class="hd">
+    <h1><span class="mark">E</span> Console Admin</h1>
+    <div class="actions">
+      <span class="meta" id="genAt"></span>
+      <button class="btn ghost" onclick="load()">↻ Rafraîchir</button>
+      <button class="btn ghost" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script>
+const SKEY = 'emploia_admin_secret';
+const $ = (id) => document.getElementById(id);
+const nf = (n) => (Number(n) || 0).toLocaleString('fr-FR');
+const eur = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' €';
+
+function login() {
+  const v = $('secret').value.trim();
+  if (!v) { $('gateErr').textContent = 'Entre le secret.'; return; }
+  try { sessionStorage.setItem(SKEY, v); } catch {}
+  load();
+}
+function logout() {
+  try { sessionStorage.removeItem(SKEY); } catch {}
+  $('dash').hidden = true; $('gate').hidden = false; $('secret').value = ''; $('gateErr').textContent = '';
+}
+
+async function load() {
+  let secret = '';
+  try { secret = sessionStorage.getItem(SKEY) || ''; } catch {}
+  if (!secret) { logout(); return; }
+  try {
+    const r = await fetch('/api/admin/stats', { headers: { 'x-admin-secret': secret }, cache: 'no-store' });
+    if (r.status === 403) { $('gateErr').textContent = 'Secret invalide.'; $('gate').hidden = false; $('dash').hidden = true; return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    $('gate').hidden = true; $('dash').hidden = false; $('gateErr').textContent = '';
+    render(data);
+  } catch (e) {
+    if ($('dash').hidden) { $('gateErr').textContent = 'Erreur de chargement. Réessaie.'; }
+    else { $('content').insertAdjacentHTML('afterbegin', '<div class="card" style="border-color:var(--red);margin-bottom:14px">⚠️ Erreur de rafraîchissement.</div>'); }
+  }
+}
+
+function kpi(lbl, val, cls, sub) {
+  return `<div class="card kpi"><div class="lbl">${lbl}</div><div class="val ${cls||''}">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+}
+
+function chart(name, days, series, color) {
+  const max = Math.max(1, ...series);
+  const total = series.reduce((a, b) => a + b, 0);
+  const bars = series.map((v, i) => {
+    const h = Math.round((v / max) * 100);
+    const on = v > 0 ? 'on' : '';
+    return `<div class="b ${on}" style="height:${Math.max(h,2)}%" title="${days[i]}: ${nf(v)}"></div>`;
+  }).join('');
+  const first = days[0]?.slice(5), last = days[days.length - 1]?.slice(5);
+  return `<div class="card chart"><div class="ct"><span class="nm">${name}</span><span class="tot">${nf(total)} sur 14 j</span></div><div class="bars">${bars}</div><div class="xr"><span>${first}</span><span>${last}</span></div></div>`;
+}
+
+function render(d) {
+  const u = d.users || {}, rev = d.revenue || {}, ev = d.events || {}, oth = d.other || {}, plan = u.byPlan || {};
+  $('genAt').textContent = d.generatedAt ? 'MàJ ' + new Date(d.generatedAt).toLocaleString('fr-FR') : '';
+  let h = '';
+
+  // KPIs
+  h += `<div class="sec"><div class="grid kpis">`;
+  h += kpi('👥 Utilisateurs', nf(u.total), '', `${nf(u.newThisWeek)} cette semaine`);
+  h += kpi('💰 MRR', eur(rev.mrr), 'grn', `ARR ${eur(rev.arr)}`);
+  h += kpi('📈 Conversion', u.conversionRate || '—', 'blu', `${nf((plan.pro||0)+(plan.intensif||0))} payants`);
+  h += kpi('⚡ Actifs 7 j', nf(u.activeLast7d), 'amb', `${nf(u.activeLast30d)} sur 30 j`);
+  h += `</div></div>`;
+
+  // Funnel
+  if (Array.isArray(d.funnel) && d.funnel.length) {
+    const top = Math.max(1, ...d.funnel.map(s => s.count || 0));
+    h += `<div class="sec"><div class="sec-h">Entonnoir de conversion</div><div class="card"><div class="funnel">`;
+    for (const s of d.funnel) {
+      const w = Math.round(((s.count || 0) / top) * 100);
+      const conv = (s.conversionFromPrev == null) ? '' : `<b>${s.conversionFromPrev}%</b> vs préc.`;
+      h += `<div class="fstep"><div class="fl">${s.label}</div><div class="fbar-track"><div class="fbar" style="width:${Math.max(w,3)}%">${nf(s.count)}</div></div><div class="fconv">${conv}</div></div>`;
+    }
+    h += `</div><div class="note">Volumes d'événements (pas utilisateurs uniques). Les % = étape / étape précédente.</div></div></div>`;
+  } else {
+    h += `<div class="sec"><div class="card note">Entonnoir indisponible — déploie la PR d'instrumentation (#20) pour activer <code>funnel</code> et <code>daily</code>.</div></div>`;
+  }
+
+  // Daily charts
+  if (d.daily && Array.isArray(d.daily.days)) {
+    const dd = d.daily;
+    h += `<div class="sec"><div class="sec-h">14 derniers jours</div><div class="grid charts">`;
+    h += chart('Inscriptions', dd.days, dd.user_registered || []);
+    h += chart('CV générés', dd.days, dd.cv_generated || []);
+    h += chart('Checkout lancés', dd.days, dd.checkout_started || []);
+    h += chart('Abonnements', dd.days, dd.plan_upgraded || []);
+    h += `</div></div>`;
+  }
+
+  // Plans + Engagement
+  h += `<div class="sec"><div class="grid two">`;
+  h += `<div class="card"><div class="sec-h">Répartition des plans</div><div class="rows">
+    <div class="row"><span class="k">Gratuit</span><span class="v">${nf(plan.free)}</span></div>
+    <div class="row"><span class="k">Pro (9€)</span><span class="v">${nf(plan.pro)}</span></div>
+    <div class="row"><span class="k">Intensif (19€)</span><span class="v">${nf(plan.intensif)}</span></div>
+  </div>${u.sampleSize?`<div class="note">Échantillon ${nf(u.sampleSize)}/${nf(u.sampleOf)} users.</div>`:''}</div>`;
+  h += `<div class="card"><div class="sec-h">Engagement (cumulé)</div><div class="rows">
+    <div class="row"><span class="k">CV générés</span><span class="v">${nf(ev.cvGenerated)}</span></div>
+    <div class="row"><span class="k">Lettres générées</span><span class="v">${nf(ev.letterGenerated)}</span></div>
+    <div class="row"><span class="k">Scores ATS</span><span class="v">${nf(ev.atsChecked)}</span></div>
+    <div class="row"><span class="k">Entretiens lancés</span><span class="v">${nf(ev.interviewStarted)}</span></div>
+    <div class="row"><span class="k">Paywall vus</span><span class="v">${nf(ev.paywallViewed)}</span></div>
+    <div class="row"><span class="k">Checkout lancés</span><span class="v">${nf(ev.checkoutStarted)}</span></div>
+  </div></div>`;
+  h += `</div></div>`;
+
+  // Other
+  h += `<div class="sec"><div class="card"><div class="sec-h">Canaux</div><div class="rows">
+    <div class="row"><span class="k">Abonnés alertes</span><span class="v">${nf(oth.alertSubscribers)}</span></div>
+    <div class="row"><span class="k">Abonnés newsletter</span><span class="v">${nf(oth.newsletterSubscribers)}</span></div>
+    <div class="row"><span class="k">Réponses NPS</span><span class="v">${nf(oth.npsEntries)}</span></div>
+  </div></div></div>`;
+
+  if (d._note) h += `<div class="note">${d._note}</div>`;
+
+  $('content').innerHTML = h;
+}
+
+// Auto-load if a secret is already in this session.
+(function(){ let s=''; try{s=sessionStorage.getItem(SKEY)||'';}catch{} if(s) load(); })();
+</script>
+</body>
+</html>
