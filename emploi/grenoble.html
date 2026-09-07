@@ -54,7 +54,24 @@
     .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Grenoble ?","acceptedAnswer":{"@type":"Answer","text":"La micro-électronique, l'énergie et l'industrie, la recherche et le numérique sont les principaux secteurs qui recrutent à Grenoble, avec une forte demande d'ingénieurs."}},{"@type":"Question","name":"Quel salaire espérer à Grenoble ?","acceptedAnswer":{"@type":"Answer","text":"Grâce au poids de l'industrie de pointe, les salaires d'ingénieurs sont attractifs : jusqu'à 58 000 € brut/an pour un profil confirmé en micro-électronique."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Grenoble ?","acceptedAnswer":{"@type":"Answer","text":"STMicroelectronics, Schneider Electric, le CEA, Soitec, HP et Caterpillar comptent parmi les plus gros employeurs de l'agglomération."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -102,18 +119,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Grenoble</span></h2>
-    <p>Grenoble est la capitale française de la haute technologie. Surnommée "la Silicon Valley des Alpes", elle concentre un tissu exceptionnel d'entreprises tech et de centres de recherche : STMicroelectronics, Schneider Electric, Air Liquide, le CEA et le CNRS. C'est la ville qui recrute le plus d'ingénieurs et de chercheurs en France après Paris.</p><p>Les secteurs dominants : micro-électronique et semi-conducteurs, énergie renouvelable, logiciel embarqué, intelligence artificielle, sciences des matériaux. Les salaires d'ingénieurs y sont parmi les plus élevés de province (45 000€–80 000€+).</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Grenoble</span></h2>
+    <p>Capitale française de la micro-électronique et de la recherche (CEA, STMicroelectronics, Soitec), Grenoble concentre une densité exceptionnelle d'ingénieurs et de chercheurs. L'énergie (Schneider Electric) et le numérique y sont également très présents.</p>
   </div>
 
-  <div class="seo-related">
-    <h2>Autres villes</h2>
-    <div class="seo-related-links"><a href="/emploi/lyon">Lyon</a><a href="/emploi/paris">Paris</a><a href="/emploi/remote">Remote</a><a href="/emploi/bordeaux">Bordeaux</a></div>
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Grenoble</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Grenoble et dans Auvergne-Rhône-Alpes, dans les secteurs les plus dynamiques : Micro-électronique, Énergie &amp; industrie, Recherche &amp; innovation, Numérique, Santé.</p>
+    <div class="emp-chips"><span class="emp-chip">STMicroelectronics</span><span class="emp-chip">Schneider Electric</span><span class="emp-chip">CEA</span><span class="emp-chip">Soitec</span><span class="emp-chip">HP</span><span class="emp-chip">Caterpillar</span><span class="emp-chip">Atos</span><span class="emp-chip">Air Liquide</span></div>
   </div>
-  <div class="seo-related" style="margin-top:24px">
-    <h2>Par métier</h2>
-    <div class="seo-related-links"><a href="/metier/developpeur">Développeur</a><a href="/metier/devops">DevOps</a><a href="/metier/data">Data</a><a href="/metier/chef-projet">Chef de Projet</a></div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Grenoble — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Grenoble, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Ingénieur micro-électronique</td><td>38 000 – 58 000 €</td></tr><tr><td>Développeur web</td><td>34 000 – 50 000 €</td></tr><tr><td>Comptable</td><td>28 000 – 41 000 €</td></tr><tr><td>Technicien</td><td>28 000 – 40 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Grenoble</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Grenoble ?</h3><p>La micro-électronique, l'énergie et l'industrie, la recherche et le numérique sont les principaux secteurs qui recrutent à Grenoble, avec une forte demande d'ingénieurs.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Grenoble ?</h3><p>Grâce au poids de l'industrie de pointe, les salaires d'ingénieurs sont attractifs : jusqu'à 58 000 € brut/an pour un profil confirmé en micro-électronique.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Grenoble ?</h3><p>STMicroelectronics, Schneider Electric, le CEA, Soitec, HP et Caterpillar comptent parmi les plus gros employeurs de l'agglomération.</p></div>
   </div>
 </div>
 

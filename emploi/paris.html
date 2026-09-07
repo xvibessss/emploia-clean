@@ -54,7 +54,24 @@
     .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Paris ?","acceptedAnswer":{"@type":"Answer","text":"La finance, le luxe, le conseil, la tech et la santé sont les secteurs les plus dynamiques à Paris. Les fonctions commerciales, comptables et informatiques figurent parmi les plus recherchées."}},{"@type":"Question","name":"Quel salaire espérer à Paris ?","acceptedAnswer":{"@type":"Answer","text":"Les salaires parisiens sont supérieurs de 10 à 15 % à la moyenne nationale pour compenser le coût de la vie. Un développeur débutant démarre autour de 38 000 € brut/an, un profil confirmé peut dépasser 60 000 €."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Paris ?","acceptedAnswer":{"@type":"Answer","text":"Parmi les plus gros employeurs : LVMH, BNP Paribas, L'Oréal, Sanofi, TotalEnergies, Orange, Société Générale et Capgemini, sans compter des milliers de PME et start-up."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -109,10 +126,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Paris</span> — Guide complet</h2>
-    <p>Offres CDI, CDD, alternance et stage à Paris et en Île-de-France. Postulez avec un CV ATS-optimisé généré en 30 secondes.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Paris</span></h2>
+    <p>Premier bassin d'emploi de France, Paris et l'Île-de-France concentrent près d'un quart des offres nationales. La capitale recrute massivement dans la finance, le luxe, le conseil et le numérique, avec une forte demande de profils qualifiés en CDI comme en alternance.</p>
+  </div>
+
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Paris</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Paris et dans Île-de-France, dans les secteurs les plus dynamiques : Finance &amp; banque, Luxe &amp; mode, Tech &amp; numérique, Conseil, Santé &amp; pharma.</p>
+    <div class="emp-chips"><span class="emp-chip">LVMH</span><span class="emp-chip">BNP Paribas</span><span class="emp-chip">L'Oréal</span><span class="emp-chip">Sanofi</span><span class="emp-chip">TotalEnergies</span><span class="emp-chip">Orange</span><span class="emp-chip">Société Générale</span><span class="emp-chip">Capgemini</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Paris — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Paris, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Développeur web</td><td>38 000 – 60 000 €</td></tr><tr><td>Comptable</td><td>32 000 – 48 000 €</td></tr><tr><td>Chef de projet</td><td>45 000 – 70 000 €</td></tr><tr><td>Assistant administratif</td><td>26 000 – 34 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Paris</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Paris ?</h3><p>La finance, le luxe, le conseil, la tech et la santé sont les secteurs les plus dynamiques à Paris. Les fonctions commerciales, comptables et informatiques figurent parmi les plus recherchées.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Paris ?</h3><p>Les salaires parisiens sont supérieurs de 10 à 15 % à la moyenne nationale pour compenser le coût de la vie. Un développeur débutant démarre autour de 38 000 € brut/an, un profil confirmé peut dépasser 60 000 €.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Paris ?</h3><p>Parmi les plus gros employeurs : LVMH, BNP Paribas, L'Oréal, Sanofi, TotalEnergies, Orange, Société Générale et Capgemini, sans compter des milliers de PME et start-up.</p></div>
   </div>
 </div>
 

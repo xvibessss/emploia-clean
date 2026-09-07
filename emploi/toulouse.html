@@ -54,7 +54,24 @@
     .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
     .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
     .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
   </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels secteurs recrutent le plus à Toulouse ?","acceptedAnswer":{"@type":"Answer","text":"L'aéronautique et le spatial dominent largement, suivis du numérique, de la santé/biotech et de l'ingénierie. Les postes d'ingénieurs et de techniciens y sont très recherchés."}},{"@type":"Question","name":"Quel salaire espérer à Toulouse ?","acceptedAnswer":{"@type":"Answer","text":"Grâce au poids de l'aéronautique, les salaires d'ingénieurs sont attractifs : de 38 000 à 58 000 € brut/an. Un développeur confirmé se situe autour de 52 000 €."}},{"@type":"Question","name":"Quelles grandes entreprises recrutent à Toulouse ?","acceptedAnswer":{"@type":"Answer","text":"Airbus, Thales Alenia Space, Safran, Continental, ATR et le CNES sont les plus gros employeurs, entourés d'un écosystème dense de sous-traitants et de start-up."}}]}</script>
 </head>
 <body>
 <nav class="emp-nav">
@@ -109,10 +126,32 @@
     <a href="/app" class="btn btn-primary btn-lg">Commencer gratuitement →</a>
   </div>
 
-  <div class="seo-info">
-    <h2>Offres d'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Toulouse</span> — Guide complet</h2>
-    <p>Offres d'emploi à Toulouse — tech, aérospatiale, santé. Générez votre CV optimisé pour chaque offre en 30 secondes.</p>
-    <p>Emploia vous aide à candidater efficacement grâce à un CV généré par intelligence artificielle, optimisé pour les systèmes ATS des recruteurs. En quelques secondes, obtenez un document professionnel adapté à chaque offre.</p>
+    <div class="seo-info" data-enriched="1">
+    <h2>Le marché de l'emploi à <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Toulouse</span></h2>
+    <p>Capitale européenne de l'aéronautique et du spatial, Toulouse concentre Airbus, Thales, Safran et le CNES. La ville rose est aussi un pôle numérique et de recherche majeur, avec une demande soutenue d'ingénieurs et de développeurs.</p>
+  </div>
+
+  <div class="seo-employers">
+    <h2>Les entreprises qui recrutent à Toulouse</h2>
+    <p class="seo-sub">Quelques-uns des principaux employeurs présents à Toulouse et dans Occitanie, dans les secteurs les plus dynamiques : Aéronautique &amp; spatial, Numérique &amp; IT, Santé &amp; biotech, Recherche, Ingénierie.</p>
+    <div class="emp-chips"><span class="emp-chip">Airbus</span><span class="emp-chip">Thales Alenia Space</span><span class="emp-chip">Safran</span><span class="emp-chip">Continental</span><span class="emp-chip">ATR</span><span class="emp-chip">CNES</span><span class="emp-chip">Capgemini</span><span class="emp-chip">Sopra Steria</span></div>
+  </div>
+
+  <div class="seo-salary">
+    <h2>Salaires à Toulouse — fourchettes indicatives</h2>
+    <p class="seo-sub">Repères de rémunération pour quelques métiers courants à Toulouse, du profil débutant au profil confirmé.</p>
+    <table class="salary-table">
+      <thead><tr><th>Métier</th><th>Salaire brut annuel</th></tr></thead>
+      <tbody><tr><td>Ingénieur aéronautique</td><td>38 000 – 58 000 €</td></tr><tr><td>Développeur web</td><td>35 000 – 52 000 €</td></tr><tr><td>Comptable</td><td>29 000 – 43 000 €</td></tr><tr><td>Technicien</td><td>28 000 – 40 000 €</td></tr></tbody>
+    </table>
+    <p class="salary-note">Fourchettes indicatives (brut annuel, débutant → confirmé), données à titre d'information. Les rémunérations réelles varient selon l'expérience, le diplôme et l'entreprise.</p>
+  </div>
+
+  <div class="seo-faq">
+    <h2>Questions fréquentes — emploi à Toulouse</h2>
+    <div class="faq-item"><h3>Quels secteurs recrutent le plus à Toulouse ?</h3><p>L'aéronautique et le spatial dominent largement, suivis du numérique, de la santé/biotech et de l'ingénierie. Les postes d'ingénieurs et de techniciens y sont très recherchés.</p></div>
+    <div class="faq-item"><h3>Quel salaire espérer à Toulouse ?</h3><p>Grâce au poids de l'aéronautique, les salaires d'ingénieurs sont attractifs : de 38 000 à 58 000 € brut/an. Un développeur confirmé se situe autour de 52 000 €.</p></div>
+    <div class="faq-item"><h3>Quelles grandes entreprises recrutent à Toulouse ?</h3><p>Airbus, Thales Alenia Space, Safran, Continental, ATR et le CNES sont les plus gros employeurs, entourés d'un écosystème dense de sous-traitants et de start-up.</p></div>
   </div>
 </div>
 
