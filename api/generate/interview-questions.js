@@ -109,6 +109,11 @@ Réponds UNIQUEMENT en JSON valide :
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
     if (!result?.behavioral) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    // Track event (fire and forget)
+    {
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'interview_started', props: { plan: user.plan } }) }).catch(() => {});
+    }
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {
     await refundGeneration(user);

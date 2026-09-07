@@ -24,15 +24,40 @@ export default async function handler(req, res) {
     const allUsers = await kvSmembers('all_users');
     const totalUsers = allUsers.length;
 
-    const [cvGeneratedRaw, usersRegisteredRaw, plansUpgradedRaw] = await Promise.all([
-      kvGet('track:cv_generated'),
-      kvGet('track:user_registered'),
-      kvGet('track:plan_upgraded'),
-    ]);
+    // Lifetime event counters (funnel stages + engagement).
+    const EVENTS = [
+      'user_registered', 'cv_generated', 'letter_generated', 'ats_checked',
+      'interview_started', 'paywall_viewed', 'checkout_started', 'plan_upgraded',
+    ];
+    const counterVals = await kvMget(...EVENTS.map((e) => `track:${e}`));
+    const counts = {};
+    EVENTS.forEach((e, i) => { counts[e] = Number(counterVals[i]) || 0; });
 
-    const cvGenerated = Number(cvGeneratedRaw) || 0;
-    const usersRegistered = Number(usersRegisteredRaw) || 0;
-    const plansUpgraded = Number(plansUpgradedRaw) || 0;
+    const cvGenerated = counts.cv_generated;
+    const usersRegistered = counts.user_registered;
+    const plansUpgraded = counts.plan_upgraded;
+
+    // Conversion funnel (event volumes). pct = stage / previous stage.
+    const pct = (a, b) => (b > 0 ? +((a / b) * 100).toFixed(1) : null);
+    const funnel = [
+      { stage: 'registered', label: 'Inscriptions', count: counts.user_registered },
+      { stage: 'cv_generated', label: 'CV généré', count: counts.cv_generated, conversionFromPrev: pct(counts.cv_generated, counts.user_registered) },
+      { stage: 'paywall_viewed', label: 'Paywall vu', count: counts.paywall_viewed, conversionFromPrev: pct(counts.paywall_viewed, counts.cv_generated) },
+      { stage: 'checkout_started', label: 'Checkout lancé', count: counts.checkout_started, conversionFromPrev: pct(counts.checkout_started, counts.paywall_viewed) },
+      { stage: 'plan_upgraded', label: 'Abonnement', count: counts.plan_upgraded, conversionFromPrev: pct(counts.plan_upgraded, counts.checkout_started) },
+    ];
+
+    // Daily time-series (last 14 days) for the key funnel events.
+    const DAILY_EVENTS = ['user_registered', 'cv_generated', 'checkout_started', 'plan_upgraded'];
+    const DAYS = 14;
+    const days = Array.from({ length: DAYS }, (_, i) => new Date(now - (DAYS - 1 - i) * DAY).toISOString().slice(0, 10));
+    const dailyKeys = [];
+    for (const ev of DAILY_EVENTS) for (const d of days) dailyKeys.push(`track:${ev}:${d}`);
+    const dailyVals = await kvMget(...dailyKeys);
+    const daily = { days };
+    DAILY_EVENTS.forEach((ev, ei) => {
+      daily[ev] = days.map((_, di) => Number(dailyVals[ei * DAYS + di]) || 0);
+    });
 
     const npsEntries = await kvZcard('nps:scores');
     const alertSubscribers = await kvScard('alert_subscribers');
@@ -87,7 +112,16 @@ export default async function handler(req, res) {
       generatedAt: new Date().toISOString(),
       users: { total: totalUsers, byPlan: planCounts, activeLast7d, activeLast30d, newToday, newThisWeek, conversionRate },
       revenue: { mrr, arr, proRevenue, intensifRevenue },
-      events: { cvGenerated, usersRegistered, plansUpgraded },
+      events: {
+        cvGenerated, usersRegistered, plansUpgraded,
+        letterGenerated: counts.letter_generated,
+        atsChecked: counts.ats_checked,
+        interviewStarted: counts.interview_started,
+        paywallViewed: counts.paywall_viewed,
+        checkoutStarted: counts.checkout_started,
+      },
+      funnel,
+      daily,
       other: {
         alertSubscribers: Number(alertSubscribers) || 0,
         newsletterSubscribers: Number(newsletterSubscribers) || 0,
