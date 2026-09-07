@@ -360,6 +360,7 @@
     { "source": "/score/:token", "destination": "/score.html" },
     { "source": "/nps", "destination": "/nps.html" },
     { "source": "/admin/stats", "destination": "/api/admin/stats" },
+    { "source": "/admin", "destination": "/admin.html" },
     { "source": "/api/track", "destination": "/api/track" },
     { "source": "/api/nps", "destination": "/api/nps" },
     { "source": "/api/share-score", "destination": "/api/share-score" },
