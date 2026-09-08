@@ -435,18 +435,76 @@ window.empUpdateNav = function(user) {
 window.empToggleUserMenu = function() { document.getElementById('empUserDropdown')?.classList.toggle('open'); };
 
 // Upgrade modal
+// Prices mirror the pricing section on the landing (data-annual / data-monthly).
+// The amount actually charged is enforced by Stripe via the plan key, not this text.
+window._empUpBilling = 'annual'; // 'annual' | 'monthly'
+const EMP_UP_PRICES = { annual: { price: '12', per: 'facturé annuellement · 15€ en mensuel' }, monthly: { price: '15', per: 'sans engagement' } };
+
+window.empUpgradeSetBilling = function(mode) {
+  window._empUpBilling = mode;
+  const p = EMP_UP_PRICES[mode];
+  const priceEl = document.getElementById('empUpPrice'), perEl = document.getElementById('empUpPer');
+  if (priceEl) priceEl.textContent = p.price;
+  if (perEl) perEl.textContent = p.per;
+  document.querySelectorAll('#empUpBillingToggle [data-bill]').forEach(b => {
+    b.style.background = b.dataset.bill === mode ? 'var(--primary,#6366f1)' : 'transparent';
+    b.style.color = b.dataset.bill === mode ? '#fff' : 'var(--slate,#64748b)';
+  });
+};
+
+window.empUpgradeCheckout = async function(btn) {
+  // Requires an account so the subscription binds to the user.
+  if (!window.empUser && typeof window.empShowAuth === 'function') {
+    document.getElementById('empUpgradeModal')?.classList.remove('open');
+    document.body.style.overflow = '';
+    window.empShowAuth('signup');
+    return;
+  }
+  const plan = window._empUpBilling === 'annual' ? 'pro_annual' : 'pro';
+  const label = btn.textContent;
+  if (window.trackEvent) window.trackEvent('checkout_started', { plan });
+  btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
+  try {
+    const res = await fetch('/api/stripe-checkout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.url) { window.location.href = data.url; return; }
+    (window.empToast ? empToast(data.error || 'Paiement momentanément indisponible. Réessayez.', 'error') : alert('Paiement momentanément indisponible.'));
+  } catch (e) {
+    (window.empToast ? empToast('Paiement momentanément indisponible. Réessayez.', 'error') : alert('Paiement momentanément indisponible.'));
+  }
+  btn.style.pointerEvents = ''; btn.removeAttribute('aria-busy'); btn.textContent = label;
+};
+
 window.empShowUpgrade = function() {
   let m = document.getElementById('empUpgradeModal');
   if (!m) {
     m = document.createElement('div');
     m.id = 'empUpgradeModal';
     m.className = 'emp-auth-overlay';
-    m.innerHTML = `<div class="emp-upgrade-box"><button class="emp-auth-close" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" aria-label="Fermer">✕</button><div style="font-size:36px;margin-bottom:8px">🚀</div><h2 style="font-size:20px;font-weight:600;margin:0 0 8px;color:var(--ink)">Limite gratuite atteinte</h2><p style="color:var(--slate);font-size:14px;line-height:1.6;margin:0 0 20px">Vous avez utilisé vos 5 générations gratuites. Passez Pro pour des générations illimitées.</p><a href="/#pricing" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:10px">Voir les offres Pro →</a><button onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" style="background:none;border:0;color:var(--steel);font-size:13px;cursor:pointer;margin-top:4px">Plus tard</button></div>`;
+    const feat = ['CV &amp; lettres illimités', 'Coach d\'entretien IA', 'Suivi candidatures Kanban', 'Orion, ton copilote IA', 'Modèles premium']
+      .map(f => `<li style="display:flex;align-items:center;gap:9px;padding:5px 0;font-size:13.5px;color:var(--ink,#0f172a)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>${f}</li>`).join('');
+    m.innerHTML = `<div class="emp-upgrade-box" style="max-width:420px;text-align:left">
+      <button class="emp-auth-close" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" aria-label="Fermer">✕</button>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,.12);color:#6366f1;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;margin-bottom:14px">⚡ Limite gratuite atteinte</div>
+      <h2 style="font-size:21px;font-weight:800;margin:0 0 6px;color:var(--ink,#0f172a);letter-spacing:-.4px">Débloquez tout Emploia</h2>
+      <p style="color:var(--slate,#64748b);font-size:13.5px;line-height:1.6;margin:0 0 16px">Continuez sur votre lancée avec des générations illimitées et le coaching IA.</p>
+      <div id="empUpBillingToggle" style="display:inline-flex;background:var(--cloud,#f1f5f9);border-radius:100px;padding:3px;margin-bottom:14px;font-size:12px;font-weight:700">
+        <button data-bill="monthly" onclick="empUpgradeSetBilling('monthly')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:transparent;color:var(--slate,#64748b)">Mensuel</button>
+        <button data-bill="annual" onclick="empUpgradeSetBilling('annual')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:var(--primary,#6366f1);color:#fff">Annuel −20%</button>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px"><span style="font-size:38px;font-weight:900;color:var(--ink,#0f172a);letter-spacing:-1.5px"><span id="empUpPrice">12</span>€</span><span style="color:var(--slate,#64748b);font-size:14px">/mois</span></div>
+      <div id="empUpPer" style="color:var(--steel,#94a3b8);font-size:12px;margin-bottom:16px">facturé annuellement · 15€ en mensuel</div>
+      <ul style="list-style:none;padding:0;margin:0 0 18px">${feat}</ul>
+      <button onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Démarrer l'essai Pro — 14 jours gratuits →</button>
+      <div style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Sans carte aujourd'hui · annulation en 1 clic</div>
+      <div style="text-align:center"><a href="/#pricing" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" style="color:var(--slate,#64748b);font-size:13px;text-decoration:underline">Comparer toutes les offres</a></div>
+    </div>`;
     document.body.appendChild(m);
     m.addEventListener('click', e => { if (e.target === m) { m.classList.remove('open'); document.body.style.overflow = ''; } });
   }
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (window.empUpgradeSetBilling) window.empUpgradeSetBilling(window._empUpBilling || 'annual');
   if (window.trackEvent) window.trackEvent('paywall_viewed');
 };
 
