@@ -28,6 +28,8 @@ export default async function handler(req, res) {
     const EVENTS = [
       'user_registered', 'cv_generated', 'letter_generated', 'ats_checked',
       'interview_started', 'paywall_viewed', 'checkout_started', 'plan_upgraded',
+      'referral_code_created', 'referral_signup',
+      'email_sent', 'email_delivered', 'email_opened', 'email_clicked', 'email_bounced', 'email_complained',
     ];
     const counterVals = await kvMget(...EVENTS.map((e) => `track:${e}`));
     const counts = {};
@@ -58,6 +60,24 @@ export default async function handler(req, res) {
     DAILY_EVENTS.forEach((ev, ei) => {
       daily[ev] = days.map((_, di) => Number(dailyVals[ei * DAYS + di]) || 0);
     });
+
+    // Referral (Part 1) and email deliverability (Part 2) aggregates.
+    const referral = {
+      codesCreated: counts.referral_code_created,
+      signups: counts.referral_signup,
+      conversion: pct(counts.referral_signup, counts.referral_code_created),
+    };
+    const email = {
+      sent: counts.email_sent,
+      delivered: counts.email_delivered,
+      opened: counts.email_opened,
+      clicked: counts.email_clicked,
+      bounced: counts.email_bounced,
+      complained: counts.email_complained,
+      openRate: pct(counts.email_opened, counts.email_delivered),
+      clickRate: pct(counts.email_clicked, counts.email_delivered),
+      configured: (counts.email_sent + counts.email_delivered + counts.email_opened) > 0,
+    };
 
     const npsEntries = await kvZcard('nps:scores');
     const alertSubscribers = await kvScard('alert_subscribers');
@@ -122,6 +142,8 @@ export default async function handler(req, res) {
       },
       funnel,
       daily,
+      referral,
+      email,
       other: {
         alertSubscribers: Number(alertSubscribers) || 0,
         newsletterSubscribers: Number(newsletterSubscribers) || 0,

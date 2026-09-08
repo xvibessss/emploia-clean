@@ -361,6 +361,8 @@
     { "source": "/nps", "destination": "/nps.html" },
     { "source": "/admin/stats", "destination": "/api/admin/stats" },
     { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/api/seo-metrics", "destination": "/api/seo-metrics" },
+    { "source": "/api/resend-webhook", "destination": "/api/resend-webhook" },
     { "source": "/api/track", "destination": "/api/track" },
     { "source": "/api/nps", "destination": "/api/nps" },
     { "source": "/api/share-score", "destination": "/api/share-score" },

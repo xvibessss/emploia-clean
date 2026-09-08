@@ -11,6 +11,8 @@ const VALID_EVENTS = [
   'letter_generated',
   'paywall_viewed',
   'checkout_started',
+  'referral_code_created',
+  'referral_signup',
 ];
 
 const MAX_TIMELINE_SIZE = 10000;
