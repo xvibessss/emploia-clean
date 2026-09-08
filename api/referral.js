@@ -46,6 +46,9 @@ export default async function handler(req) {
       const refData = { userId: user.id, email: user.email, signups: [], monthsEarned: 0, createdAt: new Date().toISOString() };
       await kvSet(`ref:${code}`, refData);
       await kvSet(`refcode:${user.id}`, code);
+      // Track (fire and forget)
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_code_created' }) }).catch(() => {});
     }
 
     const refData = await kvGet(`ref:${code}`) || {};
@@ -95,6 +98,11 @@ export default async function handler(req) {
     const signups = [...(refData.signups || []), normalizedNewEmail];
     const monthsEarned = Math.min(6, signups.length); // max 6 months
     await kvSet(`ref:${code}`, { ...refData, signups, monthsEarned });
+    // Track a genuinely new referred signup (fire and forget)
+    {
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_signup' }) }).catch(() => {});
+    }
 
     // Reward = internally-granted free Pro time (proUntil), honored by getCurrentUser.
     // No Stripe subscription is created; it simply auto-expires.
