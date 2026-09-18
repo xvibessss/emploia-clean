@@ -62,6 +62,7 @@ Règles : score entre 50 et 97. verdict parmi : "Excellent match", "Bon profil",
       body: JSON.stringify({
         model: user?.plan && user.plan !== 'free' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
         max_tokens: user?.plan && user.plan !== 'free' ? 500 : 300,
+        temperature: 0, // match score must be stable/reproducible run-to-run
         system: [{ type: 'text', text: 'Tu es un expert ATS et recruteur senior en France avec 15 ans d\'expérience. Tu évalues avec précision la correspondance entre un profil candidat et une offre d\'emploi — score, verdict et conseils actionnables. Réponds uniquement en JSON valide.', cache_control: { type: 'ephemeral' } }],
         messages: [{ role: 'user', content: prompt }],
       }),
