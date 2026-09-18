@@ -47,6 +47,7 @@ export default async function handler(req) {
       body: JSON.stringify({
         model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
         max_tokens: user.plan === 'free' ? 1200 : 2500,
+        temperature: 0, // scoring must be stable/reproducible run-to-run
         system: [{ type: "text", text: "Tu es un expert ATS certifié et recruteur senior avec 15 ans d'expérience dans les grandes entreprises françaises. Tu maîtrises SAP SuccessFactors, Talentsoft, Workday, iCIMS et Greenhouse. Tu analyses en profondeur la compatibilité CV/offre selon 5 axes : correspondance mots-clés (orthographe exacte), structure et format ATS-friendly, pertinence des expériences, formation et certifications, softs skills implicites. Tes recommandations sont chirurgicales et actionnables en moins de 10 minutes. Réponds uniquement en JSON valide.", cache_control: { type: "ephemeral" } }],
         messages: [{
           role: "user",
