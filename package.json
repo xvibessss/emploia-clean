@@ -1,3 +1,7 @@
 {
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "bench": "node scripts/bench/run.mjs",
+    "bench:live": "node scripts/bench/run.mjs --live"
+  }
 }

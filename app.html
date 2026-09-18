@@ -476,6 +476,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
               if (parsed.chunk) { fullText += parsed.chunk; contentEl.textContent = fullText; }
               if (parsed.done) {
                 lastResult = fullText;
+                renderRevision(fullText);
                 if (window.empUser?.plan === 'free') { window.empUser.generationsUsed = (window.empUser.generationsUsed || 0) + 1; syncUsagePill(window.empUser); }
                 if (window.plausible) plausible('generation_complete', { props: { type: mode } });
                 if (window.trackEvent) trackEvent(mode === 'cv' ? 'cv_generated' : mode === 'letter' ? 'letter_generated' : 'ats_checked', { mode });
@@ -589,8 +590,37 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     setTimeout(() => { document.getElementById('empFloatNudge')?.remove(); }, 18000);
   }
 
+  // ── Mode révision : lister les [à compléter] avant export ──
+  function getPlaceholders(text) {
+    const t = typeof text === 'string' ? text : '';
+    return [...new Set((t.match(/\[[^\]\n]{0,80}\]/g) || []).map(s => s.trim()))];
+  }
+  function renderRevision(text) {
+    const area = document.getElementById('resultArea');
+    if (!area) return;
+    document.getElementById('revisionPanel')?.remove();
+    if (mode !== 'cv' && mode !== 'letter') return;
+    const ph = getPlaceholders(text);
+    if (!ph.length) return;
+    const items = ph.map(p => `<li style="font-size:12px;color:var(--slate);line-height:1.7;font-family:ui-monospace,monospace">${esc(p)}</li>`).join('');
+    const div = document.createElement('div');
+    div.id = 'revisionPanel';
+    div.style.cssText = 'background:#fff8ec;border:1.5px solid #f0c675;border-radius:12px;padding:14px 16px;margin-bottom:14px';
+    div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8a5a00;margin-bottom:6px">✍️ À compléter avant d'exporter · ${ph.length}</div>`
+      + `<p style="font-size:12px;color:#7a5a1e;line-height:1.6;margin:0 0 10px">Emploia n'invente jamais tes données. Remplace chaque marqueur par tes vraies informations pour un document 100% fiable :</p>`
+      + `<ul style="margin:0 0 0 16px;padding:0;display:flex;flex-direction:column;gap:3px">${items}</ul>`;
+    area.insertBefore(div, area.firstChild);
+  }
+  function confirmIfIncomplete() {
+    const txt = typeof lastResult === 'string' ? lastResult : '';
+    const n = getPlaceholders(txt).length;
+    if (!n) return true;
+    return confirm(`Il reste ${n} champ${n > 1 ? 's' : ''} « [à compléter] » non rempli${n > 1 ? 's' : ''}. Exporter quand même ?`);
+  }
+
   function copyResult() {
     if (!lastResult) return;
+    if (!confirmIfIncomplete()) return;
     const txt = typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult, null, 2);
     navigator.clipboard.writeText(txt).then(() => empToast('Copié dans le presse-papier !', 'success')).catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
   }
@@ -598,6 +628,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   async function saveToVault() {
     if (!lastResult) return;
     if (!window.empUser) { empShowAuth('login'); return; }
+    if (!confirmIfIncomplete()) return;
     const txt = typeof lastResult === 'string' ? lastResult : (lastResult.result || lastResult.text || JSON.stringify(lastResult, null, 2));
     const modeLabel = { cv: 'CV', letter: 'Lettre de motivation', ats: 'Analyse ATS' }[mode] || mode;
     const jobVal = (document.getElementById('jobInput')?.value || '').slice(0, 60).trim();
@@ -625,6 +656,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
 
   async function downloadResult() {
     if (!lastResult) return;
+    if (!confirmIfIncomplete()) return;
     const txt = typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult, null, 2);
     empToast('Génération du PDF…', 'info');
     try {
