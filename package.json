@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "bench": "node scripts/bench/run.mjs",
-    "bench:live": "node scripts/bench/run.mjs --live"
+    "bench:live": "node scripts/bench/run.mjs --live",
+    "test:employer": "node scripts/employer/expiry.test.mjs"
   }
 }

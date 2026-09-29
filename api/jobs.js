@@ -1,4 +1,5 @@
 import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
+import { isJobLive, toPublicJob } from './_lib/employer.js';
 
 const H = {
   'Access-Control-Allow-Origin': '*',
@@ -361,7 +362,8 @@ async function fetchEmployerJobs(q, type, location) {
   try {
     let jobs = await kvGet('employer_jobs') || [];
     if (!Array.isArray(jobs)) return [];
-    jobs = jobs.filter(j => j.status === 'active');
+    const now = Date.now();
+    jobs = jobs.filter(j => isJobLive(j, now));
     if (type && type !== 'tous') {
       const m = { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' };
       if (m[type]) jobs = jobs.filter(j => j.type === m[type]);
@@ -378,7 +380,7 @@ async function fetchEmployerJobs(q, type, location) {
       const ll = location.toLowerCase();
       jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
     }
-    return jobs.slice(0, 5);
+    return jobs.slice(0, 5).map(toPublicJob);
   } catch { return []; }
 }
 
