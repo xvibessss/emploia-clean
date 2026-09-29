@@ -131,7 +131,7 @@ function buildJ5Email({ firstName, email }) {
       <p style="font-size:13px;color:#5b21b6;margin:0;line-height:1.6">Il analyse ta candidature, g&eacute;n&egrave;re des questions r&eacute;elles, &eacute;value tes r&eacute;ponses et te donne un plan d'am&eacute;lioration personnalis&eacute; — avant l'entretien.</p>
     </div>
     <a href="${BASE_URL}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">Activer mon essai Pro gratuit →</a>
-    <p style="font-size:12px;color:#94a3b8;margin:20px 0 0;line-height:1.6">Aucune carte bancaire requise pour l'essai.</p>`;
+    <p style="font-size:12px;color:#94a3b8;margin:20px 0 0;line-height:1.6">0€ aujourd'hui — annulable en 1 clic avant la fin de l'essai.</p>`;
 
   return {
     to: [email],

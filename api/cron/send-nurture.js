@@ -95,7 +95,7 @@ export default async function handler(req) {
       </div>
 
       <div style="text-align:center;background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(59,130,246,.06));border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:20px;margin-bottom:24px">
-        <div style="font-size:32px;font-weight:900;color:#0f172a;letter-spacing:-1px">9€<span style="font-size:16px;font-weight:600;color:#64748b">/mois</span></div>
+        <div style="font-size:32px;font-weight:900;color:#0f172a;letter-spacing:-1px">15€<span style="font-size:16px;font-weight:600;color:#64748b">/mois</span></div>
         <div style="font-size:13px;color:#64748b;margin-top:4px">Soit moins qu'un repas — pour décrocher votre prochain CDI</div>
         <div style="margin-top:8px;font-size:12px;color:#6366f1;font-weight:700">✅ 7 jours d'essai gratuit · Annulation en 1 clic</div>
       </div>
