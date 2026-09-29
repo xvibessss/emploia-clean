@@ -61,3 +61,5 @@ jobs:
         run: node scripts/ci-guards.mjs
       - name: Generation quality bench (detector self-test + prompt guard)
         run: node scripts/bench/run.mjs
+      - name: Employer offer lifecycle tests
+        run: node scripts/employer/expiry.test.mjs
