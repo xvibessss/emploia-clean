@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '## %s — session end\\n%s\\n\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$(cd /Users/chapellehugo/emploia-clean && git log --oneline -3 2>/dev/null)\" >> /Users/chapellehugo/.claude/projects/-Users-chapellehugo/memory/session_log.md 2>/dev/null || true"
+            "command": "cd /Users/chapellehugo/emploia-clean && { echo \"# Session state — $(date '+%Y-%m-%d %H:%M')\"; echo \"\"; echo \"## Last 5 commits\"; git log --oneline -5 2>/dev/null; echo \"\"; echo \"## Uncommitted changes\"; git status --short 2>/dev/null; echo \"\"; echo \"## Staged diff summary\"; git diff --cached --stat 2>/dev/null; } > SESSION_STATE.md 2>/dev/null || true"
           }
         ]
       }
