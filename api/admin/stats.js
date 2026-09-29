@@ -2,8 +2,8 @@ export const config = { runtime: 'nodejs' };
 
 import { kvGet, kvSmembers, kvMget, kvZcard, kvScard } from '../_lib/auth.js';
 
-const PRO_PRICE = 9;
-const INTENSIF_PRICE = 19;
+const PRO_PRICE = 15;
+const INTENSIF_PRICE = 35;
 const DAY = 86400000;
 
 export default async function handler(req, res) {

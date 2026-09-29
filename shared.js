@@ -495,8 +495,8 @@ window.empShowUpgrade = function() {
       <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px"><span style="font-size:38px;font-weight:900;color:var(--ink,#0f172a);letter-spacing:-1.5px"><span id="empUpPrice">12</span>€</span><span style="color:var(--slate,#64748b);font-size:14px">/mois</span></div>
       <div id="empUpPer" style="color:var(--steel,#94a3b8);font-size:12px;margin-bottom:16px">facturé annuellement · 15€ en mensuel</div>
       <ul style="list-style:none;padding:0;margin:0 0 18px">${feat}</ul>
-      <button onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Démarrer l'essai Pro — 14 jours gratuits →</button>
-      <div style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Sans carte aujourd'hui · annulation en 1 clic</div>
+      <button onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Démarrer l'essai Pro — 7 jours gratuits →</button>
+      <div style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Carte requise · 0€ aujourd'hui · annulation en 1 clic</div>
       <div style="text-align:center"><a href="/#pricing" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" style="color:var(--slate,#64748b);font-size:13px;text-decoration:underline">Comparer toutes les offres</a></div>
     </div>`;
     document.body.appendChild(m);

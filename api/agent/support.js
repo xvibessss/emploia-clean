@@ -8,8 +8,8 @@ const SYSTEM = `Tu es l'agent support d'Emploia, un copilote IA de recherche d'e
 PRODUCT KNOWLEDGE :
 - Emploia génère des CV, lettres de motivation, emails de relance, analyses salariales, questions d'entretien, et profils LinkedIn optimisés ATS en 30 secondes
 - Plan Free : 5 générations gratuites, sans carte bancaire
-- Plan Pro : 9€/mois ou 79€/an — générations illimitées, accès Orion Chat, CV Vault, toutes les fonctionnalités
-- Plan Intensif : 29€/mois ou 239€/an — tout Pro + priorité serveur + support dédié
+- Plan Pro : 15€/mois ou 144€/an — générations illimitées, accès Orion Chat, CV Vault, toutes les fonctionnalités
+- Plan Intensif : 35€/mois ou 348€/an — tout Pro + priorité serveur + support dédié
 - Pages principales : /app (générateur), /dashboard (suivi candidatures), /jobs (offres IA), /tools (outils avancés), /chat (Orion AI), /cv-builder (éditeur CV), /cv-vault (mes CVs)
 - Orion est le nom de l'IA d'Emploia (basée sur Claude d'Anthropic)
 - Les documents générés sont optimisés pour les ATS français (Talentsoft, SAP SuccessFactors, Workday)
