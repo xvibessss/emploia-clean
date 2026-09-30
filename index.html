@@ -153,8 +153,8 @@
 @media (max-width:767px){.bring-grid{grid-template-columns:1fr}}
 
 /* Comparison grid override */
-.cmp{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr}
-@media (max-width:767px){.cmp{grid-template-columns:1.4fr repeat(4, 80px);min-width:560px}.emp-compare{overflow-x:auto}}
+.cmp{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr}
+@media (max-width:767px){.cmp{grid-template-columns:1.4fr repeat(5, 80px);min-width:640px}.emp-compare{overflow-x:auto}}
 
 /* Testi grid */
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
@@ -256,13 +256,7 @@
 .sec-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate);font-weight:500}
 .sec-badge svg{color:var(--brand-green);flex-shrink:0}
 
-/* Billing toggle */
-.billing-toggle{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:32px;font-size:14px;color:var(--slate)}
-.billing-toggle-track{width:44px;height:24px;background:var(--primary);border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
-.billing-toggle-thumb{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.billing-toggle-track.monthly .billing-toggle-thumb{transform:translateX(20px)}
-.billing-label{font-weight:600;color:var(--ink)}
-.billing-save{background:var(--brand-green);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:4px}
+/* Comparison grid override (see .cmp below) */
 
 /* Count-up stat values */
 .emp-stat-item .val[data-count]{transition:all .1s}
@@ -942,15 +936,6 @@
       <p>Commencez gratuitement. Passez au-dessus quand vous êtes prêt à candidater sérieusement.</p>
     </div>
 
-    <!-- Billing toggle -->
-    <div class="billing-toggle reveal" id="billingToggleWrap">
-      <span>Mensuel</span>
-      <div class="billing-toggle-track" id="billingTrack" onclick="empToggleBilling(this)">
-        <div class="billing-toggle-thumb"></div>
-      </div>
-      <span class="billing-label">Annuel <span class="billing-save">−20%</span></span>
-    </div>
-
     <div class="emp-pricing-grid">
       <div class="emp-pricing-card reveal" data-delay="1">
         <h4>Gratuit</h4>
@@ -967,12 +952,11 @@
         <a href="/app" class="emp-btn emp-btn-secondary">Commencer gratuitement</a>
       </div>
 
-      <div class="emp-pricing-card featured reveal" data-delay="2">
-        <span class="pop">Le plus populaire</span>
+      <div class="emp-pricing-card reveal" data-delay="2">
         <h4>Pro</h4>
         <div class="blurb">Pour mener une vraie campagne de candidature.</div>
-        <div class="price"><span class="price-val" data-annual="12" data-monthly="15">12</span>€<small> /mois</small></div>
-        <div class="per" id="proPer">Facturé annuellement · 15€ mensuel</div>
+        <div class="price">19€<small> /mois</small></div>
+        <div class="per">Sans engagement · annulable à tout moment</div>
         <ul>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>CV &amp; lettres illimités</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coach d'entretien IA</li>
@@ -980,29 +964,46 @@
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Orion IA Copilote chat</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Modèles premium</li>
         </ul>
-        <a href="/app" data-checkout="pro" class="emp-btn emp-btn-primary">Essayer 7 jours gratuits</a>
+        <a href="/app" data-checkout="pro" class="emp-btn emp-btn-secondary">Essayer 7 jours gratuits</a>
         <div style="text-align:center;font-size:12px;color:var(--slate);margin-top:8px">Annulable à tout moment</div>
       </div>
 
-      <div class="emp-pricing-card reveal" data-delay="3">
+      <div class="emp-pricing-card featured reveal" data-delay="3">
+        <span class="pop">Le plus avantageux</span>
+        <h4>Pack Campagne</h4>
+        <div class="blurb">Une recherche d'emploi dure 3 mois. Payez-la une fois.</div>
+        <div class="price price-long">45€<small> les 3 mois</small></div>
+        <div class="per">Paiement unique · non reconductible</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tout de Pro, pendant 90 jours</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Soit 15€/mois — le tarif le plus bas</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Aucun abonnement à résilier</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Pas de prélèvement surprise</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Prolongeable quand vous voulez</li>
+        </ul>
+        <a href="/app" data-checkout="campagne" class="emp-btn emp-btn-primary">Prendre le Pack Campagne</a>
+        <div style="text-align:center;font-size:12px;color:var(--slate);margin-top:8px">Sans essai — accès immédiat</div>
+      </div>
+
+      <div class="emp-pricing-card reveal" data-delay="4">
         <h4>Intensif</h4>
         <div class="blurb">Pour les reconversions et recherches soutenues.</div>
-        <div class="price"><span class="price-val" data-annual="29" data-monthly="35">29</span>€<small> /mois</small></div>
-        <div class="per" id="intensifPer">Facturé annuellement</div>
+        <div class="price">49€<small> /mois</small></div>
+        <div class="per">Sans engagement · annulable à tout moment</div>
         <ul>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tout de Pro</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Priorité serveur</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Profils multiples</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coaching humain (2h/mois)</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Négociation salariale</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Export multilingue</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Export multilingue · support dédié</li>
         </ul>
         <a href="/app" data-checkout="intensif" class="emp-btn emp-btn-secondary">Choisir Intensif</a>
       </div>
 
-      <div class="emp-pricing-card reveal" data-delay="4">
+      <div class="emp-pricing-card reveal" data-delay="5">
         <h4>Écoles &amp; RH</h4>
         <div class="blurb">Pour écoles, missions locales et cabinets de recrutement.</div>
-        <div class="price">Sur devis</div>
+        <div class="price price-long">Sur devis</div>
         <div class="per">Tarif par siège</div>
         <ul>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tableau de bord équipe</li>
@@ -1021,22 +1022,26 @@
         <div>Comparer les plans</div>
         <div>Gratuit</div>
         <div>Pro</div>
+        <div>Pack Campagne</div>
         <div>Intensif</div>
         <div>Écoles &amp; RH</div>
       </div>
       <div class="emp-compare-section">Création de candidature</div>
-      <div class="emp-compare-row cmp"><div>Générations IA (CV, lettres, score ATS)</div><div>5 offertes</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
-      <div class="emp-compare-row cmp"><div>Lettres de motivation</div><div>Incluses dans les 5</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
-      <div class="emp-compare-row cmp"><div>Modèles premium</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
-      <div class="emp-compare-row cmp"><div>Export PDF · DOCX · LinkedIn</div><div>PDF</div><div class="yes">Tous</div><div class="yes">Tous</div><div class="yes">Tous</div></div>
-      <div class="emp-compare-section">Préparation &amp; coaching</div>
-      <div class="emp-compare-row cmp"><div>Coach d'entretien IA</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
-      <div class="emp-compare-row cmp"><div>Coaching humain</div><div>—</div><div>—</div><div class="yes">2h / mois</div><div class="yes">Sur devis</div></div>
-      <div class="emp-compare-row cmp"><div>Négociation salariale</div><div>—</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Générations IA (CV, lettres, score ATS)</div><div>5 offertes</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
+      <div class="emp-compare-row cmp"><div>Lettres de motivation</div><div>Incluses dans les 5</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
+      <div class="emp-compare-row cmp"><div>Modèles premium</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Export PDF · DOCX · LinkedIn</div><div>PDF</div><div class="yes">Tous</div><div class="yes">Tous</div><div class="yes">Tous</div><div class="yes">Tous</div></div>
+      <div class="emp-compare-section">Préparation &amp; accompagnement</div>
+      <div class="emp-compare-row cmp"><div>Coach d'entretien IA</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Négociation salariale</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Priorité serveur</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-section">Facturation</div>
+      <div class="emp-compare-row cmp"><div>Type de paiement</div><div>—</div><div>Abonnement</div><div class="yes">Paiement unique</div><div>Abonnement</div><div>Sur devis</div></div>
+      <div class="emp-compare-row cmp"><div>Essai 7 jours</div><div>—</div><div class="yes">✓</div><div>—</div><div class="yes">✓</div><div>—</div></div>
       <div class="emp-compare-section">Pour les équipes</div>
-      <div class="emp-compare-row cmp"><div>SSO &amp; contrôle d'accès</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
-      <div class="emp-compare-row cmp"><div>Tableau de bord équipe</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
-      <div class="emp-compare-row cmp"><div>Hébergement France (RGPD)</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>SSO &amp; contrôle d'accès</div><div>—</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Tableau de bord équipe</div><div>—</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Hébergement France (RGPD)</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
     </div>
   </div>
 </section>
@@ -1258,10 +1263,11 @@
 
 <script src="/shared.js"></script>
 <script>
-/* Pricing → Stripe Checkout. Wires the Pro/Intensif cards (data-checkout) to
-   /api/stripe-checkout with the right plan key, honoring the annual/monthly
-   toggle. Amounts are whatever the STRIPE_PRICE_* env vars point to — this only
-   chooses which plan. Falls back to /app (the href) if JS/checkout is unavailable. */
+/* Pricing → Stripe Checkout. Wires the Pro/Campagne/Intensif cards
+   (data-checkout) to /api/stripe-checkout with the right plan key. The plan key
+   is passed through verbatim; the server decides subscription vs one-off payment
+   and amounts are whatever the STRIPE_PRICE_* env vars point to.
+   Falls back to /app (the href) if JS/checkout is unavailable. */
 (function () {
   function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
   async function startCheckout(plan, btn) {
@@ -1286,11 +1292,8 @@
     const btn = e.target.closest('[data-checkout]');
     if (!btn) return;
     e.preventDefault();
-    const base = btn.getAttribute('data-checkout'); // 'pro' | 'intensif'
-    const track = document.getElementById('billingTrack');
-    const annual = !(track && track.classList.contains('monthly')); // default = annual
-    const plan = annual ? base + '_annual' : base;
-    // Prefer an authenticated checkout so the subscription binds to the account.
+    const plan = btn.getAttribute('data-checkout'); // 'pro' | 'campagne' | 'intensif'
+    // Prefer an authenticated checkout so the purchase binds to the account.
     if (!window.empUser && typeof window.empShowAuth === 'function') { window.empShowAuth('signup'); return; }
     startCheckout(plan, btn);
   });
@@ -1359,20 +1362,6 @@
   },{threshold:0.4});
   stats.forEach(function(el){ io.observe(el); });
 })();
-
-/* ── Billing toggle ── */
-var billingAnnual = true;
-function empToggleBilling(track){
-  billingAnnual = !billingAnnual;
-  track.classList.toggle('monthly', !billingAnnual);
-  document.querySelectorAll('.price-val').forEach(function(el){
-    el.textContent = billingAnnual ? el.dataset.annual : el.dataset.monthly;
-  });
-  var proPer = document.getElementById('proPer');
-  var intPer = document.getElementById('intensifPer');
-  if(proPer) proPer.textContent = billingAnnual ? 'Facturé annuellement · 15€ mensuel' : 'Facturé mensuellement';
-  if(intPer) intPer.textContent = billingAnnual ? 'Facturé annuellement' : 'Facturé mensuellement';
-}
 
 /* ── Typewriter hero ── */
 (function(){

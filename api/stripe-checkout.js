@@ -2,11 +2,16 @@ export const config = { runtime: 'edge' };
 import { checkRateLimit, getAllowedOrigin, validateEmail, getCurrentUser } from './_lib/auth.js';
 
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
-const PRICE_IDS = {
-  pro:             process.env.STRIPE_PRICE_PRO             || null,
-  intensif:        process.env.STRIPE_PRICE_INTENSIF        || null,
-  pro_annual:      process.env.STRIPE_PRICE_PRO_ANNUAL      || null,
-  intensif_annual: process.env.STRIPE_PRICE_INTENSIF_ANNUAL || null,
+
+// Plan catalogue. `mode` decides the Stripe checkout type:
+//   subscription → recurring, 7-day trial, card required (Pro, Intensif)
+//   payment      → one-off charge, NO trial, NO subscription created
+//                  (Pack Campagne: 45 € for 3 months, non-renewing)
+// Price IDs come from the environment; the code never needs their value.
+const PLANS = {
+  pro:      { priceId: () => process.env.STRIPE_PRICE_PRO      || null, mode: 'subscription' },
+  intensif: { priceId: () => process.env.STRIPE_PRICE_INTENSIF || null, mode: 'subscription' },
+  campagne: { priceId: () => process.env.STRIPE_PRICE_CAMPAGNE || null, mode: 'payment' },
 };
 
 // Headers set dynamically based on origin
@@ -43,9 +48,10 @@ export default async function handler(req) {
   try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'Corps invalide' }), { status: 400, headers }); }
 
   const { plan } = body;
-  if (!plan || !(plan in PRICE_IDS)) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
-  const priceId = PRICE_IDS[plan];
-  if (!priceId) return new Response(JSON.stringify({ error: 'Plan annuel non configuré' }), { status: 400, headers });
+  if (!plan || !(plan in PLANS)) return new Response(JSON.stringify({ error: 'Plan invalide' }), { status: 400, headers });
+  const { mode } = PLANS[plan];
+  const priceId = PLANS[plan].priceId();
+  if (!priceId) return new Response(JSON.stringify({ error: 'Plan non configuré' }), { status: 400, headers });
 
   // Prefer authenticated user email over body-supplied email to prevent spoofing
   const sessionUser = await getCurrentUser(req);
@@ -60,7 +66,7 @@ export default async function handler(req) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        mode: 'subscription',
+        mode,
         'line_items[0][price]': priceId,
         'line_items[0][quantity]': '1',
         success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/app?success=1`,
@@ -69,7 +75,10 @@ export default async function handler(req) {
         'metadata[plan]': plan,
         locale: 'fr',
         'payment_method_types[0]': 'card',
-        'subscription_data[trial_period_days]': '7',
+        // Trial only exists for subscriptions. The Pack Campagne is a one-off
+        // charge: sending subscription_data on mode=payment would both be
+        // rejected by Stripe and give away a free trial on a single payment.
+        ...(mode === 'subscription' ? { 'subscription_data[trial_period_days]': '7' } : {}),
       }),
     });
 

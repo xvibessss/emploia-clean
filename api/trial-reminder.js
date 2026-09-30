@@ -163,8 +163,8 @@ function buildJ7Email({ firstName, email }) {
       </div>
     </div>
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-bottom:28px">
-      <p style="font-size:14px;font-weight:700;color:#166534;margin:0 0 4px">Emploia Pro — 9&nbsp;€ / mois</p>
-      <p style="font-size:13px;color:#15803d;margin:0;line-height:1.6">C'est <strong>moins qu'un caf&eacute; par semaine</strong> pour multiplier tes chances de d&eacute;crocher un entretien. Et tu commences par 7&nbsp;jours gratuits.</p>
+      <p style="font-size:14px;font-weight:700;color:#166534;margin:0 0 4px">Emploia Pro — 19&nbsp;€ / mois</p>
+      <p style="font-size:13px;color:#15803d;margin:0;line-height:1.6">C'est <strong>moins qu'un caf&eacute; par jour</strong> pour multiplier tes chances de d&eacute;crocher un entretien. Et tu commences par 7&nbsp;jours gratuits.</p>
     </div>
     <a href="${BASE_URL}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">D&eacute;marrer mon essai gratuit →</a>
     <p style="font-size:12px;color:#94a3b8;margin:20px 0 0;line-height:1.6">Annulation possible &agrave; tout moment, sans engagement.</p>`;

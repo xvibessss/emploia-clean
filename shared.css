@@ -275,15 +275,19 @@ input,textarea,select{font:inherit;color:inherit}
 .emp-logo-wall .row span{font-size:18px;font-weight:700;opacity:.7;letter-spacing:-.3px}
 
 /* ── PRICING ────────────────────────────────────── */
-.emp-pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px}
+.emp-pricing-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:8px}
 .emp-pricing-card{background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:32px 28px;display:flex;flex-direction:column;position:relative}
 .emp-pricing-card.featured{background:var(--surface);border:2px solid var(--primary);padding:31px 27px}
 .emp-pricing-card .pop{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:var(--r-full);white-space:nowrap}
 .emp-pricing-card h4{margin:0 0 6px;font-size:18px;font-weight:600;color:var(--ink)}
-.emp-pricing-card .price{font-size:36px;font-weight:600;color:var(--ink);letter-spacing:-.5px;line-height:1}
+.emp-pricing-card .price{font-size:32px;font-weight:600;color:var(--ink);letter-spacing:-.5px;line-height:1.15;white-space:nowrap}
+/* Longer labels ("45€ les 3 mois", "Sur devis") shrink rather than wrap
+   mid-amount, now that the grid runs 5 columns wide. */
+.emp-pricing-card .price.price-long{font-size:26px}
 .emp-pricing-card ul{list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;flex:1}
 .emp-pricing-card li{font-size:13px;color:var(--charcoal);display:flex;align-items:flex-start;gap:8px;line-height:1.45}
 .emp-pricing-card .emp-btn{width:100%}
+@media(max-width:1279px){.emp-pricing-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:1023px){.emp-pricing-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.emp-pricing-grid{grid-template-columns:1fr}}
 

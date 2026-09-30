@@ -63,3 +63,9 @@ jobs:
         run: node scripts/bench/run.mjs
       - name: Employer offer lifecycle tests
         run: node scripts/employer/expiry.test.mjs
+      - name: Billing tests (Pack Campagne, grille tarifaire)
+        run: node scripts/billing/campagne.test.mjs
+      - name: Billing probes (checkout mode + webhook grant/rejeu)
+        run: |
+          node scripts/billing/probe-checkout.mjs
+          node scripts/billing/probe-webhook.mjs

@@ -22,15 +22,20 @@ async function gatherMetrics() {
   const sample = allUsers.slice(0, 200);
   const userData = await Promise.allSettled(sample.map(e => kvGet(`user:${e}`)));
 
-  let proCount = 0, intensifCount = 0, freeCount = 0;
+  let proCount = 0, intensifCount = 0, freeCount = 0, campagneCount = 0;
   let activeThisWeek = 0;
   const oneWeekAgo = Date.now() - 7 * 86400 * 1000;
+  const CAMPAGNE_DAYS = 90;
 
   for (const r of userData) {
     if (r.status !== 'fulfilled' || !r.value) continue;
     const u = r.value;
+    // pro_annual / intensif_annual are legacy plan values from the retired
+    // annual subscriptions — still tolerated for accounts stamped before it.
+    const campagneAt = u.campagnePurchasedAt ? new Date(u.campagnePurchasedAt).getTime() : 0;
     if (u.plan === 'pro' || u.plan === 'pro_annual') proCount++;
     else if (u.plan === 'intensif' || u.plan === 'intensif_annual') intensifCount++;
+    else if (campagneAt > Date.now() - CAMPAGNE_DAYS * 86400 * 1000) campagneCount++;
     else freeCount++;
     if (u.lastActiveAt && new Date(u.lastActiveAt).getTime() > oneWeekAgo) activeThisWeek++;
   }
@@ -38,8 +43,9 @@ async function gatherMetrics() {
   // Scale to total if sample < total
   const scale = totalUsers > 0 ? totalUsers / Math.max(sample.length, 1) : 1;
 
-  // Revenue estimate (approximate)
-  const monthlyRevenue = Math.round(proCount * scale * 9 + intensifCount * scale * 29);
+  // Revenue estimate (approximate). Pack Campagne is amortised at 15 €/month
+  // over its 3 months, matching api/admin/stats.js.
+  const monthlyRevenue = Math.round(proCount * scale * 19 + intensifCount * scale * 49 + campagneCount * scale * 15);
 
   // Generation counts from track events
   const [genCv, genCover, genInterview] = await Promise.all([

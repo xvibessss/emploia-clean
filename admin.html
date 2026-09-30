@@ -256,10 +256,11 @@ function renderAll(){
   // Revenue
   h=`<div class="grid kpis">`+kpi('💰 MRR',eur(rev.mrr),'grn')+kpi('📅 ARR',eur(rev.arr),'grn')+kpi('👤 Payants',nf(paid),'blu',u.conversionRate?`${u.conversionRate} conversion`:'' )+kpi('🧮 ARPU',paid>0?eur((rev.mrr/paid).toFixed(1)):'—','vio','par abonné/mois')+`</div>`;
   h+=`<div class="sec-h">Détail par plan</div><div class="card"><div class="rows">
-    <div class="row"><span class="k">Pro — 15 €/mois</span><span class="v">${nf(plan.pro)} · ${eur(rev.proRevenue)}</span></div>
-    <div class="row"><span class="k">Intensif — 35 €/mois</span><span class="v">${nf(plan.intensif)} · ${eur(rev.intensifRevenue)}</span></div>
+    <div class="row"><span class="k">Pro — 19 €/mois</span><span class="v">${nf(plan.pro)} · ${eur(rev.proRevenue)}</span></div>
+    <div class="row"><span class="k">Pack Campagne — 45 € les 3 mois</span><span class="v">${nf(plan.campagne||0)} · ${eur(rev.campagneRevenue||0)}</span></div>
+    <div class="row"><span class="k">Intensif — 49 €/mois</span><span class="v">${nf(plan.intensif)} · ${eur(rev.intensifRevenue)}</span></div>
     <div class="row"><span class="k">Gratuit</span><span class="v">${nf(plan.free)}</span></div>
-  </div>${u.sampleSize?`<div class="note">Réparti sur un échantillon de ${nf(u.sampleSize)}/${nf(u.sampleOf)} utilisateurs.</div>`:''}</div>`;
+  </div><div class="note">Le Pack Campagne est un paiement unique de 45 €, compté dans le MRR à 15 €/mois sur ses 3 mois d'activité.</div>${u.sampleSize?`<div class="note">Réparti sur un échantillon de ${nf(u.sampleSize)}/${nf(u.sampleOf)} utilisateurs.</div>`:''}</div>`;
   $('sec-revenue').innerHTML=h;
 
   // Acquisition
