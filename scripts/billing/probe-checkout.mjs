@@ -29,7 +29,7 @@ const call = plan => handler(new Request('https://emploia.fr/api/stripe-checkout
 }));
 
 let fail = 0;
-for (const plan of ['pro', 'intensif', 'campagne']) {
+for (const plan of ['pro', 'campagne']) {
   captured.length = 0;
   const res = await call(plan);
   const body = await res.json();

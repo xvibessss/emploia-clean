@@ -1,8 +1,8 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, kvSetNX, htmlEscape, extendPro } from './_lib/auth.js';
+import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './_lib/auth.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-// Pack Campagne — 45 € one-off buys 3 months of Pro access.
+// Pack Campagne — 59 € one-off buys 3 months of Pro access.
 const CAMPAGNE_DAYS = 90;
 
 function timingSafeEqual(a, b) {
@@ -75,7 +75,7 @@ export default async function handler(req) {
         const plan = session.metadata?.plan || 'pro';
 
         // ── Pack Campagne: one-off payment, not a subscription ──────────────
-        // 45 € grants 90 days of Pro through the internal proUntil grant that
+        // 59 € grants 90 days of Pro through the internal proUntil grant that
         // getCurrentUser honors at read-time. Deliberately does NOT write
         // `plan`: getCurrentUser only promotes an account whose plan is free
         // or unset, so stamping plan='campagne' would silently void the grant.
@@ -84,6 +84,19 @@ export default async function handler(req) {
         // which guards every event type, this one included; without it a
         // retried event would hand out another 90 free days.
         if (session.mode === 'payment') {
+          // Credit the creator before anything else: the sale happened and the
+          // commission is owed even if the buyer has no account record yet.
+          // Two atomic counters rather than one object — a read-modify-write
+          // would lose a sale whenever two buyers convert at the same moment.
+          // Commission owed is derived at read time in api/affiliate.js, so
+          // changing the rate never rewrites history.
+          const affiliate = session.metadata?.affiliate;
+          if (affiliate && /^[A-Z0-9]{3,20}$/.test(affiliate)) {
+            await Promise.all([
+              kvSadd('affiliates', affiliate),
+              kvIncr(`affiliate:${affiliate}:sales`),
+            ]).catch(() => {});
+          }
           if (!email) break;
           const normalizedEmail = email.toLowerCase();
           const user = await kvGet(`user:${normalizedEmail}`);
@@ -113,7 +126,10 @@ export default async function handler(req) {
           break;
         }
 
-        // ── Pro / Intensif: recurring subscription ──────────────────────────
+        // ── Pro: recurring subscription ─────────────────────────────────────
+        // 'intensif' is no longer sellable (removed from api/stripe-checkout.js)
+        // but the label is kept so a renewal or a plan change on one of the
+        // grandfathered subscriptions still reads correctly in emails.
         const planLabel = plan === 'intensif' ? 'Intensif' : 'Pro';
         if (email) {
           const normalizedEmail = email.toLowerCase();

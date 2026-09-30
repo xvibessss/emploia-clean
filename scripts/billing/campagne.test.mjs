@@ -77,10 +77,26 @@ test('stripe-webhook.js importe extendPro au lieu de le redéfinir', () => {
 
 console.log('\n[3] stripe-checkout — mode payment vs subscription');
 
-test('campagne → mode payment ; pro et intensif → mode subscription', () => {
+test('campagne → mode payment ; pro → mode subscription', () => {
   assert.match(checkoutSrc, /campagne:\s*\{[^}]*mode:\s*'payment'/, 'campagne doit être en mode payment');
   assert.match(checkoutSrc, /pro:\s*\{[^}]*mode:\s*'subscription'/, 'pro doit rester en mode subscription');
-  assert.match(checkoutSrc, /intensif:\s*\{[^}]*mode:\s*'subscription'/, 'intensif doit rester en mode subscription');
+});
+
+// Intensif was retired from sale on 2026-09-30. The catalogue is what decides
+// what can be bought, so the guarantee is that no new checkout can create one —
+// not that the string disappeared from the file (comments still mention it).
+test('intensif est retiré du catalogue de vente', () => {
+  const catalogue = checkoutSrc.match(/const PLANS = \{[\s\S]*?\n\};/);
+  assert.ok(catalogue, 'le catalogue PLANS doit être trouvable');
+  assert.doesNotMatch(catalogue[0], /intensif/, 'aucun plan intensif achetable');
+});
+
+// Grandfathered subscribers keep paying and must keep their access.
+test('les abonnés Intensif existants restent honorés', () => {
+  const webhookMap = readFileSync(new URL('../../api/stripe-webhook.js', import.meta.url), 'utf8');
+  assert.match(webhookMap, /STRIPE_PRICE_INTENSIF\]:\s*'intensif'/, 'le webhook mappe encore le prix Intensif');
+  const alertsSrc = readFileSync(new URL('../../api/alerts.js', import.meta.url), 'utf8');
+  assert.match(alertsSrc, /plan === 'intensif'/, 'les droits Intensif restent reconnus');
 });
 
 test('trial_period_days est conditionné au mode subscription', () => {
@@ -134,7 +150,9 @@ test('le chemin payment octroie proUntil via extendPro, +90 jours', () => {
 
 test('le chemin payment ne crée ni abonnement ni plan payant en KV', () => {
   const start = webhookSrc.indexOf("session.mode === 'payment'");
-  const end = webhookSrc.indexOf('Pro / Intensif', start);
+  // Anchored on the first line of the subscription branch rather than on a
+  // comment: a reworded comment must not silently widen the slice under test.
+  const end = webhookSrc.indexOf('const planLabel', start);
   assert.ok(end > start, 'la branche payment doit être délimitée');
   const branch = webhookSrc.slice(start, end);
   assert.doesNotMatch(branch, /subscriptionId/, 'aucun subscriptionId ne doit être stocké pour un paiement unique');
@@ -152,23 +170,36 @@ test('getCurrentUser n\'honore le grant que si le plan est free/absent', () => {
 
 console.log('\n[5] Grille tarifaire — cohérence des montants affichés');
 
-test('le MRR admin utilise 19 / 49 et amortit le Pack à 15', () => {
+test('le MRR admin utilise 24 / 49 et amortit le Pack à 59/3', () => {
   const statsSrc = readFileSync(new URL('../../api/admin/stats.js', import.meta.url), 'utf8');
-  assert.match(statsSrc, /const PRO_PRICE = 19/, 'Pro à 19');
-  assert.match(statsSrc, /const INTENSIF_PRICE = 49/, 'Intensif à 49');
-  assert.match(statsSrc, /const CAMPAGNE_PRICE = 45/, 'Pack à 45');
+  assert.match(statsSrc, /const PRO_PRICE = 24/, 'Pro à 24');
+  // Intensif is no longer sold but grandfathered subscribers still pay 49 €,
+  // so dropping the constant would silently under-report the MRR.
+  assert.match(statsSrc, /const INTENSIF_PRICE = 49/, 'Intensif à 49 pour les abonnés existants');
+  assert.match(statsSrc, /const CAMPAGNE_PRICE = 59/, 'Pack à 59');
   assert.match(statsSrc, /CAMPAGNE_PRICE \/ 3/, 'Pack amorti sur 3 mois');
+});
+
+// The Pack must stay cheaper per month than Pro, otherwise the cheapest offer
+// is also the one carrying the "le plus avantageux" badge and Pro sells to
+// nobody — the exact flaw of the retired 45 € price (45/3 = 15 < 19).
+test('le Pack reste moins cher au mois que Pro, sans le cannibaliser', () => {
+  const statsSrc = readFileSync(new URL('../../api/admin/stats.js', import.meta.url), 'utf8');
+  const pro = Number(statsSrc.match(/const PRO_PRICE = (\d+)/)[1]);
+  const pack = Number(statsSrc.match(/const CAMPAGNE_PRICE = (\d+)/)[1]);
+  assert.ok(pack / 3 < pro, `le Pack (${pack}/3 = ${(pack / 3).toFixed(2)} €/mois) doit être sous Pro (${pro} €/mois)`);
+  assert.ok(pack / 3 > pro * 0.7, `l'écart doit rester lisible : ${(pack / 3).toFixed(2)} vs ${pro} €/mois`);
 });
 
 test('le prompt support annonce la nouvelle grille, sans annuel ni coaching humain', () => {
   const supportSrc = readFileSync(new URL('../../api/agent/support.js', import.meta.url), 'utf8');
-  assert.match(supportSrc, /Plan Pro : 19€\/mois/, 'Pro à 19€');
-  assert.match(supportSrc, /Plan Intensif : 49€\/mois/, 'Intensif à 49€');
-  assert.match(supportSrc, /Pack Campagne : 45€ les 3 mois/, 'Pack Campagne à 45€');
-  // Old grid: Pro 15€/mois, Intensif 35€/mois, annual 144€/348€.
-  // "soit 15€/mois" is allowed — it is the Pack amortised over 3 months.
+  assert.match(supportSrc, /Plan Pro : 24€\/mois/, 'Pro à 24€');
+  assert.match(supportSrc, /Pack Campagne : 59€ les 3 mois/, 'Pack Campagne à 59€');
+  assert.match(supportSrc, /PAS de plan Intensif/, 'le prompt doit dire qu\'Intensif n\'est plus vendu');
+  // Retired grids: Pro 15 then 19 €/mois, Intensif 35 then 49, annual 144/348.
   assert.doesNotMatch(supportSrc, /144€|348€/, 'plus aucun tarif annuel');
-  assert.doesNotMatch(supportSrc, /Plan Pro : 15€|Plan Intensif : 35€/, 'plus aucun tarif de plan de l\'ancienne grille');
+  assert.doesNotMatch(supportSrc, /Plan Pro : (15|19)€/, 'plus aucun tarif Pro périmé');
+  assert.doesNotMatch(supportSrc, /Pack Campagne : 45€/, 'plus aucun tarif Pack périmé');
   assert.match(supportSrc, /PAS de coaching humain/, 'le prompt doit nier explicitement le coaching humain');
 });
 

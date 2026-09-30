@@ -43,9 +43,9 @@ async function gatherMetrics() {
   // Scale to total if sample < total
   const scale = totalUsers > 0 ? totalUsers / Math.max(sample.length, 1) : 1;
 
-  // Revenue estimate (approximate). Pack Campagne is amortised at 15 €/month
+  // Revenue estimate (approximate). Pack Campagne is amortised at 19.67 €/month
   // over its 3 months, matching api/admin/stats.js.
-  const monthlyRevenue = Math.round(proCount * scale * 19 + intensifCount * scale * 49 + campagneCount * scale * 15);
+  const monthlyRevenue = Math.round(proCount * scale * 24 + intensifCount * scale * 49 + campagneCount * scale * (59 / 3));
 
   // Generation counts from track events
   const [genCv, genCover, genInterview] = await Promise.all([

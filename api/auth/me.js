@@ -172,8 +172,8 @@ export default async function handler(req) {
     <div style="font-size:13px;color:#b91c1c;display:flex;align-items:center;gap:8px">✕ Smart Apply + Alertes jusqu'à 50 offres</div>
   </div>
 </div>
-<p style="color:#475569;font-size:13px;margin:0 0 20px">Si vous continuez, <strong>seulement 19€/mois</strong> — annulable en 1 clic à tout moment. Pour vous remercier de votre confiance, votre carte ne sera débitée qu'à la fin de l'essai.</p>
-<a href="https://emploia.fr/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;margin-bottom:12px">Continuer avec Pro → 19€/mois</a>
+<p style="color:#475569;font-size:13px;margin:0 0 20px">Si vous continuez, <strong>seulement 24€/mois</strong> — annulable en 1 clic à tout moment. Pour vous remercier de votre confiance, votre carte ne sera débitée qu'à la fin de l'essai.</p>
+<a href="https://emploia.fr/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;margin-bottom:12px">Continuer avec Pro → 24€/mois</a>
 <p style="font-size:12px;color:#94a3b8;margin:8px 0 0">Annulez avant l'expiration et vous ne payez rien.</p>`
         )).catch(() => {});
       }

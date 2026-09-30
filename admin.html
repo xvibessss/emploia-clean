@@ -151,6 +151,7 @@
       <div class="nav-group">
         <div class="nav-h">Croissance</div>
         <div class="nav-item" data-nav="referral">🎁 Parrainage</div>
+        <div class="nav-item" data-nav="affiliates">📣 Créateurs &amp; commissions</div>
       </div>
     </nav>
     <div class="side-foot">
@@ -178,6 +179,7 @@
       <section data-sec="product" id="sec-product"></section>
       <section data-sec="automations" id="sec-automations"></section>
       <section data-sec="referral" id="sec-referral"></section>
+      <section data-sec="affiliates" id="sec-affiliates"></section>
     </div>
   </div>
 </div>
@@ -187,7 +189,7 @@ const SKEY = 'emploia_admin_secret';
 const $ = (id) => document.getElementById(id);
 const nf = (n) => (Number(n) || 0).toLocaleString('fr-FR');
 const eur = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' €';
-const TITLES = { overview:"Vue d'ensemble", revenue:"Revenus & facturation", acquisition:"Acquisition & canaux", seo:"SEO", retention:"Cohortes & rétention", product:"Produit & engagement", automations:"Automatisations", referral:"Parrainage" };
+const TITLES = { overview:"Vue d'ensemble", revenue:"Revenus & facturation", acquisition:"Acquisition & canaux", seo:"SEO", retention:"Cohortes & rétention", product:"Produit & engagement", automations:"Automatisations", referral:"Parrainage", affiliates:"Créateurs & commissions" };
 let DATA = null;
 
 /* ── Auth ── */
@@ -256,11 +258,11 @@ function renderAll(){
   // Revenue
   h=`<div class="grid kpis">`+kpi('💰 MRR',eur(rev.mrr),'grn')+kpi('📅 ARR',eur(rev.arr),'grn')+kpi('👤 Payants',nf(paid),'blu',u.conversionRate?`${u.conversionRate} conversion`:'' )+kpi('🧮 ARPU',paid>0?eur((rev.mrr/paid).toFixed(1)):'—','vio','par abonné/mois')+`</div>`;
   h+=`<div class="sec-h">Détail par plan</div><div class="card"><div class="rows">
-    <div class="row"><span class="k">Pro — 19 €/mois</span><span class="v">${nf(plan.pro)} · ${eur(rev.proRevenue)}</span></div>
-    <div class="row"><span class="k">Pack Campagne — 45 € les 3 mois</span><span class="v">${nf(plan.campagne||0)} · ${eur(rev.campagneRevenue||0)}</span></div>
-    <div class="row"><span class="k">Intensif — 49 €/mois</span><span class="v">${nf(plan.intensif)} · ${eur(rev.intensifRevenue)}</span></div>
+    <div class="row"><span class="k">Pro — 24 €/mois</span><span class="v">${nf(plan.pro)} · ${eur(rev.proRevenue)}</span></div>
+    <div class="row"><span class="k">Pack Campagne — 59 € les 3 mois</span><span class="v">${nf(plan.campagne||0)} · ${eur(rev.campagneRevenue||0)}</span></div>
+    <div class="row"><span class="k">Intensif — 49 €/mois <em>(retiré de la vente)</em></span><span class="v">${nf(plan.intensif)} · ${eur(rev.intensifRevenue)}</span></div>
     <div class="row"><span class="k">Gratuit</span><span class="v">${nf(plan.free)}</span></div>
-  </div><div class="note">Le Pack Campagne est un paiement unique de 45 €, compté dans le MRR à 15 €/mois sur ses 3 mois d'activité.</div>${u.sampleSize?`<div class="note">Réparti sur un échantillon de ${nf(u.sampleSize)}/${nf(u.sampleOf)} utilisateurs.</div>`:''}</div>`;
+  </div><div class="note">Le Pack Campagne est un paiement unique de 59 €, compté dans le MRR à 19,67 €/mois sur ses 3 mois d'activité.</div>${u.sampleSize?`<div class="note">Réparti sur un échantillon de ${nf(u.sampleSize)}/${nf(u.sampleOf)} utilisateurs.</div>`:''}</div>`;
   $('sec-revenue').innerHTML=h;
 
   // Acquisition
@@ -272,6 +274,7 @@ function renderAll(){
   // SEO (no owned data source server-side)
   $('sec-seo').innerHTML=`<p class="lead">Le SEO est le principal levier d'acquisition d'Emploia (85 pages villes/métiers enrichies). Données Google Search Console (30 derniers jours).</p><div class="card"><div class="empty">Chargement des données Search Console…</div></div>`;
   loadSeo();
+  loadAffiliates();
 
   // Retention
   const dau=u.activeLast7d||0, mau=u.activeLast30d||0;
@@ -322,6 +325,43 @@ function renderAll(){
 }
 
 /* SEO — Google Search Console (separate endpoint) */
+async function loadAffiliates(){
+  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  const lead=`<p class="lead">Codes créateurs TikTok. Le code donne <b>10 € de réduction</b> sur le Pack Campagne (59 € → 49 €) et sert de clé d'attribution. La commission est de <b>12 € par vente</b>, versée à la main : après avoir payé un créateur, clique « Marquer payé » pour remettre son solde à zéro.</p>`;
+  try{
+    const r=await fetch('/api/admin/affiliates',{headers:{'x-admin-secret':secret},cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const s=await r.json();
+    const list=s.affiliates||[], tot=s.totals||{};
+    let h=lead+`<div class="grid kpis">`
+      +kpi('🛒 Ventes via créateurs',nf(tot.sales),'grn')
+      +kpi('💶 Encaissé brut',eur(tot.grossRevenue),'blu')
+      +kpi('📤 Commissions à verser',eur(tot.commissionOwed),'amb')
+      +kpi('✅ Net après commissions',eur(tot.netRevenue),'vio')
+      +`</div>`;
+    h+=`<div class="sec-h">Par créateur</div><div class="card"><div class="rows">`;
+    if(!list.length) h+=`<div class="empty" style="padding:16px">Aucune vente attribuée à un code pour l'instant. Crée un code promo dans Stripe, puis partage le lien <code>emploia.fr/?code=LECODE</code>.</div>`;
+    else list.forEach(a=>{
+      h+=`<div class="row"><span class="k"><b>${esc(a.code)}</b> · ${nf(a.sales)} vente${a.sales>1?'s':''} · ${nf(a.unpaidSales)} non réglée${a.unpaidSales>1?'s':''}</span>`
+       +`<span class="v">${eur(a.commissionOwed)} dû · <button class="btn ghost" style="padding:4px 10px;font-size:12px" onclick="markPaid('${esc(a.code)}',${a.sales})">Marquer payé</button></span></div>`;
+    });
+    h+=`</div></div>`;
+    $('sec-affiliates').innerHTML=h;
+  }catch(e){
+    $('sec-affiliates').innerHTML=lead+soonCard('Commissions indisponibles','Impossible de lire <code>/api/admin/affiliates</code>. Vérifie que <code>ADMIN_SECRET</code> est bien posé sur Vercel.');
+  }
+}
+
+async function markPaid(code,sales){
+  if(!confirm(`Confirmer le versement à ${code} ? Son solde repassera à 0 €.`)) return;
+  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  try{
+    const r=await fetch('/api/admin/affiliates',{method:'POST',headers:{'x-admin-secret':secret,'Content-Type':'application/json'},body:JSON.stringify({code:code,paidSales:sales})});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    loadAffiliates();
+  }catch(e){ alert('Échec de l\'enregistrement du versement. Réessaie.'); }
+}
+
 async function loadSeo(){
   let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
   const lead=`<p class="lead">Le SEO est le principal levier d'acquisition d'Emploia (85 pages villes/métiers enrichies). Données Google Search Console (30 derniers jours).</p>`;

@@ -116,7 +116,7 @@ export default async function handler(req) {
   <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:36px">
     <div style="font-size:18px;font-weight:800;color:#6E48BE;margin-bottom:24px">Emploia</div>
     ${htmlBody}
-    <a href="${BASE_URL}/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6E48BE,#4f46e5);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;margin-top:8px">Passer Pro — 19€/mois →</a>
+    <a href="${BASE_URL}/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6E48BE,#4f46e5);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;margin-top:8px">Passer Pro — 24€/mois →</a>
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px">
     Emploia · <a href="${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a>
