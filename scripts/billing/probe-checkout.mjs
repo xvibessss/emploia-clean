@@ -40,7 +40,7 @@ const { default: handler } = await import('../../api/stripe-checkout.js');
 const call = (plan, code) => handler(new Request('https://emploia.fr/api/stripe-checkout', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', origin: 'https://emploia.fr', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250) + 1}` },
-  body: JSON.stringify(code ? { plan, code, email: 'probe@example.com' } : { plan, email: 'probe@example.com' }),
+  body: JSON.stringify(code ? { plan, code, consent: true, email: 'probe@example.com' } : { plan, consent: true, email: 'probe@example.com' }),
 }));
 
 let fail = 0;
@@ -103,6 +103,28 @@ const ignored = onPro['discounts[0][promotion_code]'] === undefined
   && onPro.allow_promotion_codes === undefined;
 console.log(`  ${ignored ? '✓' : '✗'} code sur « pro » → ignoré, aucune remise ni attribution`);
 if (!ignored) fail++;
+
+// ── Consentement à l'exécution immédiate ──────────────────────────────────
+// Les CGV promettent qu'une commande n'est pas passée sans consentement. La
+// page peut être contournée ; le serveur, non. On vérifie qu'aucun appel
+// Stripe ne part, pas seulement que le statut est 400.
+console.log('\n  Droit de rétractation');
+captured.length = 0;
+const noConsent = await handler(new Request('https://emploia.fr/api/stripe-checkout', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', origin: 'https://emploia.fr', 'x-forwarded-for': '10.0.1.7' },
+  body: JSON.stringify({ plan: 'campagne', email: 'probe@example.com' }),
+}));
+const refused = noConsent.status === 400 && captured.length === 0;
+console.log(`  ${refused ? '✓' : '✗'} sans consentement → refusé (status ${noConsent.status}, appels Stripe : ${captured.length})`);
+if (!refused) fail++;
+
+captured.length = 0;
+await call('campagne');
+const stamped = (captured[0] || {})['metadata[consent_immediate]'] === 'true'
+  && typeof (captured[0] || {})['metadata[consent_at]'] === 'string';
+console.log(`  ${stamped ? '✓' : '✗'} avec consentement → tracé dans les métadonnées Stripe`);
+if (!stamped) fail++;
 
 globalThis.fetch = realFetch;
 console.log(fail === 0 ? '\n✅ sonde checkout : conforme\n' : `\n❌ ${fail} écart(s)\n`);

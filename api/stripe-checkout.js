@@ -116,6 +116,17 @@ export default async function handler(req) {
   const priceId = PLANS[plan].priceId();
   if (!priceId) return new Response(JSON.stringify({ error: 'Plan non configuré' }), { status: 400, headers });
 
+  // Express consent to immediate performance (code de la consommation,
+  // L221-28 13°). The CGV promise that an order is not placed without it, so
+  // the server enforces that promise rather than trusting the page: a checkout
+  // reaching this endpoint without consent is refused outright.
+  if (body.consent !== true) {
+    return new Response(
+      JSON.stringify({ error: "Vous devez accepter l'exécution immédiate du service pour continuer." }),
+      { status: 400, headers },
+    );
+  }
+
   // Creator code: only on the Pack Campagne, only if it resolves to a live
   // Stripe promotion code. An unknown code is dropped rather than rejected.
   // The canonical form is what gets stamped into the metadata, so a code used
@@ -144,6 +155,11 @@ export default async function handler(req) {
         cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/#pricing`,
         ...(resolvedEmail ? { customer_email: resolvedEmail } : {}),
         'metadata[plan]': plan,
+        // Proof of consent, kept on the Stripe object rather than only in our
+        // own store: it has to outlive the session to be worth anything in a
+        // dispute, and Stripe is where a chargeback is argued.
+        'metadata[consent_immediate]': 'true',
+        'metadata[consent_at]': new Date().toISOString(),
         locale: 'fr',
         'payment_method_types[0]': 'card',
         // `discounts` and `allow_promotion_codes` are mutually exclusive in

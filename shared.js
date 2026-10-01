@@ -490,11 +490,12 @@ window.empUpgradeCheckout = async function(btn) {
   // The server ignores a code on anything but the Pack, and drops one it
   // cannot resolve — a stale or mistyped code costs the discount, not the sale.
   const code = plan === 'campagne' ? window.empCreatorCode() : '';
+  if (!await window.empConsentImmediate(plan === 'campagne' ? 'Pack Campagne' : 'Pro')) return;
   const label = btn.textContent;
   if (window.trackEvent) window.trackEvent('checkout_started', { plan });
   btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
   try {
-    const res = await fetch('/api/stripe-checkout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(code ? { plan, code } : { plan }) });
+    const res = await fetch('/api/stripe-checkout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(code ? { plan, code, consent: true } : { plan, consent: true }) });
     const data = await res.json().catch(() => ({}));
     if (res.ok && data.url) { window.location.href = data.url; return; }
     (window.empToast ? empToast(data.error || 'Paiement momentanément indisponible. Réessayez.', 'error') : alert('Paiement momentanément indisponible.'));
@@ -795,6 +796,53 @@ async function empAuthInit() {
     if (gen && !gen.disabled) { e.preventDefault(); gen.click(); }
   });
 })();
+
+// ── CONSENTEMENT À L'EXÉCUTION IMMÉDIATE ────────────────────────────
+// L'article L221-28, 13° du code de la consommation ne fait tomber le droit
+// de rétractation de 14 jours que si le client a, AVANT le paiement et de
+// manière expresse, demandé l'exécution immédiate ET reconnu renoncer à ce
+// droit. Sans ces deux déclarations, un acheteur du Pack à 59 € peut se faire
+// rembourser sous 14 jours après avoir utilisé le produit.
+//
+// La case est décochée par défaut et le bouton reste inactif tant qu'elle ne
+// l'est pas : un consentement pré-coché ne vaut rien. La promesse est tenue
+// jusqu'au bout côté serveur, qui refuse un checkout sans consentement.
+window.empConsentImmediate = function(planLabel) {
+  return new Promise(resolve => {
+    document.getElementById('empConsentModal')?.remove();
+    const m = document.createElement('div');
+    m.id = 'empConsentModal';
+    m.className = 'emp-auth-overlay open';
+    m.innerHTML = `<div class="emp-auth-box" style="max-width:460px;text-align:left">
+      <h2 style="font-size:19px;font-weight:800;margin:0 0 10px;color:var(--ink,#0f172a);letter-spacing:-.3px">Avant de payer</h2>
+      <p style="font-size:13.5px;line-height:1.6;color:var(--slate,#64748b);margin:0 0 14px">Votre accès à <strong>${planLabel}</strong> s'ouvre dès le paiement validé. La loi nous demande de recueillir votre accord explicite sur ce point.</p>
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--surface,#f7f6f3);border:1px solid var(--hairline,#e7e4de);border-radius:8px;padding:13px">
+        <input type="checkbox" id="empConsentBox" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--primary,#6366f1)"/>
+        <span style="font-size:13px;line-height:1.55;color:var(--charcoal,#37352f)">Je demande expressément l'exécution immédiate du service et je reconnais qu'une fois mon accès ouvert, je <strong>perds mon droit de rétractation</strong> de 14 jours.</span>
+      </label>
+      <p style="font-size:11.5px;color:var(--steel,#837f77);margin:11px 0 16px;line-height:1.5">Si vous préférez conserver ce droit, ne cochez pas : la commande ne sera pas passée. Détail dans nos <a href="/legal#cgv" target="_blank" rel="noopener" style="color:var(--primary,#6366f1);text-decoration:underline">conditions générales de vente</a>.</p>
+      <div style="display:flex;gap:9px">
+        <button type="button" id="empConsentCancel" class="emp-btn emp-btn-secondary" style="flex:1;justify-content:center">Annuler</button>
+        <button type="button" id="empConsentGo" class="emp-btn emp-btn-primary" style="flex:2;justify-content:center" disabled>Continuer vers le paiement</button>
+      </div>
+    </div>`;
+    document.body.appendChild(m);
+    document.body.style.overflow = 'hidden';
+
+    const box = m.querySelector('#empConsentBox');
+    const go = m.querySelector('#empConsentGo');
+    const close = (ok) => { m.remove(); document.body.style.overflow = ''; resolve(ok); };
+    box.addEventListener('change', () => {
+      go.disabled = !box.checked;
+      go.style.opacity = box.checked ? '' : '.5';
+      go.style.pointerEvents = box.checked ? '' : 'none';
+    });
+    go.style.opacity = '.5'; go.style.pointerEvents = 'none';
+    go.addEventListener('click', () => close(box.checked));
+    m.querySelector('#empConsentCancel').addEventListener('click', () => close(false));
+    m.addEventListener('click', e => { if (e.target === m) close(false); });
+  });
+};
 
 // ── MODE RÉVISION : marqueurs « [à compléter] » ──────────────────────
 // Emploia n'invente jamais une donnée absente de ce que l'utilisateur a

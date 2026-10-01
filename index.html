@@ -1135,9 +1135,10 @@
       </div>
       <div class="emp-footer-col">
         <h5>Mentions</h5>
-        <a href="/legal">Confidentialité</a>
-        <a href="/legal">CGU</a>
-        <a href="/legal">RGPD</a>
+        <a href="/legal#privacy">Confidentialité</a>
+        <a href="/legal#cgu">CGU</a>
+        <a href="/legal#cgv">CGV</a>
+        <a href="/legal#mentions">Mentions légales</a>
         <a href="/contact">Contact</a>
       </div>
     </div>
@@ -1182,6 +1183,8 @@
   function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
   async function startCheckout(plan, btn) {
     const code = plan === 'campagne' && window.empCreatorCode ? window.empCreatorCode() : '';
+    // Consentement exprès à l'exécution immédiate : sans lui, pas de commande.
+    if (window.empConsentImmediate && !await window.empConsentImmediate(plan === 'campagne' ? 'Pack Campagne' : 'Pro')) return;
     const label = btn.textContent;
     if (window.trackEvent) window.trackEvent('checkout_started', { plan });
     btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
@@ -1189,7 +1192,7 @@
       const res = await fetch('/api/stripe-checkout', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(code ? { plan, code } : { plan }),
+        body: JSON.stringify(code ? { plan, code, consent: true } : { plan, consent: true }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.url) { window.location.href = data.url; return; }
