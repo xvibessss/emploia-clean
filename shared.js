@@ -795,3 +795,54 @@ async function empAuthInit() {
     if (gen && !gen.disabled) { e.preventDefault(); gen.click(); }
   });
 })();
+
+// ── MODE RÉVISION : marqueurs « [à compléter] » ──────────────────────
+// Emploia n'invente jamais une donnée absente de ce que l'utilisateur a
+// fourni : il laisse un marqueur entre crochets à la place. Ces fonctions
+// vivent ici et non dans une page parce qu'elles ont déjà divergé une fois —
+// le panneau n'existait que dans app.html, et les sept outils de tools.html
+// laissaient exporter un document truffé de marqueurs sans un mot.
+window.empPlaceholders = function(text) {
+  const t = typeof text === 'string' ? text : '';
+  return [...new Set((t.match(/\[[^\]\n]{0,80}\]/g) || []).map(s => s.trim()))];
+};
+
+// Insère le panneau en tête du conteneur, ou le retire s'il ne reste aucun
+// marqueur. Lit `text` quand on le lui donne, sinon le texte rendu du
+// conteneur — ce qui marche aussi bien pour un bloc de texte que pour un
+// résultat structuré en plusieurs cartes. Retourne le nombre de marqueurs.
+window.empRevisionPanel = function(container, text) {
+  if (!container) return 0;
+  container.querySelector(':scope > .emp-revision-panel')?.remove();
+  const found = window.empPlaceholders(typeof text === 'string' ? text : container.textContent);
+  if (!found.length) return 0;
+
+  const panel = document.createElement('div');
+  panel.className = 'emp-revision-panel';
+
+  const head = document.createElement('div');
+  head.className = 'emp-revision-head';
+  head.textContent = `✍️ À compléter avant d'exporter · ${found.length}`;
+
+  const intro = document.createElement('p');
+  intro.className = 'emp-revision-intro';
+  intro.textContent = "Emploia n'invente jamais vos données. Remplacez chaque marqueur par vos vraies informations pour un document fiable :";
+
+  const list = document.createElement('ul');
+  list.className = 'emp-revision-list';
+  // textContent et non innerHTML : le marqueur vient du texte généré, il
+  // n'a aucune raison d'être interprété comme du HTML.
+  found.forEach(p => { const li = document.createElement('li'); li.textContent = p; list.appendChild(li); });
+
+  panel.append(head, intro, list);
+  container.insertBefore(panel, container.firstChild);
+  return found.length;
+};
+
+// Garde-fou avant une copie ou un export. Retourne false si l'utilisateur
+// renonce, true s'il n'y a rien à signaler ou s'il choisit de continuer.
+window.empConfirmIfIncomplete = function(text) {
+  const n = window.empPlaceholders(typeof text === 'string' ? text : '').length;
+  if (!n) return true;
+  return confirm(`Il reste ${n} champ${n > 1 ? 's' : ''} « [à compléter] » non rempli${n > 1 ? 's' : ''}. Exporter quand même ?`);
+};
