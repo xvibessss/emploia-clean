@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA"/>
+<title>EmploiA pour les écoles, CFA et cabinets — 9 € par étudiant et par an</title>
+<meta name="description" content="Équipez chaque étudiant d'un copilote de candidature et donnez à votre service insertion un tableau de bord par promotion. 9 € par étudiant et par an, sous le seuil de mise en concurrence. Pilote sur un semestre."/>
+<link rel="canonical" href="https://emploia.fr/ecoles"/>
+<link rel="icon" href="/favicon.svg"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/favicon.svg"/>
+<meta name="theme-color" content="#6E48BE"/>
+<meta property="og:title" content="EmploiA pour les écoles, CFA et cabinets"/>
+<meta property="og:description" content="Un copilote de candidature pour chaque étudiant, un tableau de bord pour votre service insertion. 9 € par étudiant et par an."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://emploia.fr/ecoles"/>
+<meta property="og:image" content="https://emploia.fr/og-image.svg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="EmploiA pour les écoles, CFA et cabinets"/>
+<meta name="twitter:description" content="Un copilote de candidature pour chaque étudiant, un tableau de bord pour votre service insertion. 9 € par étudiant et par an."/>
+<meta name="twitter:image" content="https://emploia.fr/og-image.svg"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "EmploiA pour les établissements d'enseignement",
+  "serviceType": "Outil d'aide à l'insertion professionnelle des étudiants",
+  "provider": { "@type": "Organization", "name": "EmploiA", "url": "https://emploia.fr" },
+  "areaServed": "FR",
+  "audience": { "@type": "EducationalAudience", "educationalRole": "Établissement d'enseignement supérieur, CFA, cabinet d'outplacement" },
+  "offers": [
+    { "@type": "Offer", "name": "Siège étudiant — 100 à 499", "price": "9", "priceCurrency": "EUR", "description": "Par étudiant et par an" },
+    { "@type": "Offer", "name": "Siège étudiant — 500 à 999", "price": "7.50", "priceCurrency": "EUR", "description": "Par étudiant et par an" },
+    { "@type": "Offer", "name": "Siège étudiant — 1000 et plus", "price": "6", "priceCurrency": "EUR", "description": "Par étudiant et par an" },
+    { "@type": "Offer", "name": "Outplacement — à l'usage", "price": "39", "priceCurrency": "EUR", "description": "Par candidat accompagné" }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="/shared.css"/>
+<style>
+/* Dossier institutionnel : colonne éditoriale étroite pour la prose, blocs
+   « fiche technique » sur filets fins. Tokens du site, pas de palette parallèle. */
+.ec-col{max-width:64ch}
+.ec-sec{border-top:1px solid var(--hairline);padding:var(--sp-section) 0}
+.ec-stack{display:flex;flex-direction:column;gap:var(--sp-xl)}
+.ec-stack-sm{display:flex;flex-direction:column;gap:var(--sp-sm)}
+.ec-stack-lg{display:flex;flex-direction:column;gap:var(--sp-xxl)}
+
+.ec-eyebrow{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin:0}
+.ec-h1{font-size:clamp(30px,5vw,50px);line-height:1.08;letter-spacing:-.025em;font-weight:800;margin:0;text-wrap:balance;color:var(--ink)}
+.ec-h1 .quiet{color:var(--slate);font-weight:700}
+.ec-h2{font-size:clamp(23px,3.2vw,32px);line-height:1.18;letter-spacing:-.02em;font-weight:800;margin:0;text-wrap:balance;color:var(--ink)}
+.ec-h3{font-size:17px;line-height:1.35;font-weight:700;margin:0;color:var(--ink)}
+.ec-lede{font-size:clamp(16px,2vw,19px);line-height:1.6;color:var(--slate);margin:0}
+.ec-p{margin:0;color:var(--charcoal);line-height:1.68}
+.ec-hint{font-size:13px;color:var(--steel);margin:0;line-height:1.55}
+
+/* Hero */
+.ec-hero{background:var(--surface-soft);border-bottom:1px solid var(--hairline);padding:var(--sp-section-lg) 0 var(--sp-section)}
+.ec-masthead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding-bottom:16px;margin-bottom:var(--sp-xxl);border-bottom:1px solid var(--hairline-strong)}
+.ec-masthead .lbl{font-size:13px;font-weight:600;color:var(--slate)}
+.ec-masthead .sep{color:var(--muted)}
+.ec-cta-row{display:flex;flex-wrap:wrap;gap:var(--sp-sm);align-items:center}
+
+/* Fiche */
+.ec-fiche{background:var(--canvas);border:1px solid var(--hairline);padding:clamp(18px,3vw,28px)}
+.ec-fiche-head{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);padding-bottom:12px;margin:0 0 var(--sp-lg);border-bottom:1px solid var(--hairline)}
+.ec-grid{display:grid;gap:1px;background:var(--hairline)}
+.ec-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ec-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ec-cell{background:var(--canvas);padding:var(--sp-lg);min-width:0}
+.ec-num{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;display:block;margin-bottom:8px;color:var(--brand-orange-deep)}
+.ec-lbl{font-size:14px;color:var(--slate);line-height:1.5;display:block}
+.ec-src{font-size:11.5px;color:var(--stone);margin-top:8px;display:block}
+
+.ec-ticks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px}
+.ec-ticks li{position:relative;padding-left:26px;font-size:15px;line-height:1.55;color:var(--charcoal)}
+.ec-ticks li::before{content:"";position:absolute;left:0;top:.5em;width:9px;height:9px;border:1.5px solid var(--primary);border-radius:var(--r-full)}
+
+/* Objections */
+.ec-qa{display:grid;gap:1px;background:var(--hairline);border:1px solid var(--hairline)}
+.ec-qa-item{background:var(--canvas);padding:clamp(17px,2.4vw,24px);min-width:0}
+.ec-q{font-size:17px;font-weight:700;margin:0 0 8px;color:var(--ink);line-height:1.35}
+.ec-a{font-size:14.5px;color:var(--slate);line-height:1.65;margin:0}
+.ec-a strong{color:var(--ink);font-weight:700}
+
+/* Étapes */
+.ec-steps{list-style:none;counter-reset:ecs;padding:0;margin:0;display:flex;flex-direction:column;gap:1px;background:var(--hairline);border:1px solid var(--hairline)}
+.ec-steps li{counter-increment:ecs;background:var(--canvas);padding:var(--sp-lg) var(--sp-xl) var(--sp-lg) 62px;position:relative;min-width:0}
+.ec-steps li::before{content:counter(ecs,decimal-leading-zero);position:absolute;left:var(--sp-xl);top:var(--sp-lg);font-size:15px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums}
+.ec-st{font-weight:700;font-size:15.5px;display:block;margin-bottom:4px;color:var(--ink)}
+.ec-sd{font-size:14px;color:var(--slate);line-height:1.6;display:block}
+.ec-sw{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--primary);font-weight:700;display:block;margin-top:7px}
+
+/* Calculateur */
+.ec-calc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline)}
+.ec-calc-in,.ec-calc-out{padding:clamp(18px,3vw,26px);min-width:0}
+.ec-calc-in{background:var(--canvas)}
+.ec-calc-out{background:var(--surface-soft)}
+.ec-field{display:flex;flex-direction:column;gap:7px;margin-bottom:var(--sp-xl)}
+.ec-field:last-child{margin-bottom:0}
+.ec-field label{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--steel)}
+.ec-seg{display:flex;gap:1px;background:var(--hairline);border:1px solid var(--hairline)}
+.ec-seg button{flex:1;min-width:0;background:var(--canvas);font-size:13px;font-weight:600;color:var(--slate);padding:10px 6px;transition:background .12s var(--ease),color .12s var(--ease)}
+.ec-seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-dark);font-weight:700}
+.ec-calc input[type="number"]{font-family:inherit;font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;background:var(--canvas);color:var(--ink);border:1px solid var(--hairline-strong);border-radius:var(--r-xs);padding:10px 12px;width:100%}
+.ec-calc input[type="range"]{width:100%;accent-color:var(--primary);margin:0}
+.ec-calc input:focus-visible,.ec-seg button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+.ec-price{font-size:clamp(38px,6.5vw,54px);line-height:1;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;display:block;color:var(--ink)}
+.ec-price-unit{font-size:14px;color:var(--slate);display:block;margin-top:9px;line-height:1.5}
+.ec-readout{list-style:none;padding:0;margin:var(--sp-xl) 0 0;display:flex;flex-direction:column}
+.ec-readout li{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 0;border-top:1px solid var(--hairline);font-size:14px}
+.ec-readout .k{color:var(--slate);min-width:0}
+.ec-readout .v{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.ec-badge{display:block;margin-top:var(--sp-lg);font-size:12.5px;font-weight:600;line-height:1.5;background:var(--tint-lavender);color:var(--brand-purple-800);border-left:2px solid var(--primary);padding:10px 13px}
+
+/* Tableau */
+.ec-tablewrap{overflow-x:auto;border:1px solid var(--hairline)}
+.ec-tablewrap table{border-collapse:collapse;width:100%;min-width:440px;background:var(--canvas)}
+.ec-tablewrap caption{text-align:left;padding:14px 16px 0;font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--steel)}
+.ec-tablewrap th,.ec-tablewrap td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hairline);font-size:14.5px}
+.ec-tablewrap th{font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--steel);font-weight:700}
+.ec-tablewrap td.n{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.ec-tablewrap tbody tr:last-child td{border-bottom:none}
+
+.ec-note{border-left:2px solid var(--hairline-strong);padding:2px 0 2px 18px;font-size:14.5px;color:var(--slate);line-height:1.65;margin:0}
+.ec-note strong{color:var(--ink)}
+.ec-contact{background:var(--canvas);border:1px solid var(--hairline);padding:clamp(18px,3vw,28px);display:flex;flex-wrap:wrap;gap:var(--sp-lg);align-items:center;justify-content:space-between}
+.ec-addr{font-size:17px;font-weight:700;user-select:all;word-break:break-word;margin:0;color:var(--ink)}
+
+@media (max-width:767px){
+  .ec-grid-3,.ec-grid-2,.ec-calc{grid-template-columns:minmax(0,1fr)}
+  .ec-sec{padding:var(--sp-section-sm) 0}
+  .ec-hero{padding:var(--sp-section) 0}
+}
+</style>
+</head>
+<body>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<header class="emp-nav">
+  <div class="container emp-nav-inner">
+    <div style="display:flex;align-items:center;gap:36px">
+      <a href="/" class="emp-brand">
+        <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+        EmploiA
+      </a>
+      <nav class="emp-nav-links">
+        <a href="/jobs">Offres</a>
+        <a href="/app">Générateur CV</a>
+        <a href="/interview">Coach IA</a>
+        <a href="/agents" style="color:var(--primary);font-weight:700">Agents IA</a>
+        <a href="/blog">Blog</a>
+        <a href="/#pricing">Tarifs</a>
+      </nav>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres</a>
+  <a href="/agents">Agents IA</a>
+  <a href="/app">Générateur CV</a>
+  <a href="/interview">Coach IA</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</nav>
+
+<main>
+
+<section class="ec-hero">
+  <div class="container">
+    <div class="ec-masthead">
+      <span class="lbl">Offre Écoles, CFA &amp; cabinets</span>
+      <span class="sep">·</span>
+      <span class="lbl" style="font-weight:500;color:var(--steel)">Année 2026-2027</span>
+    </div>
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Insertion professionnelle</p>
+      <h1 class="ec-h1">Votre taux d'insertion est un argument de recrutement. <span class="quiet">Vos étudiants le jouent avec un CV écrit la veille.</span></h1>
+      <p class="ec-lede">EmploiA équipe chaque étudiant d'un copilote de candidature — CV adapté offre par offre, score ATS, lettres, préparation d'entretien — et donne à votre service insertion la visibilité qu'un entretien individuel de trente minutes ne peut pas produire à l'échelle d'une promotion.</p>
+      <div class="ec-cta-row">
+        <a class="emp-btn emp-btn-primary" href="#pilote">Voir le pilote</a>
+        <a class="emp-btn emp-btn-secondary" href="#calcul">Calculer le coût pour votre effectif</a>
+      </div>
+      <p class="ec-hint">9 € par étudiant et par an. Une promotion de 400 étudiants : 3 600 € — sous le seuil de mise en concurrence.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ec-sec">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Le contexte</p>
+      <h2 class="ec-h2">Le marché se durcit pendant que l'accompagnement public se réduit</h2>
+      <p class="ec-p">Deux courbes se croisent, et c'est l'établissement qui encaisse l'écart. Vos étudiants arrivent sur un marché plus dur qu'il y a deux ans, au moment précis où les crédits publics d'accompagnement reculent.</p>
+    </div>
+
+    <div class="ec-fiche">
+      <p class="ec-fiche-head">Chiffres officiels — France, 2026</p>
+      <div class="ec-grid ec-grid-3">
+        <div class="ec-cell">
+          <span class="ec-num">21,1 %</span>
+          <span class="ec-lbl">de chômage chez les 15-24 ans, en hausse de 2,0 points en un an</span>
+          <span class="ec-src">INSEE, 2<sup>e</sup> trimestre 2026</span>
+        </div>
+        <div class="ec-cell">
+          <span class="ec-num">− 4,3 %</span>
+          <span class="ec-lbl">de crédits sur le programme 102 « Accès et retour à l'emploi »</span>
+          <span class="ec-src">PLF 2026, rapport Sénat</span>
+        </div>
+        <div class="ec-cell">
+          <span class="ec-num">− 2,35 Md€</span>
+          <span class="ec-lbl">sur l'ensemble de la mission Travail et Emploi</span>
+          <span class="ec-src">PLF 2026, rapport Sénat</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="ec-p ec-col">Concrètement : l'enquête insertion que vous publierez l'an prochain portera sur une promotion qui a cherché dans des conditions dégradées, avec moins de relais extérieurs. Et ce taux figure dans les classements, dans vos dossiers d'accréditation, et sur la page que consultent les candidats de la rentrée suivante.</p>
+  </div>
+</section>
+
+<section class="ec-sec">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Le problème réel</p>
+      <h2 class="ec-h2">Ce n'est pas que vos étudiants manquent d'accompagnement. C'est qu'il ne passe pas à l'échelle.</h2>
+      <p class="ec-p">Un chargé d'insertion relit sérieusement vingt, peut-être trente CV par semaine. Une promotion de 400 étudiants qui candidate à cinq offres chacun, c'est deux mille candidatures à adapter. L'arithmétique ne se discute pas : la majorité partira sans relecture.</p>
+      <p class="ec-p">Alors les étudiants se débrouillent. Ils utilisent déjà une IA généraliste — et vous n'avez aucune visibilité sur ce qu'elle produit, aucun contrôle sur la qualité, et aucune garantie sur l'endroit où atterrissent leurs données personnelles.</p>
+    </div>
+
+    <div class="ec-qa">
+      <div class="ec-qa-item">
+        <p class="ec-q">« Nous avons déjà un career center. »</p>
+        <p class="ec-a">Tant mieux — EmploiA n'a pas vocation à le remplacer. Il absorbe la partie mécanique du travail, celle qui épuise vos équipes sans les valoriser : adapter un CV à une offre, vérifier la lisibilité ATS, répéter un entretien une dixième fois. <strong>Vos chargés d'insertion récupèrent leurs heures pour ce qu'une IA ne fera pas</strong> : le réseau d'entreprises, les cas difficiles, les reconversions.</p>
+      </div>
+      <div class="ec-qa-item">
+        <p class="ec-q">« ChatGPT est gratuit. »</p>
+        <p class="ec-a">Et vos étudiants s'en servent déjà, mal, sans que vous le sachiez. Un outil généraliste ne connaît pas les ATS français, n'a pas de garde-fou contre l'invention de diplômes ou d'expériences, et ne vous remonte aucune donnée. <strong>Ce que vous achetez ici n'est pas l'accès à une IA — c'est le cadrage, l'optimisation ATS et le tableau de bord.</strong></p>
+      </div>
+      <div class="ec-qa-item">
+        <p class="ec-q">« Où vont les données de nos étudiants ? »</p>
+        <p class="ec-a">Hébergement en France, conformité RGPD, suppression du compte et des données à la demande depuis l'interface. Les analytics que vous recevez sont <strong>agrégés</strong> : vous voyez l'usage et la progression de la promotion, jamais le CV nominatif d'un étudiant.</p>
+      </div>
+      <div class="ec-qa-item">
+        <p class="ec-q">« Prouvez-nous que ça marche. »</p>
+        <p class="ec-a">Nous ne vous le demanderons pas sur parole. <strong>EmploiA est jeune et n'affiche aucune référence qu'il n'a pas</strong> — vous ne trouverez sur cette page ni logo d'école emprunté, ni témoignage fabriqué, ni note moyenne inventée. La réponse est le pilote décrit plus bas : une promotion, un semestre, un bilan chiffré, et vous décidez ensuite.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ec-sec">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Ce que reçoit l'établissement</p>
+      <h2 class="ec-h2">Côté étudiant, un outil. Côté direction, un instrument de pilotage.</h2>
+    </div>
+    <div class="ec-grid ec-grid-2">
+      <div class="ec-cell ec-stack-sm">
+        <h3 class="ec-h3">Pour chaque étudiant</h3>
+        <ul class="ec-ticks">
+          <li>CV et lettres adaptés offre par offre, sans limite</li>
+          <li>Score ATS et correction des blocages de lecture automatique</li>
+          <li>Coach d'entretien avec retour par compétence</li>
+          <li>Suivi des candidatures en Kanban, relances incluses</li>
+          <li>Préparation à la négociation salariale</li>
+          <li>Export PDF, DOCX et profil LinkedIn</li>
+        </ul>
+      </div>
+      <div class="ec-cell ec-stack-sm">
+        <h3 class="ec-h3">Pour le service insertion</h3>
+        <ul class="ec-ticks">
+          <li>Tableau de bord par promotion : usage, progression des scores ATS, volume de candidatures</li>
+          <li>Analytics agrégés, exploitables dans votre enquête insertion</li>
+          <li>SSO et contrôle d'accès par cohorte</li>
+          <li>Interface aux couleurs de l'établissement</li>
+          <li>Hébergement France, RGPD, suppression à la demande</li>
+          <li>Ouverture et fermeture des accès en self-service à chaque rentrée</li>
+        </ul>
+      </div>
+    </div>
+    <p class="ec-note ec-col">Les diplômés gardent l'accès jusqu'à la fin du siège payé. Un siège libéré peut être réattribué : vous payez une promotion, pas une liste figée.</p>
+  </div>
+</section>
+
+<section class="ec-sec" id="calcul">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Tarification</p>
+      <h2 class="ec-h2">Le prix d'un siège, et ce qu'il représente vraiment</h2>
+      <p class="ec-p">Renseignez votre effectif. Le repère de droite est volontairement sévère : il compare la dépense au coût employeur d'un seul chargé d'insertion à temps plein.</p>
+    </div>
+
+    <div class="ec-calc">
+      <div class="ec-calc-in">
+        <div class="ec-field">
+          <label for="ecSeats" id="ecKindLabel">Type d'établissement</label>
+          <div class="ec-seg" id="ecKind" role="group" aria-label="Type d'établissement">
+            <button type="button" data-kind="ecole" aria-pressed="true">École / Université</button>
+            <button type="button" data-kind="cfa" aria-pressed="false">CFA</button>
+            <button type="button" data-kind="outpl" aria-pressed="false">Outplacement</button>
+          </div>
+        </div>
+        <div class="ec-field">
+          <label for="ecSeats" id="ecSeatsLabel">Nombre d'étudiants</label>
+          <input type="number" id="ecSeats" min="20" max="8000" step="10" value="400" inputmode="numeric"/>
+          <input type="range" id="ecRange" min="20" max="3000" step="10" value="400" aria-labelledby="ecSeatsLabel"/>
+          <p class="ec-hint" id="ecTierHint">Palier 100-499 sièges : 9 € par étudiant et par an.</p>
+        </div>
+        <div class="ec-field">
+          <label for="ecAdvisor">Coût employeur d'un chargé d'insertion (€/an)</label>
+          <input type="number" id="ecAdvisor" min="20000" max="120000" step="1000" value="42000" inputmode="numeric"/>
+          <p class="ec-hint">Hypothèse modifiable : brut chargé, temps plein. Sert uniquement de repère.</p>
+        </div>
+      </div>
+
+      <div class="ec-calc-out">
+        <p class="ec-fiche-head">Budget annuel</p>
+        <p style="margin:0">
+          <span class="ec-price" id="ecTotal">3 600 €</span>
+          <span class="ec-price-unit" id="ecTotalUnit">par an, pour 400 étudiants — 9 € par siège</span>
+        </p>
+        <ul class="ec-readout">
+          <li><span class="k">Par étudiant et par mois</span><span class="v" id="ecPerMonth">0,75 €</span></li>
+          <li><span class="k">Part du coût d'un chargé d'insertion</span><span class="v" id="ecPct">8,6 %</span></li>
+          <li><span class="k">Équivalent en jours de salaire</span><span class="v" id="ecDays">19 jours</span></li>
+        </ul>
+        <p class="ec-badge" id="ecBadge">Sous le seuil de 40 000 € HT : passation possible de gré à gré, sans mise en concurrence formalisée.</p>
+      </div>
+    </div>
+
+    <div class="ec-tablewrap">
+      <table>
+        <caption>Grille complète</caption>
+        <thead>
+          <tr><th scope="col">Offre</th><th scope="col">Volume</th><th scope="col">Tarif</th><th scope="col">Exemple</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>École, université, CFA</td><td>100 à 499 sièges</td><td class="n">9 € / an</td><td class="n">400 étudiants → 3 600 €</td></tr>
+          <tr><td>École, université, CFA</td><td>500 à 999 sièges</td><td class="n">7,50 € / an</td><td class="n">800 étudiants → 6 000 €</td></tr>
+          <tr><td>École, université, CFA</td><td>1 000 sièges et plus</td><td class="n">6 € / an</td><td class="n">2 000 étudiants → 12 000 €</td></tr>
+          <tr><td>Cabinet d'outplacement</td><td>à l'usage</td><td class="n">39 € / candidat</td><td class="n">60 candidats → 2 340 €</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ec-note ec-col">En dessous de 100 sièges, le tarif reste 9 € avec un plancher de facturation de 900 € — en dessous, la mise en place coûte plus que la recette, et nous préférons le dire maintenant que le découvrir en cours d'année.</p>
+  </div>
+</section>
+
+<section class="ec-sec">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Achat public et privé</p>
+      <h2 class="ec-h2">Le montant vous dispense de la procédure la plus lourde</h2>
+      <p class="ec-p">C'est souvent l'argument décisif, et il n'a rien à voir avec le produit. Pour un acheteur public, un marché de fournitures ou de services <strong>inférieur à 40 000 € HT</strong> peut être passé sans publicité ni mise en concurrence préalables. Une promotion de 400 étudiants à 3 600 € entre très largement dans cette enveloppe.</p>
+      <p class="ec-p">Pour un établissement privé, le montant tombe généralement sous le seuil de délégation du directeur ou du responsable de service : <strong>la décision n'a pas besoin de remonter au conseil d'administration</strong>.</p>
+    </div>
+    <div class="ec-fiche ec-col">
+      <p class="ec-fiche-head">Lignes budgétaires mobilisables</p>
+      <ul class="ec-ticks">
+        <li><strong>Budget du service relations entreprises ou insertion</strong> — le rattachement le plus direct</li>
+        <li><strong>Solde de la taxe d'apprentissage</strong> — l'aide à l'insertion des étudiants entre dans les dépenses éligibles</li>
+        <li><strong>CFA : accompagnement à la recherche d'employeur</strong> — celui dont dépend la signature des contrats d'apprentissage, et donc votre financement au contrat</li>
+      </ul>
+    </div>
+    <p class="ec-note ec-col">Nous ne sommes pas organisme de formation certifié Qualiopi, et EmploiA n'est <strong>pas finançable par le CPF</strong> : ce n'est pas une action de formation, c'est un outil. Nous le disons d'emblée pour que personne ne construise un dossier sur une hypothèse fausse.</p>
+  </div>
+</section>
+
+<section class="ec-sec" id="pilote">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Le pilote</p>
+      <h2 class="ec-h2">Une promotion, un semestre, un bilan chiffré</h2>
+      <p class="ec-p">Nous n'ouvrons pas une négociation sur un déploiement complet avec un établissement qui ne nous connaît pas. Le pilote existe pour que la décision se prenne sur des chiffres venus de vos étudiants, pas sur une démonstration commerciale.</p>
+    </div>
+    <ol class="ec-steps">
+      <li>
+        <span class="ec-st">Cadrage</span>
+        <span class="ec-sd">Quarante-cinq minutes avec le service insertion : la promotion retenue, les métiers visés, les ATS que rencontrent vos étudiants, et ce que vous voulez pouvoir mesurer en fin de semestre.</span>
+        <span class="ec-sw">45 minutes</span>
+      </li>
+      <li>
+        <span class="ec-st">Ouverture des accès</span>
+        <span class="ec-sd">Sièges créés pour la promotion, interface aux couleurs de l'établissement, SSO si vous le souhaitez. Aucune installation côté système d'information : EmploiA est une application web.</span>
+        <span class="ec-sw">Une semaine</span>
+      </li>
+      <li>
+        <span class="ec-st">Semestre d'usage</span>
+        <span class="ec-sd">Les étudiants travaillent. Vous suivez l'adoption et la progression des scores ATS sur le tableau de bord, en continu, avec un point à mi-parcours si vous le voulez.</span>
+        <span class="ec-sw">Un semestre</span>
+      </li>
+      <li>
+        <span class="ec-st">Bilan et décision</span>
+        <span class="ec-sd">Nous remettons les données agrégées : taux d'adoption, volume de candidatures produites, évolution des scores ATS, usage du coach d'entretien. Reconduction, extension à d'autres promotions, ou arrêt.</span>
+        <span class="ec-sw">Votre décision</span>
+      </li>
+    </ol>
+    <p class="ec-note ec-col">Tarif du pilote : la grille ci-dessus au prorata du semestre, sur la seule promotion concernée. Aucun engagement au-delà, et aucune reconduction tacite.</p>
+  </div>
+</section>
+
+<section class="ec-sec">
+  <div class="container ec-stack-lg">
+    <div class="ec-stack ec-col">
+      <p class="ec-eyebrow">Parler à quelqu'un</p>
+      <h2 class="ec-h2">Écrivez-nous l'effectif et la promotion visée</h2>
+      <p class="ec-p">Une réponse sous 48 heures, avec une proposition chiffrée sur votre effectif réel. Si EmploiA ne convient pas à votre situation, nous vous le dirons dans ce message plutôt qu'au troisième rendez-vous.</p>
+    </div>
+    <div class="ec-contact">
+      <div class="ec-stack-sm" style="min-width:0">
+        <p class="ec-hint" style="margin:0">Contact — écoles, CFA et cabinets</p>
+        <p class="ec-addr" id="ecAddr">contact@emploia.fr</p>
+      </div>
+      <div class="ec-cta-row">
+        <a class="emp-btn emp-btn-primary" href="mailto:contact@emploia.fr?subject=Offre%20%C3%89coles%20%26%20CFA%20%E2%80%94%20demande%20de%20devis">Écrire par email</a>
+        <a class="emp-btn emp-btn-secondary" href="/contact">Formulaire de contact</a>
+      </div>
+    </div>
+    <p class="ec-hint ec-col">À indiquer dans votre message : le type d'établissement, l'effectif de la promotion envisagée, le semestre visé, et la personne qui porte le budget. Cela nous évite deux allers-retours.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div>
+        <div class="emp-brand" style="margin-bottom:14px">
+          <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+          EmploiA
+        </div>
+        <div class="emp-footer-tagline">Le copilote de candidature 100% français.<br/>Fait à Paris · Hébergé en France.</div>
+      </div>
+      <div class="emp-footer-col"><h5>Produit</h5><a href="/app">Générateur de CV</a><a href="/interview">Coach d'entretien</a><a href="/dashboard">Tableau de bord</a><a href="/jobs">Offres d'emploi</a></div>
+      <div class="emp-footer-col"><h5>Entreprise</h5><a href="/about">À propos</a><a href="/contact">Contact</a><a href="/blog">Blog</a><a href="/employeurs">Employeurs</a><a href="/ecoles">Écoles &amp; CFA</a></div>
+      <div class="emp-footer-col"><h5>Légal</h5><a href="/legal">Confidentialité</a><a href="/legal">CGU</a><a href="/legal">RGPD</a></div>
+    </div>
+    <div class="emp-footer-bot">
+      <div>© <span data-year></span> EmploiA SAS · Tous droits réservés</div>
+      <div class="soc"><a href="https://www.linkedin.com/company/emploia" rel="noopener" target="_blank">LinkedIn</a><a href="https://twitter.com/emploia_fr" rel="noopener" target="_blank">Twitter</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
+<script>
+/* Calculateur de sièges. Les montants affichés sont indicatifs : aucun paiement
+   ne part de cette page, les devis Écoles & RH sont établis à la main. Les
+   paliers doivent rester alignés sur le tableau « Grille complète » ci-dessus. */
+(function () {
+  var TIERS = [
+    { min: 1000, price: 6,   label: '1 000 sièges et plus : 6 € par étudiant et par an.' },
+    { min: 500,  price: 7.5, label: 'Palier 500-999 sièges : 7,50 € par étudiant et par an.' },
+    { min: 0,    price: 9,   label: 'Palier 100-499 sièges : 9 € par étudiant et par an.' }
+  ];
+  var FLOOR = 900;        // plancher de facturation sous ~100 sièges
+  var OUTPLACEMENT = 39;  // € par candidat accompagné
+  var THRESHOLD = 40000;  // seuil HT de mise en concurrence
+  var WORKDAYS = 218;     // jours ouvrés par an, convention de paie
+
+  var kind = 'ecole';
+  var $ = function (id) { return document.getElementById(id); };
+  var seats = $('ecSeats'), range = $('ecRange'), advisor = $('ecAdvisor');
+  if (!seats || !range || !advisor) return;
+
+  function eur(n, d) {
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }) + ' €';
+  }
+  function int(n) { return Math.round(n).toLocaleString('fr-FR'); }
+  function dec(n, d) { return n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+
+  function tierFor(n) {
+    for (var i = 0; i < TIERS.length; i++) { if (n >= TIERS[i].min) return TIERS[i]; }
+    return TIERS[TIERS.length - 1];
+  }
+
+  function quote(n) {
+    if (kind === 'outpl') {
+      return { unit: OUTPLACEMENT, total: n * OUTPLACEMENT, floored: false,
+        hint: 'Facturation à l’usage : 39 € par candidat effectivement accompagné.' };
+    }
+    var t = tierFor(n);
+    var raw = n * t.price;
+    var floored = raw < FLOOR;
+    return { unit: t.price, total: floored ? FLOOR : raw, floored: floored, hint: t.label };
+  }
+
+  function render() {
+    var n = Math.max(1, Math.min(8000, parseInt(seats.value, 10) || 1));
+    var adv = Math.max(1, parseInt(advisor.value, 10) || 42000);
+    var q = quote(n);
+    var noun = kind === 'outpl' ? 'candidats' : 'étudiants';
+
+    $('ecTotal').textContent = eur(q.total);
+    $('ecTotalUnit').textContent = 'par an, pour ' + int(n) + ' ' + noun + ' — '
+      + eur(q.unit, q.unit % 1 ? 2 : 0) + (kind === 'outpl' ? ' par candidat' : ' par siège')
+      + (q.floored ? ' (plancher de facturation appliqué)' : '');
+    $('ecTierHint').textContent = q.hint;
+    $('ecPerMonth').textContent = dec(q.total / n / 12, 2) + ' €';
+    $('ecPct').textContent = dec(q.total / adv * 100, 1) + ' %';
+    $('ecDays').textContent = int(q.total / (adv / WORKDAYS)) + ' jours';
+    $('ecBadge').textContent = q.total < THRESHOLD
+      ? 'Sous le seuil de 40 000 € HT : passation possible de gré à gré, sans mise en concurrence formalisée.'
+      : 'Au-delà de 40 000 € HT : une procédure de mise en concurrence sera probablement requise. Nous vous accompagnons sur le dossier.';
+  }
+
+  seats.addEventListener('input', function () {
+    var v = parseInt(seats.value, 10);
+    if (v >= Number(range.min) && v <= Number(range.max)) range.value = v;
+    render();
+  });
+  range.addEventListener('input', function () { seats.value = range.value; render(); });
+  advisor.addEventListener('input', render);
+
+  Array.prototype.forEach.call(document.querySelectorAll('#ecKind button'), function (b) {
+    b.addEventListener('click', function () {
+      kind = b.getAttribute('data-kind');
+      Array.prototype.forEach.call(document.querySelectorAll('#ecKind button'), function (o) {
+        o.setAttribute('aria-pressed', String(o === b));
+      });
+      $('ecSeatsLabel').textContent = kind === 'outpl'
+        ? 'Nombre de candidats accompagnés par an'
+        : 'Nombre d’étudiants';
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
