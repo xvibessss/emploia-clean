@@ -33,7 +33,7 @@ const AFFILIATE_CODE_RE = /^[A-Z0-9]{3,20}$/;
 // anything unknown, expired, or out of redemptions — the caller then falls
 // back to letting Stripe's own promo field handle it, so a typo degrades into
 // "no discount", never into a failed checkout.
-async function resolvePromotionCode(code) {
+async function lookupPromotionCode(code) {
   try {
     const res = await fetch(
       `https://api.stripe.com/v1/promotion_codes?code=${encodeURIComponent(code)}&active=true&limit=1`,
@@ -42,6 +42,36 @@ async function resolvePromotionCode(code) {
     if (!res.ok) return null;
     const data = await res.json();
     return data.data?.[0]?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+// Stripe's `code` filter matches the stored string exactly, but a creator code
+// travels through a video caption and a viewer's keyboard: its case is not
+// guaranteed at either end. A code created as `testAA` in the dashboard — which
+// happened on 2026-10-01 — would never resolve against a typed `TESTAA`.
+//
+// So: one exact lookup on the canonical form, which is the normal path once
+// codes are created upper case; on a miss, list the active codes once and match
+// case-insensitively. Two requests at worst, and a viewer's capitalisation can
+// no longer cost a creator a commission.
+//
+// The listing is capped at 100: beyond that a code past the first page would
+// fall back to "no discount" rather than resolve. Well beyond the size of a
+// hand-run creator programme, and it fails in the harmless direction.
+async function resolvePromotionCode(canonical) {
+  const exact = await lookupPromotionCode(canonical);
+  if (exact) return exact;
+  try {
+    const res = await fetch(
+      'https://api.stripe.com/v1/promotion_codes?active=true&limit=100',
+      { headers: { Authorization: `Bearer ${STRIPE_SECRET}` }, signal: AbortSignal.timeout(5000) },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const hit = (data.data || []).find((p) => String(p.code || '').toUpperCase() === canonical);
+    return hit?.id || null;
   } catch {
     return null;
   }
@@ -88,8 +118,10 @@ export default async function handler(req) {
 
   // Creator code: only on the Pack Campagne, only if it resolves to a live
   // Stripe promotion code. An unknown code is dropped rather than rejected.
-  const rawCode = typeof body.code === 'string' ? body.code.trim().toUpperCase() : '';
-  const affiliateCode = plan === 'campagne' && AFFILIATE_CODE_RE.test(rawCode) ? rawCode : '';
+  // The canonical form is what gets stamped into the metadata, so a code used
+  // as LEA10 and as lea10 credits the same creator exactly once.
+  const canonicalCode = (typeof body.code === 'string' ? body.code.trim() : '').toUpperCase();
+  const affiliateCode = plan === 'campagne' && AFFILIATE_CODE_RE.test(canonicalCode) ? canonicalCode : '';
   const promotionCodeId = affiliateCode ? await resolvePromotionCode(affiliateCode) : null;
 
   // Prefer authenticated user email over body-supplied email to prevent spoofing

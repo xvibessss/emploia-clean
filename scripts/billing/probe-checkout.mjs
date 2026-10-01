@@ -9,9 +9,24 @@ process.env.KV_REST_API_URL = 'http://127.0.0.1:9/stub';
 process.env.KV_REST_API_TOKEN = 'stub';
 
 const captured = [];
+const lookups = [];
+// Le code promo tel qu'il existe RÉELLEMENT chez Stripe : créé en casse mixte
+// depuis le dashboard, comme cela s'est produit le 2026-10-01.
+const STORED_CODE = 'testAA';
+const STORED_ID = 'promo_stub_id';
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, opts = {}) => {
   const u = String(url);
+  if (u.includes('api.stripe.com/v1/promotion_codes')) {
+    const asked = new URL(u).searchParams.get('code');
+    lookups.push(asked === null ? '(listing)' : asked);
+    // Stripe filtre sur la chaîne exacte : seule la casse stockée répond au
+    // filtre. Sans filtre, il renvoie la liste, casse d'origine comprise.
+    const data = asked === null
+      ? [{ id: STORED_ID, code: STORED_CODE }, { id: 'promo_autre', code: 'AUTRE20' }]
+      : (asked === STORED_CODE ? [{ id: STORED_ID, code: STORED_CODE }] : []);
+    return new Response(JSON.stringify({ data }), { status: 200 });
+  }
   if (u.includes('api.stripe.com')) {
     captured.push(Object.fromEntries(new URLSearchParams(opts.body)));
     return new Response(JSON.stringify({ url: 'https://checkout.stripe.com/stub' }), { status: 200 });
@@ -22,10 +37,10 @@ globalThis.fetch = async (url, opts = {}) => {
 
 const { default: handler } = await import('../../api/stripe-checkout.js');
 
-const call = plan => handler(new Request('https://emploia.fr/api/stripe-checkout', {
+const call = (plan, code) => handler(new Request('https://emploia.fr/api/stripe-checkout', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', origin: 'https://emploia.fr', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250) + 1}` },
-  body: JSON.stringify({ plan, email: 'probe@example.com' }),
+  body: JSON.stringify(code ? { plan, code, email: 'probe@example.com' } : { plan, email: 'probe@example.com' }),
 }));
 
 let fail = 0;
@@ -50,6 +65,44 @@ captured.length = 0;
 const res = await call('pro_annual');
 console.log(`  ${res.status === 400 && captured.length === 0 ? '✓' : '✗'} pro_annual → rejeté (status ${res.status}, appels Stripe: ${captured.length})`);
 if (res.status !== 400) fail++;
+
+// ── Codes créateurs ───────────────────────────────────────────────────────
+// Le code arrive d'une légende de vidéo, retapé par un spectateur : sa casse
+// n'est pas garantie. L'attribution, elle, doit rester unique.
+console.log('\n  Codes créateurs');
+for (const typed of [STORED_CODE, STORED_CODE.toUpperCase(), STORED_CODE.toLowerCase()]) {
+  captured.length = 0; lookups.length = 0;
+  await call('campagne', typed);
+  const sent = captured[0] || {};
+  const discounted = sent['discounts[0][promotion_code]'] === STORED_ID;
+  const attributed = sent['metadata[affiliate]'] === STORED_CODE.toUpperCase();
+  const noPromoField = sent.allow_promotion_codes === undefined;
+  const okAll = discounted && attributed && noPromoField;
+  console.log(`  ${okAll ? '✓' : '✗'} saisi « ${typed.padEnd(7)} » → remise appliquée, attribué à ${sent['metadata[affiliate]'] || 'PERSONNE'} (${lookups.length} recherche${lookups.length > 1 ? 's' : ''})`);
+  if (!discounted) { console.log('      ✗ la remise n\'a pas été appliquée'); fail++; }
+  if (!attributed) { console.log(`      ✗ attribution attendue ${STORED_CODE.toUpperCase()}`); fail++; }
+  if (!noPromoField) { console.log('      ✗ allow_promotion_codes ne doit pas coexister avec discounts'); fail++; }
+}
+
+// Un code inconnu ne doit pas faire échouer la vente : on retombe sur le champ
+// promo de Stripe, et aucune commission n'est attribuée.
+captured.length = 0;
+await call('campagne', 'INCONNU99');
+const unknown = captured[0] || {};
+const degrades = unknown.allow_promotion_codes === 'true' && unknown['metadata[affiliate]'] === undefined;
+console.log(`  ${degrades ? '✓' : '✗'} code inconnu → vente maintenue, aucune attribution`);
+if (!degrades) fail++;
+
+// Un code sur l'abonnement ne doit rien déclencher : la commission est
+// réservée au Pack, sinon il faudrait la reprendre sur les résiliations.
+captured.length = 0;
+await call('pro', STORED_CODE);
+const onPro = captured[0] || {};
+const ignored = onPro['discounts[0][promotion_code]'] === undefined
+  && onPro['metadata[affiliate]'] === undefined
+  && onPro.allow_promotion_codes === undefined;
+console.log(`  ${ignored ? '✓' : '✗'} code sur « pro » → ignoré, aucune remise ni attribution`);
+if (!ignored) fail++;
 
 globalThis.fetch = realFetch;
 console.log(fail === 0 ? '\n✅ sonde checkout : conforme\n' : `\n❌ ${fail} écart(s)\n`);
