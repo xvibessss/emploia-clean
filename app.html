@@ -591,31 +591,19 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   }
 
   // ── Mode révision : lister les [à compléter] avant export ──
-  function getPlaceholders(text) {
-    const t = typeof text === 'string' ? text : '';
-    return [...new Set((t.match(/\[[^\]\n]{0,80}\]/g) || []).map(s => s.trim()))];
-  }
+  // L'implémentation vit dans shared.js (empRevisionPanel / empPlaceholders)
+  // pour que tools.html applique exactement la même détection : la version
+  // locale d'ici était la seule à exister, et les outils exportaient sans
+  // garde-fou.
   function renderRevision(text) {
     const area = document.getElementById('resultArea');
     if (!area) return;
-    document.getElementById('revisionPanel')?.remove();
-    if (mode !== 'cv' && mode !== 'letter') return;
-    const ph = getPlaceholders(text);
-    if (!ph.length) return;
-    const items = ph.map(p => `<li style="font-size:12px;color:var(--slate);line-height:1.7;font-family:ui-monospace,monospace">${esc(p)}</li>`).join('');
-    const div = document.createElement('div');
-    div.id = 'revisionPanel';
-    div.style.cssText = 'background:#fff8ec;border:1.5px solid #f0c675;border-radius:12px;padding:14px 16px;margin-bottom:14px';
-    div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8a5a00;margin-bottom:6px">✍️ À compléter avant d'exporter · ${ph.length}</div>`
-      + `<p style="font-size:12px;color:#7a5a1e;line-height:1.6;margin:0 0 10px">Emploia n'invente jamais tes données. Remplace chaque marqueur par tes vraies informations pour un document 100% fiable :</p>`
-      + `<ul style="margin:0 0 0 16px;padding:0;display:flex;flex-direction:column;gap:3px">${items}</ul>`;
-    area.insertBefore(div, area.firstChild);
+    // Hors CV et lettre, le marqueur entre crochets n'est pas un champ à
+    // remplir : on retire le panneau plutôt que de l'afficher à tort.
+    window.empRevisionPanel(area, mode === 'cv' || mode === 'letter' ? text : '');
   }
   function confirmIfIncomplete() {
-    const txt = typeof lastResult === 'string' ? lastResult : '';
-    const n = getPlaceholders(txt).length;
-    if (!n) return true;
-    return confirm(`Il reste ${n} champ${n > 1 ? 's' : ''} « [à compléter] » non rempli${n > 1 ? 's' : ''}. Exporter quand même ?`);
+    return window.empConfirmIfIncomplete(typeof lastResult === 'string' ? lastResult : '');
   }
 
   function copyResult() {

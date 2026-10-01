@@ -595,6 +595,9 @@ function esc(s) {
 }
 
 function copyText(text) {
+  // Même garde-fou que l'export d'app.html : on ne laisse pas partir un
+  // texte encore truffé de marqueurs « [à compléter] » sans le signaler.
+  if (!empConfirmIfIncomplete(text)) return;
   navigator.clipboard.writeText(text).then(() => empToast('Copié !', 'success')).catch(() => empToast('Copie impossible', 'error'));
 }
 
@@ -648,6 +651,7 @@ async function generateLinkedin() {
       </div>
       ${d.tips?.length ? `<div class="result-block"><div class="result-block-title">Conseils d'optimisation</div>${d.tips.map(t => `<div class="tip-item">${esc(t)}</div>`).join('')}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('li-btn', false, 'Générer mon profil LinkedIn'); }
 }
@@ -706,6 +710,7 @@ async function generateRelance() {
       </div>
       ${d.tips?.length ? `<div class="result-block"><div class="result-block-title">Conseils</div>${d.tips.map(t => `<div class="tip-item">${esc(t)}</div>`).join('')}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('rel-btn', false, 'Générer l\'email de relance'); }
 }
@@ -753,6 +758,7 @@ async function generateOutreach() {
       </div>
       ${d.tip ? `<div class="tip-item">${esc(d.tip)}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('out-btn', false, 'Générer les messages'); }
 }
@@ -806,6 +812,7 @@ async function generateNegociation() {
       ${d.alternatives?.length ? `<div class="result-block"><div class="result-block-title">Si le salaire est bloqué</div>${d.alternatives.map(a => `<div class="tip-item">${esc(a)}</div>`).join('')}</div>` : ''}
       ${d.redLines?.length ? `<div class="result-block"><div class="result-block-title" style="color:#ef4444">À ne surtout pas dire</div>${d.redLines.map(r => `<div class="tip-item" style="background:rgba(239,68,68,.08);color:#ef4444">${esc(r)}</div>`).join('')}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('neg-btn', false, 'Générer mon kit de négociation'); }
 }
@@ -850,6 +857,7 @@ async function generateDebrief() {
       ${d.thankYouEmail ? `<div class="result-block"><div class="result-block-title" style="display:flex;justify-content:space-between;align-items:center">Email de remerciement <button class="copy-btn" onclick="copyText(${esc(JSON.stringify(d.thankYouEmail))})">Copier</button></div><div class="result-block-body">${esc(d.thankYouEmail)}</div></div>` : ''}
       ${d.nextSteps?.length ? `<div class="result-block"><div class="result-block-title">🚀 Prochaines étapes</div>${d.nextSteps.map(s => `<div class="tip-item">${esc(s)}</div>`).join('')}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('debrief-btn', false, 'Analyser mon entretien ✨'); }
 }
@@ -895,6 +903,7 @@ async function generateEntreprise() {
       ${d.salaryContext ? `<div class="result-block"><div class="result-block-title">💰 Contexte salarial</div><div class="tip-item" style="background:rgba(93,175,160,.1);color:#2d7a6e">${esc(d.salaryContext)}</div></div>` : ''}
       ${d.redFlags?.filter(Boolean).length ? `<div class="result-block"><div class="result-block-title" style="color:#ef4444">⚠️ Signaux d'alerte</div>${d.redFlags.filter(Boolean).map(r => `<div class="tip-item" style="background:rgba(239,68,68,.08);color:#ef4444">${esc(r)}</div>`).join('')}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('ent-btn', false, 'Analyser l\'entreprise'); }
 }
@@ -960,6 +969,7 @@ async function generateQuestions() {
       ${d.motivation?.length ? `<div class="result-block"><div class="result-block-title">💼 Questions de motivation &amp; fit</div>${renderQ(d.motivation, false)}</div>` : ''}
       ${d.toAsk?.length ? `<div class="result-block"><div class="result-block-title" style="color:var(--primary)">❓ Questions à poser au recruteur</div>${renderQ(d.toAsk, false)}</div>` : ''}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('iq-btn', false, 'Générer les questions ✨'); }
 }
@@ -1100,6 +1110,7 @@ async function generateAts() {
       ${atsRiskHtml}
       ${verdictHtml}
     `;
+    empRevisionPanel(out);
   } catch { empToast('Erreur réseau', 'error'); }
   finally { setLoading('ats-btn', false, 'Analyser mon CV ✨'); }
 }
