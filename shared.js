@@ -232,6 +232,20 @@ try {
   if (_ref && /^[A-Z0-9]{6,10}$/i.test(_ref)) sessionStorage.setItem('emploia_ref', _ref.toUpperCase());
 } catch (e) {}
 
+// ── CREATOR CODE CAPTURE ────────────────────────────────────────────
+// Separate from the referral code above, and deliberately so: ?ref= rewards a
+// user with free months, ?code= is a paid creator's Stripe promotion code
+// (10 € off the Pack Campagne) that also attributes the sale for commission.
+// A TikTok viewer lands on any page, wanders, then converts, so the code is
+// kept for the whole session rather than read off the current URL.
+window.empCreatorCode = function() {
+  try { return sessionStorage.getItem('emploia_code') || ''; } catch (e) { return ''; }
+};
+try {
+  const _code = new URLSearchParams(window.location.search).get('code');
+  if (_code && /^[A-Z0-9]{3,20}$/i.test(_code)) sessionStorage.setItem('emploia_code', _code.toUpperCase());
+} catch (e) {}
+
 // ── AUTH SYSTEM ─────────────────────────────────────────────────────
 window.empUser = null;
 
@@ -435,37 +449,52 @@ window.empUpdateNav = function(user) {
 window.empToggleUserMenu = function() { document.getElementById('empUserDropdown')?.classList.toggle('open'); };
 
 // Upgrade modal
-// Prices mirror the pricing section on the landing (data-annual / data-monthly).
+// Prices mirror the pricing section on the landing.
 // The amount actually charged is enforced by Stripe via the plan key, not this text.
-window._empUpBilling = 'annual'; // 'annual' | 'monthly'
-const EMP_UP_PRICES = { annual: { price: '12', per: 'facturé annuellement · 15€ en mensuel' }, monthly: { price: '15', per: 'sans engagement' } };
+// Two offers: Pack Campagne (59 € one-off for 3 months, no trial, nothing to
+// cancel) and Pro (24 €/mois, subscription, 7-day trial). The Pack is the
+// default push and stays the cheapest per month (19,67 € vs 24 €) so it never
+// undercuts Pro the way the retired 45 € price did.
+window._empUpPlan = 'campagne'; // 'campagne' | 'pro' — Campagne is the default push
+const EMP_UP_PRICES = {
+  campagne: { price: '59', unit: 'les 3 mois', per: 'paiement unique · moins de 20€/mois, rien à résilier', cta: 'Prendre le Pack Campagne →', fine: 'Sans essai · accès immédiat · non reconductible' },
+  pro:      { price: '24', unit: '/mois',      per: 'sans engagement · annulable en 1 clic',               cta: "Démarrer l'essai Pro — 7 jours gratuits →", fine: "Carte requise · 0€ aujourd'hui · annulation en 1 clic" },
+};
 
-window.empUpgradeSetBilling = function(mode) {
-  window._empUpBilling = mode;
+window.empUpgradeSetPlan = function(mode) {
+  window._empUpPlan = mode;
   const p = EMP_UP_PRICES[mode];
   const priceEl = document.getElementById('empUpPrice'), perEl = document.getElementById('empUpPer');
+  const unitEl = document.getElementById('empUpUnit'), ctaEl = document.getElementById('empUpCta');
+  const fineEl = document.getElementById('empUpFine');
   if (priceEl) priceEl.textContent = p.price;
+  if (unitEl) unitEl.textContent = p.unit;
   if (perEl) perEl.textContent = p.per;
-  document.querySelectorAll('#empUpBillingToggle [data-bill]').forEach(b => {
-    b.style.background = b.dataset.bill === mode ? 'var(--primary,#6366f1)' : 'transparent';
-    b.style.color = b.dataset.bill === mode ? '#fff' : 'var(--slate,#64748b)';
+  if (ctaEl) ctaEl.textContent = p.cta;
+  if (fineEl) fineEl.textContent = p.fine;
+  document.querySelectorAll('#empUpPlanToggle [data-plan]').forEach(b => {
+    b.style.background = b.dataset.plan === mode ? 'var(--primary,#6366f1)' : 'transparent';
+    b.style.color = b.dataset.plan === mode ? '#fff' : 'var(--slate,#64748b)';
   });
 };
 
 window.empUpgradeCheckout = async function(btn) {
-  // Requires an account so the subscription binds to the user.
+  // Requires an account so the purchase binds to the user.
   if (!window.empUser && typeof window.empShowAuth === 'function') {
     document.getElementById('empUpgradeModal')?.classList.remove('open');
     document.body.style.overflow = '';
     window.empShowAuth('signup');
     return;
   }
-  const plan = window._empUpBilling === 'annual' ? 'pro_annual' : 'pro';
+  const plan = window._empUpPlan === 'campagne' ? 'campagne' : 'pro';
+  // The server ignores a code on anything but the Pack, and drops one it
+  // cannot resolve — a stale or mistyped code costs the discount, not the sale.
+  const code = plan === 'campagne' ? window.empCreatorCode() : '';
   const label = btn.textContent;
   if (window.trackEvent) window.trackEvent('checkout_started', { plan });
   btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
   try {
-    const res = await fetch('/api/stripe-checkout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) });
+    const res = await fetch('/api/stripe-checkout', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(code ? { plan, code } : { plan }) });
     const data = await res.json().catch(() => ({}));
     if (res.ok && data.url) { window.location.href = data.url; return; }
     (window.empToast ? empToast(data.error || 'Paiement momentanément indisponible. Réessayez.', 'error') : alert('Paiement momentanément indisponible.'));
@@ -488,15 +517,15 @@ window.empShowUpgrade = function() {
       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,.12);color:#6366f1;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;margin-bottom:14px">⚡ Limite gratuite atteinte</div>
       <h2 style="font-size:21px;font-weight:800;margin:0 0 6px;color:var(--ink,#0f172a);letter-spacing:-.4px">Débloquez tout Emploia</h2>
       <p style="color:var(--slate,#64748b);font-size:13.5px;line-height:1.6;margin:0 0 16px">Continuez sur votre lancée avec des générations illimitées et le coaching IA.</p>
-      <div id="empUpBillingToggle" style="display:inline-flex;background:var(--cloud,#f1f5f9);border-radius:100px;padding:3px;margin-bottom:14px;font-size:12px;font-weight:700">
-        <button data-bill="monthly" onclick="empUpgradeSetBilling('monthly')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:transparent;color:var(--slate,#64748b)">Mensuel</button>
-        <button data-bill="annual" onclick="empUpgradeSetBilling('annual')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:var(--primary,#6366f1);color:#fff">Annuel −20%</button>
+      <div id="empUpPlanToggle" style="display:inline-flex;background:var(--cloud,#f1f5f9);border-radius:100px;padding:3px;margin-bottom:14px;font-size:12px;font-weight:700">
+        <button data-plan="campagne" onclick="empUpgradeSetPlan('campagne')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:var(--primary,#6366f1);color:#fff">Pack Campagne</button>
+        <button data-plan="pro" onclick="empUpgradeSetPlan('pro')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:transparent;color:var(--slate,#64748b)">Pro mensuel</button>
       </div>
-      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px"><span style="font-size:38px;font-weight:900;color:var(--ink,#0f172a);letter-spacing:-1.5px"><span id="empUpPrice">12</span>€</span><span style="color:var(--slate,#64748b);font-size:14px">/mois</span></div>
-      <div id="empUpPer" style="color:var(--steel,#94a3b8);font-size:12px;margin-bottom:16px">facturé annuellement · 15€ en mensuel</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px"><span style="font-size:38px;font-weight:900;color:var(--ink,#0f172a);letter-spacing:-1.5px"><span id="empUpPrice">59</span>€</span><span id="empUpUnit" style="color:var(--slate,#64748b);font-size:14px">les 3 mois</span></div>
+      <div id="empUpPer" style="color:var(--steel,#94a3b8);font-size:12px;margin-bottom:16px">paiement unique · moins de 20€/mois, rien à résilier</div>
       <ul style="list-style:none;padding:0;margin:0 0 18px">${feat}</ul>
-      <button onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Démarrer l'essai Pro — 7 jours gratuits →</button>
-      <div style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Carte requise · 0€ aujourd'hui · annulation en 1 clic</div>
+      <button id="empUpCta" onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Prendre le Pack Campagne →</button>
+      <div id="empUpFine" style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Sans essai · accès immédiat · non reconductible</div>
       <div style="text-align:center"><a href="/#pricing" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" style="color:var(--slate,#64748b);font-size:13px;text-decoration:underline">Comparer toutes les offres</a></div>
     </div>`;
     document.body.appendChild(m);
@@ -504,7 +533,7 @@ window.empShowUpgrade = function() {
   }
   m.classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (window.empUpgradeSetBilling) window.empUpgradeSetBilling(window._empUpBilling || 'annual');
+  if (window.empUpgradeSetPlan) window.empUpgradeSetPlan(window._empUpPlan || 'campagne');
   if (window.trackEvent) window.trackEvent('paywall_viewed');
 };
 

@@ -217,6 +217,17 @@ export async function kvDecr(key) {
   return upstash(['DECR', key]);
 }
 
+// Single implementation of the internal Pro grant used by the referral rewards
+// and by the Pack Campagne one-time payment. Extends from the later of "now"
+// and the existing proUntil, so an active grant is prolonged, never overwritten
+// (and an expired one restarts from today instead of the past).
+// Honored at read-time by getCurrentUser above — no Stripe subscription.
+export function extendPro(current, days) {
+  const DAY = 86400000;
+  const base = Math.max(Date.now(), current ? new Date(current).getTime() : 0);
+  return new Date(base + days * DAY).toISOString();
+}
+
 export async function incrementGenerations(user) {
   // Atomically increment a dedicated counter key to avoid race conditions.
   // Two simultaneous requests both reading generationsUsed=2 and both

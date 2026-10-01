@@ -727,7 +727,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
         if (daysPro < 7 && daysLeft > 0) {
           const trialBanner = document.createElement('div');
           trialBanner.style.cssText = 'background:var(--tint-rose);border:1px solid #f0c0cb;border-radius:var(--r-lg);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;max-width:720px;margin-left:auto;margin-right:auto';
-          trialBanner.innerHTML = `<span>Essai Pro — <strong style="color:var(--brand-pink-deep)">${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</strong> · Vous serez débité 15€/mois à l'issue de l'essai.</span><a href="/api/stripe-portal" style="font-size:12px;color:var(--brand-pink-deep);font-weight:700;text-decoration:none;white-space:nowrap">Gérer</a>`;
+          trialBanner.innerHTML = `<span>Essai Pro — <strong style="color:var(--brand-pink-deep)">${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</strong> · Vous serez débité 24€/mois à l'issue de l'essai.</span><a href="/api/stripe-portal" style="font-size:12px;color:var(--brand-pink-deep);font-weight:700;text-decoration:none;white-space:nowrap">Gérer</a>`;
           const appHeader = document.querySelector('.app-wrap');
           if (appHeader) appHeader.insertBefore(trialBanner, appHeader.firstChild);
         }

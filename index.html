@@ -46,15 +46,9 @@
   "operatingSystem": "Web",
   "offers": [
     { "@type": "Offer", "name": "Gratuit", "price": "0", "priceCurrency": "EUR" },
-    { "@type": "Offer", "name": "Pro", "price": "12", "priceCurrency": "EUR", "billingIncrement": "P1M" },
-    { "@type": "Offer", "name": "Intensif", "price": "29", "priceCurrency": "EUR", "billingIncrement": "P1M" }
-  ],
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "reviewCount": "1240",
-    "bestRating": "5"
-  }
+    { "@type": "Offer", "name": "Pack Campagne", "price": "59", "priceCurrency": "EUR" },
+    { "@type": "Offer", "name": "Pro", "price": "24", "priceCurrency": "EUR", "billingIncrement": "P1M" }
+  ]
 }
 </script>
 
@@ -146,7 +140,6 @@
 .quote-attr .av{width:32px;height:32px;border-radius:50%;background:var(--brand-orange)}
 
 /* Stars rating */
-.star-row{color:#F5A623;font-size:14px;letter-spacing:1px;margin-bottom:12px}
 .quote-stars{color:rgba(255,255,255,.9);font-size:14px;letter-spacing:1px;margin-bottom:12px}
 
 @media (max-width:1023px){.bring-grid{grid-template-columns:1fr 1fr}}
@@ -157,8 +150,6 @@
 @media (max-width:767px){.cmp{grid-template-columns:1.4fr repeat(4, 80px);min-width:560px}.emp-compare{overflow-x:auto}}
 
 /* Testi grid */
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media (max-width:900px){.testi-grid{grid-template-columns:1fr}}
 
 /* Hero AI live badge */
 .emp-hero-mockup-wrap{position:relative}
@@ -256,13 +247,7 @@
 .sec-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate);font-weight:500}
 .sec-badge svg{color:var(--brand-green);flex-shrink:0}
 
-/* Billing toggle */
-.billing-toggle{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:32px;font-size:14px;color:var(--slate)}
-.billing-toggle-track{width:44px;height:24px;background:var(--primary);border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
-.billing-toggle-thumb{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.billing-toggle-track.monthly .billing-toggle-thumb{transform:translateX(20px)}
-.billing-label{font-weight:600;color:var(--ink)}
-.billing-save{background:var(--brand-green);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:4px}
+/* Comparison grid override (see .cmp below) */
 
 /* Count-up stat values */
 .emp-stat-item .val[data-count]{transition:all .1s}
@@ -399,12 +384,12 @@
         🇫🇷 RGPD · Hébergé en France
       </span>
       <span class="hero-trust-chip">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        4,9 / 5 · 1 240 avis
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Données hébergées en France
       </span>
       <span class="hero-trust-chip">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        24 800 candidats actifs
+        5 générations gratuites, sans carte
       </span>
     </div>
     <div class="powered-badge">
@@ -491,24 +476,24 @@
   </div>
 </section>
 
-<!-- ═════ SOCIAL PROOF STATS ═════ -->
+<!-- ═════ PRODUCT FACTS ═════ -->
 <section class="social-stats-wrap reveal">
   <div class="social-stats">
     <div class="ss-item">
-      <div class="ss-num">14 200+</div>
-      <div class="ss-lbl">entretiens décrochés</div>
+      <div class="ss-num">30 s</div>
+      <div class="ss-lbl">pour un CV adapté à l'offre</div>
     </div>
     <div class="ss-item">
-      <div class="ss-num">89%</div>
-      <div class="ss-lbl">score ATS moyen obtenu</div>
+      <div class="ss-num">800k</div>
+      <div class="ss-lbl">offres analysées en continu</div>
     </div>
     <div class="ss-item">
-      <div class="ss-num">−73%</div>
-      <div class="ss-lbl">de temps par candidature</div>
+      <div class="ss-num">5</div>
+      <div class="ss-lbl">générations offertes, sans carte</div>
     </div>
     <div class="ss-item">
-      <div class="ss-num">4,9/5</div>
-      <div class="ss-lbl">satisfaction · 1 240 avis</div>
+      <div class="ss-num">100%</div>
+      <div class="ss-lbl">données hébergées en France</div>
     </div>
   </div>
 </section>
@@ -942,15 +927,6 @@
       <p>Commencez gratuitement. Passez au-dessus quand vous êtes prêt à candidater sérieusement.</p>
     </div>
 
-    <!-- Billing toggle -->
-    <div class="billing-toggle reveal" id="billingToggleWrap">
-      <span>Mensuel</span>
-      <div class="billing-toggle-track" id="billingTrack" onclick="empToggleBilling(this)">
-        <div class="billing-toggle-thumb"></div>
-      </div>
-      <span class="billing-label">Annuel <span class="billing-save">−20%</span></span>
-    </div>
-
     <div class="emp-pricing-grid">
       <div class="emp-pricing-card reveal" data-delay="1">
         <h4>Gratuit</h4>
@@ -967,12 +943,11 @@
         <a href="/app" class="emp-btn emp-btn-secondary">Commencer gratuitement</a>
       </div>
 
-      <div class="emp-pricing-card featured reveal" data-delay="2">
-        <span class="pop">Le plus populaire</span>
+      <div class="emp-pricing-card reveal" data-delay="2">
         <h4>Pro</h4>
         <div class="blurb">Pour mener une vraie campagne de candidature.</div>
-        <div class="price"><span class="price-val" data-annual="12" data-monthly="15">12</span>€<small> /mois</small></div>
-        <div class="per" id="proPer">Facturé annuellement · 15€ mensuel</div>
+        <div class="price">24€<small> /mois</small></div>
+        <div class="per">Sans engagement · annulable à tout moment</div>
         <ul>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>CV &amp; lettres illimités</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coach d'entretien IA</li>
@@ -980,30 +955,32 @@
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Orion IA Copilote chat</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Modèles premium</li>
         </ul>
-        <a href="/app" data-checkout="pro" class="emp-btn emp-btn-primary">Essayer 7 jours gratuits</a>
+        <a href="/app" data-checkout="pro" class="emp-btn emp-btn-secondary">Essayer 7 jours gratuits</a>
         <div style="text-align:center;font-size:12px;color:var(--slate);margin-top:8px">Annulable à tout moment</div>
       </div>
 
-      <div class="emp-pricing-card reveal" data-delay="3">
-        <h4>Intensif</h4>
-        <div class="blurb">Pour les reconversions et recherches soutenues.</div>
-        <div class="price"><span class="price-val" data-annual="29" data-monthly="35">29</span>€<small> /mois</small></div>
-        <div class="per" id="intensifPer">Facturé annuellement</div>
+      <div class="emp-pricing-card featured reveal" data-delay="3">
+        <span class="pop">Le plus avantageux</span>
+        <h4>Pack Campagne</h4>
+        <div class="blurb">Une recherche d'emploi dure 3 mois. Payez-la une fois.</div>
+        <div class="price price-long" id="packPrice">59€<small> les 3 mois</small></div>
+        <div class="per" id="packPer">Paiement unique · non reconductible</div>
         <ul>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tout de Pro</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Profils multiples</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Coaching humain (2h/mois)</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Négociation salariale</li>
-          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Export multilingue</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tout de Pro, pendant 90 jours</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Soit moins de 20€/mois — le tarif le plus bas</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Aucun abonnement à résilier</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Pas de prélèvement surprise</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Prolongeable quand vous voulez</li>
         </ul>
-        <a href="/app" data-checkout="intensif" class="emp-btn emp-btn-secondary">Choisir Intensif</a>
+        <a href="/app" data-checkout="campagne" class="emp-btn emp-btn-primary">Prendre le Pack Campagne</a>
+        <div style="text-align:center;font-size:12px;color:var(--slate);margin-top:8px">Sans essai — accès immédiat</div>
       </div>
 
       <div class="emp-pricing-card reveal" data-delay="4">
         <h4>Écoles &amp; RH</h4>
-        <div class="blurb">Pour écoles, missions locales et cabinets de recrutement.</div>
-        <div class="price">Sur devis</div>
-        <div class="per">Tarif par siège</div>
+        <div class="blurb">Pour écoles, CFA, missions locales et cabinets de recrutement.</div>
+        <div class="price price-long">9€<small> /étudiant/an</small></div>
+        <div class="per">100 à 500 sièges · 6€ au-delà de 1 000 · outplacement 39€/candidat</div>
         <ul>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Tableau de bord équipe</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>SSO, contrôle d'accès</li>
@@ -1011,7 +988,7 @@
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Analytics agrégés</li>
           <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>Hébergement Europe (RGPD)</li>
         </ul>
-        <a href="/contact" class="emp-btn emp-btn-dark">Parler à l'équipe</a>
+        <a href="/contact" class="emp-btn emp-btn-dark">Demander un devis</a>
       </div>
     </div>
 
@@ -1021,7 +998,7 @@
         <div>Comparer les plans</div>
         <div>Gratuit</div>
         <div>Pro</div>
-        <div>Intensif</div>
+        <div>Pack Campagne</div>
         <div>Écoles &amp; RH</div>
       </div>
       <div class="emp-compare-section">Création de candidature</div>
@@ -1029,80 +1006,16 @@
       <div class="emp-compare-row cmp"><div>Lettres de motivation</div><div>Incluses dans les 5</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div><div class="yes">Illimitées</div></div>
       <div class="emp-compare-row cmp"><div>Modèles premium</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
       <div class="emp-compare-row cmp"><div>Export PDF · DOCX · LinkedIn</div><div>PDF</div><div class="yes">Tous</div><div class="yes">Tous</div><div class="yes">Tous</div></div>
-      <div class="emp-compare-section">Préparation &amp; coaching</div>
+      <div class="emp-compare-section">Préparation &amp; accompagnement</div>
       <div class="emp-compare-row cmp"><div>Coach d'entretien IA</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
-      <div class="emp-compare-row cmp"><div>Coaching humain</div><div>—</div><div>—</div><div class="yes">2h / mois</div><div class="yes">Sur devis</div></div>
-      <div class="emp-compare-row cmp"><div>Négociation salariale</div><div>—</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-row cmp"><div>Négociation salariale</div><div>—</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
+      <div class="emp-compare-section">Facturation</div>
+      <div class="emp-compare-row cmp"><div>Type de paiement</div><div>—</div><div>Abonnement</div><div class="yes">Paiement unique</div><div>Sur devis</div></div>
+      <div class="emp-compare-row cmp"><div>Essai 7 jours</div><div>—</div><div class="yes">✓</div><div>—</div><div>—</div></div>
       <div class="emp-compare-section">Pour les équipes</div>
       <div class="emp-compare-row cmp"><div>SSO &amp; contrôle d'accès</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
       <div class="emp-compare-row cmp"><div>Tableau de bord équipe</div><div>—</div><div>—</div><div>—</div><div class="yes">✓</div></div>
       <div class="emp-compare-row cmp"><div>Hébergement France (RGPD)</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div><div class="yes">✓</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═════ TESTIMONIALS ═════ -->
-<section class="emp-section" style="padding-top:0">
-  <div class="container">
-    <div class="emp-section-head reveal">
-      <h2 class="t-h1">Ils ont <span class="grad-text">décroché.</span></h2>
-      <p>Quelques voix parmi notre communauté de 24 800 candidats actifs.</p>
-    </div>
-    <div class="testi-grid">
-      <article class="emp-testi reveal" data-delay="1">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« En trois semaines avec EmploiA, j'ai eu plus d'entretiens qu'en six mois en solo. Le coach IA a vraiment changé ma façon de raconter mon parcours. »</p>
-        <div class="emp-testi-stat"><span class="v">14</span><span class="l">entretiens en 21 jours</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--brand-orange)">C</div>
-          <div><div class="emp-testi-name">Camille Durand</div><div class="emp-testi-role">Product Manager · Qonto</div></div>
-        </div>
-      </article>
-      <article class="emp-testi reveal" data-delay="2">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« J'avais 47 ans, je pensais que le marché ne voulait plus de moi. EmploiA a réécrit mon CV pour chaque offre — j'ai signé chez un éditeur SaaS en 5 semaines. »</p>
-        <div class="emp-testi-stat"><span class="v">+38%</span><span class="l">salaire vs poste précédent</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--primary)">M</div>
-          <div><div class="emp-testi-name">Mehdi Lahlou</div><div class="emp-testi-role">VP Sales · Pennylane</div></div>
-        </div>
-      </article>
-      <article class="emp-testi reveal" data-delay="3">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« Le score ATS m'a montré pourquoi mes 80 candidatures partaient dans le vide. Trois ajustements plus tard, premier entretien décroché en 48 heures. »</p>
-        <div class="emp-testi-stat"><span class="v">48h</span><span class="l">jusqu'au 1er entretien</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--brand-green)">L</div>
-          <div><div class="emp-testi-name">Léa Marchetti</div><div class="emp-testi-role">Data Analyst · BlaBlaCar</div></div>
-        </div>
-      </article>
-      <article class="emp-testi reveal" data-delay="4">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« J'étais en reconversion du juridique vers le produit. EmploiA a reformulé 4 ans d'expérience pour les faire parler "PM". Premier poste décroché en 6 semaines. »</p>
-        <div class="emp-testi-stat"><span class="v">6</span><span class="l">semaines pour décrocher</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--brand-teal)">S</div>
-          <div><div class="emp-testi-name">Sara Benali</div><div class="emp-testi-role">Product Manager · Alan</div></div>
-        </div>
-      </article>
-      <article class="emp-testi reveal" data-delay="5">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« J'envoyais des candidatures sans jamais avoir de retour. EmploiA m'a montré que mon CV n'était pas adapté ATS. 3 semaines après : 4 entretiens. »</p>
-        <div class="emp-testi-stat"><span class="v">4</span><span class="l">entretiens en 3 semaines</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--brand-yellow);color:var(--ink,#0F172A)">T</div>
-          <div><div class="emp-testi-name">Thomas Girard</div><div class="emp-testi-role">Développeur Full Stack · Swile</div></div>
-        </div>
-      </article>
-      <article class="emp-testi reveal" data-delay="6">
-        <div class="star-row">★★★★★</div>
-        <p class="emp-testi-quote">« La préparation d'entretien avec le coach IA, c'est 10× mieux qu'un livre. Il m'a posé les vraies questions de Doctolib — mot pour mot. J'ai négocié +22% de salaire. »</p>
-        <div class="emp-testi-stat"><span class="v">+22%</span><span class="l">salaire négocié</span></div>
-        <div class="emp-testi-attr">
-          <div class="emp-testi-av" style="background:var(--brand-pink)">A</div>
-          <div><div class="emp-testi-name">Aïcha Traoré</div><div class="emp-testi-role">UX Designer · Doctolib</div></div>
-        </div>
-      </article>
     </div>
   </div>
 </section>
@@ -1153,9 +1066,8 @@
 <section class="emp-section-sm" style="padding-top:0" id="contact">
   <div class="container">
     <div class="emp-cta-banner reveal">
-      <div class="star-row" style="font-size:18px">★★★★★ <span style="font-size:14px;font-weight:500;color:var(--slate);margin-left:6px">4,9 / 5 · 1 240 avis</span></div>
       <h2 class="t-h1">Votre prochain entretien<br/><span class="grad-text">vous attend.</span></h2>
-      <p>Rejoignez 24 800 candidats qui ont laissé EmploiA s'occuper du plus pénible.</p>
+      <p>Laissez EmploiA s'occuper du plus pénible : 5 générations offertes, sans carte bancaire.</p>
       <div class="row">
         <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Essayer EmploiA gratuitement</a>
         <a href="/contact" class="emp-btn emp-btn-secondary emp-btn-lg">Demander une démo</a>
@@ -1169,7 +1081,7 @@
 
 <!-- ═════ STICKY CTA BAR ═════ -->
 <div id="stickyBar" role="complementary" aria-label="Essayer EmploiA">
-  <div class="msg">Rejoignez <strong>24 800 candidats</strong> — commencez gratuitement.</div>
+  <div class="msg"><strong>5 générations offertes</strong> — sans carte bancaire.</div>
   <div class="acts">
     <a href="/app" class="emp-btn emp-btn-primary" style="padding:9px 20px;font-size:14px">Essayer gratuitement</a>
     <button class="close-bar" onclick="document.getElementById('stickyBar').remove()" aria-label="Fermer">×</button>
@@ -1258,13 +1170,17 @@
 
 <script src="/shared.js"></script>
 <script>
-/* Pricing → Stripe Checkout. Wires the Pro/Intensif cards (data-checkout) to
-   /api/stripe-checkout with the right plan key, honoring the annual/monthly
-   toggle. Amounts are whatever the STRIPE_PRICE_* env vars point to — this only
-   chooses which plan. Falls back to /app (the href) if JS/checkout is unavailable. */
+/* Pricing → Stripe Checkout. Wires the Pro/Campagne cards (data-checkout) to
+   /api/stripe-checkout with the right plan key. The plan key is passed through
+   verbatim; the server decides subscription vs one-off payment and amounts are
+   whatever the STRIPE_PRICE_* env vars point to.
+   A creator code captured from ?code= rides along on the Pack Campagne only —
+   the server drops it on any other plan, and drops one it cannot resolve.
+   Falls back to /app (the href) if JS/checkout is unavailable. */
 (function () {
   function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
   async function startCheckout(plan, btn) {
+    const code = plan === 'campagne' && window.empCreatorCode ? window.empCreatorCode() : '';
     const label = btn.textContent;
     if (window.trackEvent) window.trackEvent('checkout_started', { plan });
     btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
@@ -1272,7 +1188,7 @@
       const res = await fetch('/api/stripe-checkout', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify(code ? { plan, code } : { plan }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.url) { window.location.href = data.url; return; }
@@ -1286,16 +1202,32 @@
     const btn = e.target.closest('[data-checkout]');
     if (!btn) return;
     e.preventDefault();
-    const base = btn.getAttribute('data-checkout'); // 'pro' | 'intensif'
-    const track = document.getElementById('billingTrack');
-    const annual = !(track && track.classList.contains('monthly')); // default = annual
-    const plan = annual ? base + '_annual' : base;
-    // Prefer an authenticated checkout so the subscription binds to the account.
+    const plan = btn.getAttribute('data-checkout'); // 'pro' | 'campagne'
+    // Prefer an authenticated checkout so the purchase binds to the account.
     if (!window.empUser && typeof window.empShowAuth === 'function') { window.empShowAuth('signup'); return; }
     startCheckout(plan, btn);
   });
 })();
 </script>
+<script>
+/* ── Creator code → visible discount on the Pack Campagne ──
+   A TikTok viewer arrives on /?code=LEA10. The discount is applied for real by
+   Stripe at checkout; this only makes it visible on the card, because a code
+   the visitor cannot see on the page reads as a code that did not work.
+   Purely cosmetic: it never decides the amount charged, and it stays silent
+   when no code was captured. The server is still free to reject the code, in
+   which case the buyer sees 59 € on Stripe's page — hence "sous réserve". */
+(function () {
+  var code = window.empCreatorCode ? window.empCreatorCode() : '';
+  if (!code) return;
+  var price = document.getElementById('packPrice');
+  var per = document.getElementById('packPer');
+  if (!price || !per) return;
+  price.innerHTML = '<span style="text-decoration:line-through;opacity:.45;font-size:.6em;margin-right:8px">59€</span>49€<small> les 3 mois</small>';
+  per.innerHTML = 'Code <strong>' + code.replace(/[^A-Z0-9]/g, '') + '</strong> appliqué · −10€ · paiement unique';
+})();
+</script>
+
 <script>
 /* ── Scroll progress bar ── */
 (function(){
@@ -1359,20 +1291,6 @@
   },{threshold:0.4});
   stats.forEach(function(el){ io.observe(el); });
 })();
-
-/* ── Billing toggle ── */
-var billingAnnual = true;
-function empToggleBilling(track){
-  billingAnnual = !billingAnnual;
-  track.classList.toggle('monthly', !billingAnnual);
-  document.querySelectorAll('.price-val').forEach(function(el){
-    el.textContent = billingAnnual ? el.dataset.annual : el.dataset.monthly;
-  });
-  var proPer = document.getElementById('proPer');
-  var intPer = document.getElementById('intensifPer');
-  if(proPer) proPer.textContent = billingAnnual ? 'Facturé annuellement · 15€ mensuel' : 'Facturé mensuellement';
-  if(intPer) intPer.textContent = billingAnnual ? 'Facturé annuellement' : 'Facturé mensuellement';
-}
 
 /* ── Typewriter hero ── */
 (function(){

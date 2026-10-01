@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge' };
-import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, validateEmail } from './_lib/auth.js';
+import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, validateEmail, extendPro } from './_lib/auth.js';
 
 // Referral system:
 // KV keys:
@@ -106,11 +106,7 @@ export default async function handler(req) {
 
     // Reward = internally-granted free Pro time (proUntil), honored by getCurrentUser.
     // No Stripe subscription is created; it simply auto-expires.
-    const DAY = 86400000;
-    const extendPro = (current, days) => {
-      const base = Math.max(Date.now(), current ? new Date(current).getTime() : 0);
-      return new Date(base + days * DAY).toISOString();
-    };
+    // extendPro lives in _lib/auth.js — shared with the Pack Campagne grant.
 
     // Referrer: +30 days per new signup, capped at 6 rewarded signups (≈6 months).
     const referrerUser = await kvGet(`user:${refData.email}`);

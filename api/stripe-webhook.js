@@ -1,7 +1,9 @@
 export const config = { runtime: 'edge' };
-import { kvGet, kvSet, kvSetNX, htmlEscape } from './_lib/auth.js';
+import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './_lib/auth.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+// Pack Campagne — 59 € one-off buys 3 months of Pro access.
+const CAMPAGNE_DAYS = 90;
 
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -71,6 +73,63 @@ export default async function handler(req) {
         const session = event.data.object;
         const email = session.customer_email || session.customer_details?.email;
         const plan = session.metadata?.plan || 'pro';
+
+        // ── Pack Campagne: one-off payment, not a subscription ──────────────
+        // 59 € grants 90 days of Pro through the internal proUntil grant that
+        // getCurrentUser honors at read-time. Deliberately does NOT write
+        // `plan`: getCurrentUser only promotes an account whose plan is free
+        // or unset, so stamping plan='campagne' would silently void the grant.
+        // No subscriptionId is stored either — there is no Stripe subscription.
+        // Replay safety comes from the kvSetNX('webhook:{id}') lock above,
+        // which guards every event type, this one included; without it a
+        // retried event would hand out another 90 free days.
+        if (session.mode === 'payment') {
+          // Credit the creator before anything else: the sale happened and the
+          // commission is owed even if the buyer has no account record yet.
+          // Two atomic counters rather than one object — a read-modify-write
+          // would lose a sale whenever two buyers convert at the same moment.
+          // Commission owed is derived at read time in api/affiliate.js, so
+          // changing the rate never rewrites history.
+          const affiliate = session.metadata?.affiliate;
+          if (affiliate && /^[A-Z0-9]{3,20}$/.test(affiliate)) {
+            await Promise.all([
+              kvSadd('affiliates', affiliate),
+              kvIncr(`affiliate:${affiliate}:sales`),
+            ]).catch(() => {});
+          }
+          if (!email) break;
+          const normalizedEmail = email.toLowerCase();
+          const user = await kvGet(`user:${normalizedEmail}`);
+          if (!user) break;
+          const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+          const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '');
+          // extendPro prolongs an existing proUntil instead of overwriting it.
+          const proUntil = extendPro(user.proUntil, CAMPAGNE_DAYS);
+          await Promise.all([
+            kvSet(`user:${normalizedEmail}`, {
+              ...user,
+              proUntil,
+              campagnePurchasedAt: new Date().toISOString(),
+              stripeCustomerId: session.customer,
+              generationsUsed: 0,
+            }),
+            kvSet(`stripe:${session.customer}`, normalizedEmail),
+            kvSet(`gen:${normalizedEmail}`, 0),
+            fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan: 'campagne' } }) }).catch(() => {}),
+            resendKey ? sendEmail(resendKey, {
+              from: 'Emploia <noreply@emploia.fr>',
+              to: [normalizedEmail],
+              subject: `🎉 ${firstName || 'Bienvenue'}, ton Pack Campagne est activé !`,
+              html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 8px;letter-spacing:-.5px">Ton Pack Campagne est actif 🚀</h1><p style="color:#475569;line-height:1.6;margin:0 0 6px">Bienvenue${firstName ? ` ${firstName}` : ''} ! Tu as <strong>3 mois d'accès complet</strong>, jusqu'au ${new Date(proUntil).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.</p><p style="color:#475569;line-height:1.6;margin:0 0 24px">Paiement unique : rien ne sera reconduit, tu n'as aucun abonnement à résilier.</p><a href="${baseUrl}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer ma campagne →</a></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}" style="color:#94a3b8">emploia.fr</a></p></div></body></html>`,
+            }) : Promise.resolve(),
+          ]);
+          break;
+        }
+
+        // ── Pro: recurring subscription ─────────────────────────────────────
+        // 'intensif' is no longer sellable (removed from api/stripe-checkout.js)
+        // but the label is kept so a renewal or a plan change on one of the
+        // grandfathered subscriptions still reads correctly in emails.
         const planLabel = plan === 'intensif' ? 'Intensif' : 'Pro';
         if (email) {
           const normalizedEmail = email.toLowerCase();
@@ -191,8 +250,6 @@ export default async function handler(req) {
             const PRICE_TO_PLAN = {
               [process.env.STRIPE_PRICE_PRO]: 'pro',
               [process.env.STRIPE_PRICE_INTENSIF]: 'intensif',
-              [process.env.STRIPE_PRICE_PRO_ANNUAL]: 'pro',
-              [process.env.STRIPE_PRICE_INTENSIF_ANNUAL]: 'intensif',
             };
             const newPlan = (priceId && PRICE_TO_PLAN[priceId]) || user.plan;
             const wasScheduledForCancellation = user.cancelAtPeriodEnd;

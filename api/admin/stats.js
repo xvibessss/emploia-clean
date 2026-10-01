@@ -2,8 +2,18 @@ export const config = { runtime: 'nodejs' };
 
 import { kvGet, kvSmembers, kvMget, kvZcard, kvScard } from '../_lib/auth.js';
 
-const PRO_PRICE = 15;
-const INTENSIF_PRICE = 35;
+const PRO_PRICE = 24;
+// Intensif is retired from sale (2026-09-30) but existing subscribers keep
+// their plan and keep being billed, so their revenue still has to be counted.
+const INTENSIF_PRICE = 49;
+// Pack Campagne: 59 € cashed once for 90 days of access. Counted in MRR as
+// 19.67 €/month (59 / 3) for the duration of the pack, so a one-off sale does
+// not inflate one month and then vanish. A buyer keeps plan='free' in KV (the
+// grant is carried by proUntil), so they are identified by an unexpired
+// campagnePurchasedAt, not by the plan field.
+const CAMPAGNE_PRICE = 59;
+const CAMPAGNE_DAYS = 90;
+const CAMPAGNE_MONTHLY = CAMPAGNE_PRICE / 3; // 19.67 €/month
 const DAY = 86400000;
 
 export default async function handler(req, res) {
@@ -88,7 +98,7 @@ export default async function handler(req, res) {
     const sample = allUsers.slice(0, SAMPLE_MAX);
     const isSampled = totalUsers > SAMPLE_MAX;
 
-    let planCounts = { free: 0, pro: 0, intensif: 0 };
+    let planCounts = { free: 0, pro: 0, intensif: 0, campagne: 0 };
     let activeLast7d = 0;
     let activeLast30d = 0;
     let newToday = 0;
@@ -104,8 +114,14 @@ export default async function handler(req, res) {
         resolvedCount++;
 
         const plan = u.plan || 'free';
+        // An active Pack Campagne buyer keeps plan='free' (access rides on
+        // proUntil), so classify it from campagnePurchasedAt before falling
+        // through to free. Counted only while the 90 days are unexpired.
+        const campagneAt = u.campagnePurchasedAt ? new Date(u.campagnePurchasedAt).getTime() : 0;
+        const campagneActive = campagneAt > 0 && campagneAt > now - CAMPAGNE_DAYS * DAY;
         if (plan === 'pro') planCounts.pro++;
         else if (plan === 'intensif') planCounts.intensif++;
+        else if (campagneActive) planCounts.campagne++;
         else planCounts.free++;
 
         const createdAt = u.createdAt ? new Date(u.createdAt).getTime() : 0;
@@ -121,9 +137,11 @@ export default async function handler(req, res) {
 
     const proRevenue = planCounts.pro * PRO_PRICE;
     const intensifRevenue = planCounts.intensif * INTENSIF_PRICE;
-    const mrr = proRevenue + intensifRevenue;
+    // Campagne is amortised at 19.67 €/month over its 3 months (see note at top).
+    const campagneRevenue = planCounts.campagne * CAMPAGNE_MONTHLY;
+    const mrr = proRevenue + intensifRevenue + campagneRevenue;
     const arr = mrr * 12;
-    const paidCount = planCounts.pro + planCounts.intensif;
+    const paidCount = planCounts.pro + planCounts.intensif + planCounts.campagne;
     const conversionRate = resolvedCount > 0
       ? ((paidCount / resolvedCount) * 100).toFixed(1) + '%'
       : '0.0%';
@@ -131,7 +149,7 @@ export default async function handler(req, res) {
     const response = {
       generatedAt: new Date().toISOString(),
       users: { total: totalUsers, byPlan: planCounts, activeLast7d, activeLast30d, newToday, newThisWeek, conversionRate },
-      revenue: { mrr, arr, proRevenue, intensifRevenue },
+      revenue: { mrr, arr, proRevenue, intensifRevenue, campagneRevenue },
       events: {
         cvGenerated, usersRegistered, plansUpgraded,
         letterGenerated: counts.letter_generated,
