@@ -72,15 +72,36 @@ interactif (cron, `-z`) :
 - Ne jamais écrire une valeur de token/clé dans une réponse, un log, un commit
   ou un message. Si un secret a fui, le signaler et demander sa rotation.
 - Pas de credential sur une infra tierce : contrainte de souveraineté de Hugo.
+- **Ne jamais lire un magasin de credentials** — `~/Library/Application Support/
+  com.vercel.cli/auth.json`, `~/.config/gh/hosts.yml`, `~/.aws/credentials`,
+  trousseau macOS, `.env` de production. Une session CLI déjà authentifiée
+  (`vercel`, `gh`, `stripe`) s'utilise telle quelle : lancer la commande, pas
+  extraire le jeton qui la fait marcher. Un secret lu entre dans le contexte,
+  donc dans le transcript et chez le fournisseur du modèle.
+- Quand une action exige un credential que la CLI n'expose pas, **s'arrêter et
+  demander à Hugo**. Il la fera lui-même ou la déléguera. Un blocage signalé
+  vaut mieux qu'un contournement réussi.
+- Corollaire pour les comptes tiers : **vérifier sur quel compte on agit avant
+  d'écrire**. Stripe, Vercel et GitHub ont chacun plusieurs comptes ou teams
+  dans cet environnement. Un identifiant créé dans le mauvais compte existe,
+  répond, et reste introuvable depuis l'application (arrivé le 2026-09-29 avec
+  quatre objets Price Stripe).
 
 ## Vérifications avant de rendre la main
 
 Les trois commandes que la CI exécute réellement (`.github/workflows/ci.yml`) :
 
 ```bash
-node scripts/ci-guards.mjs        # 219 rewrites + 76 handlers api/
+node scripts/ci-guards.mjs        # 220 rewrites + 77 handlers api/
 npm run bench                     # qualité des générations (anti-fabrication)
 npm run test:employer             # cycle de vie des offres
+```
+
+Hors CI, mais à lancer dès qu'on touche au paiement :
+
+```bash
+npm run test:billing              # 4 sondes Stripe, hors ligne (stubs)
+npm run smoke:prod -- <url>       # interroge un déploiement réel, lecture seule
 ```
 
 Un rouge bloque la livraison — on corrige l'implémentation, pas l'assertion,
