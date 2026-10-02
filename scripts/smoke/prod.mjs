@@ -73,6 +73,15 @@ await page('/', {
 console.log('\n[B] Page écoles');
 await page('/ecoles', { must: ['9 €', '40 000', 'pilote'] });
 
+console.log('\n[B bis] Conformité — identité du vendeur et conditions de vente');
+await page('/legal', {
+  // Le SIREN est l'élément qu'un service comptable d'école vérifie en premier,
+  // et la franchise en base explique l'absence de TVA sur la facture.
+  must: ['928 482 553', 'Entrepreneur individuel', '293 B', 'Conditions générales de vente', 'L221-28'],
+  // Formes sociales et grilles périmées qui ne doivent pas réapparaître.
+  mustNot: ['EmploiA SAS', 'édité à titre personnel', 'Pro / Intensif'],
+});
+
 console.log('\n[C] Pages qui doivent répondre');
 for (const p of ['/app', '/tools', '/dashboard', '/about', '/contact']) {
   try {
@@ -118,12 +127,26 @@ console.log('\n[F] Checkout Stripe');
 if (!WITH_CHECKOUT) {
   skip('sondes de checkout', 'relancer avec --checkout pour les exécuter');
 } else {
+  // Sans consentement, aucune commande ne doit partir — c'est ce que les CGV
+  // promettent, et la page peut être contournée.
+  try {
+    const res = await fetch(`${BASE}/api/stripe-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: 'campagne', email: 'smoke@example.test' }),
+      signal: AbortSignal.timeout(TIMEOUT),
+    });
+    res.status === 400
+      ? ok('checkout sans consentement est refusé', 'HTTP 400, comme attendu')
+      : ko('checkout sans consentement est refusé', `HTTP ${res.status} — la rétractation reste ouverte 14 jours`);
+  } catch (e) { ko('checkout sans consentement', e.message); }
+
   for (const plan of ['campagne', 'pro']) {
     try {
       const res = await fetch(`${BASE}/api/stripe-checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, email: 'smoke@example.test' }),
+        body: JSON.stringify({ plan, consent: true, email: 'smoke@example.test' }),
         signal: AbortSignal.timeout(TIMEOUT),
       });
       const d = await res.json().catch(() => ({}));
@@ -142,7 +165,7 @@ if (!WITH_CHECKOUT) {
     const res = await fetch(`${BASE}/api/stripe-checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: 'intensif' }),
+      body: JSON.stringify({ plan: 'intensif', consent: true }),
       signal: AbortSignal.timeout(TIMEOUT),
     });
     res.status === 400
