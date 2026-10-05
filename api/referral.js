@@ -47,14 +47,14 @@ export default async function handler(req) {
       await kvSet(`ref:${code}`, refData);
       await kvSet(`refcode:${user.id}`, code);
       // Track (fire and forget)
-      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_code_created' }) }).catch(() => {});
     }
 
     const refData = await kvGet(`ref:${code}`) || {};
     return new Response(JSON.stringify({
       code,
-      link: `https://emploia.fr/?ref=${code}`,
+      link: `https://emploia.eu/?ref=${code}`,
       signups: (refData.signups || []).length,
       monthsEarned: refData.monthsEarned || 0,
     }), { status: 200, headers: H });
@@ -100,7 +100,7 @@ export default async function handler(req) {
     await kvSet(`ref:${code}`, { ...refData, signups, monthsEarned });
     // Track a genuinely new referred signup (fire and forget)
     {
-      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_signup' }) }).catch(() => {});
     }
 

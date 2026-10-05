@@ -39,7 +39,7 @@ export default async function handler(req) {
     const token = crypto.randomUUID();
     await kvSet(`reset:${token}`, { email, createdAt: Date.now() }, 3600);
 
-    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
     // Fire-and-forget: don't await email send to prevent timing oracle
@@ -48,7 +48,7 @@ export default async function handler(req) {
       signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Emploia <noreply@emploia.fr>',
+        from: 'Emploia <noreply@emploia.eu>',
         to: [email],
         subject: 'Réinitialisez votre mot de passe Emploia',
         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
@@ -64,7 +64,7 @@ export default async function handler(req) {
       <p style="color:#94a3b8;font-size:12px;margin:28px 0 0;line-height:1.6">Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.<br/>Lien alternatif : <a href="${resetUrl}" style="color:#6366f1;word-break:break-all">${resetUrl}</a></p>
     </div>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a></p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a></p>
 </div>
 </body></html>`,
       }),

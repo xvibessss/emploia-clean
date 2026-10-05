@@ -12,4 +12,4 @@ Disallow: /reset-password
 Disallow: /chat
 Disallow: /cv-vault
 
-Sitemap: https://emploia.fr/sitemap.xml
+Sitemap: https://emploia.eu/sitemap.xml

@@ -151,8 +151,8 @@ export default async function handler(req) {
         mode,
         'line_items[0][price]': priceId,
         'line_items[0][quantity]': '1',
-        success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/app?success=1`,
-        cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.fr'}/#pricing`,
+        success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.eu'}/app?success=1`,
+        cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.eu'}/#pricing`,
         ...(resolvedEmail ? { customer_email: resolvedEmail } : {}),
         'metadata[plan]': plan,
         // Proof of consent, kept on the Stripe object rather than only in our

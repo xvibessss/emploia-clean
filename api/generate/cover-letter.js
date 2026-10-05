@@ -92,20 +92,20 @@ export default async function handler(req) {
               }
               if (parsed.type === 'message_stop') {
                 // Track event (fire and forget)
-                const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+                const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
                 fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'letter_generated', props: { plan: user.plan } }) }).catch(() => {});
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
                 if (gen.count === FREE_LIMIT) {
                   const resendKey = process.env.RESEND_API_KEY;
                   if (resendKey) {
                     const firstNameRaw = (user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '';
-                    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+                    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
                     fetch('https://api.resend.com/emails', {
                       method: 'POST',
                       signal: AbortSignal.timeout(6000),
                       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        from: 'Emploia <noreply@emploia.fr>',
+                        from: 'Emploia <noreply@emploia.eu>',
                         to: [user.email],
                         subject: `${firstNameRaw ? firstNameRaw + ', v' : 'V'}ous avez utilisé vos 5 générations gratuites 🎯`,
                         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Vos 5 générations gratuites sont épuisées 🎯</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">Vous avez généré ${FREE_LIMIT} documents ATS-optimisés. C'est exactement ce que font les candidats qui décrochent 2× plus d'entretiens.</p><div style="background:#f8fafc;border-left:4px solid #6366f1;padding:16px;border-radius:0 10px 10px 0;margin-bottom:24px"><p style="font-size:14px;color:#0f172a;font-weight:700;margin:0 0 8px">Passez Pro et continuez sur votre lancée :</p><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><span style="color:#6366f1">♾️</span><span style="font-size:13px;color:#475569">Générations <strong>illimitées</strong> — CV, lettre, score ATS</span></div><div style="display:flex;align-items:center;gap:10px"><span style="color:#6366f1">🎤</span><span style="font-size:13px;color:#475569">Coaching entretien IA illimité</span></div><div style="display:flex;align-items:center;gap:10px"><span style="color:#6366f1">🔔</span><span style="font-size:13px;color:#475569">Alertes emploi avancées</span></div></div></div><a href="${base}/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Démarrer l'essai Pro gratuit — 7 jours →</a><p style="font-size:12px;color:#94a3b8;margin:8px 0 0">0€ aujourd'hui · Annulation en 1 clic</p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${base}/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`,

@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSmembers } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 const SYSTEM = `Tu es l'agent reporting d'Emploia, un SaaS de recherche d'emploi IA 100% français.
 
@@ -131,7 +131,7 @@ export default async function handler(req) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const resendKey = process.env.RESEND_API_KEY;
-  const adminEmail = process.env.ADMIN_EMAIL || 'contact@emploia.fr';
+  const adminEmail = process.env.ADMIN_EMAIL || 'contact@emploia.eu';
   if (!apiKey || !resendKey) {
     return new Response(JSON.stringify({ error: 'Missing env vars' }), { status: 500 });
   }
@@ -208,7 +208,7 @@ export default async function handler(req) {
       signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Orion Reporting · Emploia <noreply@emploia.fr>',
+        from: 'Orion Reporting · Emploia <noreply@emploia.eu>',
         to: [adminEmail],
         subject: `📊 Rapport hebdo Emploia — ${weekStr}`,
         html: emailHtml,

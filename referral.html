@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Parrainage — Gagnez des mois gratuits avec Emploia</title>
   <meta name="description" content="Parrainez vos amis sur Emploia et gagnez 1 mois gratuit par filleul. Programme de parrainage 100% transparent, jusqu'à 6 mois offerts."/>
-  <link rel="canonical" href="https://emploia.fr/referral"/>
+  <link rel="canonical" href="https://emploia.eu/referral"/>
   <meta property="og:title" content="Parrainage Emploia — Gagnez 1 mois Pro gratuit"/>
   <meta property="og:description" content="Parrainez vos amis sur Emploia et gagnez 1 mois Pro gratuit par filleul. Programme de parrainage 100% transparent."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://emploia.fr/referral"/>
-  <meta property="og:image" content="https://emploia.fr/opengraph.svg"/>
+  <meta property="og:url" content="https://emploia.eu/referral"/>
+  <meta property="og:image" content="https://emploia.eu/opengraph.svg"/>
   <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:image" content="https://emploia.fr/opengraph.svg"/>
+  <meta name="twitter:image" content="https://emploia.eu/opengraph.svg"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6E48BE"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -647,7 +647,7 @@
         Votre lien de parrainage
       </div>
       <div class="ref-link-row">
-        <input class="ref-link-input" id="refLink" readonly value="https://emploia.fr/?ref=..."/>
+        <input class="ref-link-input" id="refLink" readonly value="https://emploia.eu/?ref=..."/>
         <button class="emp-btn emp-btn-primary" onclick="copyLink()">Copier</button>
       </div>
 
@@ -790,7 +790,7 @@
         <h5>Ressources</h5>
         <a href="/blog">Blog &amp; Guides</a>
         <a href="/referral">Parrainage</a>
-        <a href="mailto:contact@emploia.fr">Contact</a>
+        <a href="mailto:contact@emploia.eu">Contact</a>
       </div>
       <div class="emp-footer-col">
         <h5>Légal</h5>
@@ -848,7 +848,7 @@
       if (!refR.ok) return;
       const ref = await refR.json();
 
-      const link = ref.link || `https://emploia.fr/?ref=${ref.code}`;
+      const link = ref.link || `https://emploia.eu/?ref=${ref.code}`;
       document.getElementById('refLink').value = link;
 
       const signups = ref.signups || 0;

@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 const SYSTEM = `Tu es l'agent sales d'Emploia, un SaaS de recherche d'emploi IA 100% français.
 
@@ -108,7 +108,7 @@ export default async function handler(req) {
         signal: AbortSignal.timeout(8000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Hugo · Emploia <noreply@emploia.fr>',
+          from: 'Hugo · Emploia <noreply@emploia.eu>',
           to: [email],
           subject: emailContent.subject,
           html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">

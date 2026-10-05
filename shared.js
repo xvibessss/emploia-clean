@@ -212,9 +212,9 @@ window.trackEvent = function(event, props) {
 
 // ── PLAUSIBLE ───────────────────────────────────────────────────────
 (() => {
-  if (document.querySelector('script[data-domain="emploia.fr"]')) return;
+  if (document.querySelector('script[data-domain="emploia.eu"]')) return;
   const s = document.createElement('script');
-  s.defer = true; s.dataset.domain = 'emploia.fr';
+  s.defer = true; s.dataset.domain = 'emploia.eu';
   s.src = 'https://plausible.io/js/script.js';
   document.head.appendChild(s);
 })();
@@ -677,7 +677,7 @@ async function empAuthInit() {
     <textarea id="emp-sw-inp" placeholder="Votre question…" rows="1" aria-label="Message"></textarea>
     <button id="emp-sw-sub" type="submit" aria-label="Envoyer"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
   </form>
-  <div id="emp-sw-esc">Besoin d'aide humaine ? <a href="mailto:contact@emploia.fr">contact@emploia.fr</a></div>
+  <div id="emp-sw-esc">Besoin d'aide humaine ? <a href="mailto:contact@emploia.eu">contact@emploia.eu</a></div>
 </div>`;
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -744,13 +744,13 @@ async function empAuthInit() {
         const data = await res.json();
         dots.remove();
         if (res.status === 429) {
-          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
         } else {
-          addMsg(data.answer || 'Je n\'ai pas pu répondre. Contactez <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+          addMsg(data.answer || 'Je n\'ai pas pu répondre. Contactez <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
         }
       } catch {
         dots.remove();
-        addMsg('Service indisponible. Écrivez à <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>', 'bot');
+        addMsg('Service indisponible. Écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
       } finally {
         busy = false;
         sub.disabled = false;

@@ -5,7 +5,7 @@ export const config = { runtime: 'edge' };
 // Env:
 //   GSC_CLIENT_EMAIL   service account email
 //   GSC_PRIVATE_KEY    service account private key (PEM, \n-escaped ok)
-//   GSC_SITE_URL       e.g. "https://emploia.fr/" or "sc-domain:emploia.fr"
+//   GSC_SITE_URL       e.g. "https://emploia.eu/" or "sc-domain:emploia.eu"
 // Gated by ADMIN_SECRET (same header as /api/admin/stats).
 // If unconfigured, returns { configured:false } so the UI shows guidance.
 

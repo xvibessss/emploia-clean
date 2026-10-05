@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 const SYSTEM = `Tu es un agent de recrutement IA d'Emploia. Pour chaque candidat, tu analyses son profil et les offres d'emploi disponibles pour identifier les meilleures correspondances.
 
@@ -150,7 +150,7 @@ export default async function handler(req) {
         signal: AbortSignal.timeout(8000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Orion IA · Emploia <noreply@emploia.fr>',
+          from: 'Orion IA · Emploia <noreply@emploia.eu>',
           to: [email],
           subject: `🎯 ${topJobs.length} offres sélectionnées pour vous cette semaine`,
           html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">

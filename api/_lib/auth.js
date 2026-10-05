@@ -344,8 +344,8 @@ export async function kvLlen(key) {
 
 // ── ALLOWED ORIGINS ────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  'https://emploia.fr',
-  'https://www.emploia.fr',
+  'https://emploia.eu',
+  'https://www.emploia.eu',
   'https://emploia-clean.vercel.app',
 ];
 

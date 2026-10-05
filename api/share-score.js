@@ -2,7 +2,7 @@ export const config = { runtime: 'nodejs' };
 
 import { kvGet, kvSet } from './_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 const THIRTY_DAYS = 30 * 86400;
 
 export default async function handler(req, res) {
