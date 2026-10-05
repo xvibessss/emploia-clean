@@ -1,6 +1,7 @@
 export const config = { runtime: 'nodejs' };
 
 import { kvGet, kvSet, kvSmembers, getGenerationsUsed, htmlEscape } from './_lib/auth.js';
+import { sendEmail as sendResendEmail } from './_lib/email.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 const RESEND_KEY = process.env.RESEND_API_KEY;
@@ -38,16 +39,10 @@ function emailWrapper({ firstName, subject, headerGradient = 'linear-gradient(13
 </html>`;
 }
 
+// Les constructeurs d'emails de ce fichier n'indiquent pas d'expéditeur :
+// il est posé ici, et la clé vient de la portée du module.
 function sendEmail(payload) {
-  return fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ from: 'Emploia <lea@emploia.eu>', ...payload }),
-    signal: AbortSignal.timeout(8000),
-  });
+  return sendResendEmail(RESEND_KEY, { from: 'Emploia <lea@emploia.eu>', ...payload });
 }
 
 // ── Email builders ─────────────────────────────────────────────────────────────
