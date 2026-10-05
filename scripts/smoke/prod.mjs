@@ -17,7 +17,7 @@
 
 const args = process.argv.slice(2);
 const WITH_CHECKOUT = args.includes('--checkout');
-const BASE = (args.find((a) => a.startsWith('http')) || process.env.SMOKE_BASE_URL || 'https://emploia.fr')
+const BASE = (args.find((a) => a.startsWith('http')) || process.env.SMOKE_BASE_URL || 'https://emploia.eu')
   .replace(/\/$/, '');
 const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 const TIMEOUT = 15000;

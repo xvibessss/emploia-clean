@@ -70,7 +70,7 @@ async function sign(payload) {
 
 async function send(event) {
   const payload = JSON.stringify(event);
-  return handler(new Request('https://emploia.fr/api/stripe-webhook', {
+  return handler(new Request('https://emploia.eu/api/stripe-webhook', {
     method: 'POST',
     headers: { 'stripe-signature': await sign(payload) },
     body: payload,

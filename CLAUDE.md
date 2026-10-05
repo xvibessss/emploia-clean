@@ -5,7 +5,7 @@
 - **Repo**: xvibessss/emploia-clean (public, GitHub)
 - **Local dir**: `/Users/chapellehugo/emploia-clean`
 - **Deploy**: Vercel, project `emploia-clean`, team `xvibessss-projects`
-- **Prod URL**: emploia.fr + emploia-clean.vercel.app
+- **Prod URL**: emploia.eu (+ www, redirigé) + emploia-clean.vercel.app
 - **Node**: 24.x on Vercel
 - **Stack**: HTML/CSS/JS vanilla + Vercel Edge Functions + Upstash KV + Claude API
 - **AI models**: Free → `claude-haiku-4-5-20251001` / Pro+Intensif → `claude-sonnet-4-6`
@@ -33,45 +33,52 @@ These require manual action by Hugo. Do NOT clear these items unless Hugo explic
 | Task | Status | Details |
 |------|--------|---------|
 | **Vercel production branch → `main`** | **FAIT — vérifié 2026-10-01** | La production sert `main` au bit près : md5 de `/` servi par `emploia-clean.vercel.app` = `9832a8b36ffd065dde8dd4e114dc3239` = `git show origin/main:index.html \| md5`. `/`, `/tools`, `/agents`, `/chat`, `/admin`, `/ecoles` répondent tous 200. `master` reste à archiver. |
-| DNS ionos.fr | **PENDING** — vérifié 2026-10-01 : `emploia.fr` ne répond plus du tout (curl `000` sur les 6 routes, contre un 200 de parking le 2026-09-29). NS toujours chez IONOS, zone éditable depuis le compte de Hugo. **Ce blocage casse aussi le paiement** : webhook Stripe, `success_url` et `cancel_url` pointent sur `emploia.fr` (voir ci-dessous). | **Modifier** A @ `217.160.0.93` → `76.76.21.21` (l'enregistrement existe, ne pas le créer) / **créer** CNAME www → cname.vercel-dns.com / TXT resend._domainkey / MX send → feedback-smtp.us-east-1.amazonses.com |
-| **Stripe — chaîne de livraison cassée** | **PENDING — urgent, encaissement ouvert** | `STRIPE_SECRET_KEY` est **déjà live** (la prod émet des `cs_live_…`), donc la vente est ouverte. Mais l'endpoint webhook live `we_1ULdeoE4KLTGNaJXYklyPY91` pointe sur `https://emploia.fr/api/stripe-webhook`, qui ne résout pas : **toute livraison échoue et la fenêtre de retry se referme en ~3 jours**. Reposer l'URL sur `https://emploia-clean.vercel.app/api/stripe-webhook`, ajouter les événements manquants (seul `checkout.session.completed` est coché), puis mettre `NEXT_PUBLIC_URL` sur le même host. |
-| **Attribution créateurs inopérante** | **PENDING — choix de conception, pas un bug de casse** | Un code tapé côté site n'arrive pas dans la session : `amount_discount 0`, `discounts []`, `metadata` sans clé `affiliate`. La remise se saisit sur la page Stripe (`allow_promotion_codes`), et le webhook n'attribue que sur `metadata.affiliate` — jamais sur `discounts[]`. Donc **aucune vente par code n'est créditée**. Voir la section « Paiement » ci-dessous. |
-| Resend domain verify | **PENDING** | After DNS: resend.com/domains → verify emploia.fr |
+| ~~DNS ionos.fr~~ → **domaine `emploia.eu`** | **FAIT — vérifié 2026-10-05** | `emploia.fr` n'a jamais appartenu à Hugo (enregistré chez IONOS le 2025-01-30 par un tiers) : il a été **abandonné, pas réparé**, et retiré du projet Vercel. Le domaine du projet est `emploia.eu`, enregistré chez Spaceship, A `@` → `76.76.21.21`, apex et `www` attachés et `verified: true` côté Vercel. `/`, `/tools`, `/ecoles`, `/legal`, `/sitemap.xml`, `/app`, `/dashboard` répondent 200 ; `NEXT_PUBLIC_URL` est sur `https://emploia.eu` (le sitemap servi publie 169 URLs sur ce host). **Ne pas suivre une instruction DNS IONOS** : elle viserait le domaine d'un tiers. |
+| **Stripe — chaîne de livraison cassée** | **PENDING — urgent, encaissement ouvert** | `STRIPE_SECRET_KEY` est **déjà live** (la prod émet des `cs_live_…`), donc la vente est ouverte. Mais l'endpoint webhook live `we_1ULdeoE4KLTGNaJXYklyPY91` pointe encore sur `https://emploia.fr/api/stripe-webhook` — un domaine qui n'est pas celui du projet : **toute livraison échoue et la fenêtre de retry se referme en ~3 jours**. Vérifié par lecture de l'API le 2026-10-05. Reposer l'URL sur `https://emploia.eu/api/stripe-webhook`. Seul `checkout.session.completed` est coché alors que le handler traite 5 événements : ajouter `invoice.paid`, `invoice.payment_failed`, `customer.subscription.deleted`, `customer.subscription.updated`, sans quoi les renouvellements Pro ne prolongent pas l'accès et les résiliations ne le révoquent pas. |
+| ~~Attribution créateurs inopérante~~ | **CORRIGÉ EN CODE — reste à créer les codes live** | Le checkout résout désormais le code côté serveur (`resolvePromotionCode`, insensible à la casse) et pose `discounts[0][promotion_code]` **et** `metadata[affiliate]`, donc le webhook attribue. Couvert par `probe-checkout.mjs` et `probe-affiliate.mjs`. Ce qui reste est une action Stripe : créer les codes promo en MAJUSCULES sur le coupon `tydPqNqe`, **sans** « first transaction only ». |
+| Resend domain verify | **PENDING** | resend.com/domains → vérifier **emploia.eu** (SPF sur le sous-domaine `send`). Le DNS est en place, plus rien ne bloque. |
 | Google OAuth | **PENDING** | GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET on console.cloud.google.com → Vercel |
 | Crisp chat | **PENDING** | Replace 'VOTRE_CRISP_ID' in shared.js with real Website ID |
 | Env vars for admin / growth console | **PENDING** | `ADMIN_SECRET`, `RESEND_WEBHOOK_SECRET`, `GSC_CLIENT_EMAIL`, `GSC_PRIVATE_KEY`, `GSC_SITE_URL` — referenced by code on `main`, absent from the configured list below |
 
 ---
 
-## Current state — reconciled 2026-09-29
+## Current state — reconciled 2026-10-01
 
-Latest commit: `ace6533` (Merge pull request #26, 2026-09-29). Branch `main`,
-default branch on GitHub, up to date with `origin/main`. 26 PR merged.
+Latest commit: `8bf0a7d` (Merge pull request #34, 2026-10-01). Branch `main`,
+default branch on GitHub, up to date with `origin/main`. 34 PR merged.
 
-### ⚠️ Nothing recent is actually in production
+### `main` is in production — the remaining gap is the domain
 
-**The Vercel project's production branch is set to `master`, not `main`.**
+**The Vercel project's production branch was repointed from `master` to `main`**
+and verified on 2026-10-01: the index served by `emploia-clean.vercel.app` has
+the exact md5 of `origin/main:index.html`
+(`9832a8b36ffd065dde8dd4e114dc3239`), and `/`, `/tools`, `/agents`, `/chat`,
+`/admin`, `/ecoles` all return 200. A merge on `main` now promotes.
 
-- `main` *was* in production until ~2026-06-06 (commit `f2a3dae`).
-- Two production deployments were then made from `master` (`ad764cf`) around
-  2026-09-08, which rolled production back to the state of 2026-05-09.
-- Since then **every merge on `main` only produces a preview deployment, never
-  promoted** — including PR #26, merged today.
+History, kept because it explains the shape of the repo: `main` was in
+production until ~2026-06-06 (`f2a3dae`), then two deployments from `master`
+(`ad764cf`) around 2026-09-08 rolled production back to 2026-05-09, and every
+merge on `main` between then and the repoint produced only an unpromoted
+preview. `main` and `master` have **disjoint histories** (no common ancestor —
+`git merge-base` exits 1). **Do not try to merge them**; `master` is to be
+archived, not merged.
 
-Verified 2026-09-29: the index served by `emploia-clean.vercel.app` has the
-exact md5 of `origin/master:index.html`; `/agents`, `/chat`, `/tools`, `/admin`
-all return 404. `emploia.fr` resolves to `217.160.0.93` — the IONOS parking page
-(HTTP 200, TLS handshake fails on HTTPS), so the domain serves nothing of ours;
-`www.emploia.fr` has no record at all. The only reachable production is
-`emploia-clean.vercel.app`, SSO-protected outside the custom domain.
+The custom domain is live since 2026-10-05, but it is **not** the one this file
+used to name. `emploia.fr` never belonged to Hugo — registered at IONOS on
+2025-01-30 by a third party, fourteen months before this project — so it was
+abandoned rather than recovered, and removed from the Vercel project. The
+project's domain is **`emploia.eu`** (registrar Spaceship, A `@` →
+`76.76.21.21`, apex and `www` both attached and verified). `NEXT_PUBLIC_URL` is
+set to `https://emploia.eu`, and `scripts/smoke/prod.mjs` reports 29/29 against
+it.
 
-`main` and `master` have **disjoint histories** (no common ancestor —
-`git merge-base` exits 1). **Do not try to merge them.** The root cause is a
-production-branch setting, not a history divergence. The fix: point the
-production branch at `main` after checking the env vars `main` requires and
-`master` ignored, then archive `master`. See the human-only blockers table.
+One thing keyed on the old domain is still broken: the **Stripe live webhook**
+still posts to `emploia.fr`, so a real payment is taken and never fulfilled.
+That is a live Stripe write, which `AGENTS.md` reserves to Hugo — see the
+human-only blockers table.
 
-### Features merged on `main` — NOT live in production
+### Features merged on `main` — live in production since 2026-10-01
 
 PR #7 → #26, merged between 2026-09-04 and 2026-09-29:
 
@@ -108,24 +115,29 @@ Earlier work still on `main`: ATS score tab, 12 AI agents at `/agents`, 70 blog
 articles, Orion chat at `/chat`, CV Vault, dashboard widgets, trial drip emails,
 NPS, push notifications.
 
-### Tests — real commands, all green on `ace6533` (2026-09-29)
+### Tests — real commands, all green on `8bf0a7d` (2026-10-01)
 
 `npm run check`, `npm test`, `npm run smoke`, `check.sh`, `smoke-test.mjs`,
 `npm run dev` and `dev-server.mjs` **do not exist** — not here, not on `main`,
 not on `master`. Ignore any doc that mentions them. The real ones:
 
 ```bash
-node scripts/ci-guards.mjs             # 219 rewrites OK, 76 api/ handlers OK, security invariants OK
-node scripts/bench/run.mjs             # prompt guard + detector self-test OK
-node scripts/employer/expiry.test.mjs  # 7 tests OK
+node scripts/ci-guards.mjs             # 220 rewrites OK, 77 api/ handlers OK, security invariants OK
+npm run bench                          # prompt guard + detector self-test OK
+npm run test:employer                  # 7 tests OK
+npm run test:billing                   # Stripe probes, offline stubs — run it on any payment change
 find api -name '*.js' -exec node --check {} \;
 ```
 
-`package.json` declares only `bench`, `bench:live`, `test:employer`. CI
-(`.github/workflows/ci.yml`) runs gitleaks, `node --check` on `api/`, htmlhint,
-then the three scripts above. CI is green on `main`; **Lighthouse Audit and Link
-Check fail repeatedly** — they audit `emploia-clean.vercel.app`, which serves
-`master`, so they test pages absent from the branch under test.
+`package.json` declares `bench`, `bench:live`, `test:employer`, `test:billing`
+and `smoke:prod`. CI (`.github/workflows/ci.yml`) runs gitleaks, `node --check`
+on `api/`, htmlhint, then ci-guards, bench and test:employer. CI is green on
+`main`. Lighthouse Audit and Link Check audit `emploia-clean.vercel.app`
+(`.github/workflows/lighthouse.yml`, `link-check.yml`), which since the
+production-branch repoint serves `main` — so the old explanation for their
+repeated failures ("they test pages absent from the branch under test") no
+longer applies, and any remaining red there is a real finding to read rather
+than a known artefact.
 
 ### Env vars
 
@@ -133,14 +145,18 @@ Configured on Vercel: `ANTHROPIC_API_KEY`, `JWT_SECRET`, `RAPIDAPI_KEY`,
 `ADZUNA_*`, `NEXT_PUBLIC_URL`, `KV_*`, `STRIPE_*`, `RESEND_API_KEY`,
 `CRON_SECRET`, `HEALTH_SECRET`, `VAPID_*`, `ADMIN_SECRET`, `ADMIN_EMAIL`.
 
-Required by code on `main`, **status unverified** — check before promoting
-`main`: `RESEND_WEBHOOK_SECRET`, `GSC_CLIENT_EMAIL`, `GSC_PRIVATE_KEY`,
-`GSC_SITE_URL`, `STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_INTENSIF_ANNUAL`.
+Required by code on `main`, **status unverified** — `main` is already in
+production, so an absence here is a live failure rather than a future risk:
+`RESEND_WEBHOOK_SECRET`, `GSC_CLIENT_EMAIL`, `GSC_PRIVATE_KEY`, `GSC_SITE_URL`,
+`STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_INTENSIF_ANNUAL`.
 
 ### Deploy rule — overrides "How to work" above
 
-The `git push && vercel --prod --yes` instruction in this file is **suspended**
-until the production-branch decision is made. Pushing is fine; promoting is not.
+The production-branch decision is made: `main` is the production branch, so a
+merge on `main` promotes by itself. The `git push && vercel --prod --yes`
+instruction earlier in this file still does **not** apply to unattended runs —
+per `AGENTS.md`, any production deployment needs Hugo's explicit go. Pushing and
+opening a PR are free; promoting is his call.
 
 ---
 
