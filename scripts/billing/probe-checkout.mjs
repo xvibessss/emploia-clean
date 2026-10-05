@@ -37,9 +37,9 @@ globalThis.fetch = async (url, opts = {}) => {
 
 const { default: handler } = await import('../../api/stripe-checkout.js');
 
-const call = (plan, code) => handler(new Request('https://emploia.fr/api/stripe-checkout', {
+const call = (plan, code) => handler(new Request('https://emploia.eu/api/stripe-checkout', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json', origin: 'https://emploia.fr', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250) + 1}` },
+  headers: { 'Content-Type': 'application/json', origin: 'https://emploia.eu', 'x-forwarded-for': `10.0.0.${Math.floor(Math.random() * 250) + 1}` },
   body: JSON.stringify(code ? { plan, code, consent: true, email: 'probe@example.com' } : { plan, consent: true, email: 'probe@example.com' }),
 }));
 
@@ -110,9 +110,9 @@ if (!ignored) fail++;
 // Stripe ne part, pas seulement que le statut est 400.
 console.log('\n  Droit de rétractation');
 captured.length = 0;
-const noConsent = await handler(new Request('https://emploia.fr/api/stripe-checkout', {
+const noConsent = await handler(new Request('https://emploia.eu/api/stripe-checkout', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json', origin: 'https://emploia.fr', 'x-forwarded-for': '10.0.1.7' },
+  headers: { 'Content-Type': 'application/json', origin: 'https://emploia.eu', 'x-forwarded-for': '10.0.1.7' },
   body: JSON.stringify({ plan: 'campagne', email: 'probe@example.com' }),
 }));
 const refused = noConsent.status === 400 && captured.length === 0;
