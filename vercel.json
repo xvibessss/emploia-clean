@@ -50,6 +50,8 @@
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },
+    { "source": "/emploi", "destination": "/emploi.html" },
+    { "source": "/metier", "destination": "/metier.html" },
     {
       "source": "/app",
       "destination": "/app.html"
