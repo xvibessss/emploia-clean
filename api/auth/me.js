@@ -28,7 +28,7 @@ export default async function handler(req) {
   let referral = null;
   if (refCode) {
     const refData = await kvGet(`ref:${refCode}`) || {};
-    referral = { code: refCode, link: `https://emploia.fr/?ref=${refCode}`, signups: (refData.signups || []).length, monthsEarned: refData.monthsEarned || 0 };
+    referral = { code: refCode, link: `https://emploia.eu/?ref=${refCode}`, signups: (refData.signups || []).length, monthsEarned: refData.monthsEarned || 0 };
   }
 
   // Never return passwordHash or salt to client
@@ -67,32 +67,32 @@ export default async function handler(req) {
           method: 'POST',
           signal: AbortSignal.timeout(8000),
           headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: [user.email], subject, html }),
+          body: JSON.stringify({ from: 'Emploia <noreply@emploia.eu>', to: [user.email], subject, html }),
         });
         if (!fullUser) return;
         await kvSet(`user:${user.email}`, { ...fullUser, [key]: true });
       } catch { /* fire-and-forget */ }
     };
-    const baseHtml = (title, body) => `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">${title}</h1>${body}</div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a> · <a href="https://emploia.fr/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`;
+    const baseHtml = (title, body) => `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">${title}</h1>${body}</div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`;
     // Each drip is checked independently (not else-if) so a user inactive
     // for several days still receives all relevant drips on their next visit.
     // sendDrip() is idempotent via KV flags — no double-send risk.
     if (daysSince >= 1 && daysSince < 5) {
       sendDrip('drip1Sent', `${firstName}, vous avez encore 5 générations gratuites 🎁`, baseHtml(
         `${firstName}, votre copilote vous attend`,
-        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Vous avez créé votre compte récemment. Vous n'avez pas encore utilisé toutes vos générations gratuites — et c'est dommage, parce qu'Emploia peut faire des trucs impressionnants.</p><p style="color:#475569;line-height:1.6;margin:0 0 20px"><strong>Ce que vous pouvez générer maintenant :</strong></p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📄</span><span style="color:#475569;font-size:13px"><strong>CV ATS-optimisé</strong> — Collez une offre, obtenez un CV en 30s qui passe les filtres</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">✉️</span><span style="color:#475569;font-size:13px"><strong>Lettre de motivation</strong> — Personnalisée à l'offre, sans effort</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎯</span><span style="color:#475569;font-size:13px"><strong>Score ATS</strong> — Collez votre CV existant, obtenez un score et des conseils</span></div></div><a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Générer maintenant →</a>`
+        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Vous avez créé votre compte récemment. Vous n'avez pas encore utilisé toutes vos générations gratuites — et c'est dommage, parce qu'Emploia peut faire des trucs impressionnants.</p><p style="color:#475569;line-height:1.6;margin:0 0 20px"><strong>Ce que vous pouvez générer maintenant :</strong></p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📄</span><span style="color:#475569;font-size:13px"><strong>CV ATS-optimisé</strong> — Collez une offre, obtenez un CV en 30s qui passe les filtres</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">✉️</span><span style="color:#475569;font-size:13px"><strong>Lettre de motivation</strong> — Personnalisée à l'offre, sans effort</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎯</span><span style="color:#475569;font-size:13px"><strong>Score ATS</strong> — Collez votre CV existant, obtenez un score et des conseils</span></div></div><a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Générer maintenant →</a>`
       )).catch(() => {});
     }
     if (daysSince >= 3 && daysSince < 8) {
       sendDrip('drip3Sent', `Comment se passe votre recherche, ${firstName} ? 🤝`, baseHtml(
         `Votre recherche avance ?`,
-        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">3 jours depuis votre inscription sur Emploia. On espère que vous avez déjà décroché quelques entretiens !</p><p style="color:#475569;line-height:1.6;margin:0 0 20px">Si vous êtes encore en recherche, voici ce que d'autres candidats ont utilisé cette semaine :</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#1e293b;font-style:italic;margin:0 0 8px">"J'ai postulé chez 3 entreprises avec Emploia la première semaine. 2 rappels. Mon score ATS est passé de 41 à 94."</p><p style="font-size:11px;color:#94a3b8;margin:0">— Sophie M., Chargée com' digitale</p></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Passez Pro pour des <strong>générations illimitées</strong> — 7 jours d'essai gratuits, 0€ aujourd'hui.</p><a href="https://emploia.fr/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir les offres Pro →</a>`
+        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">3 jours depuis votre inscription sur Emploia. On espère que vous avez déjà décroché quelques entretiens !</p><p style="color:#475569;line-height:1.6;margin:0 0 20px">Si vous êtes encore en recherche, voici ce que d'autres candidats ont utilisé cette semaine :</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#1e293b;font-style:italic;margin:0 0 8px">"J'ai postulé chez 3 entreprises avec Emploia la première semaine. 2 rappels. Mon score ATS est passé de 41 à 94."</p><p style="font-size:11px;color:#94a3b8;margin:0">— Sophie M., Chargée com' digitale</p></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Passez Pro pour des <strong>générations illimitées</strong> — 7 jours d'essai gratuits, 0€ aujourd'hui.</p><a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir les offres Pro →</a>`
       )).catch(() => {});
     }
     if (daysSince >= 7 && daysSince < 21) {
       sendDrip('drip7Sent', `${firstName}, une semaine et votre CV peut déjà être 2× plus visible 📈`, baseHtml(
         `Une semaine. Voici ce que les autres candidats ont fait.`,
-        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Ceux qui passent Pro la première semaine décrochent en moyenne <strong>2,4× plus d'entretiens</strong>. Voici pourquoi :</p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">♾️</span><span style="color:#475569;font-size:13px"><strong>Générations illimitées</strong> — adaptez votre CV à chaque offre, sans jamais vous bloquer</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Coaching entretien IA</strong> — questions types, réponses STAR, feedback immédiat</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard candidatures</strong> — suivez toutes vos postulations en kanban</span></div></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Essai 7 jours gratuit. <strong>0€ aujourd'hui.</strong> Annulation en 1 clic.</p><a href="https://emploia.fr/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Démarrer l'essai gratuit →</a>`
+        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Ceux qui passent Pro la première semaine décrochent en moyenne <strong>2,4× plus d'entretiens</strong>. Voici pourquoi :</p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">♾️</span><span style="color:#475569;font-size:13px"><strong>Générations illimitées</strong> — adaptez votre CV à chaque offre, sans jamais vous bloquer</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Coaching entretien IA</strong> — questions types, réponses STAR, feedback immédiat</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard candidatures</strong> — suivez toutes vos postulations en kanban</span></div></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Essai 7 jours gratuit. <strong>0€ aujourd'hui.</strong> Annulation en 1 clic.</p><a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Démarrer l'essai gratuit →</a>`
       )).catch(() => {});
     }
     if (daysSince >= 14 && daysSince < 21) {
@@ -100,20 +100,20 @@ export default async function handler(req) {
         `3 guides pour accélérer votre recherche`,
         `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Deux semaines depuis votre inscription. Pour vous aider à aller encore plus loin, voici nos meilleurs guides :</p>
 <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
-  <a href="https://emploia.fr/blog/cv-ats-2026" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
+  <a href="https://emploia.eu/blog/cv-ats-2026" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
     <span style="font-size:24px">📄</span>
     <div><div style="font-size:13px;font-weight:700;color:#0f172a">Comment passer les filtres ATS en 2026</div><div style="font-size:12px;color:#64748b">15 min · Le guide complet avec checklist</div></div>
   </a>
-  <a href="https://emploia.fr/blog/methode-star-entretien" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
+  <a href="https://emploia.eu/blog/methode-star-entretien" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
     <span style="font-size:24px">🎤</span>
     <div><div style="font-size:13px;font-weight:700;color:#0f172a">La méthode STAR avec 3 exemples concrets</div><div style="font-size:12px;color:#64748b">8 min · Structurez vos réponses en entretien</div></div>
   </a>
-  <a href="https://emploia.fr/blog/salaires-france-2026" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
+  <a href="https://emploia.eu/blog/salaires-france-2026" style="display:flex;align-items:center;gap:14px;padding:14px;background:#f8fafc;border-radius:12px;text-decoration:none">
     <span style="font-size:24px">💰</span>
     <div><div style="font-size:13px;font-weight:700;color:#0f172a">Grille des salaires France 2026</div><div style="font-size:12px;color:#64748b">10 min · Tech, Marketing, Finance, RH</div></div>
   </a>
 </div>
-<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Retourner sur Emploia →</a>`
+<a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Retourner sur Emploia →</a>`
       )).catch(() => {});
     }
     if (daysSince >= 21 && daysSince < 35) {
@@ -126,7 +126,7 @@ export default async function handler(req) {
   <p style="font-size:13px;color:#475569;margin:0">2 847 candidats actifs · 1 200+ offres analysées aujourd'hui · Taux d'entretien +2,4×</p>
 </div>
 <p style="color:#475569;font-size:13px;margin:0 0 24px">7 jours d'essai gratuit. <strong>0€ aujourd'hui</strong>, annulable en 1 clic avant la fin de l'essai.</p>
-<a href="https://emploia.fr/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Essayer Pro gratuitement →</a>`
+<a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Essayer Pro gratuitement →</a>`
       )).catch(() => {});
     }
     // ── Drip Pro : onboarding des utilisateurs payants ──────────────────────
@@ -145,7 +145,7 @@ export default async function handler(req) {
   </div>
   <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
     <span style="font-size:24px;flex-shrink:0">2️⃣</span>
-    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Optimisez votre profil LinkedIn</div><div style="font-size:13px;color:#475569">Accédez aux outils Pro : optimisation LinkedIn, négociation salariale, et bilan post-entretien IA — tout sur <a href="https://emploia.fr/tools" style="color:#6366f1">emploia.fr/tools</a>.</div></div>
+    <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Optimisez votre profil LinkedIn</div><div style="font-size:13px;color:#475569">Accédez aux outils Pro : optimisation LinkedIn, négociation salariale, et bilan post-entretien IA — tout sur <a href="https://emploia.eu/tools" style="color:#6366f1">emploia.eu/tools</a>.</div></div>
   </div>
   <div style="display:flex;gap:14px;align-items:flex-start;padding:14px;background:#f8fafc;border-radius:12px">
     <span style="font-size:24px;flex-shrink:0">3️⃣</span>
@@ -156,7 +156,7 @@ export default async function handler(req) {
     <div><div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">Testez le simulateur d'entretien</div><div style="font-size:13px;color:#475569">Préparez vos entretiens avec l'IA, puis faites un bilan post-entretien pour identifier vos axes d'amélioration et rédiger votre email de remerciement.</div></div>
   </div>
 </div>
-<a href="https://emploia.fr/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Découvrir tous mes outils Pro →</a>`
+<a href="https://emploia.eu/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Découvrir tous mes outils Pro →</a>`
         )).catch(() => {});
       }
 
@@ -173,7 +173,7 @@ export default async function handler(req) {
   </div>
 </div>
 <p style="color:#475569;font-size:13px;margin:0 0 20px">Si vous continuez, <strong>seulement 24€/mois</strong> — annulable en 1 clic à tout moment. Pour vous remercier de votre confiance, votre carte ne sera débitée qu'à la fin de l'essai.</p>
-<a href="https://emploia.fr/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;margin-bottom:12px">Continuer avec Pro → 24€/mois</a>
+<a href="https://emploia.eu/api/stripe-portal" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;margin-bottom:12px">Continuer avec Pro → 24€/mois</a>
 <p style="font-size:12px;color:#94a3b8;margin:8px 0 0">Annulez avant l'expiration et vous ne payez rien.</p>`
         )).catch(() => {});
       }
@@ -188,17 +188,17 @@ export default async function handler(req) {
 </div>
 <p style="color:#475569;line-height:1.6;margin:0 0 20px">Ce double contact augmente le taux de réponse de <strong>3,2×</strong> selon nos données.</p>
 <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
-  <a href="https://emploia.fr/tools" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+  <a href="https://emploia.eu/tools" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">💬</span><div style="font-size:13px;font-weight:700;color:#0f172a">Générer un message LinkedIn en 10 secondes</div>
   </a>
-  <a href="https://emploia.fr/jobs" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+  <a href="https://emploia.eu/jobs" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">🔍</span><div style="font-size:13px;font-weight:700;color:#0f172a">Trouver des offres + employés à contacter</div>
   </a>
-  <a href="https://emploia.fr/interview" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+  <a href="https://emploia.eu/interview" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">🎤</span><div style="font-size:13px;font-weight:700;color:#0f172a">Préparer votre prochain entretien</div>
   </a>
 </div>
-<a href="https://emploia.fr/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Accéder aux outils Pro →</a>`
+<a href="https://emploia.eu/tools" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Accéder aux outils Pro →</a>`
         )).catch(() => {});
       }
     }
@@ -209,17 +209,17 @@ export default async function handler(req) {
         `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Un mois depuis votre inscription sur Emploia. Votre compte est toujours là, avec toutes vos données.</p>
 <p style="color:#475569;line-height:1.6;margin:0 0 20px">Si votre recherche d'emploi reprend — ou si vous cherchez à changer de poste dans les prochains mois — Emploia sera là.</p>
 <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-  <a href="https://emploia.fr/blog/relancer-candidature" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+  <a href="https://emploia.eu/blog/relancer-candidature" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">📧</span>
     <div style="font-size:13px;font-weight:700;color:#0f172a">Comment relancer une candidature sans paraître insistant</div>
   </a>
-  <a href="https://emploia.fr/blog/questions-entretien-rh" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
+  <a href="https://emploia.eu/blog/questions-entretien-rh" style="display:flex;align-items:center;gap:12px;padding:12px;background:#f8fafc;border-radius:10px;text-decoration:none">
     <span style="font-size:20px">🤝</span>
     <div style="font-size:13px;font-weight:700;color:#0f172a">Les 30 questions RH les plus posées — Avec réponses</div>
   </a>
 </div>
-<a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Reprendre ma recherche →</a>
-<p style="margin-top:20px;font-size:12px;color:#94a3b8">Pour ne plus recevoir ces emails : <a href="https://emploia.fr/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p>`
+<a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Reprendre ma recherche →</a>
+<p style="margin-top:20px;font-size:12px;color:#94a3b8">Pour ne plus recevoir ces emails : <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p>`
       )).catch(() => {});
     }
   }

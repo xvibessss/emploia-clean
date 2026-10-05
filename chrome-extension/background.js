@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       // Try to fetch from server if token exists
       if (data.emploia_token) {
         try {
-          const base = data.emploia_api_base || 'https://emploia.fr';
+          const base = data.emploia_api_base || 'https://emploia.eu';
           const res = await fetch(`${base}/api/profile`, {
             headers: { 'Cookie': `__Host-emploia-token=${data.emploia_token}` },
             credentials: 'include',

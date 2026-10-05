@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, htmlEscape } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 // Fetch trending jobs from Arbeitnow (free, no key)
 async function fetchTrendingJobs() {
@@ -121,7 +121,7 @@ export default async function handler(req) {
         signal: AbortSignal.timeout(6000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Emploia <noreply@emploia.fr>',
+          from: 'Emploia <noreply@emploia.eu>',
           to: [email],
           subject: `📬 Emploia Hebdo — Semaine du ${week}`,
           html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">

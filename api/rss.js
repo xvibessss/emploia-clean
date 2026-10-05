@@ -1,6 +1,6 @@
 export default function handler(req, res) {
   if (req.method !== 'GET') { res.status(405).end(); return; }
-  const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+  const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
   const articles = [
     {
@@ -473,7 +473,7 @@ export default function handler(req, res) {
       <description><![CDATA[${a.description}]]></description>
       <pubDate>${toRFC822(a.pubDate)}</pubDate>
       <category>${a.category.replace(/&/g, '&amp;')}</category>
-      <author>contact@emploia.fr (Emploia)</author>
+      <author>contact@emploia.eu (Emploia)</author>
     </item>`).join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -483,8 +483,8 @@ export default function handler(req, res) {
     <link>${base}/blog</link>
     <description>Guides pratiques pour décrocher un emploi en France : CV ATS, entretiens, lettres de motivation, salaires, alternance.</description>
     <language>fr-FR</language>
-    <managingEditor>contact@emploia.fr (Emploia)</managingEditor>
-    <webMaster>contact@emploia.fr (Emploia)</webMaster>
+    <managingEditor>contact@emploia.eu (Emploia)</managingEditor>
+    <webMaster>contact@emploia.eu (Emploia)</webMaster>
     <image>
       <url>${base}/favicon.svg</url>
       <title>Emploia Blog</title>

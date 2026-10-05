@@ -312,7 +312,7 @@ function renderAll(){
       +`</div>`;
     if((em.bounced||0)+(em.complained||0)>0) h+=`<div class="note">${nf(em.bounced)} bounces · ${nf(em.complained)} plaintes. Source : webhooks Resend.</div>`;
   } else {
-    h+=`<div class="sec-h">Délivrabilité des emails</div>`+soonCard('En attente des webhooks Resend','L\'endpoint <code>/api/resend-webhook</code> est prêt. Dans Resend → Webhooks, ajoute <code>https://emploia.fr/api/resend-webhook</code>, abonne-toi aux événements <code>email.*</code>, puis mets la clé de signature dans <code>RESEND_WEBHOOK_SECRET</code>. Les taux d\'ouverture et de clic s\'afficheront ici.');
+    h+=`<div class="sec-h">Délivrabilité des emails</div>`+soonCard('En attente des webhooks Resend','L\'endpoint <code>/api/resend-webhook</code> est prêt. Dans Resend → Webhooks, ajoute <code>https://emploia.eu/api/resend-webhook</code>, abonne-toi aux événements <code>email.*</code>, puis mets la clé de signature dans <code>RESEND_WEBHOOK_SECRET</code>. Les taux d\'ouverture et de clic s\'afficheront ici.');
   }
   $('sec-automations').innerHTML=h;
 
@@ -340,7 +340,7 @@ async function loadAffiliates(){
       +kpi('✅ Net après commissions',eur(tot.netRevenue),'vio')
       +`</div>`;
     h+=`<div class="sec-h">Par créateur</div><div class="card"><div class="rows">`;
-    if(!list.length) h+=`<div class="empty" style="padding:16px">Aucune vente attribuée à un code pour l'instant. Crée un code promo dans Stripe, puis partage le lien <code>emploia.fr/?code=LECODE</code>.</div>`;
+    if(!list.length) h+=`<div class="empty" style="padding:16px">Aucune vente attribuée à un code pour l'instant. Crée un code promo dans Stripe, puis partage le lien <code>emploia.eu/?code=LECODE</code>.</div>`;
     else list.forEach(a=>{
       h+=`<div class="row"><span class="k"><b>${esc(a.code)}</b> · ${nf(a.sales)} vente${a.sales>1?'s':''} · ${nf(a.unpaidSales)} non réglée${a.unpaidSales>1?'s':''}</span>`
        +`<span class="v">${eur(a.commissionOwed)} dû · <button class="btn ghost" style="padding:4px 10px;font-size:12px" onclick="markPaid('${esc(a.code)}',${a.sales})">Marquer payé</button></span></div>`;

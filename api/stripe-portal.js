@@ -26,7 +26,7 @@ export default async function handler(req) {
   // GET from email links: redirect unauthenticated users to login first
   if (!user) {
     if (req.method === 'GET') {
-      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       return new Response(null, { status: 302, headers: { Location: `${baseUrl}/app?action=billing` } });
     }
     return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
@@ -36,14 +36,14 @@ export default async function handler(req) {
 
   if (!user.stripeCustomerId) {
     if (req.method === 'GET') {
-      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       return new Response(null, { status: 302, headers: { Location: `${baseUrl}/app` } });
     }
     return new Response(JSON.stringify({ error: 'Aucun abonnement actif trouvé' }), { status: 404, headers: H });
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
     const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
       method: 'POST',
       headers: {
@@ -68,7 +68,7 @@ export default async function handler(req) {
   } catch (err) {
     console.error('Stripe portal error:', err);
     if (req.method === 'GET') {
-      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       return new Response(null, { status: 302, headers: { Location: `${baseUrl}/app` } });
     }
     return new Response(JSON.stringify({ error: 'Erreur portail Stripe' }), { status: 500, headers: H });

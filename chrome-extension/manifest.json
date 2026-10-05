@@ -47,7 +47,7 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://emploia.fr/*",
+    "https://emploia.eu/*",
     "https://emploia-clean.vercel.app/*"
   ],
   "web_accessible_resources": [

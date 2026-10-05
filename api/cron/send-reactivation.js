@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSmembers, getGenerationsUsed } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 // Day-30+ reactivation: free users who signed up 28-60 days ago but haven't used
 // the product in the last 21 days. Goal: remind them the tool exists and has improved.
@@ -71,7 +71,7 @@ export default async function handler(req) {
         signal: AbortSignal.timeout(8000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Emploia <noreply@emploia.fr>',
+          from: 'Emploia <noreply@emploia.eu>',
           to: [email],
           subject: remaining > 0
             ? `${firstNameRaw ? firstNameRaw + ', i' : 'I'}l vous reste encore ${remaining} CV gratuit${remaining > 1 ? 's' : ''} sur Emploia 🎯`
@@ -113,7 +113,7 @@ export default async function handler(req) {
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">
     © ${new Date().getFullYear()} Emploia ·
-    <a href="${BASE_URL}" style="color:#94a3b8">emploia.fr</a> ·
+    <a href="${BASE_URL}" style="color:#94a3b8">emploia.eu</a> ·
     <a href="${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a>
   </p>
 </div>

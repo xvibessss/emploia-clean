@@ -111,7 +111,7 @@ Réponds UNIQUEMENT en JSON valide :
     if (!result?.behavioral) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
     // Track event (fire and forget)
     {
-      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
       fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'interview_started', props: { plan: user.plan } }) }).catch(() => {});
     }
     return new Response(JSON.stringify(result), { status: 200, headers: H });

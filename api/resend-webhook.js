@@ -3,7 +3,7 @@ import { kvIncr, kvSetNX } from './_lib/auth.js';
 
 // Resend delivery webhooks (Svix-signed). Aggregates email deliverability
 // counters so the admin console can show open / click rates.
-// Setup: Resend → Webhooks → add https://emploia.fr/api/resend-webhook,
+// Setup: Resend → Webhooks → add https://emploia.eu/api/resend-webhook,
 // subscribe to email.* events, copy the signing secret into
 // RESEND_WEBHOOK_SECRET (whsec_...).
 

@@ -6,19 +6,19 @@
 <meta name="google-site-verification" content="IqZoXqFuYcnkKhElhGYpdqdTrTd8hKzDLue-1M47pDA"/>
 <title>Contact — EmploiA · Réponse sous 24h</title>
 <meta name="description" content="Contactez l'équipe EmploiA. Support, partenariats, presse — nous répondons sous 24h ouvrées."/>
-<link rel="canonical" href="https://emploia.fr/contact"/>
+<link rel="canonical" href="https://emploia.eu/contact"/>
 <link rel="icon" href="/favicon.svg"/>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="theme-color" content="#6E48BE"/>
 <meta property="og:title" content="Contact — EmploiA"/>
 <meta property="og:description" content="Contactez l'équipe EmploiA. Nous répondons sous 24h."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://emploia.fr/contact"/>
-<meta property="og:image" content="https://emploia.fr/og-image.svg"/>
+<meta property="og:url" content="https://emploia.eu/contact"/>
+<meta property="og:image" content="https://emploia.eu/og-image.svg"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Contact — EmploiA · Réponse sous 24h"/>
 <meta name="twitter:description" content="Support, partenariats, presse — nous répondons sous 24h ouvrées."/>
-<meta name="twitter:image" content="https://emploia.fr/og-image.svg"/>
+<meta name="twitter:image" content="https://emploia.eu/og-image.svg"/>
 <link rel="preload" href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="stylesheet" href="/shared.css"/>
@@ -117,7 +117,7 @@
     <p>Une question, un problème, une suggestion ? L'équipe EmploiA répond sous <strong style="color:#fff">24h ouvrées</strong>.</p>
     <div class="sla-row">
       <span class="sla-chip"><span class="sla-dot"></span>Réponse sous 24h</span>
-      <span class="sla-chip">📧 contact@emploia.fr</span>
+      <span class="sla-chip">📧 contact@emploia.eu</span>
       <span class="sla-chip">🇫🇷 Équipe française</span>
     </div>
   </div>
@@ -174,7 +174,7 @@
     <div class="contact-info">
       <div class="info-card reveal" data-delay="1">
         <h3>📧 Email direct</h3>
-        <a href="mailto:contact@emploia.fr">contact@emploia.fr</a>
+        <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>
         <p class="mt">Pour les demandes urgentes ou professionnelles.</p>
       </div>
       <div class="info-card reveal" data-delay="2">
@@ -185,7 +185,7 @@
       <div class="info-card reveal" data-delay="3">
         <h3>🤝 Partenariats & presse</h3>
         <p>École, cabinet de recrutement, média ? On adore collaborer.</p>
-        <a href="mailto:contact@emploia.fr?subject=Partenariat EmploiA" class="mt">Écrire à l'équipe →</a>
+        <a href="mailto:contact@emploia.eu?subject=Partenariat EmploiA" class="mt">Écrire à l'équipe →</a>
       </div>
       <div class="info-card reveal" data-delay="4">
         <h3>📍 Paris, France</h3>
@@ -253,12 +253,12 @@ async function submitContact(){
       document.getElementById('successMsg').style.display = 'block';
     } else {
       const d = await res.json().catch(()=>({}));
-      errEl.textContent = d.error || 'Erreur lors de l\'envoi. Écrivez directement à contact@emploia.fr';
+      errEl.textContent = d.error || 'Erreur lors de l\'envoi. Écrivez directement à contact@emploia.eu';
       errEl.style.display = 'block';
       btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Envoyer le message';
     }
   } catch {
-    errEl.textContent = 'Erreur réseau. Écrivez directement à contact@emploia.fr';
+    errEl.textContent = 'Erreur réseau. Écrivez directement à contact@emploia.eu';
     errEl.style.display = 'block';
     btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Envoyer le message';
   }

@@ -14,7 +14,7 @@ export default async function handler(req) {
   }
 
   const state = crypto.randomUUID();
-  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
   const params = new URLSearchParams({
     client_id: clientId,

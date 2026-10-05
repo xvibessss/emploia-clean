@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSmembers, getGenerationsUsed, htmlEscape } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 // Day-3 re-engagement: fire for users who signed up 2–5 days ago with 0 generations used.
 // Runs daily at 10am — a batch of up to 80 users per run (cursor-based).
@@ -68,7 +68,7 @@ export default async function handler(req) {
         signal: AbortSignal.timeout(8000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Emploia <noreply@emploia.fr>',
+          from: 'Emploia <noreply@emploia.eu>',
           to: [email],
           subject: `${firstNameRaw ? firstNameRaw + ', v' : 'V'}otre CV ATS est prêt à être généré 🚀`,
           html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
@@ -95,7 +95,7 @@ export default async function handler(req) {
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">
     © ${new Date().getFullYear()} Emploia ·
-    <a href="${BASE_URL}" style="color:#94a3b8">emploia.fr</a> ·
+    <a href="${BASE_URL}" style="color:#94a3b8">emploia.eu</a> ·
     <a href="${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a>
   </p>
 </div>

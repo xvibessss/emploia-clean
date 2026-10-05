@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 const SYSTEM = `Tu es l'agent support d'Emploia, un copilote IA de recherche d'emploi 100% français.
 
@@ -11,20 +11,20 @@ PRODUCT KNOWLEDGE :
 - Pack Campagne : 59€ les 3 mois — PAIEMENT UNIQUE, non reconductible, sans essai. Donne tout Pro pendant 90 jours. C'est l'offre la moins chère au mois (19,67€/mois) et il n'y a aucun abonnement à résilier. C'est l'offre à recommander par défaut, car une recherche d'emploi dure en moyenne 3 mois
 - Plan Pro : 24€/mois — abonnement avec 7 jours d'essai gratuit (carte requise), générations illimitées, accès Orion Chat, CV Vault, toutes les fonctionnalités. Pour qui préfère payer au mois plutôt que 59€ d'un coup
 - Codes promo : certains créateurs de contenu partagent un code qui donne 10€ de réduction sur le Pack Campagne (59€ → 49€). Le code se saisit sur la page de paiement. Un seul code par commande, et il ne s'applique qu'au Pack Campagne, pas à l'abonnement Pro
-- Il n'y a PAS d'abonnement annuel, PAS de plan Intensif (retiré de la vente le 30/09/2026), et PAS de coaching humain : l'accompagnement est entièrement logiciel (IA). Si un client dit être sur le plan Intensif, c'est un ancien abonné : son accès et son tarif sont inchangés, ne lui dis pas que le plan n'existe plus, dirige-le vers contact@emploia.fr s'il veut changer
-- Écoles, CFA & RH : 9€/étudiant/an (100 à 500 sièges), 6€/étudiant/an au-delà de 1000 sièges. Cabinets d'outplacement : 39€ par candidat accompagné. Devis et mise en place : contact@emploia.fr
+- Il n'y a PAS d'abonnement annuel, PAS de plan Intensif (retiré de la vente le 30/09/2026), et PAS de coaching humain : l'accompagnement est entièrement logiciel (IA). Si un client dit être sur le plan Intensif, c'est un ancien abonné : son accès et son tarif sont inchangés, ne lui dis pas que le plan n'existe plus, dirige-le vers contact@emploia.eu s'il veut changer
+- Écoles, CFA & RH : 9€/étudiant/an (100 à 500 sièges), 6€/étudiant/an au-delà de 1000 sièges. Cabinets d'outplacement : 39€ par candidat accompagné. Devis et mise en place : contact@emploia.eu
 - Pages principales : /app (générateur), /dashboard (suivi candidatures), /jobs (offres IA), /tools (outils avancés), /chat (Orion AI), /cv-builder (éditeur CV), /cv-vault (mes CVs)
 - Orion est le nom de l'IA d'Emploia (basée sur Claude d'Anthropic)
 - Les documents générés sont optimisés pour les ATS français (Talentsoft, SAP SuccessFactors, Workday)
-- Support email : contact@emploia.fr
+- Support email : contact@emploia.eu
 - Politique RGPD : données supprimables depuis /profil → "Supprimer mon compte"
 
 INSTRUCTIONS :
 - Réponds TOUJOURS en français, de façon bienveillante et concise (max 120 mots)
-- Pour les questions techniques hors périmètre Emploia, réponds "Je suis spécialisé sur Emploia — pour ce sujet, écris-nous à contact@emploia.fr"
-- Pour les demandes de remboursement ou litiges : "Écris-nous à contact@emploia.fr avec ton email d'inscription, on revient vers toi sous 24h"
+- Pour les questions techniques hors périmètre Emploia, réponds "Je suis spécialisé sur Emploia — pour ce sujet, écris-nous à contact@emploia.eu"
+- Pour les demandes de remboursement ou litiges : "Écris-nous à contact@emploia.eu avec ton email d'inscription, on revient vers toi sous 24h"
 - Ne promets jamais de fonctionnalité non existante
-- Si tu ne sais pas : dis-le et dirige vers contact@emploia.fr`;
+- Si tu ne sais pas : dis-le et dirige vers contact@emploia.eu`;
 
 function getHeaders(req) {
   const origin = getAllowedOrigin(req);
@@ -80,7 +80,7 @@ export default async function handler(req) {
   const rl = await checkRateLimit(limitKey, 'support', limit, 3600);
   if (!rl.allowed) {
     return new Response(
-      JSON.stringify({ error: 'Trop de questions. Réessayez dans une heure ou écrivez-nous à contact@emploia.fr' }),
+      JSON.stringify({ error: 'Trop de questions. Réessayez dans une heure ou écrivez-nous à contact@emploia.eu' }),
       { status: 429, headers: { ...headers, 'Retry-After': '3600' } }
     );
   }
@@ -121,13 +121,13 @@ export default async function handler(req) {
     }
 
     const data = await res.json();
-    const answer = data.content?.[0]?.text || 'Je n\'ai pas pu générer une réponse. Écrivez-nous à contact@emploia.fr';
+    const answer = data.content?.[0]?.text || 'Je n\'ai pas pu générer une réponse. Écrivez-nous à contact@emploia.eu';
 
     return new Response(JSON.stringify({ answer, model: 'haiku' }), { status: 200, headers });
 
   } catch (e) {
     return new Response(
-      JSON.stringify({ answer: 'Service momentanément indisponible. Pour toute question urgente : contact@emploia.fr', error: true }),
+      JSON.stringify({ answer: 'Service momentanément indisponible. Pour toute question urgente : contact@emploia.eu', error: true }),
       { status: 200, headers }
     );
   }

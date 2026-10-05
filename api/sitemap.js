@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-  const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+  const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
   const today = new Date().toISOString().split('T')[0];
   const urls = [
     { loc: `${base}/`,                    changefreq: 'weekly',  priority: '1.0', lastmod: today },

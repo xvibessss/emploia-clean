@@ -88,7 +88,7 @@ export default async function handler(req) {
   await kvSet(`userid:${id}`, email);
   kvSadd('all_users', email).catch(() => {});
   // Track registration (fire and forget)
-  const trackBase = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+  const trackBase = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
   fetch(`${trackBase}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'user_registered' }) }).catch(() => {});
 
   // Generate a cryptographically random referral code (not derived from userId)
@@ -102,7 +102,7 @@ export default async function handler(req) {
   // Track referral signup if a ref code was provided
   const refCode = typeof body.ref === 'string' ? body.ref.trim().toUpperCase() : null;
   if (refCode && /^[A-Z0-9]{8}$/.test(refCode)) {
-    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
     fetch(`${base}/api/referral`, {
       method: 'POST',
       signal: AbortSignal.timeout(5000),
@@ -117,13 +117,13 @@ export default async function handler(req) {
     const firstName = htmlEscape(firstNameRaw);
     // Reuse the already-generated random code (stored above in ownRefCode)
     const welcomeRefCode = ownRefCode;
-    const refLink = `https://emploia.fr/?ref=${welcomeRefCode}`;
+    const refLink = `https://emploia.eu/?ref=${welcomeRefCode}`;
     fetch('https://api.resend.com/emails', {
       method: 'POST',
       signal: AbortSignal.timeout(8000),
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Emploia <noreply@emploia.fr>',
+        from: 'Emploia <noreply@emploia.eu>',
         to: [email],
         subject: `🎉 Bienvenue ${firstNameRaw} — ton CV ATS est à 30 secondes`,
         html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
@@ -135,7 +135,7 @@ export default async function handler(req) {
     <div style="padding:32px">
       <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Bienvenue, ${firstName} ! 🎉</h1>
       <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez <strong style="color:#0f172a">5 générations gratuites</strong> prêtes à l'emploi — votre copilote de candidature IA 100% français.</p>
-      <a href="https://emploia.fr/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Créer mon CV maintenant →</a>
+      <a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Créer mon CV maintenant →</a>
       <div style="margin-top:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
         <p style="color:#166534;font-size:12px;line-height:1.6;margin:0"><strong>💡 Pourquoi ça marche ?</strong> 75% des CV sont filtrés automatiquement avant d'être lus par un humain. Emploia optimise ton CV pour passer ces filtres ATS — mots-clés, format, structure — en 30 secondes.</p>
       </div>
@@ -144,15 +144,15 @@ export default async function handler(req) {
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;align-items:flex-start;gap:12px">
             <div style="min-width:28px;height:28px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:14px">1️⃣</div>
-            <div><strong style="color:#0f172a;font-size:13px">Complétez votre profil</strong><br/><span style="color:#64748b;font-size:12px">Ajoutez vos expériences une fois — Emploia les réutilise pour chaque candidature.</span><br/><a href="https://emploia.fr/profil" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Compléter mon profil</a></div>
+            <div><strong style="color:#0f172a;font-size:13px">Complétez votre profil</strong><br/><span style="color:#64748b;font-size:12px">Ajoutez vos expériences une fois — Emploia les réutilise pour chaque candidature.</span><br/><a href="https://emploia.eu/profil" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Compléter mon profil</a></div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:12px">
             <div style="min-width:28px;height:28px;border-radius:8px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:14px">2️⃣</div>
-            <div><strong style="color:#0f172a;font-size:13px">Trouvez une offre & générez votre CV</strong><br/><span style="color:#64748b;font-size:12px">Collez une offre d'emploi → CV ATS-optimisé en 30 secondes.</span><br/><a href="https://emploia.fr/app" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Générer mon CV</a></div>
+            <div><strong style="color:#0f172a;font-size:13px">Trouvez une offre & générez votre CV</strong><br/><span style="color:#64748b;font-size:12px">Collez une offre d'emploi → CV ATS-optimisé en 30 secondes.</span><br/><a href="https://emploia.eu/app" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Générer mon CV</a></div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:12px">
             <div style="min-width:28px;height:28px;border-radius:8px;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:14px">3️⃣</div>
-            <div><strong style="color:#0f172a;font-size:13px">Préparez votre entretien</strong><br/><span style="color:#64748b;font-size:12px">Entraînez-vous avec notre simulateur IA avant le grand jour.</span><br/><a href="https://emploia.fr/interview" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Démarrer le simulateur</a></div>
+            <div><strong style="color:#0f172a;font-size:13px">Préparez votre entretien</strong><br/><span style="color:#64748b;font-size:12px">Entraînez-vous avec notre simulateur IA avant le grand jour.</span><br/><a href="https://emploia.eu/interview" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600">→ Démarrer le simulateur</a></div>
           </div>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default async function handler(req) {
       </div>
     </div>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.fr" style="color:#94a3b8">emploia.fr</a> · <a href="https://emploia.fr/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a></p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a></p>
 </div>
 </body></html>`,
       }),

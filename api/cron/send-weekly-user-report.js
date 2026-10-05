@@ -1,7 +1,7 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 // Every Sunday at 8am: send each active user a short progress recap.
 // "Active" = has at least 1 application OR at least 1 generation.
@@ -128,7 +128,7 @@ export default async function handler(req) {
         method: 'POST',
         signal: AbortSignal.timeout(8000),
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: 'Emploia <noreply@emploia.fr>', to: [email], subject, html }),
+        body: JSON.stringify({ from: 'Emploia <noreply@emploia.eu>', to: [email], subject, html }),
       }).then(r => ({ ok: r.ok, email }))
     ));
     for (const r of results) {

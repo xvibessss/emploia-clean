@@ -2,7 +2,7 @@ export const config = { runtime: 'nodejs' };
 
 import { kvGet, kvSet, kvSmembers, getGenerationsUsed, htmlEscape } from './_lib/auth.js';
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.fr';
+const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const DAY = 86400000; // ms
 const BATCH_SIZE = 100;
@@ -30,7 +30,7 @@ function emailWrapper({ firstName, subject, headerGradient = 'linear-gradient(13
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">
     &copy; ${year} Emploia &middot;
-    <a href="${BASE_URL}" style="color:#94a3b8;text-decoration:none">emploia.fr</a> &middot;
+    <a href="${BASE_URL}" style="color:#94a3b8;text-decoration:none">emploia.eu</a> &middot;
     <a href="${unsubscribeLink(email)}" style="color:#94a3b8;text-decoration:none">Se d&eacute;sabonner</a>
   </p>
 </div>
@@ -45,7 +45,7 @@ function sendEmail(payload) {
       Authorization: `Bearer ${RESEND_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: 'Emploia <lea@emploia.fr>', ...payload }),
+    body: JSON.stringify({ from: 'Emploia <lea@emploia.eu>', ...payload }),
     signal: AbortSignal.timeout(8000),
   });
 }
