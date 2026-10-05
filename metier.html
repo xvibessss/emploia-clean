@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Emploi par métier — les 37 métiers qui recrutent — Emploia</title>
+<meta name="description" content="Offres d'emploi pour 37 métiers : salaires, compétences attendues et offres en cours. Du développeur à l'aide-soignant."/>
+<link rel="canonical" href="https://emploia.eu/metier"/>
+<link rel="icon" href="/favicon.svg"/>
+<link rel="manifest" href="/manifest.json"/>
+<meta property="og:title" content="Emploi par métier — les 37 métiers qui recrutent — Emploia"/>
+<meta property="og:description" content="Offres d'emploi pour 37 métiers : salaires, compétences attendues et offres en cours. Du développeur à l'aide-soignant."/>
+<meta property="og:url" content="https://emploia.eu/metier"/>
+<meta property="og:type" content="website"/>
+<link rel="stylesheet" href="/shared.css"/>
+  <style>
+    .seo-layout { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; }
+    .seo-hero { margin-bottom: 48px; }
+    .seo-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: var(--ind2); border: 1px solid rgba(99,102,241,.2); color: var(--inb); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
+    .seo-hero h1 { font-size: clamp(28px, 4.5vw, 52px); font-weight: 900; line-height: 1.1; letter-spacing: -2px; margin-bottom: 16px; }
+    .seo-hero p { font-size: 15px; color: var(--t2); max-width: 560px; line-height: 1.7; margin-bottom: 28px; }
+    .seo-search-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .seo-search-input { flex: 1; min-width: 200px; background: var(--s2); border: 1px solid var(--brd); border-radius: var(--r); padding: 12px 16px; color: var(--t1); font-size: 14px; }
+    .seo-search-input:focus { outline: none; border-color: var(--ind); }
+    .seo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .job-card { background: var(--s2); border: 1px solid var(--brd); border-radius: 20px; padding: 22px; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; }
+    .job-card:hover { border-color: var(--brdh); transform: translateY(-2px); background: var(--s3); }
+    .job-card-top { display: flex; gap: 12px; margin-bottom: 12px; }
+    .job-logo { width: 42px; height: 42px; border-radius: 10px; background: var(--s4); border: 1px solid var(--brd); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden; }
+    .job-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+    .job-title { font-size: 14px; font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+    .job-company { font-size: 12px; color: var(--t2); }
+    .job-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .job-tag { padding: 3px 10px; border-radius: 100px; font-size: 11px; background: var(--s3); border: 1px solid var(--brd); color: var(--t3); }
+    .job-tag.type { background: var(--ind2); border-color: rgba(99,102,241,.2); color: var(--inb); }
+    .job-card-footer { display: flex; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--brd2); }
+    .job-card-footer .btn { flex: 1; font-size: 12px; padding: 8px 10px; justify-content: center; }
+    .seo-cta { background: linear-gradient(135deg, rgba(99,102,241,.12) 0%, rgba(59,130,246,.08) 100%); border: 1px solid rgba(99,102,241,.2); border-radius: 24px; padding: 48px 40px; text-align: center; margin-top: 60px; }
+    .seo-cta h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
+    .seo-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
+    .seo-info { margin-top: 60px; }
+    .seo-info h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+    .seo-info p { font-size: 14px; color: var(--t2); line-height: 1.8; margin-bottom: 12px; }
+    .seo-related { margin-top: 48px; }
+    .seo-related h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .seo-related-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .seo-related-links a { background: var(--s2); border: 1px solid var(--brd); border-radius: 100px; padding: 6px 16px; font-size: 13px; color: var(--t2); text-decoration: none; transition: all .15s; }
+    .seo-related-links a:hover { border-color: var(--ind); color: var(--inb); background: var(--ind2); }
+    .rech-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px; color: var(--t3); flex-wrap: wrap; gap: 8px; }
+    .loading-state { display: flex; align-items: center; justify-content: center; padding: 60px 24px; color: var(--t3); gap: 12px; }
+  
+    .seo-employers { margin-top: 56px; }
+    .seo-employers h2, .seo-salary h2, .seo-faq h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .seo-sub { font-size: 14px; color: var(--t2); margin-bottom: 18px; line-height: 1.7; }
+    .emp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .emp-chip { background: var(--s2); border: 1px solid var(--brd); border-radius: 12px; padding: 8px 14px; font-size: 13px; color: var(--t1); font-weight: 600; }
+    .seo-salary { margin-top: 56px; }
+    .salary-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    .salary-table th, .salary-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--brd2); }
+    .salary-table th { color: var(--t3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+    .salary-table td:last-child, .salary-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--t1); font-weight: 600; }
+    .salary-note { font-size: 12px; color: var(--t3); margin-top: 10px; font-style: italic; }
+    .seo-faq { margin-top: 56px; }
+    .faq-item { border: 1px solid var(--brd); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; background: var(--s2); }
+    .faq-item h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .faq-item p { font-size: 14px; color: var(--t2); line-height: 1.7; margin: 0; }
+  </style>
+</head>
+<body>
+<nav class="emp-nav">
+  <div class="emp-nav-inner">
+    <a href="/" class="emp-logo">
+      <div class="emp-logo-mark">E</div>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs" class="emp-nav-a">Offres</a>
+      <a href="/app" class="emp-nav-a">Générer CV</a>
+      <a href="/interview" class="emp-nav-a">Entretien</a>
+      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="seo-layout">
+  <div class="seo-hero">
+    <h1>Emploi par métier</h1>
+    <p>37 métiers couverts, du tertiaire aux métiers manuels. Chaque page détaille le salaire moyen, les compétences recherchées et les offres disponibles.</p>
+  </div>
+
+  <div class="seo-related">
+    <h2>Les 37 métiers</h2>
+    <div class="seo-related-links"><a href="/metier/agent-securite">Agent de sécurité</a><a href="/metier/agent-immobilier">Agent immobilier</a><a href="/metier/aide-soignant">Aide-soignant</a><a href="/metier/btp">BTP / Construction</a><a href="/metier/chauffeur-livreur">Chauffeur-livreur</a><a href="/metier/chef-projet">Chef de Projet</a><a href="/metier/chef-cuisine">Chef de cuisine</a><a href="/metier/coiffeur">Coiffeur</a><a href="/metier/commercial">Commercial & Vente</a><a href="/metier/communication">Communication / RP</a><a href="/metier/community-manager">Community Manager</a><a href="/metier/comptable">Comptable / Finance</a><a href="/metier/controleur-gestion">Contrôleur de gestion</a><a href="/metier/cybersecurite">Cybersécurité</a><a href="/metier/data">Data & IA</a><a href="/metier/design">Design & UX</a><a href="/metier/devops">DevOps / Cloud</a><a href="/metier/developpeur">Développeur</a><a href="/metier/developpeur-mobile">Développeur mobile</a><a href="/metier/enseignant">Enseignant</a><a href="/metier/finance">Finance & Comptabilité</a><a href="/metier/infirmier">Infirmier</a><a href="/metier/ingenieur">Ingénieur</a><a href="/metier/juridique">Juriste / Droit</a><a href="/metier/logistique">Logistique / Supply Chain</a><a href="/metier/marketing">Marketing</a><a href="/metier/mecanicien">Mécanicien</a><a href="/metier/pharmacien">Pharmacien</a><a href="/metier/plombier">Plombier</a><a href="/metier/product-manager">Product Manager</a><a href="/metier/rh">Ressources Humaines</a><a href="/metier/sante">Santé / Médical</a><a href="/metier/secretaire">Secrétaire / Assistant</a><a href="/metier/serveur">Serveur</a><a href="/metier/technicien-maintenance">Technicien de maintenance</a><a href="/metier/vendeur">Vendeur</a><a href="/metier/electricien">Électricien</a></div>
+  </div>
+
+  <div class="seo-related">
+    <h2>Chercher par ville</h2>
+    <div class="seo-related-links"><a href="/emploi/aix-en-provence">Aix-en-Provence</a><a href="/emploi/amiens">Amiens</a><a href="/emploi/angers">Angers</a><a href="/emploi/annecy">Annecy</a><a href="/emploi/argenteuil">Argenteuil</a><a href="/emploi/avignon">Avignon</a><a href="/emploi/besancon">Besançon</a><a href="/emploi/bordeaux">Bordeaux</a><a href="/emploi/boulogne-billancourt">Boulogne-Billancourt</a><a href="/emploi/brest">Brest</a><a href="/emploi/caen">Caen</a><a href="/emploi/clermont-ferrand">Clermont-Ferrand</a><a href="/emploi/creteil">Créteil</a><a href="/emploi/dijon">Dijon</a><a href="/emploi/grenoble">Grenoble</a><a href="/emploi/la-rochelle">La Rochelle</a><a href="/emploi/le-havre">Le Havre</a><a href="/emploi/le-mans">Le Mans</a><a href="/emploi/lille">Lille</a><a href="/emploi/limoges">Limoges</a><a href="/emploi/lyon">Lyon</a><a href="/emploi/marseille">Marseille</a><a href="/emploi/metz">Metz</a><a href="/emploi/montpellier">Montpellier</a><a href="/emploi/montreuil">Montreuil</a><a href="/emploi/mulhouse">Mulhouse</a><a href="/emploi/nancy">Nancy</a><a href="/emploi/nanterre">Nanterre</a><a href="/emploi/nantes">Nantes</a><a href="/emploi/nice">Nice</a><a href="/emploi/nimes">Nîmes</a><a href="/emploi/orleans">Orléans</a><a href="/emploi/paris">Paris</a><a href="/emploi/pau">Pau</a><a href="/emploi/perpignan">Perpignan</a><a href="/emploi/poitiers">Poitiers</a><a href="/emploi/reims">Reims</a><a href="/emploi/remote">Remote / Télétravail</a><a href="/emploi/rennes">Rennes</a><a href="/emploi/roubaix">Roubaix</a><a href="/emploi/rouen">Rouen</a><a href="/emploi/saint-etienne">Saint-Étienne</a><a href="/emploi/strasbourg">Strasbourg</a><a href="/emploi/toulon">Toulon</a><a href="/emploi/toulouse">Toulouse</a><a href="/emploi/tourcoing">Tourcoing</a><a href="/emploi/tours">Tours</a><a href="/emploi/versailles">Versailles</a></div>
+  </div>
+
+</div>
+
+<nav class="emp-bottom-nav">
+  <a href="/" class="emp-bottom-nav-item"><span class="bn-icon">🏠</span>Accueil</a>
+  <a href="/jobs" class="emp-bottom-nav-item active"><span class="bn-icon">📋</span>Offres</a>
+  <a href="/app" class="emp-bottom-nav-item"><span class="bn-icon">✨</span>Générer</a>
+  <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
+  <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
+</nav>
+
+<script src="/shared.js"></script>
+</body>
+</html>
