@@ -1,5 +1,6 @@
 export const config = { runtime: 'edge' };
 import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './_lib/auth.js';
+import { sendEmail } from './_lib/email.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 // Pack Campagne — 59 € one-off buys 3 months of Pro access.
@@ -25,15 +26,6 @@ async function verifyStripeSignature(payload, header, secret) {
   const computed = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload));
   const computedHex = Array.from(new Uint8Array(computed)).map(b => b.toString(16).padStart(2, '0')).join('');
   return timingSafeEqual(computedHex, sig);
-}
-
-function sendEmail(resendKey, payload) {
-  return fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(8000),
-  }).catch(() => {});
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';

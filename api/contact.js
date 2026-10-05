@@ -1,16 +1,8 @@
 export const config = { runtime: 'edge' };
 import { checkRateLimit, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape } from './_lib/auth.js';
+import { sendEmail } from './_lib/email.js';
 
 const SUBJECTS = { support: 'Support technique', billing: 'Facturation', feature: 'Suggestion', partnership: 'Partenariat', rgpd: 'RGPD', other: 'Autre' };
-
-function sendEmail(apiKey, payload) {
-  return fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(8000),
-  }).catch(() => {});
-}
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
