@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSet, checkRateLimit, getAllowedOrigin } from '../_lib/auth.js';
 import { isJobLive, expiresAt, toPublicJob } from '../_lib/employer.js';
 

@@ -1,9 +1,9 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSmembers } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
-const SYSTEM = `Tu es l'agent reporting d'Emploia, un SaaS de recherche d'emploi IA 100% français.
+const SYSTEM = `Tu es l'agent reporting d'Emploia, un SaaS français de recherche d'emploi par IA.
 
 À partir des métriques fournies, génère un rapport hebdomadaire exécutif en français pour le fondateur.
 Structure ton rapport ainsi :

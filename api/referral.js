@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, validateEmail, extendPro } from './_lib/auth.js';
 
 // Referral system:

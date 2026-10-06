@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSet, kvSadd, checkRateLimit, getAllowedOrigin, validateEmail, htmlEscape } from './_lib/auth.js';
 
 const DISPOSABLE = ['mailinator', 'guerrillamail', 'tempmail', 'yopmail', '10minutemail', 'throwam'];

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 
 // Google Search Console — real SEO metrics for the admin console.
 // Auth: a Google service account granted access to the property in GSC.

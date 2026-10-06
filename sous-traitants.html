@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sous-traitants et transferts de données — Emploia</title>
+  <meta name="description" content="Liste publique des sous-traitants d'Emploia : rôle, pays d'exécution, données concernées et base légale du transfert. Établie en lisant les appels sortants du code."/>
+  <link rel="canonical" href="https://emploia.eu/sous-traitants"/>
+  <link rel="icon" href="/favicon.svg"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6E48BE"/>
+  <meta property="og:title" content="Sous-traitants et transferts de données — Emploia"/>
+  <meta property="og:description" content="Qui traite les données, dans quel pays, et sur quelle base légale. La liste qu'un DPO demande, publiée et tenue à jour."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://emploia.eu/sous-traitants"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="/shared.css"/>
+  <style>
+  /* Même grammaire visuelle que /ecoles : colonne éditoriale étroite pour la
+     prose, tableaux sur filets fins. Tokens du site, pas de palette parallèle. */
+  .st-layout{max-width:980px;margin:0 auto;padding:100px 24px 80px}
+  .st-col{max-width:68ch}
+  .st-stack{display:flex;flex-direction:column;gap:var(--sp-lg)}
+  .st-eyebrow{font-size:12px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin:0}
+  .st-h1{font-size:clamp(28px,4.5vw,42px);line-height:1.1;letter-spacing:-.025em;font-weight:800;margin:0;color:var(--ink);text-wrap:balance}
+  .st-h2{font-size:clamp(20px,2.8vw,26px);line-height:1.2;letter-spacing:-.02em;font-weight:800;margin:0;color:var(--ink)}
+  .st-lede{font-size:clamp(15px,1.8vw,18px);line-height:1.65;color:var(--slate);margin:0}
+  .st-p{margin:0;color:var(--charcoal);line-height:1.72;font-size:15px}
+  .st-date{font-size:12.5px;color:var(--steel);margin:0}
+  .st-sec{border-top:1px solid var(--hairline);padding:var(--sp-section-sm) 0;display:flex;flex-direction:column;gap:var(--sp-lg)}
+  .st-tablewrap{overflow-x:auto;border:1px solid var(--hairline)}
+  .st-tablewrap table{border-collapse:collapse;width:100%;min-width:720px;background:var(--canvas)}
+  .st-tablewrap th,.st-tablewrap td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--hairline);font-size:14px;line-height:1.55;vertical-align:top}
+  .st-tablewrap th{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--steel);font-weight:700;white-space:nowrap}
+  .st-tablewrap tbody tr:last-child td{border-bottom:none}
+  .st-tablewrap td strong{color:var(--ink)}
+  .st-eu{color:var(--brand-purple-800);font-weight:600;white-space:nowrap}
+  .st-ext{color:var(--brand-orange-deep);font-weight:600;white-space:nowrap}
+  .st-note{border-left:2px solid var(--hairline-strong);padding:2px 0 2px 18px;font-size:14.5px;color:var(--slate);line-height:1.68;margin:0}
+  .st-note strong{color:var(--ink)}
+  .st-callout{background:var(--tint-lavender);border-left:2px solid var(--primary);padding:16px 18px;font-size:14.5px;line-height:1.68;color:var(--brand-purple-800);margin:0}
+  .st-callout strong{color:var(--brand-purple-800);font-weight:700}
+  .st-ticks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  .st-ticks li{position:relative;padding-left:24px;font-size:14.5px;line-height:1.6;color:var(--charcoal)}
+  .st-ticks li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;border:1.5px solid var(--primary);border-radius:var(--r-full)}
+  @media (max-width:767px){ .st-layout{padding:80px 18px 60px} }
+  </style>
+</head>
+<body>
+<div id="empToasts" class="emp-toast-container"></div>
+
+<header class="emp-nav">
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+      EmploiA
+    </a>
+    <nav class="emp-nav-links">
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générateur CV</a>
+      <a href="/ecoles">Écoles &amp; CFA</a>
+      <a href="/blog">Blog</a>
+      <a href="/#pricing">Tarifs</a>
+    </nav>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres</a>
+  <a href="/app">Générateur CV</a>
+  <a href="/ecoles">Écoles &amp; CFA</a>
+  <a href="/blog">Blog</a>
+  <a href="/#pricing">Tarifs</a>
+</nav>
+
+<main class="st-layout page-enter">
+
+  <div class="st-stack st-col">
+    <p class="st-eyebrow">Transparence</p>
+    <h1 class="st-h1">Sous-traitants et transferts de données</h1>
+    <p class="st-lede">Qui traite les données, pour quoi faire, dans quel pays, et sur quelle base légale lorsque le pays est hors de l'Union européenne. Cette liste est établie en lisant les appels sortants du code, pas en recopiant une politique type.</p>
+    <p class="st-date">Dernière mise à jour : 6 octobre 2026. Publiée au titre de l'article 28 du RGPD, qui impose au responsable de traitement de connaître ses sous-traitants ultérieurs.</p>
+  </div>
+
+  <section class="st-sec">
+    <p class="st-callout"><strong>En une phrase :</strong> le traitement applicatif s'exécute en France et la base de données est en Allemagne, donc dans l'Union européenne. <strong>En revanche, le contenu que vous soumettez à l'IA — CV, parcours, expériences — est traité par Anthropic aux États-Unis.</strong> C'est le seul transfert hors UE portant sur des données de candidature, et nous préférons l'écrire ici plutôt que vous laisser le découvrir.</p>
+  </section>
+
+  <section class="st-sec">
+    <h2 class="st-h2">La liste</h2>
+    <div class="st-tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Sous-traitant</th>
+            <th scope="col">Rôle</th>
+            <th scope="col">Données transmises</th>
+            <th scope="col">Pays</th>
+            <th scope="col">Base du transfert</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Anthropic, PBC</strong></td>
+            <td>Génération IA : CV, lettres, score ATS, coach d'entretien, agents</td>
+            <td>Le contenu que vous soumettez : parcours, diplômes, expériences, et l'offre visée</td>
+            <td class="st-ext">États-Unis</td>
+            <td>Clauses contractuelles types</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel Inc.</strong></td>
+            <td>Hébergement, exécution des fonctions applicatives, réseau de diffusion</td>
+            <td>Requêtes HTTP, journaux techniques</td>
+            <td class="st-eu">Exécution en France (Paris)</td>
+            <td>Société américaine ; clauses contractuelles types</td>
+          </tr>
+          <tr>
+            <td><strong>Upstash</strong></td>
+            <td>Base de données : comptes, profils, candidatures suivies, compteurs</td>
+            <td>Compte, profil professionnel, suivi de candidatures</td>
+            <td class="st-eu">Allemagne (Francfort)</td>
+            <td>Pas de transfert hors UE</td>
+          </tr>
+          <tr>
+            <td><strong>Resend</strong></td>
+            <td>Emails transactionnels : activation, relances, rapports</td>
+            <td>Adresse email, prénom, contenu du message</td>
+            <td class="st-ext">États-Unis</td>
+            <td>Clauses contractuelles types</td>
+          </tr>
+          <tr>
+            <td><strong>Stripe</strong></td>
+            <td>Paiement et facturation</td>
+            <td>Email, données de carte — <strong>jamais vues par EmploiA</strong>, et aucune donnée de CV</td>
+            <td class="st-ext">Irlande et États-Unis</td>
+            <td>Clauses contractuelles types</td>
+          </tr>
+          <tr>
+            <td><strong>Plausible Analytics</strong></td>
+            <td>Mesure d'audience sans cookie</td>
+            <td>Page consultée, évènement d'usage — aucun identifiant personnel</td>
+            <td class="st-eu">Union européenne</td>
+            <td>Pas de transfert hors UE</td>
+          </tr>
+          <tr>
+            <td><strong>France Travail</strong></td>
+            <td>Recherche d'offres d'emploi</td>
+            <td>Mots-clés et localisation de recherche — <strong>aucune donnée de CV</strong></td>
+            <td class="st-eu">France</td>
+            <td>Pas de transfert hors UE</td>
+          </tr>
+          <tr>
+            <td><strong>Adzuna</strong></td>
+            <td>Recherche d'offres d'emploi</td>
+            <td>Mots-clés et localisation de recherche — <strong>aucune donnée de CV</strong></td>
+            <td class="st-eu">Royaume-Uni</td>
+            <td>Décision d'adéquation de la Commission européenne</td>
+          </tr>
+          <tr>
+            <td><strong>RapidAPI</strong></td>
+            <td>Passerelle vers trois sources d'offres d'emploi complémentaires</td>
+            <td>Mots-clés et localisation de recherche — <strong>aucune donnée de CV</strong></td>
+            <td class="st-ext">États-Unis</td>
+            <td>Clauses contractuelles types</td>
+          </tr>
+          <tr>
+            <td><strong>Google</strong></td>
+            <td>Connexion Google, facultative, et police de caractères du site</td>
+            <td>Si vous choisissez ce mode de connexion : email et nom du compte Google</td>
+            <td class="st-ext">États-Unis</td>
+            <td>Clauses contractuelles types ; usage facultatif</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="st-note">Un établissement qui souhaite éviter tout transfert hors UE sur l'authentification peut désactiver la connexion Google pour ses cohortes : l'inscription par email fonctionne sans elle.</p>
+  </section>
+
+  <section class="st-sec">
+    <h2 class="st-h2">Ce qu'il faut savoir sur Anthropic</h2>
+    <p class="st-p">C'est la question qui décide d'un dossier, donc la réponse est détaillée. Les fonctionnalités d'IA reposent sur l'API Claude d'Anthropic, PBC, société américaine. Le contenu que vous soumettez — votre parcours, vos diplômes, vos expériences, l'offre que vous visez — lui est transmis pour produire le document demandé.</p>
+    <ul class="st-ticks">
+      <li><strong>Les données transmises par API ne sont pas utilisées pour réentraîner les modèles.</strong> C'est un engagement contractuel d'Anthropic sur son offre API commerciale, distinct des conditions de ses applications grand public.</li>
+      <li>Le transfert est encadré par des clauses contractuelles types, le mécanisme prévu par le chapitre V du RGPD.</li>
+      <li>Aucune donnée de paiement ni mot de passe ne lui est transmis.</li>
+      <li>Les analytics remis à un établissement sont agrégés par promotion : un CV nominatif n'y figure jamais.</li>
+    </ul>
+    <p class="st-note">Nous n'allons pas prétendre qu'un sous-traitant américain est un non-événement. Nous affirmons qu'il est <strong>documenté</strong>, encadré, et limité au contenu que l'utilisateur choisit de soumettre.</p>
+  </section>
+
+  <section class="st-sec">
+    <h2 class="st-h2">Où s'exécute le traitement</h2>
+    <p class="st-p">Les fonctions applicatives d'EmploiA sont épinglées à la région Paris (<code>cdg1</code>) de Vercel, et cette contrainte est vérifiée automatiquement à chaque modification du code : une fonction qui ne la déclarerait pas fait échouer notre intégration continue. La base de données est à Francfort, en Allemagne, sans réplique hors UE.</p>
+    <p class="st-note">Pour rester exact : <strong>épingler l'exécution ne signifie pas qu'aucun octet ne quitte la France.</strong> La terminaison TLS et le routage des requêtes passent par le réseau mondial de diffusion de Vercel avant d'atteindre Paris. Nous disons donc « le traitement applicatif s'exécute en France », et non « aucune donnée ne quitte la France », qui serait faux.</p>
+  </section>
+
+  <section class="st-sec">
+    <h2 class="st-h2">Changements et contact</h2>
+    <p class="st-p">Nous nous engageons à mettre cette page à jour <strong>avant</strong> qu'un nouveau sous-traitant traite des données de candidature, et à prévenir les établissements sous contrat. Une liste publique tenue à jour vaut mieux qu'une annexe figée dans un document signé il y a deux ans — c'est aussi ce que demande l'article 28 du RGPD sur les sous-traitants ultérieurs.</p>
+    <p class="st-p">Pour une question de DPO, une demande de DPA ou la fiche sécurité : <a href="mailto:contact@emploia.eu?subject=Question%20DPO%20%E2%80%94%20sous-traitants">contact@emploia.eu</a>. Les éléments déjà publiés figurent dans la <a href="/legal#privacy">politique de confidentialité</a> et les <a href="/legal#mentions">mentions légales</a>.</p>
+    <p class="st-note">Nous ne publions pas encore d'attestation de DPA signé avec chacun de ces fournisseurs : leur collecte est en cours, et nous préférons une page courte et vraie à une page complète et invérifiable. Si votre dossier l'exige, écrivez-nous — nous vous dirons où nous en sommes plutôt que de cocher une case.</p>
+  </section>
+
+</main>
+
+<footer class="emp-footer">
+  <div class="container">
+    <div class="emp-footer-grid">
+      <div>
+        <div class="emp-brand" style="margin-bottom:14px">
+          <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+          EmploiA
+        </div>
+        <div class="emp-footer-tagline">Conçu en France · Données applicatives en Europe.</div>
+      </div>
+      <div class="emp-footer-col"><h5>Produit</h5><a href="/app">Générateur de CV</a><a href="/interview">Coach d'entretien</a><a href="/dashboard">Tableau de bord</a><a href="/jobs">Offres d'emploi</a></div>
+      <div class="emp-footer-col"><h5>Entreprise</h5><a href="/about">À propos</a><a href="/contact">Contact</a><a href="/blog">Blog</a><a href="/employeurs">Employeurs</a><a href="/ecoles">Écoles &amp; CFA</a></div>
+      <div class="emp-footer-col"><h5>Légal</h5><a href="/legal#mentions">Mentions légales</a><a href="/legal#cgv">CGV</a><a href="/legal#cgu">CGU</a><a href="/legal#privacy">Confidentialité</a><a href="/sous-traitants">Sous-traitants</a></div>
+    </div>
+    <div class="emp-footer-bot">
+      <div>© <span data-year></span> EmploiA · Tous droits réservés</div>
+      <div class="soc"><a href="https://www.linkedin.com/company/emploia" rel="noopener" target="_blank">LinkedIn</a><a href="https://twitter.com/emploia_fr" rel="noopener" target="_blank">Twitter</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/shared.js"></script>
+</body>
+</html>

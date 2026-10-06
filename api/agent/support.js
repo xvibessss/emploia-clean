@@ -1,9 +1,9 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
-const SYSTEM = `Tu es l'agent support d'Emploia, un copilote IA de recherche d'emploi 100% français.
+const SYSTEM = `Tu es l'agent support d'Emploia, un copilote IA français de recherche d'emploi.
 
 PRODUCT KNOWLEDGE :
 - Emploia génère des CV, lettres de motivation, emails de relance, analyses salariales, questions d'entretien, et profils LinkedIn optimisés ATS en 30 secondes

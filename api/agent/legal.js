@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
 const SYSTEM = `Tu es Maître Orion, l'agent juridique IA d'Emploia, spécialisé en droit du travail français.

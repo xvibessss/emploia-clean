@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, getAllowedOrigin, validateEmail, getCurrentUser } from './_lib/auth.js';
 
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;

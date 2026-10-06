@@ -1,6 +1,6 @@
 // Additional search endpoint that aggregates more sources
 // Used for real-time search suggestions and extended results
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getAllowedOrigin, checkRateLimit, kvGet, kvSet } from './_lib/auth.js';
 
 // Scrape-free APEC via their public RSS feed
