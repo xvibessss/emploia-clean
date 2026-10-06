@@ -130,6 +130,7 @@
     <a class="legal-tab" data-section="mentions" href="/legal/mentions">Mentions légales</a>
     <a class="legal-tab" data-section="privacy" href="/legal/privacy">Confidentialité</a>
     <a class="legal-tab" data-section="cgu" href="/legal/cgu">CGU</a>
+    <a class="legal-tab" data-section="cgv" href="/legal#cgv">CGV</a>
     <a class="legal-tab" data-section="cookies" href="/legal/cookies">Cookies</a>
   </div>
 
@@ -440,8 +441,6 @@
 
 <script src="/shared.js"></script>
 <script>
-  document.getElementById('yr').textContent = new Date().getFullYear();
-
   const PATH_TO_SECTION = {
     '/legal/mentions': 'mentions',
     '/legal/privacy': 'privacy',
@@ -449,6 +448,8 @@
     '/legal/cookies': 'cookies',
     '/legal': 'mentions',
   };
+
+  const SECTIONS = ['mentions', 'privacy', 'cgu', 'cgv', 'cookies'];
 
   function showSection(id) {
     document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));
@@ -460,10 +461,17 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Detect which section to show based on URL path
+  // Detect which section to show: URL hash first (les pieds de page du site
+  // pointent vers /legal#mentions, #privacy, #cgu, #cgv), sinon le chemin.
+  const hash = window.location.hash.replace('#', '');
   const path = window.location.pathname.replace(/\/$/, '');
-  const sectionId = PATH_TO_SECTION[path] || 'mentions';
+  const sectionId = SECTIONS.includes(hash) ? hash : (PATH_TO_SECTION[path] || 'mentions');
   showSection(sectionId);
+
+  window.addEventListener('hashchange', () => {
+    const h = window.location.hash.replace('#', '');
+    if (SECTIONS.includes(h)) showSection(h);
+  });
 
   // Tab click handling (prevent full reload)
   document.querySelectorAll('.legal-tab').forEach(tab => {
