@@ -112,6 +112,29 @@ for (const j of ['vercel.json', 'package.json']) {
   catch (e) { fail(`${j} invalide : ${e.message}`); }
 }
 
+// ── 6. La liste d'événements du vérificateur suit le handler ────────────────
+// Un événement ajouté au handler mais pas à cette liste ne serait jamais
+// réclamé chez Stripe : il ne serait donc jamais livré, et le code écrit pour
+// le traiter ne tournerait jamais. C'est exactement la panne constatée en
+// production le 2026-10-05 — quatre des cinq événements n'étaient pas cochés.
+console.log('\n[6] verify-webhook.mjs couvre tous les événements du handler');
+try {
+  const handler = fs.readFileSync('api/stripe-webhook.js', 'utf8');
+  const verifier = fs.readFileSync('scripts/billing/verify-webhook.mjs', 'utf8');
+
+  const handled = [...handler.matchAll(/case\s+'([a-z_]+\.[a-z_.]+)'\s*:/g)].map(m => m[1]);
+  const required = [...verifier.matchAll(/^\s*'([a-z_]+\.[a-z_.]+)',/gm)].map(m => m[1]);
+
+  if (!handled.length) fail('aucun case event.type trouvé dans api/stripe-webhook.js — motif à revoir');
+  else {
+    const missing = handled.filter(e => !required.includes(e));
+    const extra = required.filter(e => !handled.includes(e));
+    if (missing.length) fail(`verify-webhook.mjs ignore ${missing.length} événement(s) traité(s) par le handler : ${missing.join(', ')}`);
+    if (extra.length) fail(`verify-webhook.mjs exige ${extra.length} événement(s) que le handler ne traite pas : ${extra.join(', ')}`);
+    if (!missing.length && !extra.length) ok(`les ${handled.length} événements du handler sont exigés à l'identique`);
+  }
+} catch (e) { fail('contrôle des événements webhook impossible : ' + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
