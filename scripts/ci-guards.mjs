@@ -68,8 +68,44 @@ const envs = ['.env', '.env.local', '.env.production'].filter(exists);
 if (envs.length) fail('fichier(s) secret(s) commités : ' + envs.join(', '));
 else ok('aucun .env commité');
 
-// ── 4. JSON config is valid ─────────────────────────────────────────────────
-console.log('\n[4] JSON de config valide');
+// ── 4. data locality: every function is pinned to Paris ─────────────────────
+// La page /ecoles et /sous-traitants affirment à un acheteur institutionnel que
+// le traitement applicatif s'exécute en France. Cette affirmation ne tient que
+// si chaque fonction est effectivement épinglée, et elle se périmerait au
+// premier handler ajouté sans y penser — d'où ce garde.
+//
+// Deux mécanismes distincts, et c'est le piège : la clé `regions` de
+// vercel.json pilote les fonctions Serverless/Node, tandis qu'une fonction en
+// runtime Edge s'exécute par défaut « dans la région la plus proche de la
+// requête » et doit déclarer ses propres `regions` dans son export const
+// config. Poser seulement la clé projet laisserait les 66 handlers Edge
+// s'exécuter n'importe où, tout en ayant l'air réglé.
+console.log('\n[4] localisation des données → toute fonction épinglée sur cdg1');
+try {
+  const v = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+  const projectRegions = v.regions || [];
+  if (projectRegions.length === 1 && projectRegions[0] === 'cdg1') ok('vercel.json déclare regions: ["cdg1"]');
+  else fail(`vercel.json doit déclarer regions: ["cdg1"] (actuel : ${JSON.stringify(projectRegions)})`);
+
+  let unpinned = 0;
+  for (const f of apiFiles) {
+    const base = path.basename(f);
+    if (base.startsWith('_') || f.includes('/_lib/')) continue; // libs, pas des handlers
+    const src = readAll(f);
+    const cfg = src.match(/export\s+const\s+config\s*=\s*\{[\s\S]*?\}\s*;/);
+    // Un handler sans bloc config tourne en Node et hérite de la clé projet.
+    if (!cfg) continue;
+    if (!/runtime\s*:\s*['"]edge['"]/.test(cfg[0])) continue;
+    if (!/regions\s*:\s*\[\s*['"]cdg1['"]\s*\]/.test(cfg[0])) {
+      fail(`handler Edge non épinglé sur cdg1 : ${f} — ajouter regions: ['cdg1'] à son export const config`);
+      unpinned++;
+    }
+  }
+  if (!unpinned) ok(`tous les handlers Edge déclarent regions: ['cdg1']`);
+} catch (e) { fail('contrôle de localisation impossible : ' + e.message); }
+
+// ── 5. JSON config is valid ─────────────────────────────────────────────────
+console.log('\n[5] JSON de config valide');
 for (const j of ['vercel.json', 'package.json']) {
   if (!exists(j)) continue;
   try { JSON.parse(fs.readFileSync(j, 'utf8')); ok(`${j} valide`); }

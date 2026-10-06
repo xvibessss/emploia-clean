@@ -4,6 +4,7 @@
   "buildCommand": "echo ok",
   "outputDirectory": ".",
   "installCommand": "echo ok",
+  "regions": ["cdg1"],
   "functions": {
     "api/**/*.js": { "maxDuration": 60 }
   },
@@ -147,6 +148,7 @@
     { "source": "/rss.xml", "destination": "/api/rss" },
     { "source": "/employeurs", "destination": "/employeurs.html" },
     { "source": "/ecoles", "destination": "/ecoles.html" },
+    { "source": "/sous-traitants", "destination": "/sous-traitants.html" },
     { "source": "/poster-offre", "destination": "/employeurs.html" },
     { "source": "/blog/cv-ats-2026", "destination": "/blog/cv-ats-2026.html" },
     { "source": "/blog/methode-star-entretien", "destination": "/blog/methode-star-entretien.html" },

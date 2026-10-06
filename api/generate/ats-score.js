@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getCurrentUser, claimFreeGeneration, refundGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, withTimeout, htmlEscape } from "../_lib/auth.js";
 
 export default async function handler(req) {

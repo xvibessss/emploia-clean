@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
 const SYSTEM = `Tu es Orion Data, l'agent IA d'Emploia spécialisé en data science, analytics et ingénierie des données.

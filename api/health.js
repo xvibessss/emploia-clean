@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 
 async function pingUpstash() {
   const url = process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL;

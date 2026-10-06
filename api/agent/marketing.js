@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
 const SYSTEM = `Tu es Orion Marketing, l'agent IA d'Emploia spécialisé en marketing, croissance et acquisition.

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
 
 const SYSTEM = `Tu es Orion CX, l'agent IA d'Emploia spécialisé en expérience client, satisfaction et fidélisation.
