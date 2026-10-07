@@ -40,9 +40,21 @@ function isGermanJob(title, desc) {
 }
 
 // ── JSEARCH (Indeed + LinkedIn + Glassdoor) ───────────
-async function fetchJSearch(q, type, location, page) {
+// Une source indisponible ne doit pas faire tomber la recherche : les sept
+// autres ont des offres à rendre. Mais elle ne doit plus tomber en silence.
+// Chaque échec se terminait par un `return []` nu, si bien que trois des huit
+// sources n'ont rien renvoyé pendant des mois sans que rien ne le signale —
+// la réponse était 200, la page affichait des offres, et il en manquait les
+// deux tiers. Le journal est créé par requête et traverse les collecteurs :
+// pas de variable de module, qui serait partagée entre requêtes concurrentes.
+function muet(journal, source, raison) {
+  journal?.push({ source, raison });
+  return [];
+}
+
+async function fetchJSearch(q, type, location, page, journal) {
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return [];
+  if (!key) return muet(journal, 'JSearch', 'clé absente : RAPIDAPI_KEY');
   try {
     const typeMap = { stage:'INTERN', alternance:'INTERN', cdd:'CONTRACTOR', cdi:'FULLTIME', freelance:'CONTRACTOR' };
     const locStr = location || 'Paris France';
@@ -63,7 +75,7 @@ async function fetchJSearch(q, type, location, page) {
         headers: { 'x-rapidapi-host': 'jsearch.p.rapidapi.com', 'x-rapidapi-key': key }
       }), 10000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'JSearch', `HTTP ${res.status}`);
     const data = await res.json();
     return (data.data || []).map(j => ({
       id: 'js_' + j.job_id,
@@ -84,13 +96,13 @@ async function fetchJSearch(q, type, location, page) {
       logo: j.employer_logo || null,
       country: 'FR',
     }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'JSearch', e.message || String(e)); }
 }
 
 // ── FRENCH JOB MARKET (APEC + HelloWork + Free-Work) ─
-async function fetchFrenchMarket(q, type, location, page) {
+async function fetchFrenchMarket(q, type, location, page, journal) {
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return [];
+  if (!key) return muet(journal, 'French Job Market', 'clé absente : RAPIDAPI_KEY');
   try {
     const typeMap = {
       cdi: ['permanent'], cdd: ['temporary'], stage: ['internship'],
@@ -114,7 +126,7 @@ async function fetchFrenchMarket(q, type, location, page) {
         body: JSON.stringify(body),
       }), 10000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'French Job Market', `HTTP ${res.status}`);
     const data = await res.json();
     const DOM_TOM = ['martinique', 'guadeloupe', 'guyane', 'réunion', 'reunion', 'mayotte', 'lamentin', 'cayenne', 'saint-denis - 97'];
     return (data.data || [])
@@ -137,14 +149,14 @@ async function fetchFrenchMarket(q, type, location, page) {
       logo: null,
       country: 'FR',
     }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'French Job Market', e.message || String(e)); }
 }
 
 // ── INTERNSHIPS API ───────────────────────────────────
-async function fetchInternships(q, type, location) {
+async function fetchInternships(q, type, location, journal) {
   if (type && !['stage', 'alternance', 'tous', ''].includes(type)) return [];
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return [];
+  if (!key) return muet(journal, 'Internships', 'clé absente : RAPIDAPI_KEY');
   try {
     const params = new URLSearchParams({
       location_filter: location || 'France',
@@ -160,7 +172,7 @@ async function fetchInternships(q, type, location) {
         }
       }), 10000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'Internships', `HTTP ${res.status}`);
     const data = await res.json();
     const jobs = Array.isArray(data) ? data : (data.data || []);
     return jobs
@@ -191,18 +203,18 @@ async function fetchInternships(q, type, location) {
           country: 'FR',
         };
       });
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'Internships', e.message || String(e)); }
 }
 
 // ── REMOTIVE ──────────────────────────────────────────
-async function fetchRemotive(q, type) {
+async function fetchRemotive(q, type, journal) {
   if (type && ['stage', 'alternance', 'cdd'].includes(type)) return [];
   try {
     const res = await withTimeout(
       fetch(`https://remotive.com/api/remote-jobs?search=${encodeURIComponent(q||'developer engineer manager')}&limit=8`),
       8000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'Remotive', `HTTP ${res.status}`);
     const data = await res.json();
     return (data.jobs || [])
       .filter(j => {
@@ -226,11 +238,11 @@ async function fetchRemotive(q, type) {
         logo: j.company_logo_url || null,
         country: 'REMOTE',
       }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'Remotive', e.message || String(e)); }
 }
 
 // ── ARBEITNOW ─────────────────────────────────────────
-async function fetchArbeitnow(q, type, page) {
+async function fetchArbeitnow(q, type, page, journal) {
   if (type && ['stage', 'alternance'].includes(type)) return [];
   try {
     const params = new URLSearchParams({ page: String(page + 1) });
@@ -238,7 +250,7 @@ async function fetchArbeitnow(q, type, page) {
     const res = await withTimeout(
       fetch(`https://www.arbeitnow.com/api/job-board-api?${params}`), 7000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'Arbeitnow', `HTTP ${res.status}`);
     const data = await res.json();
     return (data.data || [])
       .filter(j => {
@@ -262,26 +274,32 @@ async function fetchArbeitnow(q, type, page) {
         logo: j.company_logo || null,
         country: j.remote ? 'REMOTE' : 'FR',
       }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'Arbeitnow', e.message || String(e)); }
 }
 
 // ── ADZUNA ────────────────────────────────────────────
-async function fetchAdzuna(q, type, location, page) {
-  if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) return [];
+async function fetchAdzuna(q, type, location, page, journal) {
+  if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) return muet(journal, 'Adzuna', 'clés absentes : ADZUNA_APP_ID / ADZUNA_APP_KEY');
   try {
+    // Adzuna prend la page dans le chemin, pas en paramètre. L'ancien appel
+    // envoyait `page=N` à côté d'un chemin figé sur `/search/1` : la pagination
+    // ne bougeait jamais, toutes les pages rendaient la première.
     const params = new URLSearchParams({
       app_id: process.env.ADZUNA_APP_ID,
       app_key: process.env.ADZUNA_APP_KEY,
       results_per_page: '10',
-      page: String(page + 1),
       what: [q, type==='stage'?'stage':type==='alternance'?'alternance':''].filter(Boolean).join(' ') || 'emploi',
-      where: location || 'France',
       sort_by: 'date',
     });
+    // `where` attend un lieu à l'intérieur du pays, pas le pays lui-même :
+    // l'endpoint est déjà `/jobs/fr/`. Envoyer « France » est la cause la plus
+    // probable du HTTP 400 observé — une clé invalide donnerait 401 AUTH_FAIL,
+    // vérifié. Sans lieu, on ne met donc rien et la recherche porte sur le pays.
+    if (location) params.set('where', location);
     const res = await withTimeout(
-      fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/1?${params}`), 12000
+      fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${page + 1}?${params}`), 12000
     );
-    if (!res.ok) return [];
+    if (!res.ok) return muet(journal, 'Adzuna', `HTTP ${res.status}`);
     const data = await res.json();
     return (data.results || []).map(j => ({
       id: 'az_' + j.id,
@@ -298,7 +316,7 @@ async function fetchAdzuna(q, type, location, page) {
       logo: null,
       country: 'FR',
     }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'Adzuna', e.message || String(e)); }
 }
 
 // ── FRANCE TRAVAIL (OAuth2 + Offres API) ─────────────
@@ -325,14 +343,14 @@ async function getFranceTravailToken(clientId, clientSecret) {
   return access_token;
 }
 
-async function fetchFranceTravail(q, type, location, page) {
+async function fetchFranceTravail(q, type, location, page, journal) {
   const clientId = process.env.FRANCE_TRAVAIL_CLIENT_ID;
   const clientSecret = process.env.FRANCE_TRAVAIL_CLIENT_SECRET;
-  if (!clientId || !clientSecret) return [];
+  if (!clientId || !clientSecret) return muet(journal, 'France Travail', 'clés absentes : FRANCE_TRAVAIL_CLIENT_ID / _SECRET');
   if (type === 'stage') return []; // stages not well represented
   try {
     const access_token = await getFranceTravailToken(clientId, clientSecret);
-    if (!access_token) return [];
+    if (!access_token) return muet(journal, 'France Travail', 'jeton OAuth refusé');
 
     const typeMap = { cdi: 'CDI', cdd: 'CDD', alternance: 'CA,CP', freelance: 'LIB' };
     const start = page * 10;
@@ -345,7 +363,7 @@ async function fetchFranceTravail(q, type, location, page) {
         headers: { Authorization: `Bearer ${access_token}`, Accept: 'application/json' },
       }), 10000
     );
-    if (!jobsRes.ok) return [];
+    if (!jobsRes.ok) return muet(journal, 'France Travail', `HTTP ${jobsRes.status}`);
     const data = await jobsRes.json();
     return (data.resultats || []).slice(0, 8).map(j => ({
       id: 'ft_' + j.id,
@@ -362,11 +380,11 @@ async function fetchFranceTravail(q, type, location, page) {
       logo: null,
       country: 'FR',
     }));
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'France Travail', e.message || String(e)); }
 }
 
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
-async function fetchEmployerJobs(q, type, location) {
+async function fetchEmployerJobs(q, type, location, journal) {
   try {
     let jobs = await kvGet('employer_jobs') || [];
     if (!Array.isArray(jobs)) return [];
@@ -389,7 +407,7 @@ async function fetchEmployerJobs(q, type, location) {
       jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
     }
     return jobs.slice(0, 5).map(toPublicJob);
-  } catch { return []; }
+  } catch (e) { return muet(journal, 'Emploia', e.message || String(e)); }
 }
 
 // ── DEDUPE & SORT ─────────────────────────────────────
@@ -462,44 +480,52 @@ export default async function handler(req) {
       let final = cached.jobs;
       if (remoteOnly) final = final.filter(j => j.remote === true);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], cached: true }),
         { status: 200, headers: H }
       );
     }
   } catch {}
 
-  try {
-    const [jsRes, fmRes, intRes, rmRes, abRes, azRes, empRes, ftRes] = await Promise.allSettled([
-      fetchJSearch(q, type, location, page),
-      fetchFrenchMarket(q, type, location, page),
-      fetchInternships(q, type, location),
-      fetchRemotive(q, type),
-      fetchArbeitnow(q, type, page),
-      fetchAdzuna(q, type, location, page),
-      fetchEmployerJobs(q, type, location),
-      fetchFranceTravail(q, type, location, page),
-    ]);
+  // Les collecteurs dans l'ordre de priorité du résultat : les offres déposées
+  // sur Emploia d'abord, les sources françaises ensuite, le reste après. Une
+  // seule liste, donc un seul ordre à tenir à jour — l'ancienne version en
+  // tenait deux, celui du lancement et celui de la fusion.
+  const journal = [];
+  const collecteurs = [
+    ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
+    ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
+    ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal)],
+    ['JSearch',           () => fetchJSearch(q, type, location, page, journal)],
+    ['Adzuna',            () => fetchAdzuna(q, type, location, page, journal)],
+    ['Internships',       () => fetchInternships(q, type, location, journal)],
+    ['Remotive',          () => fetchRemotive(q, type, journal)],
+    ['Arbeitnow',         () => fetchArbeitnow(q, type, page, journal)],
+  ];
 
-    const employerJobs = empRes.status === 'fulfilled' ? empRes.value : [];
-    const allJobs = [
-      ...employerJobs,
-      ...(ftRes.status === 'fulfilled' ? ftRes.value : []),
-      ...(fmRes.status === 'fulfilled' ? fmRes.value : []),
-      ...(jsRes.status === 'fulfilled' ? jsRes.value : []),
-      ...(azRes.status === 'fulfilled' ? azRes.value : []),
-      ...(intRes.status === 'fulfilled' ? intRes.value : []),
-      ...(rmRes.status === 'fulfilled' ? rmRes.value : []),
-      ...(abRes.status === 'fulfilled' ? abRes.value : []),
-    ];
+  try {
+    const resultats = await Promise.allSettled(collecteurs.map(([, appel]) => appel()));
+    const allJobs = [];
+    resultats.forEach((r, i) => {
+      if (r.status === 'fulfilled') allJobs.push(...r.value);
+      else journal.push({ source: collecteurs[i][0], raison: r.reason?.message || String(r.reason) });
+    });
+
+    // La raison part dans les logs d'exécution, où on peut la lire après coup ;
+    // seul le nom de la source part dans la réponse, parce qu'une raison peut
+    // citer un corps de réponse amont. Le nom suffit à la sonde.
+    if (journal.length) console.error('jobs: sources en échec — ' + JSON.stringify(journal));
+    const sourcesEnEchec = [...new Set(journal.map(e => e.source))];
 
     if (allJobs.length > 0) {
       let final = prioritize(deduplicate(allJobs));
       const sources = [...new Set(final.map(j => j.source))];
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
-      kvSet(cacheKey, { jobs: final, sources }, 300).catch(() => {});
+      // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
+      // disparaîtrait de la réponse pendant les cinq minutes suivantes.
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec }),
         { status: 200, headers: H }
       );
     }
