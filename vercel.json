@@ -48,6 +48,10 @@
   ],
   "rewrites": [
     {
+      "source": "/favicon.ico",
+      "destination": "/favicon.svg"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
     },
