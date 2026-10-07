@@ -262,6 +262,9 @@
       font-size: 15px;
       font-weight: 600;
       color: var(--ink);
+      /* C'est un <h1> : sans cette remise à zéro, la marge par défaut du
+         navigateur déséquilibrerait la barre d'en-tête. */
+      margin: 0;
     }
 
     .chat-header-status {
@@ -760,7 +763,7 @@
           </button>
           <div class="chat-header-orb">O</div>
           <div>
-            <div class="chat-header-name">Orion</div>
+            <h1 class="chat-header-name">Orion</h1>
             <div class="chat-header-status">● En ligne</div>
           </div>
         </div>
