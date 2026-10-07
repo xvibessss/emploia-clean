@@ -135,6 +135,23 @@ try {
   }
 } catch (e) { fail('contrôle des événements webhook impossible : ' + e.message); }
 
+// ── 7. les pages référencent l'empreinte courante des feuilles partagées ───
+// Sans ce contrôle, modifier shared.css sans réestampiller laisserait les
+// pages pointer l'ancienne URL : le cache servirait l'ancienne feuille, et on
+// aurait reproduit en silence le décalage HTML/CSS que le versionnage corrige.
+console.log("\n[7] shared.css / shared.js → empreinte à jour dans les pages");
+try {
+  const { stampAll, ASSETS } = await import('./assets/version.mjs');
+  const { hashes, stale } = stampAll({ write: false });
+  const versions = ASSETS.map(({ file }) => `${file} → ${hashes[file]}`).join(' · ');
+
+  if (stale.length) {
+    fail(`${stale.length} fichier(s) portent une empreinte périmée (${stale.slice(0, 5).join(', ')}${stale.length > 5 ? '…' : ''}) — corriger avec : npm run assets:version`);
+  } else {
+    ok(`empreintes à jour partout — ${versions}`);
+  }
+} catch (e) { fail("contrôle des empreintes d'assets impossible : " + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

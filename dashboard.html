@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="dns-prefetch" href="https://plausible.io"/>
-  <link rel="stylesheet" href="/shared.css"/>
+  <link rel="stylesheet" href="/shared.css?v=e5499748"/>
   <style>
     body { background: var(--surface); }
 
@@ -799,13 +799,8 @@
 <div class="dash-layout page-enter">
 
   <!-- La bannière d'accueil affiche une salutation et un prénom chargés en JS,
-       pas un titre de page. Un lecteur d'écran a besoin du second.
-         Le style est répété en ligne à dessein : shared.css est servi sans
-         versionnage avec un cache de sept jours, alors que le HTML, lui, est
-         toujours frais. Un visiteur revenu entre-temps recevrait ce titre
-         sans la règle .sr-only — donc affiché en grand. À retirer le jour où
-         la feuille de style sera versionnée. -->
-  <h1 class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0">Tableau de bord</h1>
+       pas un titre de page. Un lecteur d'écran a besoin du second. -->
+  <h1 class="sr-only">Tableau de bord</h1>
 
   <!-- WELCOME BANNER -->
   <div class="welcome-banner reveal">
@@ -1313,7 +1308,7 @@
 <!-- BOTTOM NAV -->
 
 
-<script src="/shared.js"></script>
+<script src="/shared.js?v=bd13709d"></script>
 <script>
   // Greeting
   const hr = new Date().getHours();
