@@ -3,9 +3,18 @@
    Handles: push notifications, offline cache
 ─────────────────────────────────────────── */
 
-const CACHE_STATIC  = 'emploia-static-v3';
+// Empreintes des feuilles partagées. Stampées par scripts/assets/version.mjs
+// à partir du contenu des fichiers : ne pas éditer à la main, ci-guards
+// vérifie qu'elles sont à jour.
+const ASSETS = { '/shared.css': 'e5499748', '/shared.js': 'bd13709d' };
+
+// Le nom du cache statique dérive des empreintes. Une feuille qui change
+// renomme donc le cache, et l'éviction à l'activation (plus bas) jette
+// l'ancien sans que personne ait à y penser. C'est ce « penser à bumper v3 »
+// que personne ne faisait, et qui laissait traîner d'anciennes feuilles.
+const CACHE_STATIC  = `emploia-static-${Object.values(ASSETS).join('-')}`;
 const CACHE_PAGES   = 'emploia-pages-v3';
-const STATIC_ASSETS = ['/shared.css', '/shared.js'];
+const STATIC_ASSETS = Object.entries(ASSETS).map(([p, v]) => `${p}?v=${v}`);
 
 // ── INSTALL ──────────────────────────────────────
 self.addEventListener('install', e => {
@@ -39,11 +48,20 @@ self.addEventListener('fetch', e => {
     url.includes('resend.com')
   ) return;
 
-  const isStatic = url.endsWith('.css') || url.endsWith('.js') || url.endsWith('.svg') || url.endsWith('.png') || url.endsWith('.jpg') || url.endsWith('.webp') || url.endsWith('.ico');
-  const isPage   = url.endsWith('.html') || /\/(dashboard|app|jobs|interview|profil|cv-builder|alerts|blog|recherche|onboarding|referral)\/?$/.test(url);
+  // Le classement se fait sur le chemin, jamais sur l'URL entière : depuis que
+  // les feuilles partagées portent `?v=<empreinte>`, leur URL ne se termine
+  // plus par .css ni .js, et les tester en l'état reviendrait à ne plus rien
+  // reconnaître — donc à perdre le mode hors ligne sans que ça se voie.
+  let pathname;
+  try { pathname = new URL(url).pathname; } catch { return; }
+
+  const isStatic = ['.css', '.js', '.svg', '.png', '.jpg', '.webp', '.ico'].some(ext => pathname.endsWith(ext));
+  const isPage   = pathname.endsWith('.html') || /\/(dashboard|app|jobs|interview|profil|cv-builder|alerts|blog|recherche|onboarding|referral)\/?$/.test(pathname);
 
   if (isStatic) {
-    // Cache-first for static assets — they're versioned via CACHE_STATIC bump
+    // Cache-first : sûr maintenant que l'URL porte l'empreinte du contenu.
+    // Une feuille modifiée arrive sous une URL jamais vue, donc en échec de
+    // cache, donc par le réseau.
     e.respondWith(
       caches.match(e.request).then(cached => {
         if (cached) return cached;

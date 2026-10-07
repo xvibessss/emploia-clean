@@ -135,7 +135,24 @@ try {
   }
 } catch (e) { fail('contrôle des événements webhook impossible : ' + e.message); }
 
-// ── 7. runtime vs style d'API : un handler Node ne doit pas parler « Web » ──
+// ── 7. les pages référencent l'empreinte courante des feuilles partagées ───
+// Sans ce contrôle, modifier shared.css sans réestampiller laisserait les
+// pages pointer l'ancienne URL : le cache servirait l'ancienne feuille, et on
+// aurait reproduit en silence le décalage HTML/CSS que le versionnage corrige.
+console.log("\n[7] shared.css / shared.js → empreinte à jour dans les pages");
+try {
+  const { stampAll, ASSETS } = await import('./assets/version.mjs');
+  const { hashes, stale } = stampAll({ write: false });
+  const versions = ASSETS.map(({ file }) => `${file} → ${hashes[file]}`).join(' · ');
+
+  if (stale.length) {
+    fail(`${stale.length} fichier(s) portent une empreinte périmée (${stale.slice(0, 5).join(', ')}${stale.length > 5 ? '…' : ''}) — corriger avec : npm run assets:version`);
+  } else {
+    ok(`empreintes à jour partout — ${versions}`);
+  }
+} catch (e) { fail("contrôle des empreintes d'assets impossible : " + e.message); }
+
+// ── 8. runtime vs style d'API : un handler Node ne doit pas parler « Web » ──
 // C'est la panne de /api/jobs, restée 500 en production du 23 mai au 6 octobre
 // 2026. Le commit 0a40c4b a retiré `export const config = { runtime: 'edge' }`
 // en laissant le corps écrit pour l'API Web. En runtime Node, `req.headers` est
@@ -148,7 +165,7 @@ try {
 //
 // Les bibliothèques de api/_lib/ sont exclues : elles reçoivent le `req` des
 // handlers Edge qui les appellent, et utilisent req.headers.get légitimement.
-console.log("\n[7] runtime déclaré ↔ style d'API utilisé");
+console.log("\n[8] runtime déclaré ↔ style d'API utilisé");
 const WEB_API = [
   [/req\.headers\.get\s*\(/, 'req.headers.get()'],
   [/new\s+URL\s*\(\s*req\.url/, 'new URL(req.url)'],
