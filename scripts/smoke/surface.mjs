@@ -42,10 +42,6 @@ const EXEMPT = {
   '/nps': 'formulaire court, rendu au clic depuis un email',
   '/reset-password': 'formulaire minimal, atteint par lien signé',
   '/recherche': 'résultats chargés en JS',
-  '/chat': 'interface applicative',
-  '/interview': 'interface applicative',
-  '/profil': 'interface applicative',
-  '/dashboard': 'interface applicative',
 };
 
 let failed = 0;
