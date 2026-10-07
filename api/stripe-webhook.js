@@ -3,8 +3,52 @@ import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './
 import { sendEmail } from './_lib/email.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
 // Pack Campagne — 59 € one-off buys 3 months of Pro access.
 const CAMPAGNE_DAYS = 90;
+const AFFILIATE_CODE_RE = /^[A-Z0-9]{3,20}$/;
+
+// Attribution de repli, pour l'acheteur qui n'est jamais passé par ?code=.
+//
+// Chemin nominal : le lien du créateur porte ?code=, shared.js le capte,
+// api/stripe-checkout.js le résout côté serveur et pose à la fois
+// discounts[0][promotion_code] et metadata[affiliate]. Rien à faire ici,
+// l'attribution est déjà dans l'événement.
+//
+// Chemin résiduel : l'acheteur arrive sans ?code=, voit le champ promo de
+// Stripe (allow_promotion_codes) et y saisit le code à la main. Stripe lui
+// accorde la remise, mais aucune metadata n'est posée — le créateur a fait la
+// vente et n'est pas crédité. C'est exactement l'acheteur le plus engagé :
+// celui qui a retenu le code au lieu de cliquer le lien.
+//
+// L'événement ne contient pas le code en clair, seulement l'identifiant du
+// promotion code (Stripe ne développe pas les objets dans les webhooks). Une
+// lecture suffit à le résoudre. Lecture seule, et volontairement enfermée dans
+// un try/catch : une commission manquée se rattrape à la main depuis la
+// console admin, un accès Pro non accordé est un client qui a payé pour rien.
+// La livraison passe donc avant l'attribution en cas de panne.
+async function resolveAffiliateFromDiscounts(session) {
+  if (!STRIPE_SECRET) return '';
+  const promo = session.discounts?.[0]?.promotion_code;
+  // Déjà développé par une version future de l'API : on prend le code tel quel.
+  if (promo && typeof promo === 'object' && promo.code) {
+    const code = String(promo.code).toUpperCase();
+    return AFFILIATE_CODE_RE.test(code) ? code : '';
+  }
+  if (!promo || typeof promo !== 'string') return '';
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/promotion_codes/${encodeURIComponent(promo)}`, {
+      headers: { Authorization: `Bearer ${STRIPE_SECRET}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    const code = String(data.code || '').toUpperCase();
+    return AFFILIATE_CODE_RE.test(code) ? code : '';
+  } catch {
+    return '';
+  }
+}
 
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -82,8 +126,14 @@ export default async function handler(req) {
           // would lose a sale whenever two buyers convert at the same moment.
           // Commission owed is derived at read time in api/affiliate.js, so
           // changing the rate never rewrites history.
-          const affiliate = session.metadata?.affiliate;
-          if (affiliate && /^[A-Z0-9]{3,20}$/.test(affiliate)) {
+          //
+          // metadata.affiliate d'abord : c'est le chemin nominal, et il ne
+          // coûte aucun appel. Le repli par discounts[] ne sert qu'à l'acheteur
+          // qui a saisi le code sur la page Stripe — voir
+          // resolveAffiliateFromDiscounts.
+          const affiliate = session.metadata?.affiliate
+            || await resolveAffiliateFromDiscounts(session);
+          if (affiliate && AFFILIATE_CODE_RE.test(affiliate)) {
             await Promise.all([
               kvSadd('affiliates', affiliate),
               kvIncr(`affiliate:${affiliate}:sales`),
