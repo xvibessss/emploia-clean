@@ -1,6 +1,14 @@
 import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
 
+// Runtime Edge, épinglé sur Paris. Le corps de ce handler est écrit pour
+// l'API Web (req.headers.get, new URL(req.url), new Response) : en runtime
+// Node, req.headers est un objet simple et le handler meurt sur sa deuxième
+// ligne. Le commit 0a40c4b avait retiré ce bloc pour « restaurer l'accès à
+// process.env » — motif infondé, process.env est lisible en Edge sur Vercel,
+// comme le font les 66 autres handlers Edge du projet.
+export const config = { runtime: 'edge', regions: ['cdg1'] };
+
 const H = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',

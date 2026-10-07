@@ -135,6 +135,45 @@ try {
   }
 } catch (e) { fail('contrôle des événements webhook impossible : ' + e.message); }
 
+// ── 7. runtime vs style d'API : un handler Node ne doit pas parler « Web » ──
+// C'est la panne de /api/jobs, restée 500 en production du 23 mai au 6 octobre
+// 2026. Le commit 0a40c4b a retiré `export const config = { runtime: 'edge' }`
+// en laissant le corps écrit pour l'API Web. En runtime Node, `req.headers` est
+// un objet simple : `req.headers.get(...)` lève un TypeError dès la deuxième
+// ligne du handler, qui répond FUNCTION_INVOCATION_FAILED sans jamais démarrer.
+//
+// Rien ne signalait l'erreur : le fichier est syntaxiquement valide, il exporte
+// bien un default, et le contrôle [2] passait. Seule l'invocation révélait la
+// panne. Ce garde compare donc le runtime déclaré au style d'API employé.
+//
+// Les bibliothèques de api/_lib/ sont exclues : elles reçoivent le `req` des
+// handlers Edge qui les appellent, et utilisent req.headers.get légitimement.
+console.log("\n[7] runtime déclaré ↔ style d'API utilisé");
+const WEB_API = [
+  [/req\.headers\.get\s*\(/, 'req.headers.get()'],
+  [/new\s+URL\s*\(\s*req\.url/, 'new URL(req.url)'],
+  [/new\s+Response\s*\(/, 'new Response()'],
+];
+let mismatched = 0;
+for (const f of apiFiles) {
+  const base = path.basename(f);
+  if (base.startsWith('_') || f.includes('/_lib/')) continue; // libs, pas des handlers
+  const src = readAll(f);
+  const cfg = src.match(/export\s+const\s+config\s*=\s*\{[\s\S]*?\}\s*;/);
+  const isEdge = cfg && /runtime\s*:\s*['"]edge['"]/.test(cfg[0]);
+  if (isEdge) continue; // style Web attendu, rien à signaler
+  const used = WEB_API.filter(([re]) => re.test(src)).map(([, label]) => label);
+  if (used.length) {
+    fail(
+      `${f} tourne en runtime Node mais utilise ${used.join(', ')} — ` +
+      `ajouter export const config = { runtime: 'edge', regions: ['cdg1'] }, ` +
+      `ou convertir le handler au style Node (req.headers['x-…'], res.status().json())`
+    );
+    mismatched++;
+  }
+}
+if (!mismatched) ok("aucun handler Node n'utilise l'API Web");
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
