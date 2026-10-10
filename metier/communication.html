@@ -120,7 +120,7 @@
   async function loadJobs(){
     const g=document.getElementById('jobGrid');
     try{
-      const r=await fetch('/api/jobs-search?q='+encodeURIComponent(DEFAULT_QUERY)+'&limit=18');
+      const r=await fetch('/api/jobs?q='+encodeURIComponent(DEFAULT_QUERY)+'&limit=18');
       const d=await r.json();const jobs=d.jobs||d.results||[];
       g.innerHTML='';
       if(!jobs.length){g.innerHTML='<div class="loading-state">Aucune offre — <a href="/jobs" style="color:var(--blb);margin-left:6px">voir toutes les offres</a></div>';document.getElementById('jobCount').textContent='Aucune offre';return;}

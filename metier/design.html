@@ -195,7 +195,7 @@
     try {
       const params = new URLSearchParams({ q: DEFAULT_QUERY, limit: 18 });
       if (DEFAULT_LOCATION) params.set('location', DEFAULT_LOCATION);
-      const r = await fetch('/api/jobs-search?' + params);
+      const r = await fetch('/api/jobs?' + params);
       const data = await r.json();
       const jobs = data.jobs || data.results || [];
       grid.innerHTML = '';
