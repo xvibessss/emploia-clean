@@ -472,6 +472,20 @@ export default async function handler(req) {
   const remoteOnly = url.searchParams.get('remote') === 'true';
   const page       = Math.max(0, Math.min(10, parseInt(url.searchParams.get('page') || '0')));
 
+  // `limit` borne le nombre de cartes rendues. Les 86 pages SEO l'envoient
+  // (&limit=18, &limit=24 pour /recherche) et recevaient sinon tout l'agrégat,
+  // soit 21 à 87 cartes sur un gabarit dessiné pour en montrer dix-huit.
+  // Absent ou invalide ⇒ aucune troncature : les 3 pages applicatives, qui ne
+  // le passent pas, gardent exactement la réponse qu'elles ont aujourd'hui.
+  // La borne haute à 50 empêche de transformer le paramètre en levier de
+  // charge sur les 8 sources amont.
+  const limitBrut = parseInt(url.searchParams.get('limit') || '', 10);
+  const limit     = Number.isFinite(limitBrut) ? Math.max(1, Math.min(50, limitBrut)) : null;
+  // Tronque après tous les filtres, jamais avant la mise en cache : l'entrée
+  // de cache reste la liste complète, donc deux pages aux `limit` différents
+  // la partagent au lieu de se l'écraser l'une l'autre.
+  const borner = (jobs) => (limit === null ? jobs : jobs.slice(0, limit));
+
   // 5-minute KV cache — key combines all search params (already bounded above)
   const cacheKey = `jobs:${q}|${type}|${location}|${page}`;
   try {
@@ -479,6 +493,7 @@ export default async function handler(req) {
     if (cached?.jobs?.length) {
       let final = cached.jobs;
       if (remoteOnly) final = final.filter(j => j.remote === true);
+      final = borner(final);
       return new Response(
         JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], cached: true }),
         { status: 200, headers: H }
@@ -524,6 +539,7 @@ export default async function handler(req) {
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
       kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
+      final = borner(final);
       return new Response(
         JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec }),
         { status: 200, headers: H }
@@ -533,5 +549,14 @@ export default async function handler(req) {
 
   const mock = getMock(q, type, page);
   if (remoteOnly) mock.jobs = mock.jobs.filter(j => j.remote === true);
+  mock.jobs = borner(mock.jobs);
+  // getMock expose `total` = toutes les offres de secours correspondantes, pas
+  // seulement celles de la page — sémantique de pagination qu'on laisse
+  // strictement intacte quand `limit` est absent (15 pour 12 cartes : c'est le
+  // comportement que les 3 pages applicatives reçoivent aujourd'hui).
+  // Mais les pages affichent « ${data.total} offres trouvées » au-dessus des
+  // cartes : laisser 15 au-dessus de 3 cartes réimprimerait, en plus petit, le
+  // mensonge qu'on vient de retirer des 86 pages.
+  if (limit !== null) mock.total = Math.min(mock.total, mock.jobs.length);
   return new Response(JSON.stringify(mock), { status: 200, headers: H });
 }

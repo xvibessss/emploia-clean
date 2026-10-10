@@ -155,10 +155,27 @@ const CONTENT_PROBES = [
     breaks: '/jobs — la recherche d’emploi, le cœur du produit',
   },
   {
-    path: '/api/jobs-search?q=developpeur&location=Paris',
-    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0,
-    describe: (d) => `${(d.jobs || []).length} offre(s)`,
-    breaks: 'les 86 pages qui l’appellent — 48 /emploi/<ville>, 37 /metier/<métier> et /recherche affichent « Aucune offre trouvée »',
+    // Les 86 pages SEO appellent désormais /api/jobs. Cette sonde reproduit
+    // leur appel au caractère près — DEFAULT_QUERY d'une page métier, plus le
+    // `&limit=18` que le gabarit envoie — parce que la sonde ci-dessus
+    // (`q=developpeur`, sans limit) n'emprunte pas le même chemin de code et
+    // ne verrait pas une régression du paramètre `limit`.
+    path: '/api/jobs?q=' + encodeURIComponent('aide-soignant santé EHPAD hôpital') + '&limit=18',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0 && d.jobs.length <= 18,
+    describe: (d) => `${(d.jobs || []).length} offre(s) pour limit=18`,
+    // Un repli sur les offres de secours rendrait les 86 pages identiques
+    // entre elles : quinze annonces parisiennes sur /emploi/limoges.
+    alsoFail: (d) => (d.demo === true ? 'demo:true — les sources réelles ont toutes échoué, les 86 pages servent le même jeu de secours' : null),
+    breaks: 'les 86 pages indexées — 48 /emploi/<ville>, 37 /metier/<métier> et /recherche affichent « Aucune offre trouvée »',
+  },
+  {
+    // Le contrat de `limit` : la borne est exacte, pas approchée. La requête
+    // sans `limit` est déjà couverte par la première sonde ; celle-ci ne
+    // vérifie que la troncature, qui est le seul comportement ajouté.
+    path: '/api/jobs?q=developpeur&limit=3',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length === 3,
+    describe: (d) => `${(d.jobs || []).length} offre(s) — borne respectée`,
+    breaks: 'la mise en page des 86 pages SEO — elles dessinent 18 cartes, pas 87',
   },
   {
     path: '/api/rss',

@@ -213,7 +213,7 @@
   async function loadJobs() {
     const grid = document.getElementById('jobGrid');
     try {
-      const r = await fetch(`/api/jobs-search?q=${encodeURIComponent(DEFAULT_QUERY)}&location=${encodeURIComponent(DEFAULT_LOCATION)}&limit=18`);
+      const r = await fetch(`/api/jobs?q=${encodeURIComponent(DEFAULT_QUERY)}&location=${encodeURIComponent(DEFAULT_LOCATION)}&limit=18`);
       const data = await r.json();
       const jobs = data.jobs || data.results || [];
       grid.innerHTML = '';
