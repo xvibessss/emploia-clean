@@ -428,6 +428,80 @@ function prioritize(jobs) {
   });
 }
 
+// ── PERTINENCE ────────────────────────────────────────
+// Deux des huit collecteurs ignorent purement et simplement le terme de
+// recherche. Mesuré sur l'API publique de Remotive, qui rend les mêmes 18
+// offres et le même premier titre pour `search=coiffeur`, `search=boulanger`,
+// `search=nurse` et `search=python` ; Arbeitnow se comporte de même. Leur
+// `search=` est accepté puis ignoré, donc leurs offres ne sont pas « peu
+// pertinentes » : elles sont indépendantes de la requête.
+//
+// Conséquence sur les 86 pages SEO : un bloc fixe de 11 offres — « Inside
+// Sales Contractor », « Senior Consultant (m/w/d) » — identique sur
+// /emploi/limoges, /emploi/amiens, /metier/coiffeur et /metier/aide-soignant.
+// Du quasi-dupliqué sur toute la surface indexée, et jusqu'à la moitié du
+// contenu des pages à faible rendement.
+//
+// On ne peut pas le corriger par le classement : une offre hors sujet reste
+// hors sujet en bas de page, et Google lit la page entière. Il faut l'écarter.
+//
+// Le filtre est volontairement permissif — il retient une offre dès qu'UN
+// indice la relie à la requête — parce que le risque à éviter est de vider une
+// page, pas d'y laisser une offre de trop.
+//
+// Pourquoi filtrer par pertinence et non par source. La liste noire des deux
+// collecteurs fautifs était plus simple, et elle est fausse : sur une mesure
+// d'Amiens, parmi les offres Arbeitnow écartées figurent « Responsable
+// Métrologie — Saint Ouen » et « Chargé de Ressources Humaines en alternance —
+// Saint Ouen ». De vraies offres françaises, simplement pas à Amiens. Les
+// écarter par pertinence les laisse remonter sur la page qui leur correspond ;
+// les écarter par source les perdrait pour toutes les pages.
+//
+// Mesuré en production (annexe 3 de AUDIT-flux-offres-2026-10-10.md) : sur six
+// villes, ce filtre garde 47,6 % à 63,3 % des offres — soit 10 à 19 annonces
+// mentionnant réellement la ville — et écarte presque exactement 11 offres par
+// page, vérifiées une à une sur Amiens comme étant 6 Remotive + 5 Arbeitnow.
+// Le bloc fixe, à l'unité, sans une seule offre légitime perdue.
+function normaliser(s) {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // « santé » → « sante »
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+// Mots trop courts ou trop communs pour porter du sens : les garder ferait
+// correspondre n'importe quoi (« de », « et », « job »).
+const MOTS_VIDES = new Set(['pour', 'avec', 'dans', 'chez', 'les', 'des', 'une', 'job', 'jobs', 'emploi', 'poste', 'offre', 'cdi', 'cdd']);
+
+function motsDeRecherche(q, location) {
+  return [...new Set([...normaliser(q).split(' '), ...normaliser(location).split(' ')])]
+    .filter(m => m.length >= 4 && !MOTS_VIDES.has(m));
+}
+
+// Une offre est retenue si l'un de ses champs porte l'un des mots de la
+// requête. On regarde le titre, l'entreprise, le lieu ET la description : une
+// offre d'aide-soignant peut ne pas porter « EHPAD » dans son titre.
+function estPertinente(job, mots) {
+  if (!mots.length) return true;                     // pas de requête → tout passe
+  const foin = normaliser(`${job.title} ${job.company} ${job.location} ${job.description}`);
+  return mots.some(m => foin.includes(m));
+}
+
+// Filtre l'agrégat, mais JAMAIS jusqu'au vide : si aucune offre ne survit, on
+// rend la liste entière plutôt qu'une page blanche. Une page SEO vide est la
+// panne qu'on vient de réparer ; mieux vaut du bruit visible qu'un trou, et
+// c'est la sonde qui doit alerter sur ce cas, pas l'utilisateur qui le découvre.
+// Le drapeau `filtre` dit laquelle des deux branches a été prise, pour que
+// l'écart soit mesurable depuis l'extérieur au lieu d'être deviné.
+function filtrerPertinence(jobs, q, location) {
+  const mots = motsDeRecherche(q, location);
+  if (!mots.length) return { jobs, filtrees: 0, filtre: 'inactif' };
+  const gardees = jobs.filter(j => estPertinente(j, mots));
+  if (!gardees.length) return { jobs, filtrees: 0, filtre: 'abandonne' };
+  return { jobs: gardees, filtrees: jobs.length - gardees.length, filtre: 'actif' };
+}
+
 // ── MOCK FALLBACK ─────────────────────────────────────
 const MOCK = [
   { id:'m1', title:'Développeur Full Stack React/Node.js', company:'BNP Paribas', location:'Paris 75009', type:'CDI', salary:'45–55k€/an', description:'Stack React, Node.js, PostgreSQL.', url:'/app', date:daysAgo(1), remote:true, source:'Emploia', logo:null, country:'FR' },
@@ -495,7 +569,7 @@ export default async function handler(req) {
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], filtre: cached.filtre || 'inconnu', cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -532,16 +606,31 @@ export default async function handler(req) {
     const sourcesEnEchec = [...new Set(journal.map(e => e.source))];
 
     if (allJobs.length > 0) {
-      let final = prioritize(deduplicate(allJobs));
+      // L'ordre compte. Le filtre de pertinence s'applique AVANT la mise en
+      // cache, pas après : la clé de cache porte déjà `q` et `location`, donc
+      // l'entrée est propre à cette requête et la liste filtrée lui
+      // correspond. Filtrer après lecture du cache aurait refait le travail à
+      // chaque appel ; filtrer avant l'écriture le fait une fois par requête
+      // et par fenêtre de cinq minutes.
+      const pertinence = filtrerPertinence(prioritize(deduplicate(allJobs)), q, location);
+      let final = pertinence.jobs;
+      if (pertinence.filtrees) {
+        console.error(`jobs: ${pertinence.filtrees} offre(s) hors sujet écartée(s) pour q=${JSON.stringify(q)} location=${JSON.stringify(location)}`);
+      }
+      if (pertinence.filtre === 'abandonne') {
+        // Aucune offre ne correspond : on sert l'agrégat brut plutôt qu'une
+        // page vide, et on le dit assez fort pour que la sonde le voie.
+        console.error(`jobs: filtre abandonné pour q=${JSON.stringify(q)} — aucune offre pertinente, agrégat brut servi`);
+      }
       const sources = [...new Set(final.map(j => j.source))];
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, filtre: pertinence.filtre }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, filtre: pertinence.filtre }),
         { status: 200, headers: H }
       );
     }

@@ -178,6 +178,47 @@ const CONTENT_PROBES = [
     breaks: 'la mise en page des 86 pages SEO — elles dessinent 18 cartes, pas 87',
   },
   {
+    // Le filtre de pertinence, vu de l'extérieur. Deux collecteurs (Remotive,
+    // Arbeitnow) ignorent le terme de recherche et servaient le même bloc de
+    // 11 offres sur les 86 pages. La sonde vérifie que ce bloc a disparu d'une
+    // requête métier précise, et que la page n'est pas vide pour autant.
+    path: '/api/jobs?q=' + encodeURIComponent('coiffeur coiffure salon') + '&limit=18',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0
+      && !d.jobs.some((j) => /Inside Sales Contractor|Service Desk Engineer|Senior Consultant \(m\/w\/d\)/i.test(j.title || '')),
+    describe: (d) => `${(d.jobs || []).length} offre(s), filtre=${d.filtre}`,
+    // `abandonne` signifie qu'aucune offre ne correspondait et que l'agrégat
+    // brut a été servi : la page n'est pas vide, mais le bruit est de retour.
+    // Ce n'est pas une panne — c'est le repli qui fait son travail — et c'est
+    // la mesure qui dira si le filtre est trop strict pour cette requête.
+    alsoFail: (d) => (d.filtre === 'abandonne'
+      ? 'filtre abandonné — aucune offre ne correspondait, l’agrégat brut est servi : bruit de retour sur cette page'
+      : null),
+    breaks: 'la pertinence des 86 pages — un bloc d’offres identique sur toute la surface indexée est du quasi-dupliqué aux yeux de Google',
+  },
+  {
+    // Une page de ville, qui est le cas que le filtre aurait pu casser.
+    // Mesuré en production avant d'être écrit ici (annexe 3 de
+    // AUDIT-flux-offres-2026-10-10.md) : six villes gardent entre 47,6 % et
+    // 63,3 % de leurs offres, soit 10 à 19 annonces mentionnant réellement la
+    // ville. Le repli `abandonne` ne se déclenche sur aucune.
+    //
+    // Le seuil est volontairement bas — 5 offres, là où la mesure la plus
+    // faible en donne 10. Une sonde calée au ras de la mesure du jour rougit
+    // à la première variation normale des sources et finit par être ignorée ;
+    // celle-ci ne rougit que si la page devient réellement maigre.
+    path: '/api/jobs?q=Perpignan&location=Perpignan&limit=18',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length >= 5,
+    describe: (d) => `${(d.jobs || []).length} offre(s), filtre=${d.filtre}`,
+    // Si `abandonne` apparaît ici, c'est que plus aucune offre ne mentionne la
+    // ville — typiquement France Travail et Adzuna tombés en même temps, les
+    // deux seules sources qui honorent `location`. La page n'est pas vide,
+    // mais elle rend le bloc fixe commun aux 48 villes.
+    alsoFail: (d) => (d.filtre === 'abandonne'
+      ? 'filtre abandonné sur une requête de ville — les sources qui honorent `location` sont tombées, les 48 pages de villes servent à nouveau le même bloc'
+      : null),
+    breaks: 'les 48 pages /emploi/<ville> — leur contenu propre est ce qui les distingue aux yeux de Google',
+  },
+  {
     path: '/api/rss',
     expect: (_d, body) => (body.match(/<item>/g) || []).length > 0,
     describe: (_d, body) => `${(body.match(/<item>/g) || []).length} article(s)`,
