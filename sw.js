@@ -6,7 +6,7 @@
 // Empreintes des feuilles partagées. Stampées par scripts/assets/version.mjs
 // à partir du contenu des fichiers : ne pas éditer à la main, ci-guards
 // vérifie qu'elles sont à jour.
-const ASSETS = { '/shared.css': 'e5499748', '/shared.js': 'bd13709d' };
+const ASSETS = { '/shared.css': 'fc5cbc03', '/shared.js': 'bd13709d' };
 
 // Le nom du cache statique dérive des empreintes. Une feuille qui change
 // renomme donc le cache, et l'éviction à l'activation (plus bas) jette
