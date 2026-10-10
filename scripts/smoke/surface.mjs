@@ -196,6 +196,29 @@ const CONTENT_PROBES = [
     breaks: 'la pertinence des 86 pages — un bloc d’offres identique sur toute la surface indexée est du quasi-dupliqué aux yeux de Google',
   },
   {
+    // Une page de ville, qui est le cas que le filtre aurait pu casser.
+    // Mesuré en production avant d'être écrit ici (annexe 3 de
+    // AUDIT-flux-offres-2026-10-10.md) : six villes gardent entre 47,6 % et
+    // 63,3 % de leurs offres, soit 10 à 19 annonces mentionnant réellement la
+    // ville. Le repli `abandonne` ne se déclenche sur aucune.
+    //
+    // Le seuil est volontairement bas — 5 offres, là où la mesure la plus
+    // faible en donne 10. Une sonde calée au ras de la mesure du jour rougit
+    // à la première variation normale des sources et finit par être ignorée ;
+    // celle-ci ne rougit que si la page devient réellement maigre.
+    path: '/api/jobs?q=Perpignan&location=Perpignan&limit=18',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length >= 5,
+    describe: (d) => `${(d.jobs || []).length} offre(s), filtre=${d.filtre}`,
+    // Si `abandonne` apparaît ici, c'est que plus aucune offre ne mentionne la
+    // ville — typiquement France Travail et Adzuna tombés en même temps, les
+    // deux seules sources qui honorent `location`. La page n'est pas vide,
+    // mais elle rend le bloc fixe commun aux 48 villes.
+    alsoFail: (d) => (d.filtre === 'abandonne'
+      ? 'filtre abandonné sur une requête de ville — les sources qui honorent `location` sont tombées, les 48 pages de villes servent à nouveau le même bloc'
+      : null),
+    breaks: 'les 48 pages /emploi/<ville> — leur contenu propre est ce qui les distingue aux yeux de Google',
+  },
+  {
     path: '/api/rss',
     expect: (_d, body) => (body.match(/<item>/g) || []).length > 0,
     describe: (_d, body) => `${(body.match(/<item>/g) || []).length} article(s)`,

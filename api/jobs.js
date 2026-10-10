@@ -448,6 +448,20 @@ function prioritize(jobs) {
 // Le filtre est volontairement permissif — il retient une offre dès qu'UN
 // indice la relie à la requête — parce que le risque à éviter est de vider une
 // page, pas d'y laisser une offre de trop.
+//
+// Pourquoi filtrer par pertinence et non par source. La liste noire des deux
+// collecteurs fautifs était plus simple, et elle est fausse : sur une mesure
+// d'Amiens, parmi les offres Arbeitnow écartées figurent « Responsable
+// Métrologie — Saint Ouen » et « Chargé de Ressources Humaines en alternance —
+// Saint Ouen ». De vraies offres françaises, simplement pas à Amiens. Les
+// écarter par pertinence les laisse remonter sur la page qui leur correspond ;
+// les écarter par source les perdrait pour toutes les pages.
+//
+// Mesuré en production (annexe 3 de AUDIT-flux-offres-2026-10-10.md) : sur six
+// villes, ce filtre garde 47,6 % à 63,3 % des offres — soit 10 à 19 annonces
+// mentionnant réellement la ville — et écarte presque exactement 11 offres par
+// page, vérifiées une à une sur Amiens comme étant 6 Remotive + 5 Arbeitnow.
+// Le bloc fixe, à l'unité, sans une seule offre légitime perdue.
 function normaliser(s) {
   return (s || '')
     .toLowerCase()
