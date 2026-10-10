@@ -34,10 +34,23 @@ const ABSENCES_CONNUES = {
   'France Travail': 'FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés — compte à ouvrir sur francetravail.io',
   Internships: 'HTTP 404 sur internships-api.p.rapidapi.com/active-jb-7d — abonnement ou chemin à revoir sur RapidAPI',
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
-  // Adzuna répond, mais par intermittence : des HTTP 503 de leur côté, plusieurs
-  // fois par heure. Le tolérer évite une sonde rouge au hasard des minutes ;
-  // c'est le journal d'exécution qui dira si le 503 devient permanent.
-  Adzuna: 'HTTP 503 intermittent côté Adzuna — toléré, à relire si la source disparaît durablement',
+  // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
+  // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
+  // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
+  // l'API répond de façon stable sur 8 appels de contrôle. Aucun 503 observé,
+  // à aucun moment.
+  //
+  // Le coût de cette entrée était asymétrique. Tant qu'Adzuna marche, elle ne
+  // fait rien. Le jour où la source meurt pour de bon, elle transforme le rouge
+  // en ligne d'information, et la panne entre dans la catégorie des absences
+  // connues sans que personne l'ait décidé. C'est le mécanisme exact qui a
+  // laissé /api/jobs-search répondre 200 avec zéro offre pendant cinq mois.
+  //
+  // La règle qui s'applique ici : une entrée dans cette liste se justifie par
+  // une cause identifiée et vérifiable — un compte jamais ouvert, un
+  // abonnement en 404 — jamais par une instabilité supposée. Une source
+  // réellement intermittente doit faire rougir la sonde, puis être corrigée ou
+  // retirée ; la taire par avance, c'est renoncer à l'apprendre.
 };
 
 let echecs = 0;
