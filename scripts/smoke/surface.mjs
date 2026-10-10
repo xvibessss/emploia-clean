@@ -178,6 +178,24 @@ const CONTENT_PROBES = [
     breaks: 'la mise en page des 86 pages SEO — elles dessinent 18 cartes, pas 87',
   },
   {
+    // Le filtre de pertinence, vu de l'extérieur. Deux collecteurs (Remotive,
+    // Arbeitnow) ignorent le terme de recherche et servaient le même bloc de
+    // 11 offres sur les 86 pages. La sonde vérifie que ce bloc a disparu d'une
+    // requête métier précise, et que la page n'est pas vide pour autant.
+    path: '/api/jobs?q=' + encodeURIComponent('coiffeur coiffure salon') + '&limit=18',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0
+      && !d.jobs.some((j) => /Inside Sales Contractor|Service Desk Engineer|Senior Consultant \(m\/w\/d\)/i.test(j.title || '')),
+    describe: (d) => `${(d.jobs || []).length} offre(s), filtre=${d.filtre}`,
+    // `abandonne` signifie qu'aucune offre ne correspondait et que l'agrégat
+    // brut a été servi : la page n'est pas vide, mais le bruit est de retour.
+    // Ce n'est pas une panne — c'est le repli qui fait son travail — et c'est
+    // la mesure qui dira si le filtre est trop strict pour cette requête.
+    alsoFail: (d) => (d.filtre === 'abandonne'
+      ? 'filtre abandonné — aucune offre ne correspondait, l’agrégat brut est servi : bruit de retour sur cette page'
+      : null),
+    breaks: 'la pertinence des 86 pages — un bloc d’offres identique sur toute la surface indexée est du quasi-dupliqué aux yeux de Google',
+  },
+  {
     path: '/api/rss',
     expect: (_d, body) => (body.match(/<item>/g) || []).length > 0,
     describe: (_d, body) => `${(body.match(/<item>/g) || []).length} article(s)`,
