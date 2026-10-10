@@ -14,6 +14,15 @@
 //
 // Lecture seule, GET non authentifié. Les endpoints cron contrôlent tous
 // CRON_SECRET avant d'agir (vérifié) : aucun envoi d'email n'est déclenché.
+//
+// Trois niveaux d'exigence, du plus faible au plus fort :
+//   [1] l'API répond        — attrape un handler qui lève (c'était /api/jobs)
+//   [2] la page est remplie — attrape une coquille vide (c'était /legal)
+//   [3] l'API répond QUELQUE CHOSE — attrape un endpoint qui renvoie 200 avec
+//       une liste vide. Un 200 creux est invisible aux deux premiers niveaux :
+//       le handler vit, la page qu'il alimente se charge, et l'utilisateur voit
+//       « Aucune offre trouvée ». C'est la panne la plus coûteuse du lot parce
+//       que c'est la seule qui ne ressemble pas à une panne.
 
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
@@ -129,5 +138,66 @@ const stale = Object.keys(EXEMPT).filter((p) => {
 });
 if (stale.length) console.log(`  ! ${stale.length} exemption(s) devenue(s) inutile(s) — à retirer d'EXEMPT : ${stale.join(', ')}`);
 
-console.log(`\n${failed ? '❌' : '✅'} ${failed} problème(s) sur ${apiRoutes.length + pageRoutes.length} routes\n`);
+// ── 3. Contenu des API de lecture : 200 ne suffit pas ───────────────────────
+// Un endpoint de liste qui répond 200 avec zéro élément a toutes les
+// apparences de la santé : le contrôle [1] le voit répondre, la page qu'il
+// alimente se charge sans erreur. L'utilisateur, lui, voit une page vide.
+//
+// Chaque sonde dit donc ce que la réponse doit CONTENIR, et nomme ce qui casse
+// à l'écran quand elle est vide — pour qu'un échec se lise sans ouvrir le code.
+const CONTENT_PROBES = [
+  {
+    path: '/api/jobs?q=developpeur',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0,
+    describe: (d) => `${(d.jobs || []).length} offre(s)` + (d.demo ? ' — MAIS demo:true, ce sont les offres de secours' : ''),
+    // Un repli sur les 15 offres codées en dur masquerait la panne des sources.
+    alsoFail: (d) => (d.demo === true ? 'demo:true — les sources réelles ont toutes échoué, la page sert le jeu de secours' : null),
+    breaks: '/jobs — la recherche d’emploi, le cœur du produit',
+  },
+  {
+    path: '/api/jobs-search?q=developpeur&location=Paris',
+    expect: (d) => Array.isArray(d.jobs) && d.jobs.length > 0,
+    describe: (d) => `${(d.jobs || []).length} offre(s)`,
+    breaks: 'les 86 pages qui l’appellent — 48 /emploi/<ville>, 37 /metier/<métier> et /recherche affichent « Aucune offre trouvée »',
+  },
+  {
+    path: '/api/rss',
+    expect: (_d, body) => (body.match(/<item>/g) || []).length > 0,
+    describe: (_d, body) => `${(body.match(/<item>/g) || []).length} article(s)`,
+    breaks: '/rss.xml — le flux que les agrégateurs lisent',
+  },
+  {
+    path: '/api/sitemap',
+    expect: (_d, body) => (body.match(/<url>/g) || []).length > 50,
+    describe: (_d, body) => `${(body.match(/<url>/g) || []).length} URL`,
+    breaks: '/sitemap.xml — ce que Google explore',
+  },
+];
+
+console.log('\n[3] API de lecture — la réponse doit contenir quelque chose');
+for (const probe of CONTENT_PROBES) {
+  let res, body;
+  try {
+    res = await fetch(BASE + probe.path, { redirect: 'follow', signal: AbortSignal.timeout(TIMEOUT) });
+    body = await res.text();
+  } catch (e) {
+    ko(probe.path, `${e.name === 'TimeoutError' ? `pas de réponse en ${TIMEOUT / 1000}s` : e.message} — casse ${probe.breaks}`);
+    continue;
+  }
+  if (res.status !== 200) { ko(probe.path, `HTTP ${res.status} — casse ${probe.breaks}`); continue; }
+
+  // Les flux XML n'ont pas de JSON : on passe un objet vide et on lit le corps.
+  let data = {};
+  try { data = JSON.parse(body); } catch {}
+
+  if (!probe.expect(data, body)) {
+    ko(probe.path, `200 mais réponse vide (${probe.describe(data, body)}) — casse ${probe.breaks}`);
+    continue;
+  }
+  const extra = probe.alsoFail?.(data, body);
+  if (extra) { ko(probe.path, `${extra} — dégrade ${probe.breaks}`); continue; }
+  ok(probe.path, probe.describe(data, body));
+}
+
+console.log(`\n${failed ? '❌' : '✅'} ${failed} problème(s) sur ${apiRoutes.length + pageRoutes.length} routes et ${CONTENT_PROBES.length} sondes de contenu\n`);
 process.exit(failed ? 1 : 0);
