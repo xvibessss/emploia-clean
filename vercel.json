@@ -4,6 +4,7 @@
   "buildCommand": "echo ok",
   "outputDirectory": ".",
   "installCommand": "echo ok",
+  "regions": ["cdg1"],
   "functions": {
     "api/**/*.js": { "maxDuration": 60 }
   },
@@ -46,6 +47,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.svg"
+    },
     {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
@@ -147,6 +152,7 @@
     { "source": "/rss.xml", "destination": "/api/rss" },
     { "source": "/employeurs", "destination": "/employeurs.html" },
     { "source": "/ecoles", "destination": "/ecoles.html" },
+    { "source": "/sous-traitants", "destination": "/sous-traitants.html" },
     { "source": "/poster-offre", "destination": "/employeurs.html" },
     { "source": "/blog/cv-ats-2026", "destination": "/blog/cv-ats-2026.html" },
     { "source": "/blog/methode-star-entretien", "destination": "/blog/methode-star-entretien.html" },
@@ -433,7 +439,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://emploia.eu https://emploia-clean.vercel.app https://plausible.io https://remotive.com https://www.arbeitnow.com https://api.stripe.com; frame-src https://js.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://js.stripe.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https: blob:; connect-src 'self' https://emploia.eu https://emploia-clean.vercel.app https://plausible.io https://remotive.com https://www.arbeitnow.com https://api.stripe.com; frame-src https://js.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'; manifest-src 'self'; upgrade-insecure-requests"
         }
       ]
     },
@@ -535,7 +541,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=604800, stale-while-revalidate=2592000"
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -544,7 +550,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=604800, stale-while-revalidate=2592000"
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },

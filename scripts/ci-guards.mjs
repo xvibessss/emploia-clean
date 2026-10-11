@@ -68,13 +68,128 @@ const envs = ['.env', '.env.local', '.env.production'].filter(exists);
 if (envs.length) fail('fichier(s) secret(s) commités : ' + envs.join(', '));
 else ok('aucun .env commité');
 
-// ── 4. JSON config is valid ─────────────────────────────────────────────────
-console.log('\n[4] JSON de config valide');
+// ── 4. data locality: every function is pinned to Paris ─────────────────────
+// La page /ecoles et /sous-traitants affirment à un acheteur institutionnel que
+// le traitement applicatif s'exécute en France. Cette affirmation ne tient que
+// si chaque fonction est effectivement épinglée, et elle se périmerait au
+// premier handler ajouté sans y penser — d'où ce garde.
+//
+// Deux mécanismes distincts, et c'est le piège : la clé `regions` de
+// vercel.json pilote les fonctions Serverless/Node, tandis qu'une fonction en
+// runtime Edge s'exécute par défaut « dans la région la plus proche de la
+// requête » et doit déclarer ses propres `regions` dans son export const
+// config. Poser seulement la clé projet laisserait les 66 handlers Edge
+// s'exécuter n'importe où, tout en ayant l'air réglé.
+console.log('\n[4] localisation des données → toute fonction épinglée sur cdg1');
+try {
+  const v = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+  const projectRegions = v.regions || [];
+  if (projectRegions.length === 1 && projectRegions[0] === 'cdg1') ok('vercel.json déclare regions: ["cdg1"]');
+  else fail(`vercel.json doit déclarer regions: ["cdg1"] (actuel : ${JSON.stringify(projectRegions)})`);
+
+  let unpinned = 0;
+  for (const f of apiFiles) {
+    const base = path.basename(f);
+    if (base.startsWith('_') || f.includes('/_lib/')) continue; // libs, pas des handlers
+    const src = readAll(f);
+    const cfg = src.match(/export\s+const\s+config\s*=\s*\{[\s\S]*?\}\s*;/);
+    // Un handler sans bloc config tourne en Node et hérite de la clé projet.
+    if (!cfg) continue;
+    if (!/runtime\s*:\s*['"]edge['"]/.test(cfg[0])) continue;
+    if (!/regions\s*:\s*\[\s*['"]cdg1['"]\s*\]/.test(cfg[0])) {
+      fail(`handler Edge non épinglé sur cdg1 : ${f} — ajouter regions: ['cdg1'] à son export const config`);
+      unpinned++;
+    }
+  }
+  if (!unpinned) ok(`tous les handlers Edge déclarent regions: ['cdg1']`);
+} catch (e) { fail('contrôle de localisation impossible : ' + e.message); }
+
+// ── 5. JSON config is valid ─────────────────────────────────────────────────
+console.log('\n[5] JSON de config valide');
 for (const j of ['vercel.json', 'package.json']) {
   if (!exists(j)) continue;
   try { JSON.parse(fs.readFileSync(j, 'utf8')); ok(`${j} valide`); }
   catch (e) { fail(`${j} invalide : ${e.message}`); }
 }
+
+// ── 6. La liste d'événements du vérificateur suit le handler ────────────────
+// Un événement ajouté au handler mais pas à cette liste ne serait jamais
+// réclamé chez Stripe : il ne serait donc jamais livré, et le code écrit pour
+// le traiter ne tournerait jamais. C'est exactement la panne constatée en
+// production le 2026-10-05 — quatre des cinq événements n'étaient pas cochés.
+console.log('\n[6] verify-webhook.mjs couvre tous les événements du handler');
+try {
+  const handler = fs.readFileSync('api/stripe-webhook.js', 'utf8');
+  const verifier = fs.readFileSync('scripts/billing/verify-webhook.mjs', 'utf8');
+
+  const handled = [...handler.matchAll(/case\s+'([a-z_]+\.[a-z_.]+)'\s*:/g)].map(m => m[1]);
+  const required = [...verifier.matchAll(/^\s*'([a-z_]+\.[a-z_.]+)',/gm)].map(m => m[1]);
+
+  if (!handled.length) fail('aucun case event.type trouvé dans api/stripe-webhook.js — motif à revoir');
+  else {
+    const missing = handled.filter(e => !required.includes(e));
+    const extra = required.filter(e => !handled.includes(e));
+    if (missing.length) fail(`verify-webhook.mjs ignore ${missing.length} événement(s) traité(s) par le handler : ${missing.join(', ')}`);
+    if (extra.length) fail(`verify-webhook.mjs exige ${extra.length} événement(s) que le handler ne traite pas : ${extra.join(', ')}`);
+    if (!missing.length && !extra.length) ok(`les ${handled.length} événements du handler sont exigés à l'identique`);
+  }
+} catch (e) { fail('contrôle des événements webhook impossible : ' + e.message); }
+
+// ── 7. les pages référencent l'empreinte courante des feuilles partagées ───
+// Sans ce contrôle, modifier shared.css sans réestampiller laisserait les
+// pages pointer l'ancienne URL : le cache servirait l'ancienne feuille, et on
+// aurait reproduit en silence le décalage HTML/CSS que le versionnage corrige.
+console.log("\n[7] shared.css / shared.js → empreinte à jour dans les pages");
+try {
+  const { stampAll, ASSETS } = await import('./assets/version.mjs');
+  const { hashes, stale } = stampAll({ write: false });
+  const versions = ASSETS.map(({ file }) => `${file} → ${hashes[file]}`).join(' · ');
+
+  if (stale.length) {
+    fail(`${stale.length} fichier(s) portent une empreinte périmée (${stale.slice(0, 5).join(', ')}${stale.length > 5 ? '…' : ''}) — corriger avec : npm run assets:version`);
+  } else {
+    ok(`empreintes à jour partout — ${versions}`);
+  }
+} catch (e) { fail("contrôle des empreintes d'assets impossible : " + e.message); }
+
+// ── 8. runtime vs style d'API : un handler Node ne doit pas parler « Web » ──
+// C'est la panne de /api/jobs, restée 500 en production du 23 mai au 6 octobre
+// 2026. Le commit 0a40c4b a retiré `export const config = { runtime: 'edge' }`
+// en laissant le corps écrit pour l'API Web. En runtime Node, `req.headers` est
+// un objet simple : `req.headers.get(...)` lève un TypeError dès la deuxième
+// ligne du handler, qui répond FUNCTION_INVOCATION_FAILED sans jamais démarrer.
+//
+// Rien ne signalait l'erreur : le fichier est syntaxiquement valide, il exporte
+// bien un default, et le contrôle [2] passait. Seule l'invocation révélait la
+// panne. Ce garde compare donc le runtime déclaré au style d'API employé.
+//
+// Les bibliothèques de api/_lib/ sont exclues : elles reçoivent le `req` des
+// handlers Edge qui les appellent, et utilisent req.headers.get légitimement.
+console.log("\n[8] runtime déclaré ↔ style d'API utilisé");
+const WEB_API = [
+  [/req\.headers\.get\s*\(/, 'req.headers.get()'],
+  [/new\s+URL\s*\(\s*req\.url/, 'new URL(req.url)'],
+  [/new\s+Response\s*\(/, 'new Response()'],
+];
+let mismatched = 0;
+for (const f of apiFiles) {
+  const base = path.basename(f);
+  if (base.startsWith('_') || f.includes('/_lib/')) continue; // libs, pas des handlers
+  const src = readAll(f);
+  const cfg = src.match(/export\s+const\s+config\s*=\s*\{[\s\S]*?\}\s*;/);
+  const isEdge = cfg && /runtime\s*:\s*['"]edge['"]/.test(cfg[0]);
+  if (isEdge) continue; // style Web attendu, rien à signaler
+  const used = WEB_API.filter(([re]) => re.test(src)).map(([, label]) => label);
+  if (used.length) {
+    fail(
+      `${f} tourne en runtime Node mais utilise ${used.join(', ')} — ` +
+      `ajouter export const config = { runtime: 'edge', regions: ['cdg1'] }, ` +
+      `ou convertir le handler au style Node (req.headers['x-…'], res.status().json())`
+    );
+    mismatched++;
+  }
+}
+if (!mismatched) ok("aucun handler Node n'utilise l'API Web");
 
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }

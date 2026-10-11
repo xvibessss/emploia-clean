@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import {
   kvGet, kvSet, signToken, setCookieHeader, checkRateLimit,
   verifyPassword, hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, COOKIE_NAME

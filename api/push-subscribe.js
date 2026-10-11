@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getAllowedOrigin, getCurrentUser, kvGet, kvSet, checkRateLimit } from './_lib/auth.js';
 
 export default async function handler(req) {

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvIncr, kvSetNX } from './_lib/auth.js';
 
 // Resend delivery webhooks (Svix-signed). Aggregates email deliverability

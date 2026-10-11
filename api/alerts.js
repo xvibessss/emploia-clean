@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, kvSadd, kvSrem } from './_lib/auth.js';
 
 // KV key: alerts:{email} → { keywords, location, type, frequency, active }

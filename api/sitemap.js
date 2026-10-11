@@ -17,6 +17,7 @@ export default function handler(req, res) {
     { loc: `${base}/blog`,                changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/employeurs`,          changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/ecoles`,              changefreq: 'monthly', priority: '0.85', lastmod: today },
+    { loc: `${base}/sous-traitants`,      changefreq: 'monthly', priority: '0.30', lastmod: today },
     { loc: `${base}/about`,              changefreq: 'monthly', priority: '0.7' },
     { loc: `${base}/contact`,            changefreq: 'yearly',  priority: '0.5' },
     { loc: `${base}/legal`,              changefreq: 'yearly',  priority: '0.3' },

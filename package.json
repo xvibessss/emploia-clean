@@ -5,8 +5,13 @@
     "bench:live": "node scripts/bench/run.mjs --live",
     "test:employer": "node scripts/employer/expiry.test.mjs",
     "test:pricing": "node scripts/pricing/ecoles.test.mjs",
+    "test:rgpd": "node scripts/rgpd/localisation.test.mjs",
     "test:email": "node scripts/billing/email.test.mjs",
     "test:billing": "node scripts/billing/email.test.mjs && node scripts/billing/campagne.test.mjs && node scripts/billing/probe-checkout.mjs && node scripts/billing/probe-webhook.mjs && node scripts/billing/probe-affiliate.mjs",
-    "smoke:prod": "node scripts/smoke/prod.mjs"
+    "smoke:prod": "node scripts/smoke/prod.mjs",
+    "smoke:surface": "node scripts/smoke/surface.mjs",
+    "smoke:sources": "node scripts/smoke/sources.mjs",
+    "verify:webhook": "node scripts/billing/verify-webhook.mjs",
+    "assets:version": "node scripts/assets/version.mjs"
   }
 }

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from './_lib/auth.js';
 
 const SYSTEM = `Tu es Orion, le copilote IA d'Emploia — le seul assistant de candidature 100% spécialisé sur le marché français.

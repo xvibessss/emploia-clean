@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import {
   kvGet, kvSet, kvSadd, signToken, setCookieHeader, checkRateLimit,
   hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape
@@ -134,7 +134,7 @@ export default async function handler(req) {
     </div>
     <div style="padding:32px">
       <h1 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-.5px">Bienvenue, ${firstName} ! 🎉</h1>
-      <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez <strong style="color:#0f172a">5 générations gratuites</strong> prêtes à l'emploi — votre copilote de candidature IA 100% français.</p>
+      <p style="color:#475569;line-height:1.6;margin:0 0 20px">Votre compte Emploia est créé. Vous avez <strong style="color:#0f172a">5 générations gratuites</strong> prêtes à l'emploi — votre copilote de candidature IA conçu en France.</p>
       <a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">✨ Créer mon CV maintenant →</a>
       <div style="margin-top:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
         <p style="color:#166534;font-size:12px;line-height:1.6;margin:0"><strong>💡 Pourquoi ça marche ?</strong> 75% des CV sont filtrés automatiquement avant d'être lus par un humain. Emploia optimise ton CV pour passer ces filtres ATS — mots-clés, format, structure — en 30 secondes.</p>

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, kvSet, kvIncr } from './_lib/auth.js';
 
 const ALLOWED_TYPES = ['cv', 'cover-letter', 'ats-score', 'interview', 'salary', 'linkedin', 'follow-up', 'debrief', 'tools'];

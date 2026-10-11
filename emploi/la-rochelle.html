@@ -16,9 +16,7 @@
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://emploia.eu/emploi/la-rochelle"/>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Emploi à La Rochelle","description":"Offres CDI, CDD, stage et alternance à La Rochelle et en Charente-Maritime. Décrochez un entretien plus vite avec l'IA Emploia.","url":"https://emploia.eu/emploi/la-rochelle","isPartOf":{"@type":"WebSite","name":"Emploia","url":"https://emploia.eu"},"spatialCoverage":{"@type":"Place","name":"La Rochelle","address":{"@type":"PostalAddress","addressLocality":"La Rochelle","addressCountry":"FR"}}}</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="/shared.css"/>
+  <link rel="stylesheet" href="/shared.css?v=fc5cbc03"/>
   <style>
     .seo-layout { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; }
     .seo-hero { margin-bottom: 48px; }
@@ -167,7 +165,7 @@
   <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
 </nav>
 
-<script src="/shared.js"></script>
+<script src="/shared.js?v=bd13709d"></script>
 <script>
   const DEFAULT_QUERY = "La Rochelle";
   const DEFAULT_LOCATION = "La Rochelle";
@@ -191,7 +189,7 @@
   async function loadJobs() {
     const grid = document.getElementById('jobGrid');
     try {
-      const r = await fetch('/api/jobs-search?' + new URLSearchParams({ q: DEFAULT_QUERY, location: DEFAULT_LOCATION, limit: 18 }));
+      const r = await fetch('/api/jobs?' + new URLSearchParams({ q: DEFAULT_QUERY, location: DEFAULT_LOCATION, limit: 18 }));
       const data = await r.json(); const jobs = data.jobs || data.results || [];
       grid.innerHTML = '';
       if (!jobs.length) { grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3);grid-column:1/-1">Aucune offre trouvée — <a href="/jobs" style="color:var(--blb)">voir toutes les offres</a></div>'; document.getElementById('jobCount').textContent = 'Aucune offre trouvée'; return; }

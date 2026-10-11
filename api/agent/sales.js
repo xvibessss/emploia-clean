@@ -1,9 +1,9 @@
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
-const SYSTEM = `Tu es l'agent sales d'Emploia, un SaaS de recherche d'emploi IA 100% français.
+const SYSTEM = `Tu es l'agent sales d'Emploia, un SaaS français de recherche d'emploi par IA.
 
 Rédige un email de conversion court (80-100 mots MAX) pour un utilisateur free qui a déjà utilisé Emploia.
 L'email doit :
