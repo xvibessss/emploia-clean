@@ -101,6 +101,33 @@ check('le coût moyen par siège décroît avec l’effectif',
   quote('ecole', 'usage', 2000) / 2000 < quote('ecole', 'usage', 800) / 800
   && quote('ecole', 'usage', 800) / 800 < quote('ecole', 'usage', 400) / 400);
 
+console.log('\n[B bis] Le coût moyen par siège porte le forfait plateforme');
+// La colonne « Coût moyen par siège » est en regard du budget annuel : un
+// acheteur la vérifie en divisant le devis par son effectif. Tant que la sonde
+// n'assertait pas ces trois valeurs, la page a pu afficher 22,00 € en face de
+// 11 300 € pour 400 sièges — une moyenne calculée hors forfait, donc fausse de
+// 6,25 € par siège. Ne jamais remplacer ces littéraux par un calcul : ce
+// serait réécrire la définition au lieu de la confronter.
+const average = sandbox.window.__ecAverage;
+check('le calculateur expose son coût moyen', typeof average === 'function');
+if (typeof average !== 'function') { console.error('\n❌ sonde tarifaire : coût moyen non exposé\n'); process.exit(1); }
+check('400 sièges → 28,25 € par siège', average('ecole', 'usage', 400) === 28.25, `${average('ecole', 'usage', 400)} €`);
+check('800 sièges → 23,25 € par siège', average('ecole', 'usage', 800) === 23.25, `${average('ecole', 'usage', 800)} €`);
+check('2 000 sièges → 17,00 € par siège', average('ecole', 'usage', 2000) === 17, `${average('ecole', 'usage', 2000)} €`);
+// L'invariant qui empêche la divergence de revenir, quel que soit l'effectif :
+// la moyenne est le devis divisé par l'effectif, plancher compris.
+let coherent = true, divergence = null;
+for (let n = 1; n <= 4000; n++) {
+  if (Math.abs(average('ecole', 'usage', n) - quote('ecole', 'usage', n) / n) > 1e-9) {
+    coherent = false; divergence = n; break;
+  }
+}
+check('la moyenne est toujours le devis divisé par l’effectif', coherent,
+  divergence ? `divergence à ${divergence} sièges` : 'cohérent de 1 à 4 000 sièges');
+// Le plancher déforme la moyenne vers le haut sous 46 sièges : c'est voulu,
+// mais il faut que ce soit la moyenne du montant facturé, pas du barème nu.
+check('sous le plancher, la moyenne suit le plancher', average('ecole', 'usage', 10) === 350, `${average('ecole', 'usage', 10)} €`);
+
 console.log('\n[C] Plancher de facturation : 3 500 €');
 check('1 siège est facturé au plancher', quote('ecole', 'usage', 1) === 3500, `${quote('ecole', 'usage', 1)} €`);
 check('45 sièges sont facturés au plancher', quote('ecole', 'usage', 45) === 3500, `${quote('ecole', 'usage', 45)} €`);
@@ -142,6 +169,12 @@ check('JSON-LD : licence consultant → 1 500 €', priceOf('licence consultant'
 for (const example of ['11 300 €', '18 600 €', '34 000 €', '11 400 €', '6 000 €']) {
   check(`le tableau affiche ${example}`, html.includes(example));
 }
+// Les moyennes aussi : c'est la colonne qui a divergé, elle doit être gardée
+// dans le HTML servi et pas seulement dans le calculateur.
+for (const avg of ['28,25 €', '23,25 €', '17,00 €']) {
+  check(`le tableau affiche la moyenne ${avg}`, html.includes(avg));
+}
+check("aucune moyenne hors forfait ne subsiste", !html.includes('20,13') && !html.includes('15,75'));
 
 // ── 4. Les promesses retirées ne reviennent pas ─────────────────────────────
 console.log('\n[F] Affirmations retirées');

@@ -31,8 +31,8 @@
   "audience": { "@type": "EducationalAudience", "educationalRole": "Établissement d'enseignement supérieur, CFA, cabinet d'outplacement" },
   "offers": [
     { "@type": "Offer", "name": "Siège étudiant — les 500 premiers", "priceCurrency": "EUR", "price": "22", "description": "Barème par tranches : 22 € par siège et par an pour les 500 premiers sièges, plus un forfait plateforme unique de 2 500 € — 400 étudiants : 11 300 € par an", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 500, "unitText": "siège" } },
-    { "@type": "Offer", "name": "Siège étudiant — de 501 à 1 000", "priceCurrency": "EUR", "price": "17", "description": "Barème par tranches : 17 € par siège et par an pour les sièges de 501 à 1 000 — 800 étudiants : 18 600 € par an, soit 20,13 € par siège en moyenne", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 501, "maxValue": 1000, "unitText": "siège" } },
-    { "@type": "Offer", "name": "Siège étudiant — au-delà de 1 000", "priceCurrency": "EUR", "price": "12", "description": "Barème par tranches : 12 € par siège et par an pour les sièges au-delà de 1 000 — 2 000 étudiants : 34 000 € par an, soit 15,75 € par siège en moyenne", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1001, "unitText": "siège" } },
+    { "@type": "Offer", "name": "Siège étudiant — de 501 à 1 000", "priceCurrency": "EUR", "price": "17", "description": "Barème par tranches : 17 € par siège et par an pour les sièges de 501 à 1 000 — 800 étudiants : 18 600 € par an, soit 23,25 € par siège en moyenne, forfait plateforme compris", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 501, "maxValue": 1000, "unitText": "siège" } },
+    { "@type": "Offer", "name": "Siège étudiant — au-delà de 1 000", "priceCurrency": "EUR", "price": "12", "description": "Barème par tranches : 12 € par siège et par an pour les sièges au-delà de 1 000 — 2 000 étudiants : 34 000 € par an, soit 17,00 € par siège en moyenne, forfait plateforme compris", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1001, "unitText": "siège" } },
     { "@type": "Offer", "name": "Forfait plateforme", "priceCurrency": "EUR", "price": "2500", "description": "Forfait annuel unique, indépendant de l'effectif : SSO, tableau de bord, personnalisation, cadrage, support nommé" },
     { "@type": "Offer", "name": "Outplacement — à l'usage", "priceCurrency": "EUR", "price": "190", "description": "190 € par candidat effectivement accompagné, sans forfait plateforme" },
     { "@type": "Offer", "name": "Outplacement — licence consultant", "priceCurrency": "EUR", "price": "1500", "description": "1 500 € par consultant et par an, candidats illimités" }
@@ -365,12 +365,12 @@
       <table>
         <caption>Ce que cela donne</caption>
         <thead>
-          <tr><th scope="col">Effectif</th><th scope="col">Détail du barème</th><th scope="col">Budget annuel</th><th scope="col">Coût moyen par siège</th></tr>
+          <tr><th scope="col">Effectif</th><th scope="col">Détail du barème</th><th scope="col">Budget annuel</th><th scope="col">Coût moyen par siège, forfait compris</th></tr>
         </thead>
         <tbody>
-          <tr><td>400 étudiants</td><td>400 × 22 € + 2 500 €</td><td class="n">11 300 €</td><td class="n">22,00 €</td></tr>
-          <tr><td>800 étudiants</td><td>500 × 22 € + 300 × 17 € + 2 500 €</td><td class="n">18 600 €</td><td class="n">20,13 €</td></tr>
-          <tr><td>2 000 étudiants</td><td>500 × 22 € + 500 × 17 € + 1 000 × 12 € + 2 500 €</td><td class="n">34 000 €</td><td class="n">15,75 €</td></tr>
+          <tr><td>400 étudiants</td><td>400 × 22 € + 2 500 €</td><td class="n">11 300 €</td><td class="n">28,25 €</td></tr>
+          <tr><td>800 étudiants</td><td>500 × 22 € + 300 × 17 € + 2 500 €</td><td class="n">18 600 €</td><td class="n">23,25 €</td></tr>
+          <tr><td>2 000 étudiants</td><td>500 × 22 € + 500 × 17 € + 1 000 × 12 € + 2 500 €</td><td class="n">34 000 €</td><td class="n">17,00 €</td></tr>
           <tr><td>60 candidats outplacement</td><td>60 × 190 €</td><td class="n">11 400 €</td><td class="n">190,00 €</td></tr>
           <tr><td>4 consultants outplacement</td><td>4 × 1 500 €</td><td class="n">6 000 €</td><td class="n">1 500,00 €</td></tr>
         </tbody>
@@ -587,8 +587,15 @@
         hint: 'Facturation à l’usage : 190 € par candidat effectivement accompagné, sans forfait plateforme.' };
     }
     var s = seatCost(n);
-    return { unit: s.marginal, platform: PLATFORM, raw: s.total + PLATFORM,
-      averaged: n > 500, average: s.total / n, hint: bracketHint(n) };
+    var raw = s.total + PLATFORM;
+    // Le coût moyen par siège se calcule sur le budget **réellement facturé**,
+    // forfait plateforme et plancher compris. Un acheteur divise le montant du
+    // devis par son effectif : toute autre définition le ferait arriver à un
+    // nombre différent de celui qu'on affiche. C'est exactement l'écart qui a
+    // fait vivre « 22,00 € » dans le tableau en face de 11 300 € pour 400
+    // sièges, alors que le devis donne 28,25 €.
+    return { unit: s.marginal, platform: PLATFORM, raw: raw,
+      averaged: true, average: Math.max(FLOOR, raw) / n, hint: bracketHint(n) };
   }
 
   function render() {
@@ -602,11 +609,13 @@
     var unitNoun = isLicence ? ' par consultant' : (kind === 'outpl' ? ' par candidat' : ' par siège');
 
     $('ecTotal').textContent = eur(total);
+    // Quand on annonce une moyenne par siège, elle porte déjà le forfait : le
+    // répéter derrière ferait lire au visiteur un forfait ajouté deux fois.
     $('ecTotalUnit').textContent = 'par an, pour ' + int(n) + ' ' + noun + ' — '
       + (q.averaged
-          ? eur(q.average, 2) + ' par siège en moyenne'
+          ? eur(total / n, 2) + ' par siège en moyenne, forfait plateforme compris'
           : eur(q.unit, q.unit % 1 ? 2 : 0) + unitNoun)
-      + (q.platform ? ' plus ' + eur(q.platform) + ' de forfait plateforme' : '')
+      + (q.platform && !q.averaged ? ' plus ' + eur(q.platform) + ' de forfait plateforme' : '')
       + (floored ? ' (plancher de facturation de ' + eur(FLOOR) + ' appliqué)' : '');
     $('ecTierHint').textContent = q.hint;
 
@@ -692,6 +701,19 @@
     var q = quote(n);
     kind = pk; mode = pm;
     return Math.max(FLOOR, q.raw);
+  };
+
+  // Le coût moyen par siège est la colonne de droite du tableau « Ce que cela
+  // donne ». Il est exposé séparément parce que diviser __ecQuote() par
+  // l'effectif dans la sonde ne prouverait rien : la sonde recalculerait sa
+  // propre définition au lieu de confronter celle de la page. C'est cette
+  // absence qui a laissé « 22,00 € » vivre en face de 11 300 €.
+  window.__ecAverage = function (k, m, n) {
+    var pk = kind, pm = mode;
+    kind = k; mode = m;
+    var q = quote(n);
+    kind = pk; mode = pm;
+    return q.averaged ? q.average : Math.max(FLOOR, q.raw) / n;
   };
 
   syncLabels();
