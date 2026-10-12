@@ -191,6 +191,47 @@ for (const f of apiFiles) {
 }
 if (!mismatched) ok("aucun handler Node n'utilise l'API Web");
 
+// ── 9. tout canonical pointe sur une URL réellement servie ─────────────────
+// `cleanUrls` est absent de vercel.json : Vercel ne sert un fichier statique
+// qu'à son chemin réel, extension comprise. Chaque URL propre du site vient
+// donc d'un rewrite explicite — c'est la raison des ~223 entrées.
+//
+// Conséquence : déclarer `canonical` vers `/page` alors que seul `/page.html`
+// existe désigne un 404 comme version faisant autorité. Google suit le
+// canonical, ne trouve rien, et cesse d'indexer la page réelle.
+//
+// C'est la panne trouvée sur score.html le 2026-10-11 : canonical vers
+// `/score`, quand seul `/score/:token` est servi. Un seul lien cassé sur
+// 7086 vérifiés par le Link Check nocturne, mais il suffit à le faire échouer
+// toutes les nuits — et un échec permanent est un échec qu'on cesse de lire.
+console.log('\n[9] chaque canonical désigne une URL servie');
+try {
+  const v = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+  const sources = (v.rewrites || []).map((r) => r.source).filter(Boolean);
+  const exact = new Set(sources.filter((s) => !s.includes(':') && !s.includes('(')));
+  // `/score/:token` et `/blog/(.*)` servent un chemin sans le nommer : il faut
+  // les comparer en motif, sinon chaque page paramétrée serait un faux positif.
+  const patterns = sources
+    .filter((s) => s.includes(':') || s.includes('('))
+    .map((s) => new RegExp('^' + s.replace(/:[a-zA-Z]+/g, '[^/]+').replace(/\(\.\*\)/g, '.*') + '$'));
+
+  let checked = 0, broken = 0;
+  for (const f of walk('.').filter((p) => p.endsWith('.html') && !p.includes('node_modules'))) {
+    const m = readAll(f).match(/rel="canonical"\s+href="([^"]+)"/);
+    if (!m) continue;
+    checked++;
+    let p;
+    try { p = new URL(m[1]).pathname; } catch { fail(`${f} : canonical « ${m[1]} » n'est pas une URL`); broken++; continue; }
+    if (p === '/') continue;
+    const clean = p.replace(/\/$/, '');
+    const isRealFile = /\.[a-z0-9]+$/i.test(clean) && exists('.' + clean);
+    if (exact.has(p) || exact.has(clean) || isRealFile || patterns.some((re) => re.test(clean))) continue;
+    fail(`${f} : canonical vers ${p} — aucun rewrite ne sert ce chemin, Google y trouverait un 404`);
+    broken++;
+  }
+  if (!broken) ok(`les ${checked} canonical désignent une URL servie`);
+} catch (e) { fail('contrôle des canonical impossible : ' + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
