@@ -61,6 +61,11 @@ console.log(`\nSonde des sources d'offres — ${BASE}\n`);
 
 const vues = new Set();
 const absencesRencontrees = new Set();
+// Nom → cause bornée (`http_429`, `cle_absente`, `timeout`…). C'est ce qui
+// rend cette sonde autonome : avant, elle disait QUI était tombé et il fallait
+// ouvrir les journaux Vercel pour savoir POURQUOI — avec une rétention d'une
+// heure sur le plan Hobby, une panne de nuit était illisible au matin.
+const causesVues = new Map();
 // Une réponse sans `sourcesEnEchec` vient d'un déploiement antérieur à
 // l'instrumentation. Sans ce drapeau, l'absence du champ se lirait comme
 // « aucun collecteur en échec » : la sonde dirait vert sur une panne.
@@ -87,6 +92,11 @@ for (const { chemin, attendu } of REQUETES) {
 
   if (Array.isArray(rep.sourcesEnEchec)) champPresent = true;
   for (const s of rep.sourcesEnEchec || []) absencesRencontrees.add(s);
+  // La cause vient du handler, bornée à un vocabulaire fermé. On garde la
+  // première vue par source : trois requêtes peuvent toucher la même panne.
+  for (const [s, c] of Object.entries(rep.causesEnEchec || {})) {
+    if (!causesVues.has(s)) causesVues.set(s, c);
+  }
   for (const s of rep.sources || []) vues.add(s);
   ok(chemin, `${rep.total} offres · ${pertinentes} pertinentes dans la première page`);
 }
@@ -97,12 +107,34 @@ if (!champPresent) {
      "déploiement antérieur à l'instrumentation — l'état des collecteurs est invérifiable");
 }
 const inattendues = [...absencesRencontrees].filter((s) => !ABSENCES_CONNUES[s]);
-if (inattendues.length) ko(`${inattendues.length} collecteur(s) en échec sans raison déclarée`, inattendues.join(', '));
+// La cause s'affiche sur la ligne d'échec elle-même. C'est tout l'objet du
+// changement : un `http_429` lu ici dit « quota épuisé » sans ouvrir un seul
+// journal, et un `cle_absente` dit « compte à ouvrir » — deux actions
+// différentes, que le seul nom de la source ne distinguait pas.
+const avecCause = (s) => (causesVues.has(s) ? `${s} (${causesVues.get(s)})` : s);
+if (inattendues.length) ko(`${inattendues.length} collecteur(s) en échec sans raison déclarée`, inattendues.map(avecCause).join(', '));
 else ok('aucun collecteur en échec en dehors des absences déclarées');
 
+// Une absence déclarée dont la cause ne correspond plus à ce qui est écrit
+// dans ABSENCES_CONNUES est signalée, sans faire rougir : la liste décrit une
+// cause identifiée, et si la cause change, l'entrée est à revoir. C'est le
+// garde-fou contre une entrée qui survit à la panne qu'elle décrivait.
 for (const [nom, raison] of Object.entries(champPresent ? ABSENCES_CONNUES : {})) {
-  if (absencesRencontrees.has(nom)) console.log(`  ! ${nom} toujours absent — ${raison}`);
-  else console.log(`  ↻ ${nom} ne figure plus parmi les échecs — retirer son entrée d'ABSENCES_CONNUES`);
+  if (absencesRencontrees.has(nom)) {
+    const cause = causesVues.get(nom);
+    console.log(`  ! ${nom} toujours absent${cause ? ` [${cause}]` : ''} — ${raison}`);
+    if (cause && cause !== 'inconnue' && !raison.toLowerCase().includes(cause.replace('http_', ''))
+        && !(cause === 'cle_absente' && /clé|clés|jamais créé/i.test(raison))) {
+      console.log(`    ↳ la cause observée (${cause}) ne correspond pas à la raison déclarée — entrée à revoir`);
+    }
+  } else console.log(`  ↻ ${nom} ne figure plus parmi les échecs — retirer son entrée d'ABSENCES_CONNUES`);
+}
+
+// Les causes des pannes non déclarées, regroupées : de quoi agir sans log.
+const nonDeclarees = [...causesVues].filter(([s]) => !ABSENCES_CONNUES[s]);
+if (nonDeclarees.length) {
+  console.log('\n  Causes observées, non déclarées :');
+  for (const [s, c] of nonDeclarees) console.log(`    ${s} → ${c}`);
 }
 
 console.log(`\n${vues.size} source(s) distinctes ont fourni des offres`);

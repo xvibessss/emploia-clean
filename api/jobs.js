@@ -47,14 +47,62 @@ function isGermanJob(title, desc) {
 // la réponse était 200, la page affichait des offres, et il en manquait les
 // deux tiers. Le journal est créé par requête et traverse les collecteurs :
 // pas de variable de module, qui serait partagée entre requêtes concurrentes.
-function muet(journal, source, raison) {
-  journal?.push({ source, raison });
+function muet(journal, source, raison, cause) {
+  journal?.push({ source, raison, cause: cause || borner_cause(raison) });
   return [];
+}
+
+// ── CAUSES BORNÉES ────────────────────────────────────
+// `raison` est riche et part dans les logs d'exécution ; elle ne peut pas
+// entrer dans la réponse publique, parce qu'un `e.message` de fetch peut
+// porter une URL complète — donc une clé d'API en clair. C'est la décision
+// d'origine, et elle est bonne.
+//
+// Mais ne rien exposer rend la sonde aveugle : il faut lire les journaux
+// Vercel pour savoir si une source est en 429 ou sans clé, et sur le plan
+// Hobby la rétention est d'une heure. Une panne de nuit est indiagnosticable
+// au matin.
+//
+// D'où une cause ÉNUMÉRÉE. Un code de statut HTTP est un entier à trois
+// chiffres : il ne peut rien divulguer. Les autres cas se réduisent à un jeton
+// d'un ensemble fermé. Rien de ce qui sort d'ici ne dépend du contenu d'un
+// message d'exception ou d'un corps de réponse amont.
+const CAUSES = new Set(['cle_absente', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
+
+// Déduit un jeton d'une raison libre, pour les `catch` qui n'en déclarent pas.
+// Le test porte sur la forme du message, jamais sur son contenu : seule la
+// branche choisie sort d'ici, pas le texte qui l'a choisie.
+function borner_cause(raison) {
+  const r = String(raison || '').trim().toLowerCase();
+  if (r.includes('clé absente') || r.includes('clés absentes')) return 'cle_absente';
+  if (r.includes('timeout') || r.includes('aborted') || r.includes('délai')) return 'timeout';
+  if (r.includes('json') || r.includes('unexpected token')) return 'reponse_illisible';
+  if (r.includes('jeton oauth')) return 'jeton_refuse';
+  // Le test porte sur `r`, en minuscules : les sites d'échec écrivent
+  // « HTTP 429 », et un `/^http /` appliqué au texte d'origine ne l'attrapait
+  // pas — la cause la plus utile de toutes (le quota de French Job Market)
+  // ressortait en `inconnue`. C'est la sonde qui l'a relevé.
+  const http = /^http (\d{3})$/.exec(r);
+  if (http) return `http_${http[1]}`;
+  if (r.includes('fetch') || r.includes('network') || r.includes('econn') ||
+      r.includes('enotfound') || r.includes('dns')) return 'erreur_reseau';
+  return 'inconnue';
+}
+
+// Dernier verrou avant la réponse. Un appelant distrait — ou un collecteur
+// ajouté dans six mois — ne peut pas faire fuiter un message en le passant
+// comme `cause` : ce qui n'est ni un `http_NNN` ni un jeton du vocabulaire
+// devient `inconnue`. La garantie ne repose pas sur la discipline des 22 sites
+// d'échec, elle est appliquée ici, en un seul endroit.
+function causePublique(cause) {
+  const c = String(cause || '');
+  if (/^http_\d{3}$/.test(c)) return c;
+  return CAUSES.has(c) ? c : 'inconnue';
 }
 
 async function fetchJSearch(q, type, location, page, journal) {
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'JSearch', 'clé absente : RAPIDAPI_KEY');
+  if (!key) return muet(journal, 'JSearch', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
   try {
     const typeMap = { stage:'INTERN', alternance:'INTERN', cdd:'CONTRACTOR', cdi:'FULLTIME', freelance:'CONTRACTOR' };
     const locStr = location || 'Paris France';
@@ -75,7 +123,7 @@ async function fetchJSearch(q, type, location, page, journal) {
         headers: { 'x-rapidapi-host': 'jsearch.p.rapidapi.com', 'x-rapidapi-key': key }
       }), 10000
     );
-    if (!res.ok) return muet(journal, 'JSearch', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'JSearch', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     return (data.data || []).map(j => ({
       id: 'js_' + j.job_id,
@@ -102,7 +150,7 @@ async function fetchJSearch(q, type, location, page, journal) {
 // ── FRENCH JOB MARKET (APEC + HelloWork + Free-Work) ─
 async function fetchFrenchMarket(q, type, location, page, journal) {
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'French Job Market', 'clé absente : RAPIDAPI_KEY');
+  if (!key) return muet(journal, 'French Job Market', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
   try {
     const typeMap = {
       cdi: ['permanent'], cdd: ['temporary'], stage: ['internship'],
@@ -126,7 +174,7 @@ async function fetchFrenchMarket(q, type, location, page, journal) {
         body: JSON.stringify(body),
       }), 10000
     );
-    if (!res.ok) return muet(journal, 'French Job Market', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'French Job Market', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     const DOM_TOM = ['martinique', 'guadeloupe', 'guyane', 'réunion', 'reunion', 'mayotte', 'lamentin', 'cayenne', 'saint-denis - 97'];
     return (data.data || [])
@@ -156,7 +204,7 @@ async function fetchFrenchMarket(q, type, location, page, journal) {
 async function fetchInternships(q, type, location, journal) {
   if (type && !['stage', 'alternance', 'tous', ''].includes(type)) return [];
   const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'Internships', 'clé absente : RAPIDAPI_KEY');
+  if (!key) return muet(journal, 'Internships', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
   try {
     const params = new URLSearchParams({
       location_filter: location || 'France',
@@ -172,7 +220,7 @@ async function fetchInternships(q, type, location, journal) {
         }
       }), 10000
     );
-    if (!res.ok) return muet(journal, 'Internships', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'Internships', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     const jobs = Array.isArray(data) ? data : (data.data || []);
     return jobs
@@ -214,7 +262,7 @@ async function fetchRemotive(q, type, journal) {
       fetch(`https://remotive.com/api/remote-jobs?search=${encodeURIComponent(q||'developer engineer manager')}&limit=8`),
       8000
     );
-    if (!res.ok) return muet(journal, 'Remotive', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'Remotive', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     return (data.jobs || [])
       .filter(j => {
@@ -250,7 +298,7 @@ async function fetchArbeitnow(q, type, page, journal) {
     const res = await withTimeout(
       fetch(`https://www.arbeitnow.com/api/job-board-api?${params}`), 7000
     );
-    if (!res.ok) return muet(journal, 'Arbeitnow', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'Arbeitnow', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     return (data.data || [])
       .filter(j => {
@@ -279,7 +327,7 @@ async function fetchArbeitnow(q, type, page, journal) {
 
 // ── ADZUNA ────────────────────────────────────────────
 async function fetchAdzuna(q, type, location, page, journal) {
-  if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) return muet(journal, 'Adzuna', 'clés absentes : ADZUNA_APP_ID / ADZUNA_APP_KEY');
+  if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) return muet(journal, 'Adzuna', 'clés absentes : ADZUNA_APP_ID / ADZUNA_APP_KEY', 'cle_absente');
   try {
     // Adzuna prend la page dans le chemin, pas en paramètre. L'ancien appel
     // envoyait `page=N` à côté d'un chemin figé sur `/search/1` : la pagination
@@ -299,7 +347,7 @@ async function fetchAdzuna(q, type, location, page, journal) {
     const res = await withTimeout(
       fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${page + 1}?${params}`), 12000
     );
-    if (!res.ok) return muet(journal, 'Adzuna', `HTTP ${res.status}`);
+    if (!res.ok) return muet(journal, 'Adzuna', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
     return (data.results || []).map(j => ({
       id: 'az_' + j.id,
@@ -346,11 +394,11 @@ async function getFranceTravailToken(clientId, clientSecret) {
 async function fetchFranceTravail(q, type, location, page, journal) {
   const clientId = process.env.FRANCE_TRAVAIL_CLIENT_ID;
   const clientSecret = process.env.FRANCE_TRAVAIL_CLIENT_SECRET;
-  if (!clientId || !clientSecret) return muet(journal, 'France Travail', 'clés absentes : FRANCE_TRAVAIL_CLIENT_ID / _SECRET');
+  if (!clientId || !clientSecret) return muet(journal, 'France Travail', 'clés absentes : FRANCE_TRAVAIL_CLIENT_ID / _SECRET', 'cle_absente');
   if (type === 'stage') return []; // stages not well represented
   try {
     const access_token = await getFranceTravailToken(clientId, clientSecret);
-    if (!access_token) return muet(journal, 'France Travail', 'jeton OAuth refusé');
+    if (!access_token) return muet(journal, 'France Travail', 'jeton OAuth refusé', 'jeton_refuse');
 
     const typeMap = { cdi: 'CDI', cdd: 'CDD', alternance: 'CA,CP', freelance: 'LIB' };
     const start = page * 10;
@@ -363,7 +411,7 @@ async function fetchFranceTravail(q, type, location, page, journal) {
         headers: { Authorization: `Bearer ${access_token}`, Accept: 'application/json' },
       }), 10000
     );
-    if (!jobsRes.ok) return muet(journal, 'France Travail', `HTTP ${jobsRes.status}`);
+    if (!jobsRes.ok) return muet(journal, 'France Travail', `HTTP ${jobsRes.status}`, `http_${jobsRes.status}`);
     const data = await jobsRes.json();
     return (data.resultats || []).slice(0, 8).map(j => ({
       id: 'ft_' + j.id,
@@ -568,8 +616,18 @@ export default async function handler(req) {
       let final = cached.jobs;
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
+      // Les entrées écrites par le déploiement précédent ne portent pas de
+      // causes. On rend alors `inconnue` par source en échec plutôt qu'un
+      // objet vide : un `{}` se lirait comme « aucune cause à signaler »,
+      // c'est-à-dire exactement le silence qu'on retire. Et on repasse par
+      // `causePublique` à la lecture — une entrée de cache est une donnée qui
+      // revient de l'extérieur du processus, elle se filtre comme telle.
+      const brut = cached.causesEnEchec || {};
+      const causesEnEchec = Object.fromEntries(
+        (cached.sourcesEnEchec || []).map(s => [s, causePublique(brut[s])])
+      );
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], filtre: cached.filtre || 'inconnu', cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -596,14 +654,28 @@ export default async function handler(req) {
     const allJobs = [];
     resultats.forEach((r, i) => {
       if (r.status === 'fulfilled') allJobs.push(...r.value);
-      else journal.push({ source: collecteurs[i][0], raison: r.reason?.message || String(r.reason) });
+      else journal.push({ source: collecteurs[i][0], raison: r.reason?.message || String(r.reason), cause: borner_cause(r.reason?.message || String(r.reason)) });
     });
 
-    // La raison part dans les logs d'exécution, où on peut la lire après coup ;
-    // seul le nom de la source part dans la réponse, parce qu'une raison peut
-    // citer un corps de réponse amont. Le nom suffit à la sonde.
+    // Deux niveaux, délibérément. La raison complète part dans les logs
+    // d'exécution, où elle est lisible par qui a accès au compte Vercel ; la
+    // réponse publique ne porte qu'une cause d'un vocabulaire fermé, filtrée
+    // par `causePublique`. Un code HTTP ne divulgue rien, un message
+    // d'exception peut porter une URL signée.
+    //
+    // Pourquoi exposer la cause : sans elle, diagnostiquer une source morte
+    // exige d'ouvrir les journaux Vercel, dont la rétention est d'une heure
+    // sur le plan Hobby. Une panne survenue la nuit était illisible au matin,
+    // et c'est ainsi que le 429 de French Job Market et le 404 d'Internships
+    // ont dû être relevés à la main au lieu de sortir de `smoke:sources`.
     if (journal.length) console.error('jobs: sources en échec — ' + JSON.stringify(journal));
-    const sourcesEnEchec = [...new Set(journal.map(e => e.source))];
+    // Une source peut échouer plusieurs fois dans la même requête (pagination,
+    // deux appels) : on garde la première cause vue par source, et le nom reste
+    // la clé — la sonde compare des noms.
+    const causes = new Map();
+    for (const e of journal) if (!causes.has(e.source)) causes.set(e.source, causePublique(e.cause));
+    const sourcesEnEchec = [...causes.keys()];
+    const causesEnEchec = Object.fromEntries(causes);
 
     if (allJobs.length > 0) {
       // L'ordre compte. Le filtre de pertinence s'applique AVANT la mise en
@@ -626,11 +698,11 @@ export default async function handler(req) {
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, filtre: pertinence.filtre }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, filtre: pertinence.filtre }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }),
         { status: 200, headers: H }
       );
     }
