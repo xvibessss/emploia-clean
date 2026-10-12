@@ -42,10 +42,6 @@ const EXEMPT = {
   // Protégées par un secret : un 401/403 est le comportement correct.
   '/admin': 'console admin, rendue après authentification côté client',
   '/admin/stats': 'protégée par ADMIN_SECRET — 403 attendu',
-  // Pas du HTML : ni <title> ni <h1> n'ont de sens.
-  '/robots.txt': 'fichier texte',
-  '/sitemap.xml': 'flux XML',
-  '/rss.xml': 'flux RSS',
   // Pages applicatives : la coquille est légère, le contenu vient du JS après
   // authentification. Leur panne se verrait sur /api/*, pas ici.
   '/nps': 'formulaire court, rendu au clic depuis un email',
@@ -78,12 +74,26 @@ const apiRoutes = execSync("find api -name '*.js' -not -path '*/_lib/*' -not -na
   .map((f) => f.replace(/^api\//, '').replace(/\.js$/, ''))
   .sort();
 
-const pageRoutes = [...new Set((JSON.parse(fs.readFileSync('vercel.json', 'utf8')).rewrites || [])
+const allRoutes = [...new Set((JSON.parse(fs.readFileSync('vercel.json', 'utf8')).rewrites || [])
   .map((r) => r.source)
   .filter((s) => s && !s.startsWith('/api/') && !s.includes(':') && !s.includes('*')))].sort();
 
+// Une route d'actif n'est pas une page : exiger un <title> et 80 mots de
+// `/favicon.ico` est un faux positif, et le faux positif est ce qui fait
+// qu'on cesse de lire une sonde. On les reconnaît à leur extension, plutôt
+// que de les nommer une par une — sinon le prochain actif ajouté au
+// vercel.json recrée le bruit.
+//
+// Mais on ne les abandonne pas pour autant : les exempter entièrement, comme
+// le faisait la version précédente pour robots.txt et sitemap.xml, revient à
+// ne rien dire si l'un d'eux commence à répondre 404. Un robots.txt en 404
+// est un vrai incident SEO. Ils sont donc contrôlés en statut seul.
+const ASSET_EXT = /\.(ico|svg|png|jpe?g|gif|webp|avif|xml|txt|json|js|css|map|webmanifest|pdf|woff2?|ttf)$/i;
+const assetRoutes = allRoutes.filter((s) => ASSET_EXT.test(s));
+const pageRoutes = allRoutes.filter((s) => !ASSET_EXT.test(s));
+
 console.log(`\nSonde de surface — ${BASE}`);
-console.log(`${apiRoutes.length} handlers d'API · ${pageRoutes.length} routes de page\n`);
+console.log(`${apiRoutes.length} handlers d'API · ${pageRoutes.length} routes de page · ${assetRoutes.length} actif(s)\n`);
 
 // ── 1. API : un 500 est un bug, un 404 est un rewrite cassé ─────────────────
 // 401, 403, 405 et 400 sont au contraire la preuve que le handler vit et
@@ -137,6 +147,24 @@ const stale = Object.keys(EXEMPT).filter((p) => {
   return r && r.status === 200 && r.words >= MIN_WORDS && r.hasH1 && r.hasTitle;
 });
 if (stale.length) console.log(`  ! ${stale.length} exemption(s) devenue(s) inutile(s) — à retirer d'EXEMPT : ${stale.join(', ')}`);
+
+// ── 2 bis. Actifs : servis, et non vides ───────────────────────────────────
+// Pas de <title> ni de <h1> à exiger ici, mais un robots.txt ou un sitemap.xml
+// en 404 est un vrai incident SEO — et les exempter entièrement, comme le
+// faisait la version précédente, revenait à ne jamais le voir. Un corps vide
+// est signalé aussi : un sitemap de zéro octet répond 200 et ne sert à rien.
+if (assetRoutes.length) {
+  console.log(`\n[2 bis] Actifs — servis et non vides`);
+  const assetResults = await mapLimit(assetRoutes, async (p) => {
+    const res = await fetch(BASE + p, { redirect: 'follow', signal: AbortSignal.timeout(TIMEOUT) });
+    return { item: p, status: res.status, bytes: (await res.text()).length };
+  });
+  const assetBad = assetResults.filter((x) => x.status !== 200 || !x.bytes);
+  for (const x of assetBad.sort((a, b) => a.item.localeCompare(b.item))) {
+    ko(x.item, x.status !== 200 ? `HTTP ${x.status}` : 'corps vide');
+  }
+  if (!assetBad.length) ok(`les ${assetResults.length} actifs sont servis`, assetResults.map((x) => x.item).join(', '));
+}
 
 // ── 3. Contenu des API de lecture : 200 ne suffit pas ───────────────────────
 // Un endpoint de liste qui répond 200 avec zéro élément a toutes les
