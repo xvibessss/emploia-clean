@@ -48,7 +48,10 @@
       flex-shrink: 0;
     }
     .offre-company-name { font-size: 14px; color: var(--slate); }
-    .offre-title { font-size: 26px; font-weight: 700; margin-bottom: 16px; color: var(--ink); }
+    /* margin-top explicite : cet élément est un titre de niveau 1, qui
+       porte une marge haute par défaut que la div précédente n'avait pas.
+       Sans elle, la conversion décalerait la carte vers le bas. */
+    .offre-title { font-size: 26px; font-weight: 700; margin-top: 0; margin-bottom: 16px; color: var(--ink); }
     .offre-tags {
       display: flex; flex-wrap: wrap; gap: 8px;
     }
@@ -200,7 +203,7 @@
           <div style="font-size:12px;color:var(--steel)" id="offreLocation">—</div>
         </div>
       </div>
-      <div class="offre-title" id="offreTitle">Chargement...</div>
+      <h1 class="offre-title" id="offreTitle">Chargement...</h1>
       <div class="offre-tags" id="offreTags"></div>
     </div>
 

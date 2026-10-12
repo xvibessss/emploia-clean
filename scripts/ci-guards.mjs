@@ -232,6 +232,58 @@ try {
   if (!broken) ok(`les ${checked} canonical désignent une URL servie`);
 } catch (e) { fail('contrôle des canonical impossible : ' + e.message); }
 
+// ── 10. titre, description et h1 : présents et uniques ─────────────────────
+// Le défaut emblématique du SEO programmatique : 48 pages villes nées du même
+// gabarit qui partagent leur <title>. Google en garde une et ignore les 47
+// autres — on ne perd pas un peu de trafic, on en perd la quasi-totalité, et
+// Search Console le signale en « balises title en double ».
+//
+// Le dépôt est sain sur ce point au 2026-10-11 : 173 pages indexables, zéro
+// doublon de title, de description ou de h1. Ce garde existe pour que la
+// prochaine famille de pages générées ne puisse pas casser cet état en
+// silence — c'est le genre d'erreur qu'on ne voit qu'au trimestre suivant,
+// dans une courbe d'impressions qui ne décolle pas.
+//
+// Un h1 absent est aussi un défaut d'accessibilité : un lecteur d'écran s'en
+// sert pour annoncer la page. C'est ce qui manquait à offre.html, où le titre
+// du poste vivait dans une div.
+console.log('\n[10] title, description et h1 — présents et uniques');
+try {
+  const pages = walk('.').filter((f) =>
+    f.endsWith('.html') &&
+    !f.includes('node_modules') &&
+    // L'extension Chrome n'est pas une page web : elle n'est ni servie ni
+    // indexable, et n'a aucun besoin de description.
+    !f.includes('chrome-extension'));
+
+  const seen = { title: new Map(), description: new Map(), h1: new Map() };
+  let indexable = 0, missing = 0;
+
+  for (const f of pages) {
+    const src = readAll(f);
+    // Une page en noindex est hors sujet : on ne lui demande ni unicité ni
+    // description, puisqu'elle ne paraîtra jamais dans un résultat.
+    if (/name="robots"[^>]*noindex/i.test(src)) continue;
+    indexable++;
+
+    const grab = (re) => { const m = src.match(re); return m ? m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : ''; };
+    const found = {
+      title: grab(/<title>([^<]*)<\/title>/i),
+      description: grab(/<meta\s+name="description"\s+content="([^"]*)"/i),
+      h1: grab(/<h1[^>]*>([\s\S]*?)<\/h1>/i),
+    };
+
+    for (const [field, value] of Object.entries(found)) {
+      if (!value) { fail(`${f} : ${field} absent — page indexable sans ${field}`); missing++; continue; }
+      const prev = seen[field].get(value);
+      if (prev) fail(`${f} : ${field} identique à ${prev} — « ${value.slice(0, 60)}${value.length > 60 ? '…' : ''} »`);
+      else seen[field].set(value, f);
+    }
+  }
+  if (!missing && seen.title.size === indexable && seen.h1.size === indexable)
+    ok(`${indexable} pages indexables`, 'title, description et h1 tous présents et uniques');
+} catch (e) { fail('contrôle des métadonnées impossible : ' + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
