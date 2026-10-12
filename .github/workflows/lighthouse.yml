@@ -16,11 +16,23 @@ jobs:
       - name: Run Lighthouse on key pages
         uses: treosh/lighthouse-ci-action@v12
         with:
+          # emploia.eu, pas l'hôte Vercel : c'est le domaine que les visiteurs
+          # atteignent, avec sa redirection www et son chemin TLS/CDN propre.
+          #
+          # Une page par gabarit, plutôt que quatre pages de la même famille.
+          # L'audit ne couvrait aucune des 85 pages villes/métiers — c'est-à-dire
+          # tout le canal d'acquisition : une régression de performance y
+          # serait restée invisible, alors que ce sont justement les pages où
+          # un visiteur arrive depuis Google et repart si elles sont lentes.
           urls: |
-            https://emploia-clean.vercel.app/
-            https://emploia-clean.vercel.app/blog
-            https://emploia-clean.vercel.app/tools
-            https://emploia-clean.vercel.app/cv-builder
+            https://emploia.eu/
+            https://emploia.eu/blog
+            https://emploia.eu/tools
+            https://emploia.eu/cv-builder
+            https://emploia.eu/ecoles
+            https://emploia.eu/emploi/lyon
+            https://emploia.eu/metier/developpeur
+            https://emploia.eu/blog/cv-ats-2026
           budgetPath: .github/lighthouse-budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true
