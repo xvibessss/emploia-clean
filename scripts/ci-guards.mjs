@@ -284,6 +284,43 @@ try {
     ok(`${indexable} pages indexables`, 'title, description et h1 tous présents et uniques');
 } catch (e) { fail('contrôle des métadonnées impossible : ' + e.message); }
 
+// ── 11. quota gratuit : garde remboursant, et crédit rendu sur échec ───────
+// Deux fonctions existent pour décompter une génération gratuite, et une seule
+// est correcte. Les deux incrémentent atomiquement, mais seule
+// claimFreeGeneration REND le crédit quand la limite est dépassée : avec
+// incrementGenerations, chaque tentative refusée gonflait le compteur à vie, et
+// c'est ce compteur que /app et /dashboard affichent à l'utilisateur.
+//
+// Second contrôle : un endpoint qui réclame un crédit doit pouvoir le rendre.
+// Trois d'entre eux renvoyaient une erreur 500 sur une réponse d'IA malformée
+// sans rembourser — l'utilisateur perdait un de ses 5 crédits pour une panne
+// qui n'était pas la sienne. C'est précisément ce que refundGeneration existe
+// pour éviter, d'après son propre commentaire.
+console.log('\n[11] quota gratuit — garde remboursant et crédit rendu');
+try {
+  const metered = apiFiles.filter((f) => {
+    if (f.includes('/_lib/') || path.basename(f).startsWith('_')) return false;
+    return /claimFreeGeneration|incrementGenerations/.test(readAll(f));
+  });
+
+  let bad = 0;
+  for (const f of metered) {
+    const src = readAll(f);
+    // On cherche l'APPEL, pas la mention : un commentaire qui nomme l'ancienne
+    // fonction pour expliquer pourquoi on ne l'emploie plus est légitime.
+    if (/await\s+incrementGenerations\s*\(/.test(src)) {
+      fail(`${f} : décompte via incrementGenerations — utiliser claimFreeGeneration, qui rend le crédit quand la limite est dépassée`);
+      bad++;
+      continue;
+    }
+    if (/await\s+claimFreeGeneration\s*\(/.test(src) && !/await\s+refundGeneration\s*\(/.test(src)) {
+      fail(`${f} : réclame un crédit sans jamais le rendre — une panne de l'IA brûlerait une des 5 générations gratuites`);
+      bad++;
+    }
+  }
+  if (!bad) ok(`${metered.length} endpoints décomptent un crédit`, 'tous via claimFreeGeneration, tous capables de le rendre');
+} catch (e) { fail('contrôle du quota gratuit impossible : ' + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

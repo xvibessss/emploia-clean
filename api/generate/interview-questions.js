@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, incrementGenerations, refundGeneration, FREE_LIMIT } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, claimFreeGeneration, refundGeneration } from '../_lib/auth.js';
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -37,12 +37,14 @@ export default async function handler(req) {
 
   if (!jobTitle) return new Response(JSON.stringify({ error: 'Poste requis' }), { status: 400, headers: H });
 
-  if (user.plan === 'free') {
-    const newCount = await incrementGenerations(user);
-    if (newCount !== null && newCount > FREE_LIMIT) {
-      return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
-    }
-  }
+  // claimFreeGeneration, et non incrementGenerations : les deux incrémentent
+  // atomiquement, mais seul le premier REND le crédit quand la limite est
+  // dépassée. Sans ce remboursement, chaque tentative refusée gonflait le
+  // compteur à vie — un utilisateur bloqué qui réessaie trois fois passait à
+  // 8 générations « utilisées » sur 5, et c'est ce nombre que /app et
+  // /dashboard affichent.
+  const gen = await claimFreeGeneration(user);
+  if (!gen.allowed) return new Response(JSON.stringify({ error: 'Limite gratuite atteinte' }), { status: 402, headers: H });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service indisponible' }), { status: 500, headers: H });
@@ -108,7 +110,15 @@ Réponds UNIQUEMENT en JSON valide :
     try { result = JSON.parse(text); }
     catch { const m = text.match(/\{[\s\S]*\}/); if (m) try { result = JSON.parse(m[0]); } catch {} }
 
-    if (!result?.behavioral) return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    if (!result?.behavioral) {
+      // La réponse est arrivée mais pas dans la forme attendue : c'est une
+      // panne de notre côté, pas une génération livrée. Sans ce
+      // remboursement l'utilisateur perdait un de ses 5 crédits pour une
+      // erreur qui n'est pas la sienne — exactement ce que refundGeneration
+      // existe pour éviter.
+      await refundGeneration(user);
+      return new Response(JSON.stringify({ error: 'Réponse invalide' }), { status: 500, headers: H });
+    }
     // Track event (fire and forget)
     {
       const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';

@@ -248,7 +248,14 @@ export async function getGenerationsUsed(email) {
 // free tier limit. Increments BEFORE the API call; refunds if over limit.
 // Returns { allowed: true, count } or { allowed: false, count: FREE_LIMIT }.
 export async function claimFreeGeneration(user) {
-  if (user.plan !== 'free') return { allowed: true, count: null };
+  // `!user.plan || user.plan === 'free'` et non `user.plan !== 'free'` : un
+  // enregistrement sans champ `plan` doit compter comme gratuit, pas comme
+  // illimité. Tous les chemins d'inscription posent `plan: 'free'` aujourd'hui,
+  // donc le cas ne se produit pas — mais refundGeneration ci-dessous emploie
+  // déjà la forme large, et deux fonctions du même fichier qui ne s'accordent
+  // pas sur la définition de « gratuit » finissent par diverger au mauvais
+  // moment. Le défaut par défaut doit être de facturer, jamais d'offrir.
+  if (user.plan && user.plan !== 'free') return { allowed: true, count: null };
   const { result: newCount } = await kvIncr(`gen:${user.email}`);
   if (typeof newCount !== 'number' || newCount > FREE_LIMIT) {
     await kvDecr(`gen:${user.email}`);
