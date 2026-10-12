@@ -20,10 +20,14 @@ export default function handler(req, res) {
     { loc: `${base}/sous-traitants`,      changefreq: 'monthly', priority: '0.30', lastmod: today },
     { loc: `${base}/about`,              changefreq: 'monthly', priority: '0.7' },
     { loc: `${base}/contact`,            changefreq: 'yearly',  priority: '0.5' },
+    // Un seul document est servi sur /legal, /legal/mentions, /legal/privacy,
+    // /legal/cgu et /legal/cookies — vérifié, md5 identique sur les quatre. Son
+    // canonical désigne /legal, donc seul /legal a sa place ici : déclarer une
+    // URL dont le canonical pointe ailleurs la fait classer « page alternative
+    // avec balise canonique correcte » et consomme du budget d'exploration pour
+    // rien. Quand la scission en trois pages de la mission 06 section G sera
+    // livrée, chacune aura son contenu propre et reviendra dans cette liste.
     { loc: `${base}/legal`,              changefreq: 'yearly',  priority: '0.3' },
-    { loc: `${base}/legal/mentions`,     changefreq: 'yearly',  priority: '0.2' },
-    { loc: `${base}/legal/privacy`,      changefreq: 'yearly',  priority: '0.2' },
-    { loc: `${base}/legal/cgu`,          changefreq: 'yearly',  priority: '0.2' },
     { loc: `${base}/blog/cv-ats-2026`,                changefreq: 'monthly', priority: '0.8', lastmod: '2026-04-20' },
     { loc: `${base}/blog/methode-star-entretien`,    changefreq: 'monthly', priority: '0.8', lastmod: '2026-04-18' },
     { loc: `${base}/blog/salaires-france-2026`,      changefreq: 'monthly', priority: '0.8', lastmod: '2026-04-15' },
