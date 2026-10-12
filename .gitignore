@@ -3,3 +3,11 @@ node_modules/
 .env
 .env.local
 SESSION_STATE.md
+
+# Débris macOS. Le dépôt est public : trois d'entre eux traînaient déjà dans le
+# worktree et auraient fini commités par un `git add -A` distrait.
+.DS_Store
+
+# État local du pipeline bones (journal, ledger, preuves) : propre à une
+# machine et à une session, sans valeur pour quiconque clone le dépôt.
+.bones/
