@@ -16,15 +16,19 @@ jobs:
       - name: Lychee link checker
         uses: lycheeverse/lychee-action@v2
         with:
+          # --base-url, et non --base : lychee avertit que --base est déprécié
+          # et sera retiré. Le domaine est emploia.eu, pas l'hôte Vercel : les
+          # pages portent des liens absolus vers emploia.eu, donc une
+          # exclusion écrite sur l'hôte Vercel ne les couvre plus. C'est ce
+          # qui rendait les exclusions ci-dessous partiellement inopérantes.
           args: |
-            --base https://emploia-clean.vercel.app
-            --exclude "^https://emploia-clean\.vercel\.app/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
-            --exclude "^https://emploia\.fr"
+            --base-url https://emploia.eu
+            --exclude "^https://emploia\.eu/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
+            --exclude "^https://emploia\.eu/api/"
             --exclude "^https://fonts\."
             --exclude "^https://plausible\.io"
             --exclude "^https://js\.stripe\.com"
             --exclude "^https://instagram\.com"
-            --exclude "^https://emploia-clean\.vercel\.app/api/"
             --timeout 20
             --retry-wait-time 5
             --max-retries 2
