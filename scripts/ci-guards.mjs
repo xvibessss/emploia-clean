@@ -321,6 +321,50 @@ try {
   if (!bad) ok(`${metered.length} endpoints décomptent un crédit`, 'tous via claimFreeGeneration, tous capables de le rendre');
 } catch (e) { fail('contrôle du quota gratuit impossible : ' + e.message); }
 
+// ── 12. aucun email n'annonce un prix qui n'existe plus ────────────────────
+// Trouvé le 2026-10-13 : la relance d'essai annonçait « Emploia Pro — 19 € /
+// mois » avec un bouton d'inscription, treize jours après la bascule à 24 €.
+// L'utilisateur cliquait sur une promesse et découvrait un autre prix.
+//
+// Rien ne pouvait l'attraper. smoke/prod.mjs vérifie l'absence des anciens
+// montants, mais seulement sur la page d'accueil servie : un prix enterré dans
+// un gabarit d'email n'apparaît sur aucune page, et ne se voit que dans la
+// boîte de réception d'un prospect — c'est-à-dire trop tard.
+//
+// Liste blanche plutôt que liste noire : un montant inconnu doit être ajouté
+// ici consciemment. Une liste des anciens prix, elle, ne dirait rien du
+// prochain changement de grille.
+console.log('\n[12] prix des emails — conformes à la grille');
+try {
+  // Montants légitimes, avec leur raison. Toute autre valeur est suspecte.
+  const ALLOWED = new Map([
+    ['0', "« 0€ aujourd'hui » — essai Pro, rien n'est débité"],
+    ['6', 'palier écoles au-delà de 1000 étudiants'],
+    ['9', 'écoles, par étudiant et par an'],
+    ['12', 'commission créateur par vente'],
+    ['24', 'Pro, par mois'],
+    ['39', 'outplacement, par candidat'],
+    ['49', 'Pack Campagne avec un code créateur'],
+    ['59', 'Pack Campagne'],
+  ]);
+
+  // Seuls les fichiers qui composent un email : ailleurs, un montant est une
+  // constante de calcul, pas une promesse faite à quelqu'un.
+  const senders = apiFiles.filter((f) => /sendEmail|emailWrapper/.test(readAll(f)));
+
+  let checked = 0, bad = 0;
+  for (const f of senders) {
+    for (const m of readAll(f).matchAll(/(\d+(?:[,.]\d+)?)(?:&nbsp;|\s)?€/g)) {
+      checked++;
+      const amount = m[1];
+      if (ALLOWED.has(amount)) continue;
+      fail(`${f} : annonce « ${amount} € » — absent de la grille. Soit le prix a changé et l'email n'a pas suivi, soit le montant est légitime et doit rejoindre ALLOWED dans ce garde`);
+      bad++;
+    }
+  }
+  if (!bad) ok(`${checked} montant(s) cité(s) dans ${senders.length} gabarits d'email`, 'tous conformes à la grille');
+} catch (e) { fail('contrôle des prix des emails impossible : ' + e.message); }
+
 console.log('');
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
