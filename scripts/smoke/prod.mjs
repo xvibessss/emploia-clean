@@ -15,6 +15,12 @@
 // rien n'est encaissé tant que personne ne saisit de carte. Mais c'est une
 // écriture chez Stripe, donc elle reste explicite.
 
+// La table des aiguilles de contenu vit dans assertions.mjs parce qu'elle a un
+// second lecteur : scripts/smoke/assertions.test.mjs la vérifie hors ligne en
+// CI contre les fichiers du dépôt. Sans ce partage, un prix changé dans un
+// .html périmerait cette sonde en silence jusqu'à sa prochaine exécution.
+import { norm, PAGE_ASSERTIONS } from './assertions.mjs';
+
 const args = process.argv.slice(2);
 const WITH_CHECKOUT = args.includes('--checkout');
 const BASE = (args.find((a) => a.startsWith('http')) || process.env.SMOKE_BASE_URL || 'https://emploia.eu')
@@ -37,10 +43,6 @@ async function get(path) {
   return { status: res.status, body: await res.text() };
 }
 
-// Normalise les espaces insécables et fines que le HTML glisse dans les prix,
-// sinon « 59 € » rendu avec une fine ne correspond jamais à « 59 € » tapé ici.
-function norm(s) { return s.replace(/[   ]/g, ' '); }
-
 async function page(path, { must = [], mustNot = [] } = {}) {
   let r;
   try { r = await get(path); }
@@ -60,39 +62,12 @@ async function page(path, { must = [], mustNot = [] } = {}) {
   }
 }
 
-console.log(`\nVérification de ${BASE}\n`);
+console.log(`\nVérification de ${BASE}`);
 
-console.log('[A] Landing — la grille servie est bien la nouvelle');
-await page('/', {
-  must: ['59€', '24€', 'Pack Campagne'],
-  // Anciens montants et preuves sociales fabriquées : leur présence signifie
-  // que la prod sert encore une version antérieure à la PR #28.
-  mustNot: ['45€', '19€', '24 800', '1 240 avis', '14 200'],
-});
-
-console.log('\n[B] Page écoles');
-await page('/ecoles', {
-  // Le barème est par tranches : les trois taux et le forfait plateforme
-  // figurent tous dans la page servie, et c'est leur ensemble qui identifie la
-  // grille. Un seul taux ne distinguerait pas la grille actuelle d'une grille
-  // à moitié mise à jour.
-  must: ['22 €', '17 €', '12 €', '2 500 €', '40 000', 'pilote'],
-  // Prix au siège d'avant le barème par tranches, retiré le 2026-10-06 par
-  // 451847a : sa présence signifie que la prod sert encore la grille à 9 €.
-  // La chaîne porte son unité, parce que « 9 € » seul se retrouve dans tout
-  // montant en 9 — « 19 € », « 39 € » — et sonnerait faux au premier
-  // changement de tarif.
-  mustNot: ['9 € par siège', '9 € par étudiant'],
-});
-
-console.log('\n[B bis] Conformité — identité du vendeur et conditions de vente');
-await page('/legal', {
-  // Le SIREN est l'élément qu'un service comptable d'école vérifie en premier,
-  // et la franchise en base explique l'absence de TVA sur la facture.
-  must: ['928 482 553', 'Entrepreneur individuel', '293 B', 'Conditions générales de vente', 'L221-28'],
-  // Formes sociales et grilles périmées qui ne doivent pas réapparaître.
-  mustNot: ['EmploiA SAS', 'édité à titre personnel', 'Pro / Intensif'],
-});
+for (const section of PAGE_ASSERTIONS) {
+  console.log(`\n${section.title}`);
+  await page(section.route, section);
+}
 
 console.log('\n[C] Pages qui doivent répondre');
 for (const p of ['/app', '/tools', '/dashboard', '/about', '/contact']) {
