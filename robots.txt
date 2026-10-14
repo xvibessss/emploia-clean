@@ -4,7 +4,6 @@ Disallow: /api/
 Disallow: /dashboard
 Disallow: /onboarding
 Disallow: /profil
-Disallow: /app
 Disallow: /interview
 Disallow: /alerts
 Disallow: /apply-queue

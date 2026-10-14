@@ -266,12 +266,30 @@ try {
     if (/name="robots"[^>]*noindex/i.test(src)) continue;
     indexable++;
 
-    const grab = (re) => { const m = src.match(re); return m ? m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : ''; };
+    // Un <h1> écrit dans un gabarit JavaScript n'est pas le titre de la page :
+    // il ne devient du HTML qu'après exécution, et dans un conteneur qui n'est
+    // pas le document. cv-builder.html n'avait que ceux-là — quatre `<h1>
+    // ${esc(cv.name)}</h1>` dans les gabarits d'aperçu du CV — et ce contrôle,
+    // qui lisait le fichier brut, les comptait comme un h1 présent et unique.
+    // La page était donc certifiée conforme sans aucun titre, ni pour Google
+    // ni pour un lecteur d'écran. On retire donc le code avant de chercher.
+    const rendu = src
+      .replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ');
+
+    const grab = (re, from = src) => { const m = from.match(re); return m ? m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : ''; };
     const found = {
       title: grab(/<title>([^<]*)<\/title>/i),
       description: grab(/<meta\s+name="description"\s+content="([^"]*)"/i),
-      h1: grab(/<h1[^>]*>([\s\S]*?)<\/h1>/i),
+      h1: grab(/<h1[^>]*>([\s\S]*?)<\/h1>/i, rendu),
     };
+    // Un titre qui porte encore `${...}` ou `{{...}}` est une interpolation non
+    // résolue servie telle quelle au visiteur, pas un titre.
+    if (/\$\{|\{\{/.test(found.h1)) {
+      fail(`${f} : h1 « ${found.h1.slice(0, 40)} » contient une interpolation non résolue`);
+      missing++;
+      continue;
+    }
 
     for (const [field, value] of Object.entries(found)) {
       if (!value) { fail(`${f} : ${field} absent — page indexable sans ${field}`); missing++; continue; }
@@ -402,6 +420,24 @@ try {
   const smSrc = readAll('api/sitemap.js');
   const declared = new Set([...smSrc.matchAll(/\$\{base\}(\/[^`]*)`/g)].map((m) => m[1]));
   declared.add('/');
+
+  // robots.txt est l'autre moitié de la déclaration, et la première version de
+  // ce garde l'ignorait : elle ne regardait que la balise meta. C'est comme ça
+  // que j'ai moi-même ajouté /app au sitemap alors que « Disallow: /app »
+  // interdisait son exploration — l'erreur exacte que ce garde devait
+  // empêcher, passée sous son nez. Un Disallow est plus fort qu'un noindex :
+  // Googlebot ne télécharge pas la page, donc ne lit même pas sa balise.
+  const robots = readAll('robots.txt')
+    .split('\n')
+    .filter((l) => /^disallow:/i.test(l.trim()))
+    .map((l) => l.split(':').slice(1).join(':').trim())
+    .filter((v) => v && v !== '/');
+  const interdite = (p) => robots.find((d) => p.startsWith(d));
+
+  for (const p of declared) {
+    const d = interdite(p);
+    if (d) fail(`sitemap : ${p} est déclarée mais « Disallow: ${d} » en interdit l'exploration — « Envoyée par le sitemap, mais bloquée » dans Search Console`);
+  }
 
   const pages = walk('.').filter(
     (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
