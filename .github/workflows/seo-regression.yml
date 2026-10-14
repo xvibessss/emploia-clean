@@ -1,0 +1,184 @@
+# Suite de régression SEO — à copier dans .github/workflows/
+#
+# Audite la PRODUCTION, pas la branche. C'est pourquoi il ne tourne pas sur les
+# pull requests : une PR ne reflète pas ce que Google voit. Il tourne chaque
+# jour, à la demande, et après un déploiement une fois la section décommentée.
+#
+# Les scripts sont en lecture seule et n'ont besoin d'aucun secret.
+
+name: SEO regression
+
+on:
+  schedule:
+    # Quotidien à 06:00 UTC — avant que Hugo ouvre son ordinateur. Hebdomadaire
+    # laisserait une panne d'indexabilité vivre sept jours, et /legal a déjà
+    # tenu quatre mois et demi parce que personne ne regardait.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "URL à auditer"
+        required: false
+        default: 'https://emploia.eu'
+      strict:
+        description: "Rendre bloquants les avertissements de contenu mince"
+        type: boolean
+        required: false
+        default: false
+  # Après un déploiement réussi en production. À décommenter une fois que le
+  # workflow de déploiement porte bien ce nom.
+  # workflow_run:
+  #   workflows: ['Deploy']
+  #   types: [completed]
+  #   branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: seo-regression
+  cancel-in-progress: false
+
+# Le shell par défaut des runners est `bash -e {0}`, SANS pipefail : le statut
+# d'un pipeline est celui de sa dernière commande. Les deux étapes d'audit
+# finissent par `| tee`, donc un script sortant en 1 aurait rendu l'étape verte
+# et `if: failure()` ne se serait jamais déclenché — un contrôle qui n'audite
+# rien. `shell: bash` ajoute `-o pipefail`, l'échec du script traverse le tube.
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Auditer la production
+        id: audit
+        run: |
+          node scripts/seo/seo-audit.mjs \
+            "${{ inputs.base_url || 'https://emploia.eu' }}" \
+            ${{ inputs.strict && '--strict' || '' }} \
+            | tee /tmp/seo-report.txt
+
+      - name: Publier le rapport dans le résumé du job
+        if: always()
+        run: |
+          {
+            echo '## Audit SEO'
+            echo
+            echo '```'
+            cat /tmp/seo-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Une régression SEO est silencieuse : personne ne la voit passer.
+      # Un job rouge dans un onglet que l'on n'ouvre pas ne sert à rien,
+      # donc on ouvre une issue — elle, elle arrive par email.
+      - name: Ouvrir une issue en cas d'échec
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/seo-report.txt', 'utf8');
+            const title = `Régression SEO détectée — ${new Date().toISOString().slice(0, 10)}`;
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'seo-regression',
+            });
+
+            const body = [
+              `L'audit hebdomadaire a échoué. Rapport complet :`,
+              '',
+              '```',
+              report.slice(0, 60000),
+              '```',
+              '',
+              `[Voir le job](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+            ].join('\n');
+
+            // Une seule issue ouverte à la fois : on commente la courante
+            // plutôt que d'en empiler une par semaine.
+            if (open.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open[0].number,
+                body,
+              });
+              return;
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['seo-regression'],
+            });
+
+  # Second job, indépendant du premier : il ne teste pas les mêmes choses.
+  # `audit` vérifie ce que le serveur envoie. `render` vérifie ce qu'un humain
+  # voit. Du 2026-05-26 au 2026-10-06, /legal a servi un HTML valide tout en
+  # affichant une page blanche : `audit` ne pouvait pas le voir, `render` oui.
+  # Les deux tournent en parallèle, l'un n'attend pas l'autre.
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Playwright n'est pas une dépendance du projet : on l'installe ici, pour
+      # ne pas alourdir le dépôt d'un paquet qui ne sert qu'à la CI.
+      # `--no-save` laisse package.json intact ; l'installation dans le
+      # node_modules de la racine est nécessaire pour que l'import ESM du
+      # script résolve — `npx --package` ne suffit pas, vérifié.
+      - name: Installer Playwright et Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Contrôler le rendu
+        run: |
+          node scripts/seo/render-check.mjs \
+            "${{ inputs.base_url || 'https://emploia.eu' }}" \
+            | tee /tmp/render-report.txt
+
+      - name: Publier le rapport dans le résumé du job
+        if: always()
+        run: |
+          {
+            echo '## Contrôle de rendu'
+            echo
+            echo '```'
+            cat /tmp/render-report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Une capture vaut mieux qu'un message : on voit immédiatement si la page
+      # est blanche, tronquée, ou simplement différente de ce qu'on croyait.
+      - name: Conserver les captures des pages en échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures-pages-en-echec
+          path: render-failures/
+          if-no-files-found: ignore
+          retention-days: 14
