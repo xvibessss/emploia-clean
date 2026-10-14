@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="dns-prefetch" href="https://plausible.io"/>
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin/>
-<link rel="stylesheet" href="/shared.css?v=fc5cbc03"/>
+<link rel="stylesheet" href="/shared.css?v=b64b326f"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -181,9 +181,6 @@
 .emp-hero-dark>*:not(.emp-dot):not(.emp-wire){position:relative;z-index:1}
 
 /* Live counter chip */
-.live-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-full);padding:7px 16px;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:22px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0;animation:pulsedot 2.2s ease-in-out infinite}
-@keyframes pulsedot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}60%{box-shadow:0 0 0 7px rgba(34,197,94,0)}}
 
 /* Hero trust badges */
 .hero-trust{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
@@ -365,7 +362,6 @@
   </svg>
 
   <div class="emp-hero-inner">
-    <div class="live-chip"><span class="live-dot"></span><span>🟢 <strong id="liveCount">847</strong> candidats actifs en ce moment</span></div>
     <h1 class="t-hero">Le copilote qui<br/><span style="background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidate à votre place.</span></h1>
     <p class="emp-hero-sub">Pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — un CV parfait par offre, en 30 secondes.</p>
     <div class="emp-hero-cta">
@@ -1171,7 +1167,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=bd13709d"></script>
+<script src="/shared.js?v=869938f7"></script>
 <script>
 /* Pricing → Stripe Checkout. Wires the Pro/Campagne cards (data-checkout) to
    /api/stripe-checkout with the right plan key. The plan key is passed through
@@ -1347,19 +1343,6 @@
 (function(){
   var btn = document.getElementById('navLoginBtn');
   if(btn && window.innerWidth >= 1024) btn.style.display = 'inline-flex';
-})();
-
-/* ── Live counter ── */
-(function(){
-  var el = document.getElementById('liveCount');
-  if(!el) return;
-  var base = 820 + Math.floor(Math.random() * 60);
-  el.textContent = base;
-  setInterval(function(){
-    var delta = Math.random() < 0.5 ? 1 : -1;
-    base = Math.max(780, Math.min(980, base + delta));
-    el.textContent = base;
-  }, 3800);
 })();
 
 /* ── Newsletter submit ── */

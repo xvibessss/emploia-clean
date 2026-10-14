@@ -84,7 +84,7 @@ export default async function handler(req) {
     </div>
     <div style="padding:32px">
       <h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">On a amélioré Emploia depuis votre dernière visite 🚀</h1>
-      <p style="color:#475569;line-height:1.7;margin:0 0 20px;font-size:14px">Le marché évolue vite. Les candidats qui utilisent Emploia régulièrement décrochent <strong style="color:#0f172a">2× plus d'entretiens</strong> — voici ce qu'il y a de nouveau pour vous :</p>
+      <p style="color:#475569;line-height:1.7;margin:0 0 20px;font-size:14px">Le marché évolue vite, et Emploia aussi. <strong style="color:#0f172a">Voici ce qui a changé</strong> depuis votre dernière visite :</p>
 
       <div style="background:#f8fafc;border-radius:14px;border:1px solid #e2e8f0;padding:20px;margin-bottom:24px">
         <div style="display:flex;flex-direction:column;gap:12px">

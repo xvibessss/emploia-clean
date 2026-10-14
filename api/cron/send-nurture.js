@@ -82,7 +82,7 @@ export default async function handler(req) {
     </div>
     <div style="padding:32px">
       <h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 10px">Vous avez déjà généré ${generationsUsed} document${generationsUsed > 1 ? 's' : ''} avec Emploia 🎯</h1>
-      <p style="color:#475569;line-height:1.7;margin:0 0 20px;font-size:14px">Vous savez déjà que l'IA fait la différence dans votre recherche. Les candidats qui utilisent Emploia Pro obtiennent <strong style="color:#0f172a">2× plus d'entretiens</strong> en moyenne.</p>
+      <p style="color:#475569;line-height:1.7;margin:0 0 20px;font-size:14px">Vos générations gratuites servent à tester. Emploia Pro les rend <strong style="color:#0f172a">illimitées</strong> — un CV et une lettre adaptés à chaque annonce, sans compter.</p>
 
       <div style="background:#f8fafc;border-radius:14px;border:1px solid #e2e8f0;padding:20px;margin-bottom:28px">
         <p style="font-size:13px;font-weight:800;color:#0f172a;margin:0 0 14px">Ce que vous débloquez avec Pro :</p>
