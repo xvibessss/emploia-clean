@@ -513,7 +513,10 @@
     });
   }
 
-  function typeBadgeClass(type) { return {'CDI':'jb-type-blue','CDD':'jb-type-purple','Stage':'jb-type-green','Alternance':'jb-type-yellow','Freelance':'jb-type-teal'}[type]||'jb-type-blue'; }
+  // Le repli était `jb-type-blue`, c'est-à-dire la couleur du CDI : un type
+  // hors des cinq s'affichait donc EN CDI. Le défaut A avait une seconde
+  // incarnation, visuelle, dans la feuille de style. Le repli est neutre.
+  function typeBadgeClass(type) { return {'CDI':'jb-type-blue','CDD':'jb-type-purple','Stage':'jb-type-green','Alternance':'jb-type-yellow','Freelance':'jb-type-teal'}[type]||'jb-badge-gray'; }
 
   function renderJob(job) {
     const daysSince = Math.floor((Date.now() - new Date(job.date)) / 86400000);
@@ -534,7 +537,7 @@
           <span class="jb-match-pill" id="pill-${esc(String(job.id))}" title="Cliquer pour analyser la compatibilité IA" onclick="analyzeScore('${esc(String(job.id))}',this)">✨ Score IA</span>
         </div>
         <div class="jb-badges">
-          <span class="jb-badge ${typeBadgeClass(job.type)}">${esc(job.type)}</span>
+          ${job.type ? `<span class="jb-badge ${typeBadgeClass(job.type)}">${esc(job.type)}</span>` : ''}
           <span class="jb-badge jb-badge-gray">${esc(job.location)}</span>
           ${job.remote ? '<span class="jb-badge jb-type-green">Remote</span>' : ''}
           ${job.salary ? `<span class="jb-badge jb-badge-gray">${esc(job.salary)}</span>` : ''}

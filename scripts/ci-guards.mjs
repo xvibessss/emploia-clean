@@ -550,5 +550,155 @@ try {
   if (!simules && !revenues) ok(`${visibles.length} fichiers servis — aucun nombre affiché issu du hasard, aucune affirmation retirée revenue`);
 } catch (e) { fail('contrôle des preuves sociales impossible : ' + e.message); }
 
+// ── 15. le type de contrat est lu, jamais fabriqué ─────────────────────────
+// Dans l'esprit du garde [3] : des régressions dont on ne veut plus.
+//
+// `detectType()` finissait par `return 'CDI'` et recevait le filtre de
+// recherche en second argument, qu'il renvoyait tel quel pour TOUTES les
+// offres. Deux conséquences, chacune mesurée : une offre au contrat inconnu
+// était publiée comme un CDI (217 sur 311 d'un relevé venaient de cette seule
+// ligne), et sous filtre « CDD » chaque offre rendue portait l'étiquette
+// « CDD » quel que soit son contrat réel. L'étiquette était une fonction de la
+// requête, pas de la donnée.
+//
+// Les deux défauts sont de la même famille : une affirmation sans lecture. Le
+// garde est structurel pour qu'ils ne puissent pas revenir par inadvertance —
+// la sonde `npm run test:causes` / `test:contrat` vérifie le comportement, ce
+// garde vérifie la forme, qui est ce qui se dégrade en silence sous une
+// correction pressée.
+console.log('\n[15] type de contrat : lu depuis la donnée, jamais depuis la requête');
+try {
+  const jobsSrc = readAll('api/jobs.js');
+  const libContrat = readAll('api/_lib/contrat.js');
+  const sansCommentaires = (t) => t.replace(/^\s*\/\/.*$/gm, '');
+  let bad14 = 0;
+
+  if (!libContrat) {
+    fail('api/_lib/contrat.js absent — la lecture du contrat doit rester partagée entre api/jobs.js et les alertes');
+    bad14++;
+  }
+
+  // (1) Le point qui compte : `detectType` ne PEUT PLUS recevoir le filtre.
+  // Une signature à un paramètre rend le défaut inexprimable, au lieu de
+  // compter sur la relecture des cinq sites d'appel.
+  const sig = /function detectType\(([^)]*)\)/.exec(libContrat || '');
+  if (!sig) { fail('detectType introuvable dans api/_lib/contrat.js'); bad14++; }
+  else if (sig[1].includes(',')) {
+    fail(`detectType prend plus d'un paramètre (${sig[1].trim()}) — le filtre de recherche ne doit pas pouvoir l'atteindre`);
+    bad14++;
+  }
+
+  // (2) Aucun site d'appel ne lui passe deux arguments, dans tout api/. Les
+  // commentaires sont retirés d'abord : ils citent l'ancienne signature pour
+  // expliquer ce qui a été retiré, et un garde qui se déclenche sur sa propre
+  // documentation finit par être désarmé.
+  for (const f of apiFiles) {
+    for (const m of sansCommentaires(readAll(f)).matchAll(/detectType\(([^)]*)\)/g)) {
+      if (m[1].includes(',')) {
+        fail(`${f} : detectType appelé avec un second argument (${m[1].trim()}) — l'étiquette redeviendrait fonction de la requête`);
+        bad14++;
+      }
+    }
+  }
+
+  // (3) `detectType` finit par `return null`. Un contrat inconnu est une
+  // information manquante, pas un CDI.
+  const i = (libContrat || '').indexOf('function detectType(');
+  if (i >= 0) {
+    const corps = libContrat.slice(i, libContrat.indexOf('\n}', i));
+    if (!/return null;\s*$/.test(corps.trim())) {
+      fail("detectType ne finit plus par `return null` — un contrat inconnu redeviendrait un contrat affirmé");
+      bad14++;
+    }
+    if (/^\s*return\s+'(CDI|CDD|Stage|Alternance|Freelance)';/m.test(corps)) {
+      fail('detectType a une branche inconditionnelle qui rend un contrat');
+      bad14++;
+    }
+  }
+
+  // (4) Le filtre de contrat doit être APPLIQUÉ, pas seulement propagé. C'était
+  // le vrai point B : le filtre n'existait nulle part et l'étiquette était
+  // réécrite pour faire croire qu'il avait agi.
+  if (!/function filtrerContrat\(/.test(jobsSrc)) {
+    fail('api/jobs.js n\'a plus de filtrerContrat — un filtre de contrat doit être appliqué sur la donnée reçue');
+    bad14++;
+  } else {
+    const pose = jobsSrc.indexOf('filtrerContrat(pertinence.jobs, type)');
+    const cache = jobsSrc.indexOf('kvSet(cacheKey');
+    if (pose < 0) { fail('filtrerContrat n\'est pas appelé dans le handler'); bad14++; }
+    else if (cache >= 0 && pose > cache) {
+      fail('filtrerContrat est appelé après la mise en cache — l\'entrée de cache porterait des offres non filtrées');
+      bad14++;
+    }
+  }
+
+  // (5) Une durée de travail n'est pas un contrat. `full_time → CDI` est la
+  // faute de catégorie que commet la table JOB_TYPES du front ; `type:
+  // 'Remote'` en était une autre. Ni l'une ni l'autre ne doit entrer dans le
+  // champ contrat côté API.
+  const codeJobs = sansCommentaires(jobsSrc) + sansCommentaires(libContrat || '');
+  if (/(full_?time|part_?time|FULLTIME|PARTTIME)\s*:\s*'(CDI|CDD|Stage|Alternance|Freelance)'/i.test(codeJobs)) {
+    fail('une durée de travail est cartographiée vers un contrat (full_time → CDI) — deux dimensions distinctes');
+    bad14++;
+  }
+  if (/type:\s*'Remote'/.test(codeJobs)) {
+    fail("type: 'Remote' — un mode de travail dans le champ contrat ; le champ `remote` le porte déjà");
+    bad14++;
+  }
+
+  // (6) Le salaire : l'ancien garde testait la véracité de la borne basse, pas
+  // son ordre de grandeur, et `0k–0k€/an` s'affichait sur /jobs. La
+  // vérification doit porter sur la sortie.
+  if (/Math\.round\(j\.salary_min\s*\/\s*1000\)/.test(jobsSrc)) {
+    fail('api/jobs.js arrondit le salaire en ligne — passer par formaterSalaireAnnuel, qui vérifie la sortie');
+    bad14++;
+  }
+  if (!/function formaterSalaireAnnuel\(/.test(libContrat || '')) {
+    fail('formaterSalaireAnnuel absent — le garde du 0k–0k doit porter sur la sortie, en un seul endroit');
+    bad14++;
+  }
+
+  // (7) `salary_is_predicted` se compare, il ne se teste pas : les réponses
+  // publiées le donnent comme la chaîne "0" chez certains clients, et
+  // `Boolean("0") === true` marquerait toutes les offres comme estimées.
+  if (/if\s*\(\s*j?\.?salary_is_predicted\s*\)/.test(codeJobs)) {
+    fail('salary_is_predicted est lu par véracité — Boolean("0") est true, toutes les offres seraient marquées estimées');
+    bad14++;
+  }
+
+  // (8) La pastille de type du front est conditionnelle, et son repli de
+  // couleur n'est pas celui du CDI. `esc(null)` rend '' : une pastille
+  // inconditionnelle donnait une puce bleue vide, et le bleu est la couleur du
+  // CDI — le défaut avait une seconde incarnation, visuelle.
+  const front = readAll('jobs.html');
+  if (front) {
+    if (/<span class="jb-badge \$\{typeBadgeClass\(job\.type\)\}">\$\{esc\(job\.type\)\}<\/span>/.test(front) &&
+        !/\$\{job\.type \? `<span class="jb-badge/.test(front)) {
+      fail('jobs.html affiche la pastille de type sans condition — un type absent donnerait une pastille vide');
+      bad14++;
+    }
+    if (/\}\[type\]\s*\|\|\s*'jb-type-blue'/.test(front)) {
+      fail("jobs.html : typeBadgeClass retombe sur 'jb-type-blue', la couleur du CDI — un type inconnu s'afficherait en CDI");
+      bad14++;
+    }
+  }
+
+  // (9) Les alertes email lisent la même notion que l'agrégateur. Elles
+  // comparaient `job_types` à `full_time` / `temporary` / `apprenticeship`,
+  // valeurs qui n'existent pas chez Arbeitnow : toute alerte typée filtrait à
+  // zéro.
+  const alertes = sansCommentaires(readAll('api/cron/send-alerts.js'));
+  if (alertes && !/_lib\/contrat\.js/.test(alertes)) {
+    fail('api/cron/send-alerts.js ne partage pas _lib/contrat.js — deux lectures divergentes du même champ');
+    bad14++;
+  }
+
+  if (!bad14) {
+    const appels = [...jobsSrc.matchAll(/detectType\(/g)].length;
+    ok(`detectType à un seul paramètre, ${appels} appel(s) sans filtre, filtre de contrat appliqué avant le cache`,
+       'salaire vérifié sur la sortie, pastille conditionnelle, alertes alignées');
+  }
+} catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

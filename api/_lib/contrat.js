@@ -1,0 +1,229 @@
+// ── LECTURE DU CONTRAT DE TRAVAIL ─────────────────────────────────────────────
+// Source unique pour tout ce qui transforme une donnée amont en type de
+// contrat affichable. Partagée par `api/jobs.js` (l'agrégateur) et
+// `api/cron/send-alerts.js` (les alertes email), qui lisaient la même notion
+// de deux façons incompatibles — l'un en devinant depuis le titre, l'autre en
+// comparant à un vocabulaire qui n'existe pas chez la source.
+//
+// LA RÈGLE, et elle est la raison d'être de ce fichier : ce qu'on reconnaît,
+// on le cartographie ; tout le reste vaut `null`. Jamais une supposition.
+// Un contrat inconnu est une information manquante, pas un CDI.
+//
+// Ce que ce fichier retire : `detectType()` finissait par `return 'CDI'` et
+// recevait le filtre de recherche en argument, qu'il renvoyait tel quel. Une
+// offre dont le contrat était inconnu était donc publiée comme un CDI, et
+// sous filtre « CDD » toutes les offres rendues étaient étiquetées « CDD »
+// quel que soit leur contrat réel. L'étiquette était une fonction de la
+// requête, pas de la donnée.
+
+// Le vocabulaire fermé. Cinq valeurs, celles que l'interface sait colorer et
+// qu'une alerte sait demander. Ce qui n'y est pas ne sort pas d'ici.
+export const CONTRATS = new Set(['CDI', 'CDD', 'Stage', 'Alternance', 'Freelance']);
+
+// Le filtre d'URL (`?type=cdd`) vers le libellé correspondant. Sert à FILTRER
+// des offres — jamais à en étiqueter une.
+export const FILTRE_VERS_CONTRAT = {
+  stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance',
+};
+
+// Dernier verrou avant qu'une étiquette entre dans une offre : ce qui n'est
+// pas du vocabulaire fermé devient `null`. Même rôle que `causePublique` pour
+// les causes d'échec — la garantie est appliquée en un point, pas confiée à la
+// discipline des huit collecteurs ni à celle du prochain qu'on ajoutera.
+export function contratPublic(v) {
+  return CONTRATS.has(v) ? v : null;
+}
+
+export function normaliserValeur(v) {
+  return String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+// ── Le titre, en dernier recours ─────────────────────────────────────────────
+// Ce qui reste d'une lecture du titre est un indice faible mais réel : « Stage
+// marketing — 6 mois » dit son contrat, parce que l'employeur l'a écrit. Il
+// n'est consulté qu'après les champs structurés de la source, et il ne comble
+// plus les trous par un défaut : un titre muet rend `null`.
+export function detectType(title) {
+  const t = normaliserValeur(title);
+  if (/\b(stage|stagiaire|intern|internship)\b/.test(t)) return 'Stage';
+  if (/\b(alternance|alternant|apprenti|apprentissage|apprenticeship)\b/.test(t)) return 'Alternance';
+  if (/\b(freelance|independant|freiberufler)\b/.test(t)) return 'Freelance';
+  if (/\b(cdd|temporary|interim)\b/.test(t)) return 'CDD';
+  if (/\bcdi\b/.test(t)) return 'CDI';
+  return null;
+}
+
+// ── DURÉE DE TRAVAIL — un autre champ, délibérément ──────────────────────────
+// `full_time` / `part_time` ne disent rien du contrat : un CDD peut être à
+// temps plein, un CDI à temps partiel. Les confondre est la faute de catégorie
+// que commet la table `JOB_TYPES` du front en posant `full_time → CDI`, et
+// c'est la même que le `'Remote'` qu'écrivait le collecteur Remotive dans le
+// champ contrat. On lit donc la durée, mais dans son propre champ, qui ne
+// touche jamais `type`.
+function lireTemps(t) {
+  if (/\b(full ?time|fulltime|vollzeit|temps plein)\b/.test(t)) return 'Temps plein';
+  if (/\b(part ?time|parttime|teilzeit|temps partiel)\b/.test(t)) return 'Temps partiel';
+  return null;
+}
+
+// ── ADZUNA ───────────────────────────────────────────────────────────────────
+// `contract_type` et `contract_time` sont documentés sur chaque résultat de
+// l'endpoint `search`, et le dépôt n'en lisait aucun des deux : zéro
+// occurrence dans `api/jobs.js`. On devinait ce qu'on nous avait dit.
+//
+// L'énumération complète de `contract_type` n'est pas publiée par Adzuna. Les
+// valeurs attestées sont `permanent` et `contract`. On ne cartographie que
+// celles-là ; le reste vaut `null`, parce qu'inventer la troisième valeur
+// serait refaire, en plus petit, le défaut qu'on retire.
+const ADZUNA_CONTRAT = { permanent: 'CDI', contract: 'CDD' };
+
+export function contratAdzuna(j) {
+  return contratPublic(ADZUNA_CONTRAT[normaliserValeur(j?.contract_type)] || detectType(j?.title));
+}
+export function tempsAdzuna(j) {
+  return lireTemps(normaliserValeur(j?.contract_time));
+}
+
+// ── ARBEITNOW ────────────────────────────────────────────────────────────────
+// `job_types` est un tableau, et le dépôt le lisait déjà — mais ailleurs, dans
+// `api/cron/send-alerts.js`, et contre un vocabulaire qui n'est pas celui de
+// la source.
+//
+// MESURÉ sur les 300 offres de la page 1 de l'API publique : le champ est du
+// TEXTE LIBRE ET MULTILINGUE, pas une énumération. 177 offres sur 300 n'ont
+// aucune valeur. Celles qui en ont mélangent trois dimensions sans les
+// distinguer : le contrat (« Unbefristeter arbeitsvertrag », « Contract »,
+// « freelance »), la durée de travail (« Full Time », « Full-time »,
+// « Part Time ») et le niveau d'expérience (« berufserfahren », « Manager »,
+// « mid-senior »). Aucune occurrence de `full_time`, `temporary`,
+// `apprenticeship` : les valeurs que `send-alerts.js` cherchait n'existent
+// pas, donc toute alerte typée filtrait 300 offres à zéro.
+//
+// D'où une reconnaissance par motif plutôt que par clé exacte, justifiée par
+// la mesure et non par le confort.
+//
+// LE PIÈGE, et il inverse le sens : « unbefristeter » (à durée INdéterminée)
+// CONTIENT « befristeter » (à durée déterminée). Un test par sous-chaîne dans
+// le mauvais ordre rend CDD pour les 28 offres les plus clairement CDI du lot.
+// Le préfixe est donc testé d'abord, et il sort immédiatement.
+function contratDepuisTexte(t) {
+  if (/\bunbefristet/.test(t)) return 'CDI';            // à tester AVANT befristet
+  if (/\bbefristet/.test(t)) return 'CDD';
+  if (/\bpermanent\b/.test(t)) return 'CDI';
+  if (/\b(contract|temporary|zeitarbeit)\b/.test(t)) return 'CDD';
+  if (/\b(internship|intern|praktikum|stage)\b/.test(t)) return 'Stage';
+  if (/\b(apprenticeship|ausbildung|alternance|apprenti)\b/.test(t)) return 'Alternance';
+  if (/\b(freelance|freiberufler|selbststandiger)\b/.test(t)) return 'Freelance';
+  // « Werkstudent » / « working student » est un statut étudiant allemand qui
+  // n'est ni un stage ni une alternance au sens français. Il reste `null` :
+  // le rapprocher serait commode et faux.
+  return null;
+}
+
+export function contratArbeitnow(j) {
+  const valeurs = (Array.isArray(j?.job_types) ? j.job_types : []).map(normaliserValeur);
+  for (const v of valeurs) {
+    const c = contratDepuisTexte(v);
+    if (c) return contratPublic(c);
+  }
+  return contratPublic(detectType(j?.title));
+}
+export function tempsArbeitnow(j) {
+  for (const v of (Array.isArray(j?.job_types) ? j.job_types : []).map(normaliserValeur)) {
+    const t = lireTemps(v);
+    if (t) return t;
+  }
+  return null;
+}
+
+// ── JSEARCH ──────────────────────────────────────────────────────────────────
+// `job_employment_type` mélange contrat et durée de travail dans un seul
+// champ. `INTERN` et `CONTRACTOR` portent un contrat ; `FULLTIME` et
+// `PARTTIME` n'en portent pas et ne doivent pas en tenir lieu — c'est cette
+// confusion qui faisait d'un temps plein un CDI.
+const JSEARCH_CONTRAT = { intern: 'Stage', contractor: 'CDD' };
+
+export function contratJSearch(j) {
+  const v = normaliserValeur(j?.job_employment_type);
+  return contratPublic(JSEARCH_CONTRAT[v] || detectType(j?.job_title));
+}
+export function tempsJSearch(j) {
+  return lireTemps(normaliserValeur(j?.job_employment_type));
+}
+
+// ── FRENCH JOB MARKET ────────────────────────────────────────────────────────
+// Celui-ci démonte l'explication facile. Le collecteur propage DÉJÀ
+// correctement `employment_type` en amont, pour les cinq valeurs — et son
+// mappeur écrasait quand même l'étiquette par `detectType(j.title, type)`.
+// Propager le filtre ne suffit donc pas : il faut cesser d'écrire l'étiquette
+// depuis la requête. Ce sont deux corrections indépendantes, et la seconde est
+// la seule qui protège.
+const FM_CONTRAT = {
+  permanent: 'CDI', temporary: 'CDD', contract: 'CDD',
+  internship: 'Stage', apprenticeship: 'Alternance', freelance: 'Freelance',
+};
+
+export function contratFrenchMarket(j) {
+  return contratPublic(FM_CONTRAT[normaliserValeur(j?.employment_type)] || detectType(j?.title));
+}
+
+// ── FRANCE TRAVAIL ───────────────────────────────────────────────────────────
+// Le contrat est déclaré par un code (`typeContrat`) doublé d'un libellé libre
+// (`typeContratLibelle`, « Contrat à durée indéterminée »). L'ancien mappeur
+// prenait le libellé : exact, mais hors du vocabulaire des cinq badges, donc
+// illisible pour un filtre comme pour `typeBadgeClass`. On lit le code.
+//
+// Et seulement les codes dont la correspondance est certaine : `MIS` (mission
+// intérimaire) et `SAI` (saisonnier) ne sont aucun de nos cinq contrats et
+// valent `null` plutôt qu'un rapprochement commode.
+const FT_CONTRAT = {
+  CDI: 'CDI', DIN: 'CDI',               // DIN = CDI intérimaire
+  CDD: 'CDD', CDS: 'CDD', DDI: 'CDD',   // CDD senior, CDD insertion
+  CA: 'Alternance', CP: 'Alternance',   // apprentissage, professionnalisation
+  LIB: 'Freelance',
+};
+
+export function contratFranceTravail(j) {
+  const code = String(j?.typeContrat ?? '').trim().toUpperCase();
+  return contratPublic(FT_CONTRAT[code] || detectType(j?.intitule));
+}
+
+// ── SALAIRE ──────────────────────────────────────────────────────────────────
+// L'ancienne ligne testait la véracité de la borne basse, pas son ordre de
+// grandeur : `j.salary_min ? …` laisse passer 400, qui s'arrondit à `0`, et la
+// page affichait « 0k–0k€/an ».
+//
+// La vérification porte donc sur la SORTIE : les deux bornes sont arrondies
+// d'abord, et rien n'est émis si elles valent toutes les deux zéro. Un seuil
+// arbitraire sur l'entrée aurait laissé passer la combinaison suivante ; ici
+// `0k–0k` est inexprimable par construction.
+//
+// Reste le cas mitoyen que la sonde a fait apparaître : une borne basse qui
+// s'arrondit à zéro quand la haute ne le fait pas (0 → 999 €). « 0k–1k€/an »
+// n'est pas `0k–0k`, donc le critère est tenu — mais la borne basse n'y porte
+// aucune information, et l'afficher inviterait à lire « ce poste peut payer
+// zéro ». On n'émet alors que la borne qui dit quelque chose, comme une limite
+// haute. C'est plus pauvre et c'est exact ; inventer une borne basse
+// plausible serait la faute que cette mission retire.
+export function formaterSalaireAnnuel(min, max) {
+  const brutBas = Number(min) || 0;
+  const brutHaut = Number(max) || brutBas;
+  const bas = Math.round(Math.min(brutBas, brutHaut) / 1000);
+  const haut = Math.round(Math.max(brutBas, brutHaut) / 1000);
+  if (haut === 0) return null;                 // rien à dire, 0k–0k inclus
+  if (bas === 0) return `jusqu'à ${haut}k€/an`; // la borne basse ne dit rien
+  return bas === haut ? `${bas}k€/an` : `${bas}k–${haut}k€/an`;
+}
+
+// `salary_is_predicted` d'Adzuna : une fourchette estimée statistiquement par
+// Adzuna, pas un montant publié par l'employeur.
+//
+// La comparaison est explicite, et c'est nécessaire : les réponses publiées
+// donnent le champ comme la CHAÎNE `"0"` chez certains clients et l'entier `0`
+// chez d'autres. Un `if (j.salary_is_predicted)` marquerait donc TOUTES les
+// offres comme estimées, puisque `Boolean("0") === true`. On compare la valeur,
+// pas sa véracité.
+export function estSalaireEstime(v) {
+  return String(v) === '1';
+}
