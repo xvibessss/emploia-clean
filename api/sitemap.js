@@ -15,6 +15,8 @@ export default function handler(req, res) {
     { loc: `${base}/blog/questions-entretien-stage`,  changefreq: 'monthly', priority: '0.8', lastmod: '2026-06-03' },
     { loc: `${base}/blog/salaires-tech-2026`,         changefreq: 'monthly', priority: '0.8', lastmod: '2026-06-03' },
     { loc: `${base}/blog`,                changefreq: 'weekly',  priority: '0.85', lastmod: today },
+    { loc: `${base}/app`,                 changefreq: 'weekly',  priority: '0.9', lastmod: today },
+    { loc: `${base}/referral`,            changefreq: 'monthly', priority: '0.6', lastmod: today },
     { loc: `${base}/employeurs`,          changefreq: 'weekly',  priority: '0.85', lastmod: today },
     { loc: `${base}/ecoles`,              changefreq: 'monthly', priority: '0.85', lastmod: today },
     { loc: `${base}/sous-traitants`,      changefreq: 'monthly', priority: '0.30', lastmod: today },

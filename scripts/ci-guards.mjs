@@ -366,5 +366,77 @@ try {
 } catch (e) { fail('contrôle des prix des emails impossible : ' + e.message); }
 
 console.log('');
+// ── 13. sitemap ↔ pages indexables : la liste ne dérive pas ────────────────
+// `api/sitemap.js` est une liste de 171 URLs tenue à la main. Rien n'oblige
+// une page nouvelle à y entrer, ni une page passée en noindex à en sortir :
+// les deux dérives sont silencieuses et coûtent chacune du trafic d'un côté
+// différent.
+//
+// Une page indexable absente du sitemap n'est pas invisible — Google la
+// trouve en suivant les liens — mais elle attend d'être découverte au lieu
+// d'être déclarée. `/recherche` montrait le cas extrême : indexable, son
+// propre canonical, zéro lien entrant dans tout le dépôt et absente de la
+// liste. Aucun chemin n'y menait, ni par le crawl ni par la déclaration.
+//
+// Une page noindex *présente* dans le sitemap est l'erreur inverse, et elle
+// est plus coûteuse : on demande explicitement l'exploration d'une URL dont
+// l'en-tête dit de ne pas l'indexer. Search Console la remonte en
+// « Envoyée par le sitemap, mais bloquée », et le budget d'exploration part
+// dans le vide. Les quatorze pages noindex du dépôt sont hors de la liste
+// aujourd'hui ; ce garde vérifie que la quinzième le sera aussi.
+console.log('\n[13] sitemap ↔ pages indexables — dans les deux sens');
+try {
+  const v = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+  // Seuls les rewrites exacts comptent : les deux motifs du dépôt
+  // (`/offre/:id`, `/score/:token`) servent des pages noindex, qui n'ont par
+  // définition rien à faire dans un sitemap.
+  const byDest = new Map();
+  for (const r of v.rewrites || []) {
+    if (!r.source || !r.destination?.endsWith('.html')) continue;
+    if (r.source.includes(':') || r.source.includes('(')) continue;
+    const d = r.destination.replace(/^\//, '');
+    if (!byDest.has(d)) byDest.set(d, []);
+    byDest.get(d).push(r.source);
+  }
+
+  const smSrc = readAll('api/sitemap.js');
+  const declared = new Set([...smSrc.matchAll(/\$\{base\}(\/[^`]*)`/g)].map((m) => m[1]));
+  declared.add('/');
+
+  const pages = walk('.').filter(
+    (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
+  );
+  let absentes = 0, bloquees = 0;
+  for (const f of pages) {
+    const rel = f.replace(/^\.\//, '');
+    const noindex = /name="robots"[^>]*noindex/.test(readAll(f));
+    // Une page servie sur plusieurs chemins propres — /legal l'est sur cinq —
+    // n'a besoin d'être déclarée qu'une fois, sur celui que son canonical
+    // désigne. Il suffit donc qu'un de ses chemins soit dans la liste.
+    const paths = byDest.get(rel) || (rel === 'index.html' ? ['/'] : []);
+    const dansLeSitemap = paths.filter((p) => declared.has(p));
+    if (noindex) {
+      if (dansLeSitemap.length) {
+        fail(`${rel} : noindex mais déclarée dans le sitemap (${dansLeSitemap.join(', ')}) — exploration demandée pour une page qu'on refuse d'indexer`);
+        bloquees++;
+      }
+      continue;
+    }
+    if (!paths.length) {
+      fail(`${rel} : page indexable qu'aucun rewrite ne sert — inatteignable`);
+      absentes++;
+      continue;
+    }
+    if (!dansLeSitemap.length) {
+      fail(`${rel} : indexable, servie sur ${paths.join(' ')}, absente du sitemap — à ajouter dans api/sitemap.js ou à passer en noindex`);
+      absentes++;
+    }
+  }
+  if (!absentes && !bloquees) {
+    const indexables = pages.filter((f) => !/name="robots"[^>]*noindex/.test(readAll(f))).length;
+    ok(`${indexables} pages indexables toutes déclarées, ${pages.length - indexables} noindex toutes absentes de la liste`);
+  }
+} catch (e) { fail('contrôle du sitemap impossible : ' + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
