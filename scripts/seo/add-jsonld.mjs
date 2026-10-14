@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 /**
- * Ajoute le bloc JSON-LD manquant sur les 10 pages identifiees par la spec
- * .bones/evidence/stage3-spec.md (pipeline bones "jsonld-metiers").
+ * Ajoute le bloc JSON-LD manquant sur les 13 pages du pipeline bones
+ * "jsonld-metiers" :
+ *   - 10 pages de la slice A, spec .bones/evidence/stage3-spec.md (PR #65)
+ *   - 3 pages du double-down : app/legal/referral, les dernieres pages
+ *     publiques ET indexables qui n'avaient aucune donnee structuree.
+ *     Les 14 autres pages sans JSON-LD sont en noindex (baliser une page que
+ *     Google n'indexe pas ne sert a rien) et popup.html est servie par
+ *     l'extension, donc non crawlable.
  *
  * Idempotent : une page qui contient deja un bloc application/ld+json est
  * laissee intacte. Relancer le script ne duplique rien.
@@ -16,7 +22,11 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 // Perimetre figé : la liste est codee en dur, pas decouverte, pour qu'elle
-// reste exactement celle que Hugo a signee au stage 3.
+// reste exactement celle que Hugo a signee — stage 3 pour les 10 premieres,
+// decision operate/learn du stage 10 pour les 3 dernieres.
+// La meme liste est redupliquee dans verify-jsonld.mjs : c'est VOLONTAIRE.
+// Un verificateur qui importerait sa cible depuis le script verifie validerait
+// une liste fausse sans broncher.
 const TARGETS = [
   ['metier/btp.html',           'CollectionPage'],
   ['metier/communication.html', 'CollectionPage'],
@@ -28,6 +38,9 @@ const TARGETS = [
   ['cv-builder.html',           'WebApplication'],
   ['contact.html',              'ContactPage'],
   ['sous-traitants.html',       'WebPage'],
+  ['app.html',                  'WebApplication'],
+  ['legal.html',                'WebPage'],
+  ['referral.html',             'WebPage'],
 ];
 
 const SITE = { '@type': 'WebSite', name: 'Emploia', url: 'https://emploia.eu' };

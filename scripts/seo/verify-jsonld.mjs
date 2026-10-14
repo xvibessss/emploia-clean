@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Assertions d'acceptance pour la slice A du pipeline bones "jsonld-metiers".
+ * Assertions d'acceptance pour le pipeline bones "jsonld-metiers".
+ *   - slice A (10 pages) : spec signee au stage 3, livree par la PR #65
+ *   - double-down (3 pages) : app/legal/referral, les dernieres pages
+ *     publiques ET indexables sans donnees structurees
  * Exit 0 seulement si TOUTES passent. Appele par ./check-jsonld.sh.
  */
 import { readFileSync } from 'node:fs';
@@ -17,6 +20,9 @@ const TARGETS = [
   ['cv-builder.html',           'WebApplication'],
   ['contact.html',              'ContactPage'],
   ['sous-traitants.html',       'WebPage'],
+  ['app.html',                  'WebApplication'],
+  ['legal.html',                'WebPage'],
+  ['referral.html',             'WebPage'],
 ];
 
 let fails = 0;
@@ -29,9 +35,12 @@ function attr(html, re) {
 }
 
 // --- Assertion 1 : le compte. Un check qui passerait sur un repertoire vide
-// ne prouve rien, donc on exige exactement 10 cibles.
-if (TARGETS.length !== 10) fail(`perimetre: ${TARGETS.length} cibles, 10 attendues`);
-else ok('perimetre: 10 cibles');
+// ne prouve rien, donc on exige exactement le perimetre signe : 10 pages de la
+// slice A + 3 du double-down. Le chiffre est volontairement en dur — c'est lui
+// qui empeche d'elargir le perimetre sans que Hugo l'ait valide.
+const EXPECTED_TARGETS = 13;
+if (TARGETS.length !== EXPECTED_TARGETS) fail(`perimetre: ${TARGETS.length} cibles, ${EXPECTED_TARGETS} attendues`);
+else ok(`perimetre: ${EXPECTED_TARGETS} cibles`);
 
 for (const [file, expectedType] of TARGETS) {
   let html;
@@ -81,12 +90,23 @@ for (const [file, expectedType] of TARGETS) {
   if (!fails) ok(`${file} — ${expectedType}`);
 }
 
+// L'outillage du pipeline lui-meme a le droit de bouger : c'est lui qui porte
+// le perimetre. La liste est NOMMEE fichier par fichier, pas un joker sur
+// scripts/ — sinon l'assertion 7 ne mordrait plus rien.
+// Dans la PR #65 ces trois fichiers etaient encore non suivis par git, donc
+// absents de `git diff` : l'assertion passait sans avoir a les prevoir.
+const TOOLING = new Set([
+  'scripts/seo/add-jsonld.mjs',
+  'scripts/seo/verify-jsonld.mjs',
+  'check-jsonld.sh',
+]);
+
 // --- Assertion 7 : aucune derive de perimetre
 try {
   const changed = execSync('git diff --name-only', { encoding: 'utf8' })
     .split('\n').map(s => s.trim()).filter(Boolean);
   const expected = new Set(TARGETS.map(([f]) => f));
-  const extra = changed.filter(f => !expected.has(f));
+  const extra = changed.filter(f => !expected.has(f) && !TOOLING.has(f));
   if (extra.length) fail(`fichiers modifies hors perimetre: ${extra.join(', ')}`);
   else ok(`git diff: ${changed.length} fichier(s), tous dans le perimetre`);
 } catch (e) {
