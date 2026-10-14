@@ -71,7 +71,19 @@ await page('/', {
 });
 
 console.log('\n[B] Page écoles');
-await page('/ecoles', { must: ['9 €', '40 000', 'pilote'] });
+await page('/ecoles', {
+  // Le barème est par tranches : les trois taux et le forfait plateforme
+  // figurent tous dans la page servie, et c'est leur ensemble qui identifie la
+  // grille. Un seul taux ne distinguerait pas la grille actuelle d'une grille
+  // à moitié mise à jour.
+  must: ['22 €', '17 €', '12 €', '2 500 €', '40 000', 'pilote'],
+  // Prix au siège d'avant le barème par tranches, retiré le 2026-10-06 par
+  // 451847a : sa présence signifie que la prod sert encore la grille à 9 €.
+  // La chaîne porte son unité, parce que « 9 € » seul se retrouve dans tout
+  // montant en 9 — « 19 € », « 39 € » — et sonnerait faux au premier
+  // changement de tarif.
+  mustNot: ['9 € par siège', '9 € par étudiant'],
+});
 
 console.log('\n[B bis] Conformité — identité du vendeur et conditions de vente');
 await page('/legal', {
