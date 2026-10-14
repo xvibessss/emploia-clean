@@ -1,0 +1,10 @@
+{
+  "name": "jsonld-metiers",
+  "target": "/Users/chapellehugo/emploia-clean",
+  "stage": 11,
+  "created": "2026-10-10T22:53:18Z",
+  "updated": "2026-10-14T21:06:05Z",
+  "strict": false,
+  "status": "active",
+  "head": "18b627755a0c81369b747807c36ea342e71dff43b18863b4406711139178204f"
+}
