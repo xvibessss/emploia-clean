@@ -106,10 +106,6 @@
       "destination": "/offre.html"
     },
     {
-      "source": "/recherche",
-      "destination": "/recherche.html"
-    },
-    {
       "source": "/legal",
       "destination": "/legal.html"
     },
@@ -598,6 +594,11 @@
       "source": "/pricing",
       "destination": "/#pricing",
       "permanent": false
+    },
+    {
+      "source": "/recherche",
+      "destination": "/jobs",
+      "permanent": true
     },
     {
       "source": "/signup",
