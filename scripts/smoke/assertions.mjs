@@ -23,10 +23,17 @@ export const PAGE_ASSERTIONS = [
   {
     title: '[A] Landing — la grille servie est bien la nouvelle',
     route: '/',
-    must: ['59€', '24€', 'Pack Campagne'],
+    must: ['59€', '24€', 'Pack Campagne', '22€'],
     // Anciens montants et preuves sociales fabriquées : leur présence signifie
     // que la prod sert encore une version antérieure à la PR #28.
-    mustNot: ['45€', '19€', '24 800', '1 240 avis', '14 200'],
+    //
+    // Les trois derniers sont la grille écoles d'avant 451847a, restée sur la
+    // carte « Écoles & RH » de la landing parce qu'aucune aiguille ne la
+    // couvrait : la landing annonçait 9€ le siège quand /ecoles en demandait 22.
+    // Ils portent leur contexte, pas leur seul montant — « 9€ » nu est un
+    // sous-mot de « 59€ », légitime sur cette même page.
+    mustNot: ['45€', '19€', '24 800', '1 240 avis', '14 200',
+              '/étudiant/an', '6€ au-delà', '39€/candidat'],
   },
   {
     title: '[B] Page écoles',
