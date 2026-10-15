@@ -154,6 +154,16 @@ export default async function handler(req) {
         success_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.eu'}/app?success=1`,
         cancel_url: `${process.env.NEXT_PUBLIC_URL || 'https://emploia.eu'}/#pricing`,
         ...(resolvedEmail ? { customer_email: resolvedEmail } : {}),
+        // Lien d'identité infalsifiable, quand on sait qui achète. Il n'était
+        // pas utilisé — zéro occurrence dans le dépôt — et son absence coûtait
+        // le cas courant de l'abonné qui paie avec l'adresse de son compte
+        // bancaire : l'achat atterrissait sur une adresse inconnue, et l'accès
+        // était accordé à un compte que l'acheteur ne possède pas.
+        //
+        // C'est l'identifiant interne (`u_…`), pas l'adresse : il est posé
+        // depuis la session authentifiée et l'acheteur ne peut pas le changer
+        // sur la page Stripe. Le webhook le lit en premier.
+        ...(sessionUser?.id ? { client_reference_id: sessionUser.id } : {}),
         'metadata[plan]': plan,
         // Proof of consent, kept on the Stripe object rather than only in our
         // own store: it has to outlive the session to be worth anything in a
