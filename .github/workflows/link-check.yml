@@ -1,5 +1,10 @@
 name: Link Check
 
+# Aucun déclencheur `pull_request`, et ce n'est pas un oubli de filtre :
+# lychee suit les liens des pages telles que la PRODUCTION les sert
+# (`--base-url https://emploia.eu` ci-dessous). Sur une PR, il revérifierait
+# la production plutôt que la branche, et rendrait le même verdict à chaque
+# fois. Le contrôle qui doit tourner sur toute PR, lui, c'est ci.yml.
 on:
   schedule:
     # Every Sunday at 7h UTC
