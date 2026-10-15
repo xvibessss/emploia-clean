@@ -30,12 +30,33 @@ const src = fs.readFileSync(new URL('../../api/jobs.js', import.meta.url), 'utf8
 const libSrc = fs.readFileSync(new URL('../../api/_lib/contrat.js', import.meta.url), 'utf8');
 const alertSrc = fs.readFileSync(new URL('../../api/cron/send-alerts.js', import.meta.url), 'utf8');
 const frontSrc = fs.readFileSync(new URL('../../jobs.html', import.meta.url), 'utf8');
+// Le front, commentaires retirés. La feuille de style cite les libellés
+// interdits pour dire qu'ils le sont : les tester sur le fichier entier ferait
+// échouer la sonde sur sa propre documentation.
+const frontCode = frontSrc.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 let passed = 0, failed = 0;
 function check(label, condition, detail) {
   if (condition) { passed++; console.log(`  ✓ ${label}${detail ? ` — ${detail}` : ''}`); }
   else { failed++; console.error(`  ✗ ${label}${detail ? ` — ${detail}` : ''}`); }
 }
+
+// Extraction d'une fonction du VRAI handler, pour l'exécuter dans un `vm` :
+// une copie de la logique resterait verte en divergeant du fichier servi.
+// Déclarée ici parce que deux sections s'en servent, et qu'une `const` utilisée
+// avant sa déclaration lève une ReferenceError au chargement du module.
+function extraire(nom) {
+  const i = src.indexOf(`function ${nom}(`);
+  if (i < 0) return null;
+  let profondeur = 0;
+  const debut = src.indexOf('{', i);
+  for (let j = debut; j < src.length; j++) {
+    if (src[j] === '{') profondeur++;
+    else if (src[j] === '}' && --profondeur === 0) return src.slice(i, j + 1);
+  }
+  return null;
+}
+const blocFiltre = extraire('filtrerContrat');
 
 // ── A. Le défaut par défaut : un contrat inconnu vaut null, jamais CDI ───────
 console.log('\n[A] Un contrat inconnu porte null, il n’est plus publié comme CDI');
@@ -254,26 +275,66 @@ check('la comparaison est explicite dans le source',
   /String\(v\)\s*===\s*'1'/.test(libSrc));
 check('aucune lecture par véracité du drapeau',
   !/if\s*\(\s*j\.salary_is_predicted\s*\)/.test(src));
-// DÉCISION : un salaire estimé n'est pas affiché.
-check('le handler ne publie pas un salaire estimé',
-  /estime\s*\?\s*null\s*:\s*formaterSalaireAnnuel/.test(src));
-check('mais conserve le signal pour un affichage marqué plus tard',
-  /salaryEstimated/.test(src));
+// DÉCISION : un salaire estimé est affiché, et marqué.
+check('le handler émet la fourchette même estimée',
+  /salary:\s*formaterSalaireAnnuel\(j\.salary_min, j\.salary_max\)/.test(src));
+check('il ne la supprime plus', !/salary:\s*estime\s*\?\s*null/.test(src));
+check('et conserve le drapeau qui la distingue', /salaryEstimated:\s*estime/.test(src));
+check('jobs.html marque « estimation Adzuna » dans le rendu', /estimation Adzuna/.test(frontCode));
+check('sur un badge distinct du gris des montants annoncés',
+  /jb-badge-estime/.test(frontSrc) &&
+  /salaryEstimated\s*\n?\s*\?\s*`<span class="jb-badge jb-badge-estime"/.test(frontSrc));
+check('le badge estimé est visuellement distinct en CSS',
+  /\.jb-badge-estime \{[^}]*dashed/.test(frontSrc));
+check('jamais le libellé « salaire proposé »', !/salaire propos/i.test(frontCode));
+
+// ── Couverture du contrat : dans la réponse, pas dans les journaux ──────────
+console.log('\n[J] La couverture du contrat sort des journaux Vercel');
+check('couvertureContrat est publié dans la réponse fraîche',
+  /filtre: pertinence\.filtre, couvertureContrat/.test(src));
+check('elle entre en cache', /kvSet\(cacheKey, \{[^}]*couvertureContrat/.test(src));
+check('la relecture du cache la rend', /couvertureContrat, cached: true/.test(src));
+// Une entrée écrite par le déploiement précédent n'en porte pas. Des zéros se
+// liraient comme « aucune offre au contrat inconnu » — l'affirmation la plus
+// trompeuse possible, puisque c'est le chiffre qu'on vient de rendre visible.
+check('une entrée de cache sans couverture vaut null, pas des zéros',
+  /cached\.couvertureContrat \|\| null/.test(src));
+check('le journal subsiste pour qui lit à chaud, mais n’est plus le seul endroit',
+  /console\.error\(`jobs: \$\{contrat\.ecartees\}/.test(src) && /couvertureContrat/.test(src));
+
+// Le comportement de `filtrerContrat`, sur la couverture.
+if (blocFiltre) {
+  const sandbox2 = { console, FILTRE_VERS_CONTRAT };
+  vm.createContext(sandbox2);
+  vm.runInContext(`${blocFiltre}\nthis.filtrerContrat = filtrerContrat;`, sandbox2);
+  const { filtrerContrat } = sandbox2;
+  const lot = [
+    { id: 1, type: 'CDI' }, { id: 2, type: 'CDD' }, { id: 3, type: null },
+    { id: 4, type: 'Stage' }, { id: 5, type: 'CDD' }, { id: 6, type: null },
+  ];
+  // Hors filtre, la couverture est quand même mesurée : c'est le chiffre qui
+  // dira si la lecture des champs amont progresse, et il n'existerait pas s'il
+  // n'était compté que sous filtre.
+  const hors = filtrerContrat(lot, '');
+  check('hors filtre, sansContrat est compté malgré tout',
+    hors.sansContrat === 2 && hors.ecartees === 0, `sansContrat=${hors.sansContrat}`);
+  check('hors filtre, vise est null', hors.vise === null);
+  const sous = filtrerContrat(lot, 'cdd');
+  check('sous filtre, vise nomme le contrat demandé', sous.vise === 'CDD');
+  check('sous filtre, sansContrat reste le compte d’avant filtrage',
+    sous.sansContrat === 2, `sansContrat=${sous.sansContrat}`);
+  check('et ecartees compte tout ce qui est parti', sous.ecartees === 4);
+  // Le rendu annoncé à l'utilisateur doit être cohérent : « n sur m » avec
+  // n ≤ m, et n compté sur la liste servie.
+  const confirmees = sous.jobs.filter(j => j.type).length;
+  check('« n offres au contrat confirmé sur m » est cohérent',
+    confirmees === 2 && confirmees <= lot.length, `${confirmees} sur ${lot.length}`);
+  check('aucune offre au contrat inconnu n’entre dans les confirmées',
+    !sous.jobs.some(j => !j.type));
+}
 
 // ── Le filtre de contrat existe et porte sur la donnée ──────────────────────
 console.log('\n[G] Le filtre de contrat est appliqué sur la donnée reçue');
-function extraire(nom) {
-  const i = src.indexOf(`function ${nom}(`);
-  if (i < 0) return null;
-  let profondeur = 0;
-  const debut = src.indexOf('{', i);
-  for (let j = debut; j < src.length; j++) {
-    if (src[j] === '{') profondeur++;
-    else if (src[j] === '}' && --profondeur === 0) return src.slice(i, j + 1);
-  }
-  return null;
-}
-const blocFiltre = extraire('filtrerContrat');
 check('filtrerContrat est extractible du handler', !!blocFiltre);
 if (blocFiltre) {
   const sandbox = { console, FILTRE_VERS_CONTRAT };

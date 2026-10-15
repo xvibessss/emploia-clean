@@ -49,14 +49,25 @@ function daysAgo(n) { return new Date(Date.now() - n * 86400000).toISOString(); 
 // l'utilisateur qui a explicitement demandé un contrat peut vider sa liste — et
 // /jobs a un état « Aucune offre trouvée » avec un bouton de réinitialisation.
 // Servir des CDI à qui demande des CDD serait le défaut d'origine, en silence.
+// `ecartees` et `sansContrat` ne partent PAS qu'en journal. Un `console.error`
+// ne vit que dans les journaux Vercel, dont la rétention est d'une heure sur le
+// plan Hobby : c'est exactement le défaut que `causesEnEchec` vient de
+// corriger pour les sources en échec, et le reproduire ici serait reculer.
+// Ils entrent dans la réponse HTTP, pour que la couverture soit lisible par
+// l'interface et par la sonde au lieu d'être devinée.
 function filtrerContrat(jobs, type) {
   const vise = FILTRE_VERS_CONTRAT[type];
-  if (!vise) return { jobs, ecartees: 0, sansContrat: 0 };
+  // Hors filtre, la couverture reste mesurable : `sansContrat` compte les
+  // offres au contrat inconnu même quand rien n'est écarté. C'est le chiffre
+  // qui dira si la lecture des champs amont progresse ou se dégrade, et il
+  // n'existerait pas si on ne le comptait que sous filtre.
+  if (!vise) return { jobs, ecartees: 0, sansContrat: jobs.filter(j => !j.type).length, vise: null };
   const gardees = jobs.filter(j => j.type === vise);
   return {
     jobs: gardees,
     ecartees: jobs.length - gardees.length,
     sansContrat: jobs.filter(j => !j.type).length,
+    vise,
   };
 }
 
@@ -429,11 +440,14 @@ async function fetchAdzuna(q, type, location, page, journal) {
         // `contract_time` est une durée de travail, pas un contrat : son
         // propre champ, qui ne touche jamais `type`.
         workTime: tempsAdzuna(j),
-        // DÉCISION : une fourchette estimée par Adzuna n'est pas le salaire de
-        // l'employeur, et on ne l'affiche pas. Voir `estSalaireEstime`.
-        salary: estime ? null : formaterSalaireAnnuel(j.salary_min, j.salary_max),
-        // Le signal est conservé pour qu'un affichage explicitement marqué
-        // « estimation Adzuna » reste possible sans refaire la lecture.
+        // DÉCISION : la fourchette est émise même estimée — ne rien afficher
+        // privait le candidat d'un ordre de grandeur réel. C'est `jobs.html`
+        // qui porte la mention « estimation Adzuna », sur un badge distinct de
+        // celui des salaires annoncés par l'employeur.
+        salary: formaterSalaireAnnuel(j.salary_min, j.salary_max),
+        // Donc ce drapeau n'est plus un simple signal conservé pour plus tard :
+        // c'est lui qui distingue un montant publié d'une estimation d'un
+        // tiers. Le perdre reviendrait à présenter la seconde comme le premier.
         salaryEstimated: estime,
         description: (j.description || '').slice(0, 300),
         url: j.redirect_url || '',
@@ -709,8 +723,15 @@ export default async function handler(req) {
       const causesEnEchec = Object.fromEntries(
         (cached.sourcesEnEchec || []).map(s => [s, causePublique(brut[s])])
       );
+      // Même raisonnement pour la couverture du contrat. Une entrée écrite par
+      // le déploiement précédent n'en porte pas, et un objet à zéros se lirait
+      // comme « aucune offre au contrat inconnu » — l'affirmation la plus
+      // trompeuse possible ici, puisque c'est précisément le chiffre qu'on
+      // vient de rendre visible. Absente, elle vaut `null`, et l'interface
+      // n'affiche alors rien plutôt qu'un zéro inventé.
+      const couvertureContrat = cached.couvertureContrat || null;
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -774,6 +795,22 @@ export default async function handler(req) {
       // seul `remoteOnly` était appliqué après la fusion.
       const contrat = filtrerContrat(pertinence.jobs, type);
       let final = contrat.jobs;
+      // La couverture du contrat, telle qu'elle sera rendue. Le journal reste
+      // utile pour qui lit les logs à chaud, mais il n'est plus le SEUL endroit
+      // où le chiffre existe : `couvertureContrat` entre dans la réponse et
+      // dans le cache, comme `causesEnEchec`.
+      //
+      // `confirmees` est compté sur la liste servie, et `total` sur celle
+      // d'avant filtrage : l'interface annonce « n offres au contrat confirmé
+      // sur m », donc les deux bornes doivent venir du même passage, pas d'un
+      // recomptage côté client sur une liste déjà tronquée par `limit`.
+      const couvertureContrat = {
+        filtre: contrat.vise,
+        total: pertinence.jobs.length,
+        confirmees: final.filter(j => j.type).length,
+        sansContrat: contrat.sansContrat,
+        ecartees: contrat.ecartees,
+      };
       if (contrat.ecartees) {
         console.error(`jobs: ${contrat.ecartees} offre(s) écartée(s) par le filtre de contrat type=${JSON.stringify(type)} (dont ${contrat.sansContrat} au contrat inconnu)`);
       }
@@ -789,11 +826,11 @@ export default async function handler(req) {
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }),
         { status: 200, headers: H }
       );
     }

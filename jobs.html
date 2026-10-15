@@ -101,6 +101,16 @@
     .jb-type-teal { background: var(--tint-sky); color: var(--brand-teal); }
     .jb-badge-gray { background: var(--surface); color: var(--slate); }
     .jb-badge-red { background: var(--tint-rose); color: var(--brand-pink-deep); }
+    /* Salaire ESTIMÉ par Adzuna, et non publié par l'employeur. Le badge doit
+       se distinguer au premier regard de `jb-badge-gray`, qui porte les
+       montants réellement annoncés : fond transparent, contour en pointillés,
+       texte en italique. Un candidat qui négocie doit voir que le chiffre ne
+       vient pas de l'offre. Le libellé est « estimation Adzuna » — jamais
+       « salaire proposé ». */
+    .jb-badge-estime { background: transparent; color: var(--stone); border: 1px dashed var(--hairline-strong, rgba(0,0,0,.18)); font-style: italic; font-weight: 500; }
+    /* Couverture du contrat : une ligne discrète sous le compteur, qui dit ce
+       que la liste contient au lieu de le laisser supposer. */
+    .jb-couverture { font-size: 11px; color: var(--stone); margin-top: 4px; }
     .jb-card-desc { font-size: 12px; color: var(--stone); line-height: 1.7; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .jb-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .jb-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -540,7 +550,9 @@
           ${job.type ? `<span class="jb-badge ${typeBadgeClass(job.type)}">${esc(job.type)}</span>` : ''}
           <span class="jb-badge jb-badge-gray">${esc(job.location)}</span>
           ${job.remote ? '<span class="jb-badge jb-type-green">Remote</span>' : ''}
-          ${job.salary ? `<span class="jb-badge jb-badge-gray">${esc(job.salary)}</span>` : ''}
+          ${job.salary ? (job.salaryEstimated
+            ? `<span class="jb-badge jb-badge-estime" title="Fourchette estimée par Adzuna depuis des annonces similaires. L'employeur n'a pas publié de salaire pour cette offre.">${esc(job.salary)} · estimation Adzuna</span>`
+            : `<span class="jb-badge jb-badge-gray">${esc(job.salary)}</span>`) : ''}
           ${isNew ? '<span class="jb-badge jb-badge-red">Nouveau</span>' : ''}
         </div>
         ${job.description ? `<div class="jb-card-desc">${esc(job.description)}</div>` : ''}
@@ -557,6 +569,34 @@
           </div>
         </div>
       </div>`;
+  }
+
+  // Couverture du contrat, rendue depuis `couvertureContrat` de la réponse.
+  //
+  // Le chiffre vient du serveur et n'est jamais recalculé ici : la liste reçue
+  // peut être tronquée par `limit`, et un recomptage client annoncerait
+  // « 18 sur 18 » là où le serveur a lu 18 contrats sur 31 offres.
+  //
+  // Absente — entrée de cache d'un déploiement antérieur — on n'affiche rien.
+  // Un « 0 sur 0 » inventé serait précisément le genre d'affirmation sans
+  // lecture que cette mission retire.
+  function couvertureContrat(c) {
+    if (!c || typeof c.total !== 'number' || !c.total) return '';
+    // Sous filtre de contrat : la liste a été réduite, et il faut dire de
+    // combien. C'est le cas que Hugo demande — « n offres au contrat confirmé
+    // sur m » — et il n'a de sens que quand le filtre a effectivement agi.
+    if (c.filtre && c.ecartees > 0) {
+      const inconnues = c.sansContrat > 0
+        ? ` · ${c.sansContrat} offre${c.sansContrat > 1 ? 's' : ''} au contrat non précisé, écartée${c.sansContrat > 1 ? 's' : ''}`
+        : '';
+      return `<div class="jb-couverture"><strong>${c.confirmees}</strong> offre${c.confirmees > 1 ? 's' : ''} au contrat confirmé sur ${c.total}${inconnues}</div>`;
+    }
+    // Hors filtre, on ne signale que ce qui manque, et seulement s'il en
+    // manque : annoncer « 31 sur 31 » à chaque recherche serait du bruit.
+    if (c.sansContrat > 0) {
+      return `<div class="jb-couverture">${c.sansContrat} offre${c.sansContrat > 1 ? 's' : ''} sur ${c.total} sans type de contrat précisé par la source</div>`;
+    }
+    return '';
   }
 
   async function loadJobs() {
@@ -579,7 +619,7 @@
       const total = data.total || 0;
       const label = q ? `pour "${q}"` : currentType !== 'tous' ? `en ${currentType}` : 'disponibles';
       document.getElementById('searchStats').innerHTML = `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${label}`;
-      document.getElementById('resultCount').innerHTML = `<strong style="color:var(--ink)">${total.toLocaleString('fr-FR')}</strong> offres`;
+      document.getElementById('resultCount').innerHTML = `<strong style="color:var(--ink)">${total.toLocaleString('fr-FR')}</strong> offres${couvertureContrat(data.couvertureContrat)}`;
       if (!data.jobs?.length) {
         document.getElementById('jobsList').innerHTML = `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">🔍</div><h3>Aucune offre trouvée</h3><p>Essayez d'autres mots-clés ou un autre type de contrat.</p><button onclick="resetFilters()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Voir toutes les offres</button></div>`;
         document.getElementById('pagination').innerHTML = ''; return;

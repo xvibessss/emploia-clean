@@ -665,12 +665,29 @@ try {
     fail('salary_is_predicted est lu par véracité — Boolean("0") est true, toutes les offres seraient marquées estimées');
     bad14++;
   }
+  // (7 bis) Une fourchette estimée est AFFICHÉE, et marquée comme estimée. Les
+  // deux moitiés de la décision sont vérifiées ensemble, parce que chacune
+  // seule est une faute : l'émettre sans la marquer attribue à un employeur un
+  // chiffre qu'il n'a pas publié ; ne pas l'émettre prive le candidat d'un
+  // ordre de grandeur réel.
+  if (/salary:\s*estime\s*\?\s*null/.test(codeJobs)) {
+    fail('un salaire estimé est supprimé au lieu d\'être marqué — le candidat perd un ordre de grandeur réel');
+    bad14++;
+  }
+  if (!/salaryEstimated/.test(codeJobs)) {
+    fail('salaryEstimated absent — rien ne distinguerait plus un montant publié d\'une estimation d\'Adzuna');
+    bad14++;
+  }
 
   // (8) La pastille de type du front est conditionnelle, et son repli de
   // couleur n'est pas celui du CDI. `esc(null)` rend '' : une pastille
   // inconditionnelle donnait une puce bleue vide, et le bleu est la couleur du
   // CDI — le défaut avait une seconde incarnation, visuelle.
   const front = readAll('jobs.html');
+  // Commentaires retirés une fois pour toutes : CSS et JS citent les libellés
+  // interdits pour dire qu'ils le sont, et un garde qui se déclenche sur sa
+  // propre documentation finit par être désarmé.
+  const frontCode = front.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   if (front) {
     if (/<span class="jb-badge \$\{typeBadgeClass\(job\.type\)\}">\$\{esc\(job\.type\)\}<\/span>/.test(front) &&
         !/\$\{job\.type \? `<span class="jb-badge/.test(front)) {
@@ -679,6 +696,73 @@ try {
     }
     if (/\}\[type\]\s*\|\|\s*'jb-type-blue'/.test(front)) {
       fail("jobs.html : typeBadgeClass retombe sur 'jb-type-blue', la couleur du CDI — un type inconnu s'afficherait en CDI");
+      bad14++;
+    }
+    // Un salaire estimé doit être visuellement distinct du badge gris des
+    // montants annoncés, et porter la mention. Le même badge pour les deux
+    // rendrait la distinction invisible, donc inutile.
+    // On vise le site d'ÉMISSION du badge, pas la feuille de style : une règle
+    // CSS orpheline laisserait le garde vert pendant que la carte rend du gris.
+    if (!/salaryEstimated[\s\S]{0,80}?jb-badge-estime/.test(frontCode)) {
+      fail('jobs.html : le badge estimé n\'est pas branché sur salaryEstimated — une estimation d\'Adzuna se lirait comme le salaire de l\'employeur');
+      bad14++;
+    }
+    if (!/estimation Adzuna/.test(frontCode)) {
+      fail('jobs.html : la mention « estimation Adzuna » est absente du rendu');
+      bad14++;
+    }
+    if (/salaire propos/i.test(frontCode)) {
+      fail('jobs.html : le libellé « salaire proposé » apparaît — une estimation d\'un tiers n\'est pas une proposition de l\'employeur');
+      bad14++;
+    }
+    // La couverture du contrat doit venir de la réponse HTTP, pas d'un
+    // recomptage client sur une liste que `limit` peut avoir tronquée.
+    if (!/data\.couvertureContrat/.test(front)) {
+      fail('jobs.html n\'affiche pas la couverture du contrat — le chiffre resterait dans les journaux Vercel, retenus une heure');
+      bad14++;
+    }
+    if (!/contrat confirmé/.test(front)) {
+      fail('jobs.html : la ligne « n offres au contrat confirmé sur m » est absente');
+      bad14++;
+    }
+  }
+
+  // (8 bis) `sansContrat` sort du journal et entre dans la réponse. Un
+  // `console.error` ne vit qu'une heure sur le plan Hobby : c'est le défaut que
+  // `causesEnEchec` vient de corriger, et le laisser revenir pour la couverture
+  // du contrat serait reculer sur le même point.
+  // Le test porte sur le PAYLOAD de la réponse, pas sur la présence du mot
+  // dans le fichier : une variable calculée puis jamais rendue laisserait le
+  // chiffre exactement là où il était, dans les journaux.
+  if (!/JSON\.stringify\(\{[^}]*couvertureContrat/.test(jobsSrc)) {
+    fail('couvertureContrat n\'est pas dans la réponse HTTP — la couverture ne serait lisible que dans les journaux Vercel, retenus une heure');
+    bad14++;
+  } else {
+    // Les DEUX réponses, pas une : le handler rend soit l'agrégat frais, soit
+    // l'entrée de cache, et une couverture présente d'un seul côté
+    // disparaîtrait une requête sur deux sans que rien ne le signale.
+    const payloads = [...jobsSrc.matchAll(/JSON\.stringify\(\{[^}]*\}\)/g)].map(m => m[0]);
+    const avecJobs = payloads.filter(p => /jobs: final/.test(p));
+    const sansCouverture = avecJobs.filter(p => !/couvertureContrat/.test(p));
+    if (sansCouverture.length) {
+      fail(`${sansCouverture.length} réponse(s) sur ${avecJobs.length} ne portent pas couvertureContrat — la couverture disparaîtrait selon le chemin pris (frais ou cache)`);
+      bad14++;
+    }
+    // Les trois endroits, et c'est la leçon de causesEnEchec : la réponse
+    // fraîche, l'entrée de cache, et la relecture du cache. Oublier le cache
+    // ferait disparaître le chiffre pendant cinq minutes sur deux.
+    if (!/kvSet\(cacheKey, \{[^}]*couvertureContrat/.test(jobsSrc)) {
+      fail('couvertureContrat n\'entre pas en cache — la couverture disparaîtrait de la réponse pendant la fenêtre de cinq minutes');
+      bad14++;
+    }
+    if (!/cached\.couvertureContrat/.test(jobsSrc)) {
+      fail('la lecture du cache ne rend pas couvertureContrat');
+      bad14++;
+    }
+    // Et une entrée ancienne vaut `null`, pas un objet à zéros : « 0 offre au
+    // contrat inconnu » est l'affirmation la plus trompeuse possible ici.
+    if (!/cached\.couvertureContrat \|\| null/.test(jobsSrc)) {
+      fail('une entrée de cache sans couverture doit valoir null, jamais des zéros qui se liraient comme une mesure');
       bad14++;
     }
   }

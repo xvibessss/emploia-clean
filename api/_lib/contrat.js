@@ -217,7 +217,18 @@ export function formaterSalaireAnnuel(min, max) {
 }
 
 // `salary_is_predicted` d'Adzuna : une fourchette estimée statistiquement par
-// Adzuna, pas un montant publié par l'employeur.
+// Adzuna, pas un montant publié par l'employeur. Le drapeau est posé quand
+// l'annonce ne publie aucune fourchette et qu'Adzuna l'estime depuis des
+// annonces voisines.
+//
+// DÉCISION : la fourchette est affichée, et marquée « estimation Adzuna ». Ne
+// rien afficher privait le candidat d'un ordre de grandeur réel ; l'afficher
+// comme les autres lui attribuerait un employeur qui ne l'a jamais publiée. La
+// troisième voie est la seule qui ne mente ni par omission ni par attribution
+// — à condition que la mention soit portée par l'interface, et jamais le
+// libellé « salaire proposé ». C'est `salaryEstimated` qui la déclenche, et le
+// garde n°15 vérifie que le badge correspondant reste distinct du badge gris
+// des salaires annoncés.
 //
 // La comparaison est explicite, et c'est nécessaire : les réponses publiées
 // donnent le champ comme la CHAÎNE `"0"` chez certains clients et l'entier `0`
