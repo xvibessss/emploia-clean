@@ -23,10 +23,22 @@ export const PAGE_ASSERTIONS = [
   {
     title: '[A] Landing — la grille servie est bien la nouvelle',
     route: '/',
-    must: ['59€', '24€', 'Pack Campagne'],
+    // La carte « Écoles & RH » ne porte plus de montant : elle renvoie au devis,
+    // comme legal.html, et le barème vit sur /ecoles seule. L'aiguille est donc
+    // la formulation et non un prix. « Sur devis » ne ferait pas l'affaire : le
+    // tableau comparatif de la même page le contient déjà pour cette colonne,
+    // donc il resterait présent même si la carte reprenait un chiffre.
+    must: ['59€', '24€', 'Pack Campagne', 'Tarification par siège'],
     // Anciens montants et preuves sociales fabriquées : leur présence signifie
     // que la prod sert encore une version antérieure à la PR #28.
-    mustNot: ['45€', '19€', '24 800', '1 240 avis', '14 200'],
+    //
+    // Les trois derniers sont la grille écoles d'avant 451847a, restée sur la
+    // carte « Écoles & RH » de la landing parce qu'aucune aiguille ne la
+    // couvrait : la landing annonçait 9€ le siège quand /ecoles en demandait 22.
+    // Ils portent leur contexte, pas leur seul montant — « 9€ » nu est un
+    // sous-mot de « 59€ », légitime sur cette même page.
+    mustNot: ['45€', '19€', '24 800', '1 240 avis', '14 200',
+              '/étudiant/an', '6€ au-delà', '39€/candidat'],
   },
   {
     title: '[B] Page écoles',
