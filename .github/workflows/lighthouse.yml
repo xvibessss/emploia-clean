@@ -1,5 +1,10 @@
 name: Lighthouse Audit
 
+# Aucun déclencheur `pull_request`, et ce n'est pas un oubli de filtre : cet
+# audit interroge les URL de production listées plus bas. Une PR — empilée ou
+# non — ne change rien à ce que ces URL servent tant qu'elle n'est pas
+# déployée, donc le lancer sur une PR mesurerait toujours la même chose. Le
+# contrôle qui doit tourner sur toute PR, lui, c'est ci.yml.
 on:
   schedule:
     # Every Monday at 8h UTC
