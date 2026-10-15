@@ -20,14 +20,14 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="dns-prefetch" href="https://plausible.io"/>
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin/>
-<link rel="stylesheet" href="/shared.css?v=fc5cbc03"/>
+<link rel="stylesheet" href="/shared.css?v=b64b326f"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
     {"@type":"Question","name":"EmploiA fonctionne-t-il pour les stages et alternances ?","acceptedAnswer":{"@type":"Answer","text":"Oui — c'est même un de nos cas d'usage majeurs. Le coach adapte le ton et la structure au niveau d'expérience, et nos modèles intègrent les formats CV étudiants français (Parcoursup, Sciences Po, écoles de commerce et d'ingé)."}},
-    {"@type":"Question","name":"Mes données sont-elles utilisées pour entraîner l'IA ?","acceptedAnswer":{"@type":"Answer","text":"Jamais. Vos CV, lettres et conversations restent privés, hébergés en France, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic."}},
+    {"@type":"Question","name":"Mes données sont-elles utilisées pour entraîner l'IA ?","acceptedAnswer":{"@type":"Answer","text":"Jamais. Vos CV, lettres et conversations restent privés, hébergés dans l'UE, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic."}},
     {"@type":"Question","name":"Quelle différence avec ChatGPT ?","acceptedAnswer":{"@type":"Answer","text":"EmploiA est un produit, pas un chatbot. Il connaît les conventions de candidature françaises, suit vos candidatures dans un seul tableau, garde le contexte d'une session à l'autre, et orchestre plusieurs assistants spécialisés (CV, lettre, coach, négo) au lieu d'un seul."}},
     {"@type":"Question","name":"Puis-je annuler à tout moment ?","acceptedAnswer":{"@type":"Answer","text":"Bien sûr. Pas d'engagement, pas de frais cachés. Vous gardez l'accès à tout ce que vous avez créé même après l'annulation."}},
     {"@type":"Question","name":"Est-ce que ça marche pour des candidatures à l'étranger ?","acceptedAnswer":{"@type":"Answer","text":"Oui — l'offre Pro inclut l'export multilingue (anglais, espagnol, allemand, italien) avec adaptation culturelle des formats CV. Le coach d'entretien gère aussi les entretiens en anglais."}}
@@ -181,9 +181,6 @@
 .emp-hero-dark>*:not(.emp-dot):not(.emp-wire){position:relative;z-index:1}
 
 /* Live counter chip */
-.live-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-full);padding:7px 16px;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:22px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0;animation:pulsedot 2.2s ease-in-out infinite}
-@keyframes pulsedot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}60%{box-shadow:0 0 0 7px rgba(34,197,94,0)}}
 
 /* Hero trust badges */
 .hero-trust{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
@@ -365,7 +362,6 @@
   </svg>
 
   <div class="emp-hero-inner">
-    <div class="live-chip"><span class="live-dot"></span><span>🟢 <strong id="liveCount">847</strong> candidats actifs en ce moment</span></div>
     <h1 class="t-hero">Le copilote qui<br/><span style="background:linear-gradient(135deg,#a78bfa 0%,#60a5fa 50%,#34d399 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">candidate à votre place.</span></h1>
     <p class="emp-hero-sub">Pour les <span class="tw-word" id="twWord">Product Managers</span><span class="tw-cursor"></span> — un CV parfait par offre, en 30 secondes.</p>
     <div class="emp-hero-cta">
@@ -384,7 +380,7 @@
       </span>
       <span class="hero-trust-chip">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Données hébergées en France
+        Données hébergées dans l'UE
       </span>
       <span class="hero-trust-chip">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -492,7 +488,7 @@
     </div>
     <div class="ss-item">
       <div class="ss-num">100%</div>
-      <div class="ss-lbl">données hébergées en France</div>
+      <div class="ss-lbl">données hébergées dans l'UE</div>
     </div>
   </div>
 </section>
@@ -893,7 +889,7 @@
           <div><span class="versus-no">—</span></div>
         </div>
         <div class="versus-row">
-          <div>Données hébergées en France (RGPD)</div>
+          <div>Données hébergées dans l'UE (RGPD)</div>
           <div class="hl-col"><span class="versus-yes">✓</span></div>
           <div><span class="versus-no">—</span></div>
           <div><span class="versus-no">—</span></div>
@@ -1036,7 +1032,7 @@
       </div>
       <div class="emp-faq-item" data-acc>
         <button class="emp-faq-head" data-acc-head>🔒 Mes données sont-elles utilisées pour entraîner l'IA ?<span class="plus">+</span></button>
-        <div class="emp-faq-body">Jamais. Vos CV, lettres et conversations restent privés, hébergés en France, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic.</div>
+        <div class="emp-faq-body">Jamais. Vos CV, lettres et conversations restent privés, hébergés dans l'UE, et ne sont jamais utilisés pour entraîner des modèles tiers. Vous pouvez exporter ou supprimer vos données en un clic.</div>
       </div>
       <div class="emp-faq-item" data-acc>
         <button class="emp-faq-head" data-acc-head>🤖 Quelle différence avec ChatGPT ?<span class="plus">+</span></button>
@@ -1171,7 +1167,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=bd13709d"></script>
+<script src="/shared.js?v=869938f7"></script>
 <script>
 /* Pricing → Stripe Checkout. Wires the Pro/Campagne cards (data-checkout) to
    /api/stripe-checkout with the right plan key. The plan key is passed through
@@ -1347,19 +1343,6 @@
 (function(){
   var btn = document.getElementById('navLoginBtn');
   if(btn && window.innerWidth >= 1024) btn.style.display = 'inline-flex';
-})();
-
-/* ── Live counter ── */
-(function(){
-  var el = document.getElementById('liveCount');
-  if(!el) return;
-  var base = 820 + Math.floor(Math.random() * 60);
-  el.textContent = base;
-  setInterval(function(){
-    var delta = Math.random() < 0.5 ? 1 : -1;
-    base = Math.max(780, Math.min(980, base + delta));
-    el.textContent = base;
-  }, 3800);
 })();
 
 /* ── Newsletter submit ── */

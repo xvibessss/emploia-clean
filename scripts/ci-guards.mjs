@@ -471,5 +471,315 @@ try {
   }
 } catch (e) { fail('contrôle du sitemap impossible : ' + e.message); }
 
+// ── 14. preuves sociales inventées : le mécanisme et les chaînes retirées ──
+// Deux balayages ont déjà nettoyé ce dépôt — la PR #28 sur la landing et la
+// page À propos, puis le commit 9b214e0 sur employeurs.html et un article.
+// Les deux portaient sur des pages HTML. Tout ce qui a survécu vivait donc
+// ailleurs : dans shared.js, dans des gabarits d'email, dans un bloc <script>,
+// et dans une seconde occurrence plus bas dans une page déjà nettoyée.
+//
+// Ce qui restait au 2026-10-14, et que ce garde empêche de revenir :
+//
+//   shared.js        six notifications d'activité attribuées à des personnes
+//                    nommées inventées, dont « Sophie M. vient de décrocher un
+//                    entretien chez Qonto » — chargées par TOUTES les pages,
+//                    18 s après l'affichage, trois fois de suite ;
+//   index.html       « 847 candidats actifs en ce moment » avec une pastille
+//                    verte pulsante, tiré d'un Math.random entre 820 et 879
+//                    puis dérivé de ±1 toutes les 3,8 s ;
+//   employeurs.html  « 2 847 candidats actifs », « 89% ont un CV ATS-optimisé »
+//                    et « 3× taux de réponse vs LinkedIn » ;
+//   5 gabarits       « 2× / 2,4× plus d'entretiens », « 1 200+ offres analysées
+//                    aujourd'hui », « 10 offres personnalisées par jour ».
+//
+// Le premier contrôle vise le MÉCANISME, pas la formulation : un nombre montré
+// à un visiteur ne doit jamais sortir de Math.random. C'est ce qui distingue
+// une métrique périmée — qu'on corrige — d'une métrique fabriquée, qu'on
+// retire. Les particules décoratives de 404.html emploient Math.random sans
+// jamais alimenter de texte : elles ne déclenchent rien.
+//
+// Le second vise les chaînes déjà jugées, pour qu'un copier-coller ne les
+// réintroduise pas. Elles sont liées à EmploiA ou à sa base d'utilisateurs,
+// jamais à une statistique de marché : « 3× plus de réponses pour une offre
+// publiée depuis moins de 2 jours » dans un article reste un énoncé éditorial,
+// hors périmètre de ce garde.
+console.log('\n[14] preuves sociales inventées — mécanisme et chaînes retirées');
+try {
+  const visibles = walk('.').filter(
+    (p) => /\.(html|js)$/.test(p) && !p.includes('node_modules') && !p.startsWith('./scripts/'),
+  );
+
+  let simules = 0;
+  for (const f of visibles) {
+    const src = readAll(f);
+    for (const m of src.matchAll(/Math\.random/g)) {
+      const autour = src.slice(Math.max(0, m.index - 320), m.index + 320);
+      if (/textContent|innerHTML|innerText/.test(autour)) {
+        fail(`${f} : un nombre affiché au visiteur sort de Math.random — métrique fabriquée, pas périmée`);
+        simules++;
+      }
+    }
+  }
+
+  // Chaque entrée porte ce qu'elle affirmait et pourquoi elle est partie.
+  const RETIREES = [
+    [/2\s?847/, 'nombre d\'utilisateurs inventé — retiré d\'employeurs.html par 9b214e0, puis de sa rangée STATS et d\'un email'],
+    // Lié à un nombre, à « en ce moment » ou à « sur Emploia » : c'est un
+    // décompte de notre base. « les candidats actifs qui postulent à 20+
+    // offres/semaine » dans un article décrit un type de candidat, pas notre
+    // audience — ce n'est pas une preuve sociale, et ce n'est pas visé.
+    [/(?:\d[\d\s]*candidats actifs|candidats actifs (?:en ce moment|sur Emploia))/i, 'décompte de notre base d\'utilisateurs, qu\'aucune mesure ne soutient'],
+    [/taux de réponse vs LinkedIn/i, 'comparaison chiffrée contre un concurrent nommé, sans mesure — publicité comparative illicite'],
+    [/offres analys[ée]es aujourd'hui/i, 'volume quotidien inventé, présenté comme une donnée du jour'],
+    [/Emploia[^.<]{0,140}(?:×|x)\s*plus d'entretiens/i, 'effet d\'Emploia sur les entretiens, jamais mesuré'],
+    [/(?:×|x)\s*plus d'entretiens[^.<]{0,60}Emploia/i, 'même affirmation, formulée dans l\'autre sens'],
+    [/\d+\s*offres personnalis[ée]es par jour/i, 'plafond quotidien inventé — le palier payant est illimité (auth.js)'],
+  ];
+  let revenues = 0;
+  for (const f of visibles) {
+    const src = readAll(f);
+    for (const [re, motif] of RETIREES) {
+      const m = src.match(re);
+      if (m) { fail(`${f} : « ${m[0].slice(0, 60)} » — ${motif}`); revenues++; }
+    }
+  }
+
+  if (!simules && !revenues) ok(`${visibles.length} fichiers servis — aucun nombre affiché issu du hasard, aucune affirmation retirée revenue`);
+} catch (e) { fail('contrôle des preuves sociales impossible : ' + e.message); }
+
+// ── 15. le type de contrat est lu, jamais fabriqué ─────────────────────────
+// Dans l'esprit du garde [3] : des régressions dont on ne veut plus.
+//
+// `detectType()` finissait par `return 'CDI'` et recevait le filtre de
+// recherche en second argument, qu'il renvoyait tel quel pour TOUTES les
+// offres. Deux conséquences, chacune mesurée : une offre au contrat inconnu
+// était publiée comme un CDI (217 sur 311 d'un relevé venaient de cette seule
+// ligne), et sous filtre « CDD » chaque offre rendue portait l'étiquette
+// « CDD » quel que soit son contrat réel. L'étiquette était une fonction de la
+// requête, pas de la donnée.
+//
+// Les deux défauts sont de la même famille : une affirmation sans lecture. Le
+// garde est structurel pour qu'ils ne puissent pas revenir par inadvertance —
+// la sonde `npm run test:causes` / `test:contrat` vérifie le comportement, ce
+// garde vérifie la forme, qui est ce qui se dégrade en silence sous une
+// correction pressée.
+console.log('\n[15] type de contrat : lu depuis la donnée, jamais depuis la requête');
+try {
+  const jobsSrc = readAll('api/jobs.js');
+  const libContrat = readAll('api/_lib/contrat.js');
+  const sansCommentaires = (t) => t.replace(/^\s*\/\/.*$/gm, '');
+  let bad14 = 0;
+
+  if (!libContrat) {
+    fail('api/_lib/contrat.js absent — la lecture du contrat doit rester partagée entre api/jobs.js et les alertes');
+    bad14++;
+  }
+
+  // (1) Le point qui compte : `detectType` ne PEUT PLUS recevoir le filtre.
+  // Une signature à un paramètre rend le défaut inexprimable, au lieu de
+  // compter sur la relecture des cinq sites d'appel.
+  const sig = /function detectType\(([^)]*)\)/.exec(libContrat || '');
+  if (!sig) { fail('detectType introuvable dans api/_lib/contrat.js'); bad14++; }
+  else if (sig[1].includes(',')) {
+    fail(`detectType prend plus d'un paramètre (${sig[1].trim()}) — le filtre de recherche ne doit pas pouvoir l'atteindre`);
+    bad14++;
+  }
+
+  // (2) Aucun site d'appel ne lui passe deux arguments, dans tout api/. Les
+  // commentaires sont retirés d'abord : ils citent l'ancienne signature pour
+  // expliquer ce qui a été retiré, et un garde qui se déclenche sur sa propre
+  // documentation finit par être désarmé.
+  for (const f of apiFiles) {
+    for (const m of sansCommentaires(readAll(f)).matchAll(/detectType\(([^)]*)\)/g)) {
+      if (m[1].includes(',')) {
+        fail(`${f} : detectType appelé avec un second argument (${m[1].trim()}) — l'étiquette redeviendrait fonction de la requête`);
+        bad14++;
+      }
+    }
+  }
+
+  // (3) `detectType` finit par `return null`. Un contrat inconnu est une
+  // information manquante, pas un CDI.
+  const i = (libContrat || '').indexOf('function detectType(');
+  if (i >= 0) {
+    const corps = libContrat.slice(i, libContrat.indexOf('\n}', i));
+    if (!/return null;\s*$/.test(corps.trim())) {
+      fail("detectType ne finit plus par `return null` — un contrat inconnu redeviendrait un contrat affirmé");
+      bad14++;
+    }
+    if (/^\s*return\s+'(CDI|CDD|Stage|Alternance|Freelance)';/m.test(corps)) {
+      fail('detectType a une branche inconditionnelle qui rend un contrat');
+      bad14++;
+    }
+  }
+
+  // (4) Le filtre de contrat doit être APPLIQUÉ, pas seulement propagé. C'était
+  // le vrai point B : le filtre n'existait nulle part et l'étiquette était
+  // réécrite pour faire croire qu'il avait agi.
+  if (!/function filtrerContrat\(/.test(jobsSrc)) {
+    fail('api/jobs.js n\'a plus de filtrerContrat — un filtre de contrat doit être appliqué sur la donnée reçue');
+    bad14++;
+  } else {
+    const pose = jobsSrc.indexOf('filtrerContrat(pertinence.jobs, type)');
+    const cache = jobsSrc.indexOf('kvSet(cacheKey');
+    if (pose < 0) { fail('filtrerContrat n\'est pas appelé dans le handler'); bad14++; }
+    else if (cache >= 0 && pose > cache) {
+      fail('filtrerContrat est appelé après la mise en cache — l\'entrée de cache porterait des offres non filtrées');
+      bad14++;
+    }
+  }
+
+  // (5) Une durée de travail n'est pas un contrat. `full_time → CDI` est la
+  // faute de catégorie que commet la table JOB_TYPES du front ; `type:
+  // 'Remote'` en était une autre. Ni l'une ni l'autre ne doit entrer dans le
+  // champ contrat côté API.
+  const codeJobs = sansCommentaires(jobsSrc) + sansCommentaires(libContrat || '');
+  if (/(full_?time|part_?time|FULLTIME|PARTTIME)\s*:\s*'(CDI|CDD|Stage|Alternance|Freelance)'/i.test(codeJobs)) {
+    fail('une durée de travail est cartographiée vers un contrat (full_time → CDI) — deux dimensions distinctes');
+    bad14++;
+  }
+  if (/type:\s*'Remote'/.test(codeJobs)) {
+    fail("type: 'Remote' — un mode de travail dans le champ contrat ; le champ `remote` le porte déjà");
+    bad14++;
+  }
+
+  // (6) Le salaire : l'ancien garde testait la véracité de la borne basse, pas
+  // son ordre de grandeur, et `0k–0k€/an` s'affichait sur /jobs. La
+  // vérification doit porter sur la sortie.
+  if (/Math\.round\(j\.salary_min\s*\/\s*1000\)/.test(jobsSrc)) {
+    fail('api/jobs.js arrondit le salaire en ligne — passer par formaterSalaireAnnuel, qui vérifie la sortie');
+    bad14++;
+  }
+  if (!/function formaterSalaireAnnuel\(/.test(libContrat || '')) {
+    fail('formaterSalaireAnnuel absent — le garde du 0k–0k doit porter sur la sortie, en un seul endroit');
+    bad14++;
+  }
+
+  // (7) `salary_is_predicted` se compare, il ne se teste pas : les réponses
+  // publiées le donnent comme la chaîne "0" chez certains clients, et
+  // `Boolean("0") === true` marquerait toutes les offres comme estimées.
+  if (/if\s*\(\s*j?\.?salary_is_predicted\s*\)/.test(codeJobs)) {
+    fail('salary_is_predicted est lu par véracité — Boolean("0") est true, toutes les offres seraient marquées estimées');
+    bad14++;
+  }
+  // (7 bis) Une fourchette estimée est AFFICHÉE, et marquée comme estimée. Les
+  // deux moitiés de la décision sont vérifiées ensemble, parce que chacune
+  // seule est une faute : l'émettre sans la marquer attribue à un employeur un
+  // chiffre qu'il n'a pas publié ; ne pas l'émettre prive le candidat d'un
+  // ordre de grandeur réel.
+  if (/salary:\s*estime\s*\?\s*null/.test(codeJobs)) {
+    fail('un salaire estimé est supprimé au lieu d\'être marqué — le candidat perd un ordre de grandeur réel');
+    bad14++;
+  }
+  if (!/salaryEstimated/.test(codeJobs)) {
+    fail('salaryEstimated absent — rien ne distinguerait plus un montant publié d\'une estimation d\'Adzuna');
+    bad14++;
+  }
+
+  // (8) La pastille de type du front est conditionnelle, et son repli de
+  // couleur n'est pas celui du CDI. `esc(null)` rend '' : une pastille
+  // inconditionnelle donnait une puce bleue vide, et le bleu est la couleur du
+  // CDI — le défaut avait une seconde incarnation, visuelle.
+  const front = readAll('jobs.html');
+  // Commentaires retirés une fois pour toutes : CSS et JS citent les libellés
+  // interdits pour dire qu'ils le sont, et un garde qui se déclenche sur sa
+  // propre documentation finit par être désarmé.
+  const frontCode = front.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  if (front) {
+    if (/<span class="jb-badge \$\{typeBadgeClass\(job\.type\)\}">\$\{esc\(job\.type\)\}<\/span>/.test(front) &&
+        !/\$\{job\.type \? `<span class="jb-badge/.test(front)) {
+      fail('jobs.html affiche la pastille de type sans condition — un type absent donnerait une pastille vide');
+      bad14++;
+    }
+    if (/\}\[type\]\s*\|\|\s*'jb-type-blue'/.test(front)) {
+      fail("jobs.html : typeBadgeClass retombe sur 'jb-type-blue', la couleur du CDI — un type inconnu s'afficherait en CDI");
+      bad14++;
+    }
+    // Un salaire estimé doit être visuellement distinct du badge gris des
+    // montants annoncés, et porter la mention. Le même badge pour les deux
+    // rendrait la distinction invisible, donc inutile.
+    // On vise le site d'ÉMISSION du badge, pas la feuille de style : une règle
+    // CSS orpheline laisserait le garde vert pendant que la carte rend du gris.
+    if (!/salaryEstimated[\s\S]{0,80}?jb-badge-estime/.test(frontCode)) {
+      fail('jobs.html : le badge estimé n\'est pas branché sur salaryEstimated — une estimation d\'Adzuna se lirait comme le salaire de l\'employeur');
+      bad14++;
+    }
+    if (!/estimation Adzuna/.test(frontCode)) {
+      fail('jobs.html : la mention « estimation Adzuna » est absente du rendu');
+      bad14++;
+    }
+    if (/salaire propos/i.test(frontCode)) {
+      fail('jobs.html : le libellé « salaire proposé » apparaît — une estimation d\'un tiers n\'est pas une proposition de l\'employeur');
+      bad14++;
+    }
+    // La couverture du contrat doit venir de la réponse HTTP, pas d'un
+    // recomptage client sur une liste que `limit` peut avoir tronquée.
+    if (!/data\.couvertureContrat/.test(front)) {
+      fail('jobs.html n\'affiche pas la couverture du contrat — le chiffre resterait dans les journaux Vercel, retenus une heure');
+      bad14++;
+    }
+    if (!/contrat confirmé/.test(front)) {
+      fail('jobs.html : la ligne « n offres au contrat confirmé sur m » est absente');
+      bad14++;
+    }
+  }
+
+  // (8 bis) `sansContrat` sort du journal et entre dans la réponse. Un
+  // `console.error` ne vit qu'une heure sur le plan Hobby : c'est le défaut que
+  // `causesEnEchec` vient de corriger, et le laisser revenir pour la couverture
+  // du contrat serait reculer sur le même point.
+  // Le test porte sur le PAYLOAD de la réponse, pas sur la présence du mot
+  // dans le fichier : une variable calculée puis jamais rendue laisserait le
+  // chiffre exactement là où il était, dans les journaux.
+  if (!/JSON\.stringify\(\{[^}]*couvertureContrat/.test(jobsSrc)) {
+    fail('couvertureContrat n\'est pas dans la réponse HTTP — la couverture ne serait lisible que dans les journaux Vercel, retenus une heure');
+    bad14++;
+  } else {
+    // Les DEUX réponses, pas une : le handler rend soit l'agrégat frais, soit
+    // l'entrée de cache, et une couverture présente d'un seul côté
+    // disparaîtrait une requête sur deux sans que rien ne le signale.
+    const payloads = [...jobsSrc.matchAll(/JSON\.stringify\(\{[^}]*\}\)/g)].map(m => m[0]);
+    const avecJobs = payloads.filter(p => /jobs: final/.test(p));
+    const sansCouverture = avecJobs.filter(p => !/couvertureContrat/.test(p));
+    if (sansCouverture.length) {
+      fail(`${sansCouverture.length} réponse(s) sur ${avecJobs.length} ne portent pas couvertureContrat — la couverture disparaîtrait selon le chemin pris (frais ou cache)`);
+      bad14++;
+    }
+    // Les trois endroits, et c'est la leçon de causesEnEchec : la réponse
+    // fraîche, l'entrée de cache, et la relecture du cache. Oublier le cache
+    // ferait disparaître le chiffre pendant cinq minutes sur deux.
+    if (!/kvSet\(cacheKey, \{[^}]*couvertureContrat/.test(jobsSrc)) {
+      fail('couvertureContrat n\'entre pas en cache — la couverture disparaîtrait de la réponse pendant la fenêtre de cinq minutes');
+      bad14++;
+    }
+    if (!/cached\.couvertureContrat/.test(jobsSrc)) {
+      fail('la lecture du cache ne rend pas couvertureContrat');
+      bad14++;
+    }
+    // Et une entrée ancienne vaut `null`, pas un objet à zéros : « 0 offre au
+    // contrat inconnu » est l'affirmation la plus trompeuse possible ici.
+    if (!/cached\.couvertureContrat \|\| null/.test(jobsSrc)) {
+      fail('une entrée de cache sans couverture doit valoir null, jamais des zéros qui se liraient comme une mesure');
+      bad14++;
+    }
+  }
+
+  // (9) Les alertes email lisent la même notion que l'agrégateur. Elles
+  // comparaient `job_types` à `full_time` / `temporary` / `apprenticeship`,
+  // valeurs qui n'existent pas chez Arbeitnow : toute alerte typée filtrait à
+  // zéro.
+  const alertes = sansCommentaires(readAll('api/cron/send-alerts.js'));
+  if (alertes && !/_lib\/contrat\.js/.test(alertes)) {
+    fail('api/cron/send-alerts.js ne partage pas _lib/contrat.js — deux lectures divergentes du même champ');
+    bad14++;
+  }
+
+  if (!bad14) {
+    const appels = [...jobsSrc.matchAll(/detectType\(/g)].length;
+    ok(`detectType à un seul paramètre, ${appels} appel(s) sans filtre, filtre de contrat appliqué avant le cache`,
+       'salaire vérifié sur la sortie, pastille conditionnelle, alertes alignées');
+  }
+} catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
