@@ -357,11 +357,8 @@ try {
   // Montants légitimes, avec leur raison. Toute autre valeur est suspecte.
   const ALLOWED = new Map([
     ['0', "« 0€ aujourd'hui » — essai Pro, rien n'est débité"],
-    ['6', 'palier écoles au-delà de 1000 étudiants'],
-    ['9', 'écoles, par étudiant et par an'],
     ['12', 'commission créateur par vente'],
     ['24', 'Pro, par mois'],
-    ['39', 'outplacement, par candidat'],
     ['49', 'Pack Campagne avec un code créateur'],
     ['59', 'Pack Campagne'],
   ]);
