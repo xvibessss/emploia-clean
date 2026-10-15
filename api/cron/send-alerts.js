@@ -1,17 +1,23 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
+import { contratArbeitnow } from '../_lib/contrat.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
-// Arbeitnow job_types values matching our contract types
-const TYPE_MAP = {
-  CDI: 'full_time',
-  CDD: 'temporary',
-  Stage: 'internship',
-  Alternance: 'apprenticeship',
-  Freelance: 'freelance',
-};
-
+// DÉCISION sur les alertes « CDI ». Une alerte typée ne retient qu'une offre
+// dont le contrat est LU et égal au type demandé ; une offre au contrat inconnu
+// n'est pas envoyée. Un abonné « CDI » recevait jusqu'ici tout ce que le
+// défaut de `detectType` étiquetait CDI, c'est-à-dire tout ce dont on ignorait
+// le contrat : un email qui promet un CDI et ouvre sur autre chose coûte plus
+// qu'un email de moins. L'abonné dont la boîte se vide n'a rien perdu — il
+// cesse de recevoir des offres qui ne correspondaient pas à sa demande.
+//
+// L'ancienne table comparait `job_types` à `full_time` / `temporary` /
+// `apprenticeship`. MESURÉ sur les 300 offres de la page 1 de l'API publique
+// Arbeitnow : aucune de ces trois valeurs n'y apparaît, le champ est du texte
+// libre et multilingue, et 177 offres sur 300 n'en ont aucune. Donc toute
+// alerte typée filtrait déjà 300 offres à zéro — un silence, pas un filtre.
+// La lecture est désormais partagée avec `api/jobs.js` via `_lib/contrat.js`.
 async function fetchJobs(keywords, location, type) {
   try {
     const params = new URLSearchParams({ search: keywords });
@@ -21,9 +27,8 @@ async function fetchJobs(keywords, location, type) {
     });
     if (!res.ok) return [];
     const data = await res.json();
-    const targetType = TYPE_MAP[type];
     let jobs = (data.data || []);
-    if (targetType) jobs = jobs.filter(j => (j.job_types || []).includes(targetType));
+    if (type && type !== 'all') jobs = jobs.filter(j => contratArbeitnow(j) === type);
     return jobs.slice(0, 5).map(j => ({
       title: j.title || '',
       company: j.company_name || '',

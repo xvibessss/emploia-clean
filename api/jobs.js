@@ -1,5 +1,15 @@
 import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
+// Toute transformation d'une donnée amont en type de contrat vit dans
+// `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
+// notion de la même façon. La règle y est écrite une fois : ce qu'on
+// reconnaît, on le cartographie ; tout le reste vaut `null`.
+import {
+  FILTRE_VERS_CONTRAT, detectType,
+  contratAdzuna, tempsAdzuna, contratArbeitnow, tempsArbeitnow,
+  contratJSearch, tempsJSearch, contratFrenchMarket, contratFranceTravail,
+  contratPublic, formaterSalaireAnnuel, estSalaireEstime,
+} from './_lib/contrat.js';
 
 // Runtime Edge, épinglé sur Paris. Le corps de ce handler est écrit pour
 // l'API Web (req.headers.get, new URL(req.url), new Response) : en runtime
@@ -18,17 +28,47 @@ const H = {
 
 function daysAgo(n) { return new Date(Date.now() - n * 86400000).toISOString(); }
 
-function detectType(title, filterType) {
-  if (filterType && filterType !== 'tous') {
-    const m = { stage:'Stage', alternance:'Alternance', cdi:'CDI', cdd:'CDD', freelance:'Freelance' };
-    if (m[filterType]) return m[filterType];
-  }
-  const t = (title || '').toLowerCase();
-  if (t.includes('stage') || t.includes('intern') || t.includes('internship')) return 'Stage';
-  if (t.includes('alternance') || t.includes('apprenti') || t.includes('apprenticeship')) return 'Alternance';
-  if (t.includes('freelance') || t.includes('indépendant')) return 'Freelance';
-  if (t.includes('cdd') || t.includes('temporary') || t.includes('contract')) return 'CDD';
-  return 'CDI';
+// ── FILTRE DE CONTRAT ─────────────────────────────────
+// Il n'en existait aucun. `?type=cdd` était propagé en amont par trois
+// collecteurs sur huit, ignoré par les cinq autres, et le seul filtre appliqué
+// après la fusion était `remoteOnly` : le candidat recevait des offres non
+// filtrées, puis `detectType` les réétiquetait toutes « CDD » pour faire
+// croire qu'elles l'étaient. Le point B n'était donc pas « le filtre n'est pas
+// propagé », c'était « le filtre n'est appliqué nulle part, et l'étiquette est
+// réécrite pour faire croire qu'il l'a été ».
+//
+// Retirer la réécriture seule aurait laissé le filtre sans effet — d'où ce
+// filtre, appliqué après réception, sur la donnée réelle.
+//
+// Une offre au contrat inconnu (`type === null`) est ÉCARTÉE sous filtre. Elle
+// n'est pas connue pour être un CDD ; la montrer en réponse à « CDD » serait la
+// même affirmation sans preuve, simplement plus discrète.
+//
+// Et contrairement au filtre de pertinence, ce filtre n'a pas de repli « plutôt
+// que du vide » : les 86 pages SEO n'envoient jamais `type`, donc seul
+// l'utilisateur qui a explicitement demandé un contrat peut vider sa liste — et
+// /jobs a un état « Aucune offre trouvée » avec un bouton de réinitialisation.
+// Servir des CDI à qui demande des CDD serait le défaut d'origine, en silence.
+// `ecartees` et `sansContrat` ne partent PAS qu'en journal. Un `console.error`
+// ne vit que dans les journaux Vercel, dont la rétention est d'une heure sur le
+// plan Hobby : c'est exactement le défaut que `causesEnEchec` vient de
+// corriger pour les sources en échec, et le reproduire ici serait reculer.
+// Ils entrent dans la réponse HTTP, pour que la couverture soit lisible par
+// l'interface et par la sonde au lieu d'être devinée.
+function filtrerContrat(jobs, type) {
+  const vise = FILTRE_VERS_CONTRAT[type];
+  // Hors filtre, la couverture reste mesurable : `sansContrat` compte les
+  // offres au contrat inconnu même quand rien n'est écarté. C'est le chiffre
+  // qui dira si la lecture des champs amont progresse ou se dégrade, et il
+  // n'existerait pas si on ne le comptait que sous filtre.
+  if (!vise) return { jobs, ecartees: 0, sansContrat: jobs.filter(j => !j.type).length, vise: null };
+  const gardees = jobs.filter(j => j.type === vise);
+  return {
+    jobs: gardees,
+    ecartees: jobs.length - gardees.length,
+    sansContrat: jobs.filter(j => !j.type).length,
+    vise,
+  };
 }
 
 function isGermanJob(title, desc) {
@@ -130,9 +170,10 @@ async function fetchJSearch(q, type, location, page, journal) {
       title: j.job_title,
       company: j.employer_name || 'Confidentiel',
       location: [j.job_city, j.job_country].filter(Boolean).join(', ') || 'France',
-      type: j.job_employment_type === 'INTERN' ? 'Stage'
-          : j.job_employment_type === 'CONTRACTOR' ? 'CDD'
-          : detectType(j.job_title, type),
+      type: contratJSearch(j),
+      // `FULLTIME` / `PARTTIME` sont des durées de travail, pas des contrats :
+      // ils sortent du champ `type` et entrent dans le leur.
+      workTime: tempsJSearch(j),
       salary: j.job_min_salary
         ? `${Math.round(j.job_min_salary)}–${Math.round(j.job_max_salary||j.job_min_salary)} ${j.job_salary_currency||'€'}`
         : null,
@@ -187,7 +228,11 @@ async function fetchFrenchMarket(q, type, location, page, journal) {
       title: j.title,
       company: j.company || 'Confidentiel',
       location: j.location || 'France',
-      type: detectType(j.title, type),
+      // Ce collecteur propage DÉJÀ `employment_type` en amont, pour les cinq
+      // valeurs — et écrasait quand même l'étiquette par `detectType`. C'est
+      // la preuve que propager le filtre ne suffit pas : il faut cesser
+      // d'écrire l'étiquette depuis la requête.
+      type: contratFrenchMarket(j),
       salary: null,
       description: (j.short_description || '').slice(0, 300),
       url: j.source_url || '',
@@ -240,7 +285,15 @@ async function fetchInternships(q, type, location, journal) {
           title: j.title,
           company: j.organization || 'Confidentiel',
           location: j.remote_derived ? 'Remote · France' : loc,
-          type: isAlternance ? 'Alternance' : empType.includes('INTERN') ? 'Stage' : 'Stage',
+          // Les deux branches rendaient « Stage » : le ternaire sur
+          // `employment_type` était décoratif. Le titre et `employment_type`
+          // sont les deux seuls indices réels ; ce qui ne dit ni l'un ni
+          // l'autre vaut `null`.
+          type: contratPublic(
+            isAlternance ? 'Alternance'
+            : empType.includes('INTERN') ? 'Stage'
+            : detectType(j.title)
+          ),
           salary: j.salary_raw || null,
           description: (j.linkedin_org_slogan || j.linkedin_org_description || '').slice(0, 300),
           url: j.url || j.external_apply_url || '',
@@ -276,7 +329,13 @@ async function fetchRemotive(q, type, journal) {
         title: j.title,
         company: j.company_name || 'Confidentiel',
         location: 'Remote · ' + (j.candidate_required_location || 'Worldwide'),
-        type: 'Remote',
+        // `'Remote'` n'est pas un contrat : c'est un mode de travail, déjà
+        // porté par le champ `remote` et par le badge « Remote » de la carte.
+        // L'écrire dans `type` ajoutait une sixième valeur à un champ qui en a
+        // cinq, et répondait à une question qu'on n'avait pas posée — même
+        // faute de catégorie que `full_time → CDI`. Remotive ne publie aucun
+        // champ de contrat ; il reste le titre, et `null` s'il est muet.
+        type: contratPublic(detectType(j.title)),
         salary: j.salary || null,
         description: (j.description || '').replace(/<[^>]*>/g, '').slice(0, 300),
         url: j.url,
@@ -312,7 +371,12 @@ async function fetchArbeitnow(q, type, page, journal) {
         title: j.title,
         company: j.company_name || 'Confidentiel',
         location: j.remote ? 'Remote · EU' : j.location || 'Europe',
-        type: detectType(j.title, type),
+        // `job_types` est le champ de contrat d'Arbeitnow. Le dépôt le lisait
+        // déjà dans `api/cron/send-alerts.js` — et pas ici, où le contrat était
+        // deviné depuis le titre. Zéro occurrence dans ce fichier avant ce
+        // commit.
+        type: contratArbeitnow(j),
+        workTime: tempsArbeitnow(j),
         salary: null,
         description: (j.description || '').replace(/<[^>]*>/g, '').slice(0, 300),
         url: j.url,
@@ -344,26 +408,56 @@ async function fetchAdzuna(q, type, location, page, journal) {
     // probable du HTTP 400 observé — une clé invalide donnerait 401 AUTH_FAIL,
     // vérifié. Sans lieu, on ne met donc rien et la recherche porte sur le pays.
     if (location) params.set('where', location);
+    // Le filtre de contrat n'était propagé que pour `stage` et `alternance`,
+    // et par mots ajoutés à `what` — donc rien pour `cdd` ni pour `cdi`. La
+    // documentation du point d'entrée `search` montre des filtres en DRAPEAU
+    // (`permanent=1`, `full_time=1`) : `cdi` et `cdd` sont donc propageables.
+    //
+    // `contract_type=` n'est PAS un paramètre de requête documenté de
+    // `search` — il n'apparaît que dans la réponse et comme filtre de l'API
+    // Intelligence. On ne le suppose donc pas accepté en query string.
+    //
+    // Et la propagation ne dispense pas du filtre en aval : ces drapeaux ne
+    // sont pas confirmés par un appel réel, et `filtrerContrat` vérifie de
+    // toute façon la donnée reçue. L'un réduit le bruit, l'autre garantit.
+    if (type === 'cdi') params.set('permanent', '1');
+    if (type === 'cdd') params.set('contract', '1');
     const res = await withTimeout(
       fetch(`https://api.adzuna.com/v1/api/jobs/fr/search/${page + 1}?${params}`), 12000
     );
     if (!res.ok) return muet(journal, 'Adzuna', `HTTP ${res.status}`, `http_${res.status}`);
     const data = await res.json();
-    return (data.results || []).map(j => ({
-      id: 'az_' + j.id,
-      title: j.title,
-      company: j.company?.display_name || 'Confidentiel',
-      location: j.location?.display_name || 'France',
-      type: detectType(j.title, type),
-      salary: j.salary_min ? `${Math.round(j.salary_min/1000)}k–${Math.round((j.salary_max||j.salary_min)/1000)}k€/an` : null,
-      description: (j.description || '').slice(0, 300),
-      url: j.redirect_url || '',
-      date: j.created || new Date().toISOString(),
-      remote: (j.title+(j.description||'')).toLowerCase().includes('télétravail')||(j.title+(j.description||'')).toLowerCase().includes('remote'),
-      source: 'Adzuna',
-      logo: null,
-      country: 'FR',
-    }));
+    return (data.results || []).map(j => {
+      const estime = estSalaireEstime(j.salary_is_predicted);
+      return {
+        id: 'az_' + j.id,
+        title: j.title,
+        company: j.company?.display_name || 'Confidentiel',
+        location: j.location?.display_name || 'France',
+        // Adzuna porte le contrat dans `contract_type` ; on le lit au lieu de
+        // le deviner depuis le titre. On devinait ce qu'on nous avait dit.
+        type: contratAdzuna(j),
+        // `contract_time` est une durée de travail, pas un contrat : son
+        // propre champ, qui ne touche jamais `type`.
+        workTime: tempsAdzuna(j),
+        // DÉCISION : la fourchette est émise même estimée — ne rien afficher
+        // privait le candidat d'un ordre de grandeur réel. C'est `jobs.html`
+        // qui porte la mention « estimation Adzuna », sur un badge distinct de
+        // celui des salaires annoncés par l'employeur.
+        salary: formaterSalaireAnnuel(j.salary_min, j.salary_max),
+        // Donc ce drapeau n'est plus un simple signal conservé pour plus tard :
+        // c'est lui qui distingue un montant publié d'une estimation d'un
+        // tiers. Le perdre reviendrait à présenter la seconde comme le premier.
+        salaryEstimated: estime,
+        description: (j.description || '').slice(0, 300),
+        url: j.redirect_url || '',
+        date: j.created || new Date().toISOString(),
+        remote: (j.title+(j.description||'')).toLowerCase().includes('télétravail')||(j.title+(j.description||'')).toLowerCase().includes('remote'),
+        source: 'Adzuna',
+        logo: null,
+        country: 'FR',
+      };
+    });
   } catch (e) { return muet(journal, 'Adzuna', e.message || String(e)); }
 }
 
@@ -418,7 +512,11 @@ async function fetchFranceTravail(q, type, location, page, journal) {
       title: j.intitule,
       company: j.entreprise?.nom || 'Confidentiel',
       location: j.lieuTravail?.libelle || location || 'France',
-      type: j.typeContratLibelle || detectType(j.intitule, type),
+      // `typeContrat` est un code d'un référentiel fermé ; `typeContratLibelle`
+      // est un libellé libre (« Contrat à durée indéterminée ») exact mais hors
+      // du vocabulaire des cinq badges, donc illisible pour un filtre comme
+      // pour `typeBadgeClass`. On lit le code.
+      type: contratFranceTravail(j),
       salary: j.salaire?.libelle || null,
       description: (j.description || '').slice(0, 300),
       url: `https://candidat.francetravail.fr/offres/recherche/detail/${j.id}`,
@@ -439,8 +537,7 @@ async function fetchEmployerJobs(q, type, location, journal) {
     const now = Date.now();
     jobs = jobs.filter(j => isJobLive(j, now));
     if (type && type !== 'tous') {
-      const m = { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' };
-      if (m[type]) jobs = jobs.filter(j => j.type === m[type]);
+      if (FILTRE_VERS_CONTRAT[type]) jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
     }
     if (q) {
       const ql = q.toLowerCase();
@@ -572,7 +669,7 @@ const MOCK = [
 function getMock(q, type, page) {
   let items = [...MOCK];
   if (q) { const ql=q.toLowerCase(); items=items.filter(j=>j.title.toLowerCase().includes(ql)||j.company.toLowerCase().includes(ql)); }
-  if (type && type!=='tous') { const m={stage:'Stage',alternance:'Alternance',cdi:'CDI',cdd:'CDD',freelance:'Freelance'}; if(m[type]) items=items.filter(j=>j.type===m[type]); }
+  if (type && type!=='tous') { if(FILTRE_VERS_CONTRAT[type]) items=items.filter(j=>j.type===FILTRE_VERS_CONTRAT[type]); }
   return { jobs:items.slice(page*12,page*12+12), total:items.length, page, demo:true, sources:['Emploia'] };
 }
 
@@ -626,8 +723,15 @@ export default async function handler(req) {
       const causesEnEchec = Object.fromEntries(
         (cached.sourcesEnEchec || []).map(s => [s, causePublique(brut[s])])
       );
+      // Même raisonnement pour la couverture du contrat. Une entrée écrite par
+      // le déploiement précédent n'en porte pas, et un objet à zéros se lirait
+      // comme « aucune offre au contrat inconnu » — l'affirmation la plus
+      // trompeuse possible ici, puisque c'est précisément le chiffre qu'on
+      // vient de rendre visible. Absente, elle vaut `null`, et l'interface
+      // n'affiche alors rien plutôt qu'un zéro inventé.
+      const couvertureContrat = cached.couvertureContrat || null;
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -685,7 +789,31 @@ export default async function handler(req) {
       // chaque appel ; filtrer avant l'écriture le fait une fois par requête
       // et par fenêtre de cinq minutes.
       const pertinence = filtrerPertinence(prioritize(deduplicate(allJobs)), q, location);
-      let final = pertinence.jobs;
+      // Le filtre de contrat s'applique après la pertinence et AVANT le cache,
+      // pour la même raison : la clé de cache porte déjà `type`, donc l'entrée
+      // est propre à ce filtre. C'est le filtre qui n'existait nulle part —
+      // seul `remoteOnly` était appliqué après la fusion.
+      const contrat = filtrerContrat(pertinence.jobs, type);
+      let final = contrat.jobs;
+      // La couverture du contrat, telle qu'elle sera rendue. Le journal reste
+      // utile pour qui lit les logs à chaud, mais il n'est plus le SEUL endroit
+      // où le chiffre existe : `couvertureContrat` entre dans la réponse et
+      // dans le cache, comme `causesEnEchec`.
+      //
+      // `confirmees` est compté sur la liste servie, et `total` sur celle
+      // d'avant filtrage : l'interface annonce « n offres au contrat confirmé
+      // sur m », donc les deux bornes doivent venir du même passage, pas d'un
+      // recomptage côté client sur une liste déjà tronquée par `limit`.
+      const couvertureContrat = {
+        filtre: contrat.vise,
+        total: pertinence.jobs.length,
+        confirmees: final.filter(j => j.type).length,
+        sansContrat: contrat.sansContrat,
+        ecartees: contrat.ecartees,
+      };
+      if (contrat.ecartees) {
+        console.error(`jobs: ${contrat.ecartees} offre(s) écartée(s) par le filtre de contrat type=${JSON.stringify(type)} (dont ${contrat.sansContrat} au contrat inconnu)`);
+      }
       if (pertinence.filtrees) {
         console.error(`jobs: ${pertinence.filtrees} offre(s) hors sujet écartée(s) pour q=${JSON.stringify(q)} location=${JSON.stringify(location)}`);
       }
@@ -698,11 +826,11 @@ export default async function handler(req) {
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }),
         { status: 200, headers: H }
       );
     }

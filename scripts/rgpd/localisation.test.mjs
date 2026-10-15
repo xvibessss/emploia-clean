@@ -44,7 +44,13 @@ const offenders = { '100% français': [], 'hébergé en France': [], 'données r
 for (const f of allFiles) {
   const src = read(f);
   if (/100% fran[çc]ais/i.test(src)) offenders['100% français'].push(f);
-  if (/héberg\w*\s+(?:en|100%?)\s*fran/i.test(src)) offenders['hébergé en France'].push(f);
+  // `\w` est ASCII en JavaScript : il ne couvre aucun accent. `héberg\w*` ne
+  // pouvait donc matcher ni « hébergé » ni « hébergées » — soit toutes les
+  // formes réellement employées. La sonde affirmait « aucun hébergé en France »
+  // et passait au vert pendant que le site l'écrivait huit fois, dont sur la
+  // page d'accueil et dans une réponse FAQ publiée en JSON-LD. `\S*` couvre les
+  // accents, et aussi le cas où du balisage coupe le mot de son complément.
+  if (/héberg\S*\s+(?:en|100%?)\s*fran/i.test(src)) offenders['hébergé en France'].push(f);
   // Les formules négatives sont cherchées comme *affirmations*. La page
   // /sous-traitants les mentionne volontairement pour les démentir (« nous
   // disons X, et non “aucune donnée ne quitte la France”, qui serait faux ») :
