@@ -90,9 +90,9 @@ export default async function handler(req) {
       )).catch(() => {});
     }
     if (daysSince >= 7 && daysSince < 21) {
-      sendDrip('drip7Sent', `${firstName}, une semaine et votre CV peut déjà être 2× plus visible 📈`, baseHtml(
-        `Une semaine. Voici ce que les autres candidats ont fait.`,
-        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Ceux qui passent Pro la première semaine décrochent en moyenne <strong>2,4× plus d'entretiens</strong>. Voici pourquoi :</p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">♾️</span><span style="color:#475569;font-size:13px"><strong>Générations illimitées</strong> — adaptez votre CV à chaque offre, sans jamais vous bloquer</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Coaching entretien IA</strong> — questions types, réponses STAR, feedback immédiat</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard candidatures</strong> — suivez toutes vos postulations en kanban</span></div></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Essai 7 jours gratuit. <strong>0€ aujourd'hui.</strong> Annulation en 1 clic.</p><a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Démarrer l'essai gratuit →</a>`
+      sendDrip('drip7Sent', `${firstName}, une semaine — voici ce que Pro débloque 📈`, baseHtml(
+        `Une semaine. Voici ce que Pro change concrètement.`,
+        `<p style="color:#475569;line-height:1.6;margin:0 0 20px">Vos 5 générations gratuites servent à tester. Pro sert à postuler sans compter. Ce qu'il débloque :</p><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">♾️</span><span style="color:#475569;font-size:13px"><strong>Générations illimitées</strong> — adaptez votre CV à chaque offre, sans jamais vous bloquer</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">🎤</span><span style="color:#475569;font-size:13px"><strong>Coaching entretien IA</strong> — questions types, réponses STAR, feedback immédiat</span></div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:20px">📊</span><span style="color:#475569;font-size:13px"><strong>Dashboard candidatures</strong> — suivez toutes vos postulations en kanban</span></div></div><p style="color:#475569;font-size:13px;margin:0 0 24px">Essai 7 jours gratuit. <strong>0€ aujourd'hui.</strong> Annulation en 1 clic.</p><a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Démarrer l'essai gratuit →</a>`
       )).catch(() => {});
     }
     if (daysSince >= 14 && daysSince < 21) {
@@ -120,11 +120,7 @@ export default async function handler(req) {
       sendDrip('drip21Sent', `${firstName}, une autre offre vous attend peut-être déjà 🚀`, baseHtml(
         `3 semaines. Les meilleures offres partent vite.`,
         `<p style="color:#475569;line-height:1.6;margin:0 0 20px">3 semaines depuis votre inscription. Le marché de l'emploi bouge vite — certaines offres clôturent en 48 heures.</p>
-<p style="color:#475569;line-height:1.6;margin:0 0 20px">Avec Emploia Pro, vous pouvez postuler à <strong>10 offres personnalisées par jour</strong> — CV + lettre adaptés à chaque annonce en moins de 30 secondes.</p>
-<div style="background:#f0f9ff;border-left:4px solid #3b82f6;padding:16px;border-radius:0 8px 8px 0;margin-bottom:24px">
-  <p style="font-size:13px;color:#1e293b;margin:0 0 6px;font-weight:700">En ce moment sur Emploia :</p>
-  <p style="font-size:13px;color:#475569;margin:0">2 847 candidats actifs · 1 200+ offres analysées aujourd'hui · Taux d'entretien +2,4×</p>
-</div>
+<p style="color:#475569;line-height:1.6;margin:0 0 20px">Avec Emploia Pro, les générations sont <strong>illimitées</strong> — un CV et une lettre adaptés à chaque annonce, sans jamais compter vos crédits.</p>
 <p style="color:#475569;font-size:13px;margin:0 0 24px">7 jours d'essai gratuit. <strong>0€ aujourd'hui</strong>, annulable en 1 clic avant la fin de l'essai.</p>
 <a href="https://emploia.eu/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Essayer Pro gratuitement →</a>`
       )).catch(() => {});
