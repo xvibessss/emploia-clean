@@ -474,5 +474,51 @@ try {
   }
 } catch (e) { fail('contrôle du sitemap impossible : ' + e.message); }
 
+// ── 14. tout test du dépôt est effectivement lancé par un workflow ─────────
+// Un *.test.mjs que rien ne lance est un garde-fou qui ne garde rien : il
+// passe au vert sur le poste de qui l'écrit, puis plus personne ne le rejoue.
+// C'est l'état dans lequel scripts/billing/email.test.mjs est resté — déclaré
+// deux fois dans package.json, lancé par aucun workflow — alors qu'il couvre
+// deux régressions nommées dans son en-tête : le reply_to absent, qui invite
+// le client à répondre depuis une boîte inexistante, et le `.catch(() => {})`
+// qui avalait les refus de Resend.
+//
+// Même famille que la garde des assertions de la sonde : un contrôle qui
+// existe sans tourner là où il attraperait quelque chose ne coûte rien à
+// laisser dériver, et ne se remarque qu'au moment où il aurait servi.
+console.log('\n[14] chaque *.test.mjs est lancé par un workflow');
+try {
+  const tests = fs.existsSync('scripts') ? walk('scripts').filter(f => f.endsWith('.test.mjs')) : [];
+  const pkgScripts = JSON.parse(fs.readFileSync('package.json', 'utf8')).scripts || {};
+
+  // Un workflow peut appeler un test directement (node scripts/…) ou passer
+  // par un script npm qui en chaîne plusieurs — `test:billing` en lance cinq.
+  // Les deux formes comptent, sinon la garde réclamerait un câblage en double.
+  const invoked = new Set();
+  const seen = new Set();
+  const scan = (cmd) => {
+    for (const m of cmd.matchAll(/node\s+(scripts\/[\w./-]+\.mjs)/g)) invoked.add(m[1]);
+    for (const m of cmd.matchAll(/npm\s+run\s+([\w:-]+)/g)) {
+      if (seen.has(m[1])) continue; // un script qui s'appelle lui-même ne boucle pas
+      seen.add(m[1]);
+      if (pkgScripts[m[1]]) scan(pkgScripts[m[1]]);
+    }
+  };
+
+  const wfDir = '.github/workflows';
+  const workflows = fs.existsSync(wfDir)
+    ? fs.readdirSync(wfDir).filter(n => /\.ya?ml$/.test(n))
+    : [];
+  if (!workflows.length) fail('aucun workflow dans .github/workflows — motif à revoir');
+  for (const w of workflows) scan(fs.readFileSync(`${wfDir}/${w}`, 'utf8'));
+
+  const dormants = tests.filter(t => !invoked.has(t));
+  for (const t of dormants) {
+    fail(`${t} n'est lancé par aucun workflow — l'ajouter au job guards de .github/workflows/ci.yml, sinon ce test ne garde rien`);
+  }
+  if (!tests.length) fail('aucun *.test.mjs trouvé sous scripts/ — motif à revoir');
+  else if (!dormants.length) ok(`${tests.length} tests, tous lancés par ${workflows.length} workflows`);
+} catch (e) { fail('contrôle des tests dormants impossible : ' + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

@@ -67,6 +67,8 @@ jobs:
         run: node scripts/rgpd/localisation.test.mjs
       - name: Bounded failure causes (aucun message d'exception dans /api/jobs)
         run: node scripts/smoke/causes.test.mjs
+      - name: Helper d'envoi d'emails (reply_to présent, refus Resend remontés)
+        run: node scripts/billing/email.test.mjs
       - name: Billing tests (Pack Campagne, grille tarifaire)
         run: node scripts/billing/campagne.test.mjs
       - name: B2B pricing grid (barème Écoles, plancher, seuil 40 k€)
