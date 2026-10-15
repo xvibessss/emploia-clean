@@ -59,7 +59,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Auditer la production
         id: audit
@@ -143,7 +143,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
 
       # Playwright n'est pas une dépendance du projet : on l'installe ici, pour
       # ne pas alourdir le dépôt d'un paquet qui ne sert qu'à la CI.
