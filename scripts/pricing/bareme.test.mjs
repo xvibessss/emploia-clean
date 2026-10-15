@@ -94,6 +94,19 @@ const CITANTS = [
       // Le JSON-LD, qui écrit les prix en entiers nus.
       ...[T1.prix, T2.prix, T3.prix, forfaitPlateforme, outplacementUsage, outplacementLicence]
         .map((m) => `"price": "${m}"`),
+      // Le tableau du barème, colonne des taux. Ni ce garde ni
+      // ecoles.test.mjs ne la couvraient : le premier vérifiait le
+      // calculateur, le second les totaux d'exemple, et changer « 17 € » en
+      // « 16 € » dans cette colonne laissait les deux au vert. C'est la
+      // colonne que lit un acheteur, donc celle qui doit être tenue.
+      // Les balises tombant en espace dans comparable(), la cellule se lit
+      // dans la continuité de son libellé de ligne.
+      `les ${nombre(T1.jusqua)} premiers sièges ${euros(T1.prix)}`,
+      `de ${nombre(T1.jusqua + 1)} à ${nombre(T2.jusqua)} sièges ${euros(T2.prix)}`,
+      `au-delà de ${nombre(T2.jusqua)} sièges ${euros(T3.prix)}`,
+      `par candidat accompagné ${euros(outplacementUsage)}`,
+      `par consultant, candidats illimités ${euros(outplacementLicence)}`,
+      `${euros(forfaitPlateforme)} une fois, quel que soit l'effectif`,
       // Le tableau « Ce que cela donne » : totaux et coûts moyens. Ce sont les
       // deux colonnes qui ont déjà divergé l'une de l'autre, la moyenne ayant
       // été calculée un temps hors forfait plateforme.
