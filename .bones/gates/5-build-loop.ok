@@ -1,0 +1,2 @@
+2026-10-10T23:18:09Z | build-loop | auto | loop.sh exit 0 (machine-verified; args: -c ./check-jsonld.sh -s .bones/evidence/stage3-spec.md)
+git: ae1c4ef-dirty
