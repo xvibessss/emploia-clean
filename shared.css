@@ -561,6 +561,15 @@ input,textarea,select{font:inherit;color:inherit}
 .skip-to-main{position:absolute;top:-100%;left:24px;background:var(--primary);color:#fff;padding:8px 16px;border-radius:0 0 var(--r-md) var(--r-md);font-size:14px;font-weight:600;z-index:9999;transition:top .2s}
 .skip-to-main:focus{top:0}
 
+/* ── FIL D'ARIANE ────────────────────────────────────── */
+.emp-breadcrumb{margin:0 0 20px}
+.emp-breadcrumb ol{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;padding:0;font-size:13px;line-height:1.4}
+.emp-breadcrumb li{display:flex;align-items:center;gap:8px}
+.emp-breadcrumb li+li::before{content:"\203A";color:var(--muted);font-size:14px}
+.emp-breadcrumb a{color:var(--slate);text-decoration:none;transition:color .15s}
+.emp-breadcrumb a:hover{color:var(--primary);text-decoration:underline}
+.emp-breadcrumb [aria-current="page"]{color:var(--ink);font-weight:500}
+
 /* ── SOCIAL PROOF TOAST ──────────────────────────────── */
 
 /* ── MODE RÉVISION : marqueurs « [à compléter] » ─────────────────────

@@ -1,0 +1,4 @@
+2026-10-14T21:02:53Z | promote | owner | Promotion effective : PR #65 mergee par Hugo (merge commit 8d2e410, presente dans origin/main). Acceptance production 10/10 sur les 10 URLs propres : bloc ld+json present, JSON valide, @type attendu, url canonique, isPartOf WebSite. Ferme l'item de test-plan du stage 7 sur le routing, qui n'avait pas pu etre valide sur la preview (302 vers vercel.com/sso-api, Deployment Protection non contournee). Smoke global 28 OK / 1 echec : l'echec /ecoles « 9 € » est un faux positif anterieur au merge (prix retire le 2026-10-06 par 451847a, sonde jamais mise a jour), hors perimetre slice A, correctif propose non applique. Sondes --checkout et ADMIN_SECRET volontairement non executees.
+owner-quote: "parfait je viens de merger"
+evidence: .bones/evidence/stage8-promote.md (sha256:1c72599af4a1eb0d510481aef6e794eb1ec65692cce186e46489843f099d8495)
+git: 1eef8b0-dirty

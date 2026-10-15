@@ -1,0 +1,3 @@
+2026-10-10T23:11:57Z | kill-or-commit | owner | Hugo retient la slice A : combler les 10 fichiers sans JSON-LD (5 pages metiers btp/communication/ingenieur/logistique/sante + 5 pages hub emploi/metier/cv-builder/contact/sous-traitants), alignees sur les schemas deja en place ailleurs dans le repo. Slice B (Occupation sur 37 pages metiers) est explicitement hors perimetre de cette run et fera l'objet de sa propre spec. Les 45 contenus dupliques et les 14 noindex restent hors perimetre. COMMIT.
+owner-quote: "Slice A seule (Recommandé)"
+git: ae1c4ef-dirty
