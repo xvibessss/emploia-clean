@@ -562,14 +562,6 @@ input,textarea,select{font:inherit;color:inherit}
 .skip-to-main:focus{top:0}
 
 /* ── SOCIAL PROOF TOAST ──────────────────────────────── */
-#emp-sp-toast{position:fixed;bottom:80px;left:24px;background:var(--canvas);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh-3);z-index:400;max-width:320px;transform:translateY(16px) scale(.97);opacity:0;transition:transform .35s var(--ease-out),opacity .35s;pointer-events:none}
-#emp-sp-toast.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
-#emp-sp-toast .sp-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
-#emp-sp-toast .sp-body{flex:1;min-width:0}
-#emp-sp-toast .sp-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
-#emp-sp-toast .sp-msg{font-size:12px;color:var(--slate);line-height:1.4}
-#emp-sp-toast .sp-close{font-size:14px;color:var(--stone);cursor:pointer;flex-shrink:0;padding:2px;background:none;border:0;line-height:1}
-#emp-sp-toast .sp-close:hover{color:var(--ink)}
 
 /* ── MODE RÉVISION : marqueurs « [à compléter] » ─────────────────────
    Panneau inséré par empRevisionPanel() en tête d'un résultat généré,

@@ -474,7 +474,82 @@ try {
   }
 } catch (e) { fail('contrôle du sitemap impossible : ' + e.message); }
 
-// ── 14. tout test du dépôt est effectivement lancé par un workflow ─────────
+// ── 14. preuves sociales inventées : le mécanisme et les chaînes retirées ──
+// Deux balayages ont déjà nettoyé ce dépôt — la PR #28 sur la landing et la
+// page À propos, puis le commit 9b214e0 sur employeurs.html et un article.
+// Les deux portaient sur des pages HTML. Tout ce qui a survécu vivait donc
+// ailleurs : dans shared.js, dans des gabarits d'email, dans un bloc <script>,
+// et dans une seconde occurrence plus bas dans une page déjà nettoyée.
+//
+// Ce qui restait au 2026-10-14, et que ce garde empêche de revenir :
+//
+//   shared.js        six notifications d'activité attribuées à des personnes
+//                    nommées inventées, dont « Sophie M. vient de décrocher un
+//                    entretien chez Qonto » — chargées par TOUTES les pages,
+//                    18 s après l'affichage, trois fois de suite ;
+//   index.html       « 847 candidats actifs en ce moment » avec une pastille
+//                    verte pulsante, tiré d'un Math.random entre 820 et 879
+//                    puis dérivé de ±1 toutes les 3,8 s ;
+//   employeurs.html  « 2 847 candidats actifs », « 89% ont un CV ATS-optimisé »
+//                    et « 3× taux de réponse vs LinkedIn » ;
+//   5 gabarits       « 2× / 2,4× plus d'entretiens », « 1 200+ offres analysées
+//                    aujourd'hui », « 10 offres personnalisées par jour ».
+//
+// Le premier contrôle vise le MÉCANISME, pas la formulation : un nombre montré
+// à un visiteur ne doit jamais sortir de Math.random. C'est ce qui distingue
+// une métrique périmée — qu'on corrige — d'une métrique fabriquée, qu'on
+// retire. Les particules décoratives de 404.html emploient Math.random sans
+// jamais alimenter de texte : elles ne déclenchent rien.
+//
+// Le second vise les chaînes déjà jugées, pour qu'un copier-coller ne les
+// réintroduise pas. Elles sont liées à EmploiA ou à sa base d'utilisateurs,
+// jamais à une statistique de marché : « 3× plus de réponses pour une offre
+// publiée depuis moins de 2 jours » dans un article reste un énoncé éditorial,
+// hors périmètre de ce garde.
+console.log('\n[14] preuves sociales inventées — mécanisme et chaînes retirées');
+try {
+  const visibles = walk('.').filter(
+    (p) => /\.(html|js)$/.test(p) && !p.includes('node_modules') && !p.startsWith('./scripts/'),
+  );
+
+  let simules = 0;
+  for (const f of visibles) {
+    const src = readAll(f);
+    for (const m of src.matchAll(/Math\.random/g)) {
+      const autour = src.slice(Math.max(0, m.index - 320), m.index + 320);
+      if (/textContent|innerHTML|innerText/.test(autour)) {
+        fail(`${f} : un nombre affiché au visiteur sort de Math.random — métrique fabriquée, pas périmée`);
+        simules++;
+      }
+    }
+  }
+
+  // Chaque entrée porte ce qu'elle affirmait et pourquoi elle est partie.
+  const RETIREES = [
+    [/2\s?847/, 'nombre d\'utilisateurs inventé — retiré d\'employeurs.html par 9b214e0, puis de sa rangée STATS et d\'un email'],
+    // Lié à un nombre, à « en ce moment » ou à « sur Emploia » : c'est un
+    // décompte de notre base. « les candidats actifs qui postulent à 20+
+    // offres/semaine » dans un article décrit un type de candidat, pas notre
+    // audience — ce n'est pas une preuve sociale, et ce n'est pas visé.
+    [/(?:\d[\d\s]*candidats actifs|candidats actifs (?:en ce moment|sur Emploia))/i, 'décompte de notre base d\'utilisateurs, qu\'aucune mesure ne soutient'],
+    [/taux de réponse vs LinkedIn/i, 'comparaison chiffrée contre un concurrent nommé, sans mesure — publicité comparative illicite'],
+    [/offres analys[ée]es aujourd'hui/i, 'volume quotidien inventé, présenté comme une donnée du jour'],
+    [/Emploia[^.<]{0,140}(?:×|x)\s*plus d'entretiens/i, 'effet d\'Emploia sur les entretiens, jamais mesuré'],
+    [/(?:×|x)\s*plus d'entretiens[^.<]{0,60}Emploia/i, 'même affirmation, formulée dans l\'autre sens'],
+    [/\d+\s*offres personnalis[ée]es par jour/i, 'plafond quotidien inventé — le palier payant est illimité (auth.js)'],
+  ];
+  let revenues = 0;
+  for (const f of visibles) {
+    const src = readAll(f);
+    for (const [re, motif] of RETIREES) {
+      const m = src.match(re);
+      if (m) { fail(`${f} : « ${m[0].slice(0, 60)} » — ${motif}`); revenues++; }
+    }
+  }
+
+  if (!simules && !revenues) ok(`${visibles.length} fichiers servis — aucun nombre affiché issu du hasard, aucune affirmation retirée revenue`);
+} catch (e) { fail('contrôle des preuves sociales impossible : ' + e.message); }
+// ── 15. tout test du dépôt est effectivement lancé par un workflow ─────────
 // Un *.test.mjs que rien ne lance est un garde-fou qui ne garde rien : il
 // passe au vert sur le poste de qui l'écrit, puis plus personne ne le rejoue.
 // C'est l'état dans lequel scripts/billing/email.test.mjs est resté — déclaré
@@ -486,7 +561,7 @@ try {
 // Même famille que la garde des assertions de la sonde : un contrôle qui
 // existe sans tourner là où il attraperait quelque chose ne coûte rien à
 // laisser dériver, et ne se remarque qu'au moment où il aurait servi.
-console.log('\n[14] chaque *.test.mjs est lancé par un workflow');
+console.log('\n[15] chaque *.test.mjs est lancé par un workflow');
 try {
   const tests = fs.existsSync('scripts') ? walk('scripts').filter(f => f.endsWith('.test.mjs')) : [];
   const pkgScripts = JSON.parse(fs.readFileSync('package.json', 'utf8')).scripts || {};

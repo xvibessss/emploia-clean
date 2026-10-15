@@ -85,38 +85,6 @@ document.querySelectorAll('#empMobileNav a').forEach(a => {
   window._empRevealObs = obs;
 })();
 
-// ── SOCIAL PROOF TOAST ──────────────────────────────────────────────
-(() => {
-  const proofs = [
-    {name:'Sophie M.', msg:'vient de décrocher un entretien chez Qonto', color:'#6E48BE'},
-    {name:'Thomas R.', msg:'a obtenu un score ATS de 94% sur son CV', color:'#5DAFA0'},
-    {name:'Camille D.', msg:'a signé une offre après 3 semaines', color:'#E08A50'},
-    {name:'Alexis B.', msg:'utilise le coach d\'entretien depuis 2h', color:'#58A05A'},
-    {name:'Marie L.', msg:'vient de postuler à 5 offres en 15 min', color:'#E26A8F'},
-    {name:'Romain P.', msg:'a comparé 12 offres grâce au score IA', color:'#0B6BCB'},
-  ];
-  let shown = 0;
-  function showNext() {
-    if (shown >= 3) return;
-    const p = proofs[Math.floor(Math.random()*proofs.length)];
-    let el = document.getElementById('emp-sp-toast');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'emp-sp-toast';
-      el.innerHTML = `<div class="sp-av" id="empSpAv"></div><div class="sp-body"><div class="sp-name" id="empSpName"></div><div class="sp-msg" id="empSpMsg"></div></div><button class="sp-close" onclick="this.closest('#emp-sp-toast').classList.remove('show')">✕</button>`;
-      document.body.appendChild(el);
-    }
-    el.querySelector('#empSpAv').textContent = p.name[0];
-    el.querySelector('#empSpAv').style.background = p.color;
-    el.querySelector('#empSpName').textContent = p.name;
-    el.querySelector('#empSpMsg').textContent = p.msg;
-    el.classList.add('show');
-    shown++;
-    setTimeout(() => { el.classList.remove('show'); setTimeout(showNext, 12000); }, 5000);
-  }
-  setTimeout(showNext, 18000);
-})();
-
 // ── DATA-ACC ACCORDION ──────────────────────────────────────────────
 document.querySelectorAll('[data-acc]').forEach(item => {
   const head = item.querySelector('[data-acc-head]');
