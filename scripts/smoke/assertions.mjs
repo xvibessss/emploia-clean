@@ -23,7 +23,12 @@ export const PAGE_ASSERTIONS = [
   {
     title: '[A] Landing — la grille servie est bien la nouvelle',
     route: '/',
-    must: ['59€', '24€', 'Pack Campagne', '22€'],
+    // La carte « Écoles & RH » ne porte plus de montant : elle renvoie au devis,
+    // comme legal.html, et le barème vit sur /ecoles seule. L'aiguille est donc
+    // la formulation et non un prix. « Sur devis » ne ferait pas l'affaire : le
+    // tableau comparatif de la même page le contient déjà pour cette colonne,
+    // donc il resterait présent même si la carte reprenait un chiffre.
+    must: ['59€', '24€', 'Pack Campagne', 'Tarification par siège'],
     // Anciens montants et preuves sociales fabriquées : leur présence signifie
     // que la prod sert encore une version antérieure à la PR #28.
     //
