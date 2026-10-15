@@ -5,6 +5,7 @@
     "bench:live": "node scripts/bench/run.mjs --live",
     "test:employer": "node scripts/employer/expiry.test.mjs",
     "test:pricing": "node scripts/pricing/ecoles.test.mjs",
+    "test:bareme": "node scripts/pricing/bareme.test.mjs",
     "test:rgpd": "node scripts/rgpd/localisation.test.mjs",
     "test:causes": "node scripts/smoke/causes.test.mjs",
     "test:assertions": "node scripts/smoke/assertions.test.mjs",
