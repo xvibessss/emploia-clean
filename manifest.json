@@ -10,16 +10,61 @@
   "dir": "ltr",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
   ],
   "screenshots": [],
-  "categories": ["productivity", "business"],
+  "categories": [
+    "productivity",
+    "business"
+  ],
   "shortcuts": [
-    { "name": "Offres d'emploi", "short_name": "Offres", "url": "/jobs", "description": "Voir les offres en temps réel" },
-    { "name": "Générer un CV", "short_name": "CV IA", "url": "/app", "description": "Créer un CV ATS en 30s" },
-    { "name": "Simulateur entretien", "short_name": "Entretien", "url": "/interview", "description": "S'entraîner avec l'IA" },
-    { "name": "Mon dashboard", "short_name": "Dashboard", "url": "/dashboard", "description": "Suivi candidatures" }
+    {
+      "name": "Offres d'emploi",
+      "short_name": "Offres",
+      "url": "/jobs",
+      "description": "Voir les offres en temps réel"
+    },
+    {
+      "name": "Générer un CV",
+      "short_name": "CV IA",
+      "url": "/app",
+      "description": "Créer un CV ATS en 30s"
+    },
+    {
+      "name": "Simulateur entretien",
+      "short_name": "Entretien",
+      "url": "/interview",
+      "description": "S'entraîner avec l'IA"
+    },
+    {
+      "name": "Mon dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Suivi candidatures"
+    }
   ],
   "related_applications": [],
   "prefer_related_applications": false

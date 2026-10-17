@@ -585,8 +585,6 @@ async function empAuthInit() {
 #emp-sw-btn{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--primary,#6E48BE);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(110,72,190,.35);display:flex;align-items:center;justify-content:center;z-index:9000;transition:transform .2s,box-shadow .2s}
 #emp-sw-btn:hover{transform:scale(1.07);box-shadow:0 6px 22px rgba(110,72,190,.48)}
 #emp-sw-btn svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#emp-sw-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:#E74C3C;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;animation:empSwPulse 2s infinite}
-@keyframes empSwPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 #emp-sw-panel{position:fixed;bottom:88px;right:24px;width:320px;height:460px;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.16);display:flex;flex-direction:column;z-index:9001;transform:scale(.92) translateY(14px);opacity:0;pointer-events:none;transition:transform .22s ease,opacity .22s ease;overflow:hidden;font-family:Inter,system-ui,sans-serif}
 #emp-sw-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
 #emp-sw-head{background:var(--primary,#6E48BE);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -625,7 +623,7 @@ async function empAuthInit() {
   const btn = document.createElement('button');
   btn.id = 'emp-sw-btn';
   btn.setAttribute('aria-label', 'Support Orion');
-  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="emp-sw-badge">1</span>`;
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
 
   const panel = document.createElement('div');
   panel.id = 'emp-sw-panel';
@@ -655,20 +653,16 @@ async function empAuthInit() {
     const msgs = document.getElementById('emp-sw-msgs');
     const inp = document.getElementById('emp-sw-inp');
     const sub = document.getElementById('emp-sw-sub');
-    const badge = document.getElementById('emp-sw-badge');
     let busy = false;
 
     btn.addEventListener('click', () => {
       const isOpen = panel.classList.toggle('open');
       if (isOpen) {
-        badge.style.display = 'none';
-        sessionStorage.setItem('empSwSeen', '1');
         setTimeout(() => inp.focus(), 230);
       }
     });
     document.getElementById('emp-sw-cls').addEventListener('click', () => panel.classList.remove('open'));
 
-    if (sessionStorage.getItem('empSwSeen')) badge.style.display = 'none';
 
     inp.addEventListener('input', () => {
       inp.style.height = 'auto';

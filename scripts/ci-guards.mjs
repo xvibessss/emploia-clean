@@ -521,6 +521,24 @@ try {
     }
   }
 
+  // Une pastille de notification annonce un message en attente. Celle du
+  // widget de support était écrite en dur — `<span id="emp-sw-badge">1</span>`
+  // — en rouge et pulsante, sur les 181 pages chargeant shared.js, alors que
+  // le panneau s'ouvrait sur un accueil générique : aucun message n'existait.
+  // Ce n'est pas un nombre tiré au hasard, c'est un nombre simplement faux, et
+  // c'est le premier visiteur — donc tout visiteur venu de TikTok — qui le voit.
+  // Restreint aux .js : une pastille écrite dans le HTML d'une page est du
+  // contenu rédigé — les « 27 » et « 16 » de blog.html comptent les articles
+  // d'une catégorie, et c'est juste. Une pastille fabriquée par du code avec
+  // un chiffre LITTÉRAL, elle, n'a par construction aucune source de données.
+  for (const f of visibles.filter((p) => p.endsWith('.js'))) {
+    const src = readAll(f);
+    for (const m of src.matchAll(/<span[^>]*\b(?:id|class)="[^"${]*badge[^"${]*"[^>]*>(\d+)<\/span>/gi)) {
+      fail(`${f} : pastille de notification fabriquée avec le littéral « ${m[1]} » — rien ne la calcule, elle annonce un message qui n'existe pas`);
+      simules++;
+    }
+  }
+
   // Chaque entrée porte ce qu'elle affirmait et pourquoi elle est partie.
   const RETIREES = [
     [/2\s?847/, 'nombre d\'utilisateurs inventé — retiré d\'employeurs.html par 9b214e0, puis de sa rangée STATS et d\'un email'],
@@ -825,6 +843,81 @@ try {
        'salaire vérifié sur la sortie, pastille conditionnelle, alertes alignées');
   }
 } catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
+
+// ── 17. icônes d'application : servies, et au format que l'OS sait lire ───
+// `apple-touch-icon` désignait `favicon.svg`. iOS n'accepte pas le SVG pour
+// cette balise : Safari exige du PNG. Un candidat qui ajoute EmploiA à son
+// écran d'accueil — le geste naturel pour un outil qu'on rouvre chaque jour
+// pendant une recherche — n'y trouvait donc pas le logo, mais une vignette
+// produite par le système. Même défaut de format que l'og:image du [15], sur
+// une autre surface que personne ne regarde depuis un poste de travail.
+//
+// Les PNG sont dérivés de `favicon.svg` par `npm run assets:icones`, et
+// l'empreinte enregistrée détecte la dérive sans Chrome en CI, comme pour
+// l'image de partage.
+console.log("\n[17] icônes d'application — servies et au bon format");
+try {
+  const pages = walk('.').filter(
+    (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
+  );
+  // rel → formats que le consommateur sait lire. `icon` accepte le SVG depuis
+  // longtemps dans tous les navigateurs de bureau et mobiles ; `apple-touch-icon`
+  // non, et c'est toute la différence.
+  const ATTENDU = {
+    'apple-touch-icon': { re: /\.(png|jpe?g)$/i, pourquoi: 'iOS exige du PNG pour cette balise' },
+    icon: { re: /\.(svg|png|ico)$/i, pourquoi: 'format non reconnu comme favicon' },
+    manifest: { re: /\.(json|webmanifest)$/i, pourquoi: 'le manifeste doit être du JSON' },
+  };
+  let mauvais = 0;
+  for (const f of pages) {
+    const src = readAll(f);
+    for (const [rel, { re, pourquoi }] of Object.entries(ATTENDU)) {
+      const m = src.match(new RegExp(`<link[^>]*rel="${rel}"[^>]*href="([^"]+)"`));
+      if (!m) {
+        if (rel === 'manifest') continue; // facultatif : toutes les pages ne sont pas installables
+        fail(`${f} : aucun <link rel="${rel}"> — l'OS devra deviner`);
+        mauvais++;
+        continue;
+      }
+      const href = m[1];
+      if (!href.startsWith('/')) {
+        fail(`${f} : rel="${rel}" en chemin relatif « ${href} » — résolu depuis le dossier de la page, cassé dès qu'elle bouge`);
+        mauvais++;
+        continue;
+      }
+      if (!exists('.' + href.split('?')[0])) {
+        fail(`${f} : rel="${rel}" vers ${href} — ce fichier n'existe pas`);
+        mauvais++;
+        continue;
+      }
+      if (!re.test(href.split('?')[0])) {
+        fail(`${f} : rel="${rel}" en ${href.split('.').pop()} — ${pourquoi}`);
+        mauvais++;
+      }
+    }
+  }
+
+  // Le manifeste doit proposer au moins un PNG de 192 et un de 512 : ce sont
+  // les deux seuils que tous ses consommateurs savent lire, `sizes="any"` ou pas.
+  const man = JSON.parse(readAll('manifest.json'));
+  for (const taille of ['192x192', '512x512']) {
+    const i = (man.icons || []).find((x) => x.sizes === taille && /png$/i.test(x.src || ''));
+    if (!i) { fail(`manifest.json : aucune icône PNG ${taille}`); mauvais++; }
+    else if (!exists('.' + i.src)) { fail(`manifest.json : ${i.src} déclarée mais absente`); mauvais++; }
+  }
+
+  const { empreinteSource, SOURCE, HASH, CIBLES } = await import('./assets/icones.mjs');
+  for (const { fichier } of CIBLES) {
+    if (!exists(fichier)) { fail(`${fichier} absente — régénérer avec : npm run assets:icones`); mauvais++; }
+  }
+  const enregistree = exists(HASH) ? readAll(HASH).trim() : null;
+  if (enregistree !== empreinteSource()) {
+    fail(`${SOURCE} a changé depuis la dernière rasterisation — régénérer avec : npm run assets:icones`);
+    mauvais++;
+  }
+
+  if (!mauvais) ok(`${pages.length} pages déclarent une icône et une apple-touch-icon servies, et le manifeste porte ses PNG`);
+} catch (e) { fail("contrôle des icônes impossible : " + e.message); }
 
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
