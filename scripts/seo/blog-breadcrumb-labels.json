@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "Libelles de feuille du fil d'Ariane, pour les SEULES pages blog qui n'en",
+    "avaient aucun. Les 57 autres pages ont deja un fil visible ecrit a la main :",
+    "leur libelle est lu dans le HTML, jamais redefini ici.",
+    "Valide par Hugo le 2026-10-17. Toute page listee ici doit exister ;",
+    "toute page orpheline absente d'ici fait echouer le generateur."
+  ],
+  "labels": {
+    "cv-par-competences-2026":          "CV par compétences",
+    "email-candidature-parfait":        "Email de candidature",
+    "entretien-en-anglais":             "Entretien en anglais",
+    "ia-et-emploi-2026":                "IA et emploi 2026",
+    "negocier-contrat-travail-2026":    "Négocier son contrat de travail",
+    "portfolio-developpeur-2026":       "Portfolio développeur",
+    "preparer-entretien-technique":     "Préparer un entretien technique",
+    "reseaux-sociaux-recherche-emploi": "Réseaux sociaux et emploi",
+    "secteurs-qui-recrutent-2026":      "Secteurs qui recrutent 2026",
+    "teletravail-negocier-2026":        "Négocier le télétravail",
+    "travailler-en-startup-2026":       "Travailler en startup"
+  }
+}
