@@ -77,6 +77,8 @@ jobs:
           node-version: '24'
       - name: Validate rewrites + security invariants
         run: node scripts/ci-guards.mjs
+      - name: Déclencheurs des workflows (pull_request non restreint par un filtre de branches)
+        run: node scripts/ci/declencheurs.test.mjs
       - name: Generation quality bench (detector self-test + prompt guard)
         run: node scripts/bench/run.mjs
       - name: Employer offer lifecycle tests
