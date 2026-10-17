@@ -1,12 +1,47 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './_lib/auth.js';
 import { sendEmail } from './_lib/email.js';
+import { enregistrerPaiementOrphelin } from './_lib/orphan.js';
+import {
+  CAMPAGNE_DAYS, preparerCompte, appliquerOctroiCampagne, emettreLienMotDePasse,
+  LIEN_ACHAT_TTL_S,
+} from './_lib/grant.js';
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
-// Pack Campagne — 59 € one-off buys 3 months of Pro access.
-const CAMPAGNE_DAYS = 90;
 const AFFILIATE_CODE_RE = /^[A-Z0-9]{3,20}$/;
+
+// ── RÉSOLUTION DE L'ACHETEUR ─────────────────────────────────────────────────
+// Trois chances au lieu de deux, et la première est infalsifiable par
+// l'acheteur : `client_reference_id` est posé par NOTRE checkout depuis la
+// session authentifiée (`api/stripe-checkout.js`), pas saisi sur la page
+// Stripe. Il compte donc le cas courant où quelqu'un paie avec l'adresse de
+// son compte bancaire, différente de celle de son compte Emploia : sans lui,
+// l'achat atterrissait sur une adresse inconnue et le client payait pour un
+// accès posé ailleurs.
+//
+// L'identifiant est un `u_…` interne, résolu via `userid:{id}` — jamais une
+// adresse, pour qu'un acheteur ne puisse pas se faire passer pour un autre
+// compte en manipulant une valeur qui lui reviendrait.
+async function resoudreAcheteur(session) {
+  const ref = typeof session.client_reference_id === 'string' ? session.client_reference_id.trim() : '';
+  if (ref && /^u_[A-Za-z0-9_]{1,64}$/.test(ref)) {
+    const email = await kvGet(`userid:${ref}`);
+    if (email) {
+      const user = await kvGet(`user:${String(email).toLowerCase()}`);
+      if (user) return { email: String(email).toLowerCase(), user, via: 'client_reference_id' };
+    }
+  }
+  const brut = session.customer_email || session.customer_details?.email;
+  if (!brut) return { email: null, user: null, via: 'aucune' };
+  const email = String(brut).toLowerCase();
+  const user = await kvGet(`user:${email}`);
+  return {
+    email,
+    user,
+    via: session.customer_email ? 'customer_email' : 'customer_details.email',
+  };
+}
 
 // Attribution de repli, pour l'acheteur qui n'est jamais passé par ?code=.
 //
@@ -74,6 +109,80 @@ async function verifyStripeSignature(payload, header, secret) {
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
+// ── L'EMAIL DU COMPTE CRÉÉ ───────────────────────────────────────────────────
+// Décision de Hugo, et c'est l'endroit de cette mission où le texte compte
+// autant que le code : **le compte est annoncé franchement, dans le corps du
+// message et non en mention de bas de page.**
+//
+// Quelqu'un qui a cliqué depuis une vidéo, payé 59 € et reçoit « choisissez
+// votre mot de passe » découvrirait qu'il a un compte sur un service où il
+// croyait acheter un produit. Le dire est honnête ; le laisser découvrir ne
+// l'est pas. D'où la première phrase, qui nomme la création avant de parler de
+// l'accès, et le rappel que l'adresse utilisée est celle du paiement — c'est
+// la réponse à la question qu'il se posera (« pourquoi cette adresse ? »).
+//
+// Ce qui est délibérément absent : aucun « bienvenue dans la communauté »,
+// aucun tutoiement — on ne connaît pas cette personne et elle n'a pas choisi
+// de s'inscrire. Le ton reste celui d'une confirmation d'achat.
+function emailCompteCree({ baseUrl, proUntil, lienMotDePasse, email }) {
+  const jusquAu = new Date(proUntil).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const jours = Math.round(LIEN_ACHAT_TTL_S / 86400);
+  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+<div style="max-width:520px;margin:40px auto;padding:0 20px">
+  <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px">
+      <div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div>
+    </div>
+    <div style="padding:32px">
+      <h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 14px;letter-spacing:-.5px">Votre Pack Campagne est actif</h1>
+
+      <p style="color:#475569;line-height:1.7;margin:0 0 14px">
+        Merci pour votre achat. Votre paiement est confirmé et vous avez
+        <strong>3 mois d'accès complet à Emploia</strong>, jusqu'au ${jusquAu}.
+      </p>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #6366f1;border-radius:10px;padding:16px 18px;margin:0 0 18px">
+        <p style="color:#0f172a;line-height:1.7;margin:0 0 8px;font-size:14px;font-weight:700">
+          Nous avons créé un compte pour vous
+        </p>
+        <p style="color:#475569;line-height:1.7;margin:0;font-size:14px">
+          Emploia fonctionne avec un compte — c'est ce qui conserve vos CV, vos
+          candidatures et votre accès. Nous en avons donc ouvert un à l'adresse
+          <strong>${htmlEscape(email)}</strong>, celle de votre paiement, pour que
+          vous n'ayez aucune inscription à faire.
+          Il ne vous reste qu'à choisir un mot de passe.
+        </p>
+      </div>
+
+      <a href="${lienMotDePasse}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none;letter-spacing:-.2px">Choisir mon mot de passe →</a>
+
+      <p style="color:#64748b;line-height:1.7;margin:18px 0 0;font-size:13px">
+        Ce lien est personnel et valable <strong>${jours} jours</strong>.
+        Votre accès court déjà : il ne démarre pas au moment où vous créez le
+        mot de passe.
+      </p>
+
+      <p style="color:#475569;line-height:1.7;margin:20px 0 0;font-size:14px">
+        Paiement unique : rien ne sera reconduit, vous n'avez aucun abonnement à
+        résilier.
+      </p>
+
+      <p style="color:#94a3b8;font-size:12px;margin:24px 0 0;line-height:1.7">
+        Vous ne souhaitez pas de compte chez nous ? Répondez à cet email et nous
+        le supprimons — avec un remboursement si vous n'avez rien utilisé.
+      </p>
+    </div>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}" style="color:#94a3b8">emploia.eu</a></p>
+</div></body></html>`;
+}
+
+// Le gabarit d'origine, pour l'acheteur qui avait déjà un compte : il garde son
+// texte et son tutoiement, puisqu'il s'est inscrit lui-même.
+function emailCompteExistant({ baseUrl, proUntil, firstName }) {
+  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 8px;letter-spacing:-.5px">Ton Pack Campagne est actif 🚀</h1><p style="color:#475569;line-height:1.6;margin:0 0 6px">Bienvenue${firstName ? ` ${firstName}` : ''} ! Tu as <strong>3 mois d'accès complet</strong>, jusqu'au ${new Date(proUntil).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.</p><p style="color:#475569;line-height:1.6;margin:0 0 24px">Paiement unique : rien ne sera reconduit, tu n'as aucun abonnement à résilier.</p><a href="${baseUrl}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer ma campagne →</a></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}" style="color:#94a3b8">emploia.eu</a></p></div></body></html>`;
+}
+
 export default async function handler(req) {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 
@@ -107,7 +216,10 @@ export default async function handler(req) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const email = session.customer_email || session.customer_details?.email;
+        // Trois chances de reconnaître l'acheteur, la première infalsifiable.
+        // Voir `resoudreAcheteur`.
+        const acheteur = await resoudreAcheteur(session);
+        const email = acheteur.email;
         const plan = session.metadata?.plan || 'pro';
 
         // ── Pack Campagne: one-off payment, not a subscription ──────────────
@@ -139,30 +251,73 @@ export default async function handler(req) {
               kvIncr(`affiliate:${affiliate}:sales`),
             ]).catch(() => {});
           }
-          if (!email) break;
+          if (!email) {
+            // PREMIÈRE SORTIE SILENCIEUSE. Stripe n'a transmis aucune adresse :
+            // on ne peut ni créer de compte ni en trouver un. Le paiement est
+            // encaissé, donc il est tracé et alerté — c'est le seul cas des
+            // trois que l'octroi automatique ne peut pas couvrir.
+            await enregistrerPaiementOrphelin({
+              sessionId: session.id,
+              email: null,
+              plan,
+              amountTotal: session.amount_total,
+              currency: session.currency,
+              affiliate,
+              reason: 'no_email_on_session',
+            }, resendKey, process.env.ADMIN_EMAIL);
+            break;
+          }
           const normalizedEmail = email.toLowerCase();
-          const user = await kvGet(`user:${normalizedEmail}`);
-          if (!user) break;
+
+          // DEUXIÈME SORTIE SILENCIEUSE — celle du brief. `if (!user) break;`
+          // abandonnait ici, le handler répondait 200, et Stripe ne réessayait
+          // jamais : argent encaissé, aucun accès, aucune trace.
+          //
+          // Le compte est désormais créé à la réception du paiement, sur la
+          // base du consentement recueilli AVANT le paiement et transporté
+          // dans les metadata Stripe. Puis l'octroi passe par la MÊME fonction
+          // que pour un compte existant.
+          let compte;
+          try {
+            compte = await preparerCompte(normalizedEmail, session);
+          } catch (e) {
+            // La création a échoué : le paiement reste dû, donc il repart dans
+            // le filet au lieu de disparaître. C'est exactement le cas que le
+            // filet existe pour attraper — un défaut dans le chemin neuf.
+            await enregistrerPaiementOrphelin({
+              sessionId: session.id,
+              email: normalizedEmail,
+              plan,
+              amountTotal: session.amount_total,
+              currency: session.currency,
+              affiliate,
+              reason: 'account_creation_failed',
+            }, resendKey, process.env.ADMIN_EMAIL);
+            break;
+          }
+
+          const { user, cree } = compte;
           const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
           const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '');
-          // extendPro prolongs an existing proUntil instead of overwriting it.
-          const proUntil = extendPro(user.proUntil, CAMPAGNE_DAYS);
+          // L'octroi, identique dans les deux parcours : extendPro prolonge un
+          // proUntil existant au lieu de l'écraser, et n'écrit pas `plan`.
+          const { proUntil } = await appliquerOctroiCampagne(user, session);
+          // Un compte neuf n'a aucun mot de passe utilisable : le lien signé
+          // est son unique porte d'entrée. Émis par le mécanisme de
+          // réinitialisation existant, pas par un second.
+          const lienMotDePasse = cree ? await emettreLienMotDePasse(normalizedEmail) : null;
+
           await Promise.all([
-            kvSet(`user:${normalizedEmail}`, {
-              ...user,
-              proUntil,
-              campagnePurchasedAt: new Date().toISOString(),
-              stripeCustomerId: session.customer,
-              generationsUsed: 0,
-            }),
-            kvSet(`stripe:${session.customer}`, normalizedEmail),
-            kvSet(`gen:${normalizedEmail}`, 0),
-            fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan: 'campagne' } }) }).catch(() => {}),
+            fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan: 'campagne', compteCree: cree } }) }).catch(() => {}),
             resendKey ? sendEmail(resendKey, {
               from: 'Emploia <noreply@emploia.eu>',
               to: [normalizedEmail],
-              subject: `🎉 ${firstName || 'Bienvenue'}, ton Pack Campagne est activé !`,
-              html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:22px;font-weight:900;color:#0f172a;margin:0 0 8px;letter-spacing:-.5px">Ton Pack Campagne est actif 🚀</h1><p style="color:#475569;line-height:1.6;margin:0 0 6px">Bienvenue${firstName ? ` ${firstName}` : ''} ! Tu as <strong>3 mois d'accès complet</strong>, jusqu'au ${new Date(proUntil).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}.</p><p style="color:#475569;line-height:1.6;margin:0 0 24px">Paiement unique : rien ne sera reconduit, tu n'as aucun abonnement à résilier.</p><a href="${baseUrl}/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Commencer ma campagne →</a></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="${baseUrl}" style="color:#94a3b8">emploia.eu</a></p></div></body></html>`,
+              subject: cree
+                ? 'Votre Pack Campagne est actif — créez votre mot de passe'
+                : `🎉 ${firstName || 'Bienvenue'}, ton Pack Campagne est activé !`,
+              html: cree
+                ? emailCompteCree({ baseUrl, proUntil, lienMotDePasse, email: normalizedEmail })
+                : emailCompteExistant({ baseUrl, proUntil, firstName }),
             }) : Promise.resolve(),
           ]);
           break;
@@ -174,8 +329,10 @@ export default async function handler(req) {
         // grandfathered subscriptions still reads correctly in emails.
         const planLabel = plan === 'intensif' ? 'Intensif' : 'Pro';
         if (email) {
-          const normalizedEmail = email.toLowerCase();
-          const user = await kvGet(`user:${normalizedEmail}`);
+          const normalizedEmail = email;
+          // L'acheteur est déjà résolu — `client_reference_id` d'abord, donc un
+          // abonné qui paie avec l'adresse de sa banque est reconnu ici aussi.
+          const user = acheteur.user;
           if (user) {
             const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
             const firstName = htmlEscape((user.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || '');
@@ -226,7 +383,25 @@ export default async function handler(req) {
         const email = invoice.customer_email?.toLowerCase() || await kvGet(`stripe:${customerId}`);
         if (email && resendKey) {
           const user = await kvGet(`user:${email}`);
-          if (!user) break;
+          if (!user) {
+            // TROISIÈME SORTIE SILENCIEUSE — celle que le brief ne mentionnait
+            // pas. Un échec de renouvellement sur une adresse sans compte
+            // partait au silence lui aussi. Il n'y a pas d'argent encaissé ici,
+            // au contraire : un paiement a ÉCHOUÉ pour un client qu'on ne sait
+            // pas rattacher, donc personne ne sera prévenu de la coupure à
+            // venir. Ça se trace et ça s'alerte pour la même raison.
+            await enregistrerPaiementOrphelin({
+              sessionId: invoice.id || `inv_${customerId}`,
+              email,
+              plan: null,
+              amountTotal: invoice.amount_due,
+              currency: invoice.currency,
+              affiliate: null,
+              reason: 'no_account_on_failure',
+              extra: { customerId, attemptCount: invoice.attempt_count || 1 },
+            }, resendKey, process.env.ADMIN_EMAIL);
+            break;
+          }
           await kvSet(`user:${email}`, { ...user, subscriptionStatus: 'past_due' });
           const firstName = htmlEscape((user?.name || '').replace(/[\r\n]/g, ' ').split(' ')[0] || 'là');
           const attemptCount = invoice.attempt_count || 1;
