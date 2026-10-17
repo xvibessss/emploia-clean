@@ -25,6 +25,11 @@ on:
         type: boolean
         required: false
         default: false
+      repetition_alerte:
+        description: "Répéter l'alerte d'échec sans rien publier (preuve que le chemin d'alerte fonctionne)"
+        type: boolean
+        required: false
+        default: false
   # Après un déploiement réussi en production. À décommenter une fois que le
   # workflow de déploiement porte bien ce nom.
   # workflow_run:
@@ -83,51 +88,43 @@ jobs:
       # Une régression SEO est silencieuse : personne ne la voit passer.
       # Un job rouge dans un onglet que l'on n'ouvre pas ne sert à rien,
       # donc on ouvre une issue — elle, elle arrive par email.
+      #
+      # La condition est strictement celle d'origine, et cette étape ne gagne
+      # aucun interrupteur : rien de ce qui la rend testable ne passe par ici.
+      # Seul le corps de l'alerte a déménagé dans un module, pour pouvoir être
+      # exercé — par la sonde hors ligne à chaque PR, et par l'étape de
+      # répétition ci-dessous.
       - name: Ouvrir une issue en cas d'échec
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@v9
         with:
           script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('/tmp/seo-report.txt', 'utf8');
-            const title = `Régression SEO détectée — ${new Date().toISOString().slice(0, 10)}`;
+            const alerter = require('./scripts/seo/alerte-regression.cjs');
+            await alerter({ github, context, core });
 
-            const { data: open } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'seo-regression',
-            });
-
-            const body = [
-              `L'audit hebdomadaire a échoué. Rapport complet :`,
-              '',
-              '```',
-              report.slice(0, 60000),
-              '```',
-              '',
-              `[Voir le job](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
-            ].join('\n');
-
-            // Une seule issue ouverte à la fois : on commente la courante
-            // plutôt que d'en empiler une par semaine.
-            if (open.length > 0) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: open[0].number,
-                body,
-              });
-              return;
-            }
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title,
-              body,
-              labels: ['seo-regression'],
-            });
+      # L'étape ci-dessus n'avait jamais tourné une seule fois. Le workflow
+      # n'est pas déclenché par les pull requests — il audite la production ;
+      # un workflow_dispatch réussi ne satisfait pas `failure()` ; un
+      # workflow_dispatch en échec n'est pas un `schedule`. Son premier
+      # passage aurait donc été un matin de panne réelle : le plus mauvais
+      # moment pour découvrir que la garde contre la panne est en panne.
+      #
+      # Cette étape-ci la fait tourner à la demande. Même module, même
+      # parcours — lecture du rapport, inventaire des issues ouvertes, choix
+      # entre créer et commenter —, mais la requête est assemblée par
+      # `.endpoint()`, qui construit méthode, URL et corps sans les envoyer,
+      # et le résultat part dans le résumé du job. Aucune issue n'est créée
+      # ni commentée : les issues du dépôt ne sont pas polluées.
+      #
+      # Elle ne peut pas s'armer sur un `schedule` : le contexte `inputs` n'y
+      # existe pas, et la condition exige explicitement le dispatch.
+      - name: Répéter l'alerte sans rien publier
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.repetition_alerte }}
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const alerter = require('./scripts/seo/alerte-regression.cjs');
+            await alerter({ github, context, core, repetition: true });
 
   # Second job, indépendant du premier : il ne teste pas les mêmes choses.
   # `audit` vérifie ce que le serveur envoie. `render` vérifie ce qu'un humain
