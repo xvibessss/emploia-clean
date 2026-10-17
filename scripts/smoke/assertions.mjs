@@ -19,6 +19,17 @@
 // U+00A0 insécable, U+202F insécable étroite, U+2009 fine.
 export function norm(s) { return s.replace(/[   ]/g, ' '); }
 
+// Les montants du barème Écoles ne sont pas recopiés ici : ils sont dérivés de
+// scripts/pricing/bareme.mjs, qui les déclare une fois pour tout le dépôt.
+// Cette table en a été le troisième exemplaire manuscrit, et c'est par ce genre
+// de copie que le « 9 € » de /ecoles a survécu trois jours au barème par
+// tranches — la sonde réclamait un prix que la page ne portait plus.
+// scripts/pricing/bareme.test.mjs refuse en CI qu'un montant y revienne à la
+// main.
+import { BAREME, euros, nombre } from '../pricing/bareme.mjs';
+
+const [TRANCHE_1, TRANCHE_2, TRANCHE_3] = BAREME.tranches;
+
 export const PAGE_ASSERTIONS = [
   {
     title: '[A] Landing — la grille servie est bien la nouvelle',
@@ -47,12 +58,25 @@ export const PAGE_ASSERTIONS = [
     // figurent tous dans la page servie, et c'est leur ensemble qui identifie la
     // grille. Un seul taux ne distinguerait pas la grille actuelle d'une grille
     // à moitié mise à jour.
-    must: ['22 €', '17 €', '12 €', '2 500 €', '40 000', 'pilote'],
+    must: [
+      euros(TRANCHE_1.prix), euros(TRANCHE_2.prix), euros(TRANCHE_3.prix),
+      euros(BAREME.forfaitPlateforme), nombre(BAREME.seuilMiseEnConcurrence),
+      'pilote',
+    ],
     // Prix au siège d'avant le barème par tranches, retiré le 2026-10-06 par
     // 451847a : sa présence signifie que la prod sert encore la grille à 9 €.
     // La chaîne porte son unité, parce que « 9 € » seul se retrouve dans tout
     // montant en 9 — « 19 € », « 39 € » — et sonnerait faux au premier
     // changement de tarif.
+    //
+    // Ces deux aiguilles restent malgré l'arrivée de
+    // scripts/pricing/bareme.test.mjs, qui refuse déjà tout montant étranger
+    // au barème dans les fichiers du dépôt : elles ne visent pas le dépôt mais
+    // les octets servis par la production, qu'aucune garde hors ligne ne voit.
+    // Le `must` dérivé ci-dessus ne les remplace pas non plus — une page peut
+    // porter le nouveau prix **et** garder l'ancien dans un paragraphe oublié,
+    // cas où le `must` passerait et où seule une aiguille négative verrait le
+    // reliquat.
     mustNot: ['9 € par siège', '9 € par étudiant'],
   },
   {

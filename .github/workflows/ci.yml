@@ -1,10 +1,28 @@
 name: CI
 
 on:
+  # Le filtre reste sur `push`, et c'est le cas différent : sans lui, chaque
+  # poussée d'une branche de travail relancerait les quatre jobs en plus du
+  # run de sa propre PR. Il n'y a pas de double run pour autant — un commit
+  # poussé sur une branche de PR ne déclenche que `pull_request` (la poussée
+  # ne vise pas main), et une fusion dans main ne déclenche que `push` (le
+  # type `closed` n'est pas dans les types par défaut de `pull_request`).
   push:
     branches: [main]
+
+  # Pas de filtre `branches:` ici, et c'est tout le correctif. Le filtre d'un
+  # `pull_request` porte sur la branche CIBLE, jamais sur la source : avec
+  # `branches: [main]`, une PR empilée — celle qui en vise une autre plutôt
+  # que main — ne déclenchait AUCUN des quatre jobs ci-dessous. Seuls les
+  # déploiements Vercel s'affichaient, et leurs checks verts donnaient
+  # l'illusion d'une PR gardée.
+  #
+  # La PR 83 en a fait la démonstration : elle ajoutait un garde tarifaire
+  # câblé dans le job `guards`, et ce job n'a jamais tourné dessus. Même
+  # famille que le garde des tests dormants — un contrôle câblé mais jamais
+  # exécuté ne garde rien ; ici ce n'était pas le câblage qui manquait, mais
+  # le déclencheur.
   pull_request:
-    branches: [main]
 
 jobs:
   secret-scan:
@@ -75,6 +93,8 @@ jobs:
         run: node scripts/billing/campagne.test.mjs
       - name: B2B pricing grid (barème Écoles, plancher, seuil 40 k€)
         run: node scripts/pricing/ecoles.test.mjs
+      - name: Source unique du barème Écoles (déclaration vs page, prompt, sonde)
+        run: node scripts/pricing/bareme.test.mjs
       - name: Assertions de la sonde prod (aiguilles de contenu vs fichiers du dépôt)
         run: node scripts/smoke/assertions.test.mjs
       - name: Achat anonyme (le webhook n'abandonne jamais un paiement en silence)
