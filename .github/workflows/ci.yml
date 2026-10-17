@@ -99,6 +99,8 @@ jobs:
         run: node scripts/smoke/assertions.test.mjs
       - name: Achat anonyme (le webhook n'abandonne jamais un paiement en silence)
         run: node scripts/billing/achat-anonyme.test.mjs
+      - name: Alerte de régression SEO (création, dédoublonnage, répétition sans écriture)
+        run: node scripts/seo/alerte-regression.test.mjs
       - name: Billing probes (checkout mode + webhook grant/rejeu + commissions)
         run: |
           node scripts/billing/probe-checkout.mjs
