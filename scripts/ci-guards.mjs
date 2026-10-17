@@ -826,5 +826,59 @@ try {
   }
 } catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
 
+// ── 15. image de partage : servie, raster, et à jour ──────────────────────
+// Un lien d'EmploiA partagé sur TikTok, LinkedIn ou WhatsApp n'affichait
+// aucune image, et de deux façons à la fois. 165 pages désignaient
+// `opengraph.svg` : aucune plateforme n'accepte `image/svg+xml`. Les 4 autres,
+// dont la page d'accueil, désignaient `og-image.svg` — un fichier qui n'existe
+// pas, et qui répondait 404 en production.
+//
+// Le SVG reste la source éditable ; le PNG servi en est dérivé par
+// `npm run assets:og`. Rien ne lie mécaniquement les deux, et c'est cette
+// dérive qui a laissé l'image annoncer « Gratuit / 9€ » longtemps après les
+// passages à 19 € puis 24 €, afficher `emploia.fr` — un domaine qui n'a jamais
+// appartenu au projet — et répéter « 100% français », la formule que la sonde
+// RGPD a retirée de 75 fichiers mais qu'elle ne pouvait pas voir ici : elle ne
+// balaie que .html, .js, .css et .json.
+//
+// Ce garde compare une empreinte, pas des pixels : la CI n'a pas besoin de
+// Chrome pour l'exécuter.
+console.log('\n[15] image de partage — servie, raster et à jour');
+try {
+  const RASTER = /\.(png|jpe?g|webp|gif)$/i;
+  const pages = walk('.').filter(
+    (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
+  );
+  let mauvais = 0, sans = 0;
+  for (const f of pages) {
+    const src = readAll(f);
+    if (/name="robots"[^>]*noindex/.test(src)) continue;
+    const m = src.match(/property="og:image"\s+content="([^"]+)"/);
+    if (!m) { fail(`${f} : page indexable sans og:image — carte de partage sans visuel`); sans++; continue; }
+    let chemin;
+    try { chemin = new URL(m[1]).pathname; } catch { fail(`${f} : og:image « ${m[1]} » n'est pas une URL absolue`); mauvais++; continue; }
+    const local = '.' + chemin;
+    if (!exists(local)) { fail(`${f} : og:image vers ${chemin} — ce fichier n'existe pas, la carte restera vide`); mauvais++; continue; }
+    if (!RASTER.test(chemin)) { fail(`${f} : og:image en ${chemin.split('.').pop()} — aucune plateforme ne rend ce format, il faut du PNG, JPEG ou WebP`); mauvais++; continue; }
+    // Sans dimensions déclarées, Facebook et LinkedIn montrent une première
+    // carte sans image, le temps de télécharger le fichier pour les déduire.
+    if (!/property="og:image:width"/.test(src) || !/property="og:image:height"/.test(src)) {
+      fail(`${f} : og:image sans og:image:width/height — première carte affichée sans visuel`);
+      mauvais++;
+    }
+  }
+
+  // Le PNG servi correspond-il encore au SVG source ?
+  const { empreinteSvg, SVG, HASH } = await import('./assets/og-image.mjs');
+  const enregistree = exists(HASH) ? readAll(HASH).trim() : null;
+  const courante = empreinteSvg();
+  if (enregistree !== courante) {
+    fail(`${SVG} a changé depuis la dernière rasterisation (${enregistree ?? 'aucune empreinte'} ≠ ${courante}) — régénérer avec : npm run assets:og`);
+    mauvais++;
+  }
+
+  if (!mauvais && !sans) ok(`toutes les pages indexables pointent vers une image servie et rasterisée, à jour avec ${SVG}`);
+} catch (e) { fail("contrôle de l'image de partage impossible : " + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

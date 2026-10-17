@@ -17,6 +17,7 @@
     "smoke:sources": "node scripts/smoke/sources.mjs",
     "verify:webhook": "node scripts/billing/verify-webhook.mjs",
     "verify:palier": "node scripts/smoke/palier-gratuit.mjs",
-    "assets:version": "node scripts/assets/version.mjs"
+    "assets:version": "node scripts/assets/version.mjs",
+    "assets:og": "node scripts/assets/og-image.mjs"
   }
 }
