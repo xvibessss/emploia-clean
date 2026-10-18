@@ -147,6 +147,7 @@
     },
     { "source": "/rss.xml", "destination": "/api/rss" },
     { "source": "/employeurs", "destination": "/employeurs.html" },
+    { "source": "/createurs", "destination": "/createurs.html" },
     { "source": "/ecoles", "destination": "/ecoles.html" },
     { "source": "/sous-traitants", "destination": "/sous-traitants.html" },
     { "source": "/poster-offre", "destination": "/employeurs.html" },
