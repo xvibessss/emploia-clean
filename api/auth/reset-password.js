@@ -37,7 +37,14 @@ export default async function handler(req) {
   }
 
   const resetData = await kvGet(`reset:${token}`);
-  if (!resetData || Date.now() - resetData.createdAt > 3_600_000) {
+  // La fenêtre était figée à une heure, ce qui est juste pour un lien que
+  // l'utilisateur vient de demander. Un compte créé par un achat reçoit un
+  // lien à sept jours (`_lib/grant.js`) : sans honorer `ttlMs`, ce lien serait
+  // refusé au bout d'une heure alors que son TTL KV court encore, et un client
+  // qui a payé se retrouverait dehors. Absent, la valeur reste une heure — les
+  // liens de `forgot-password` gardent exactement leur comportement.
+  const fenetre = Number.isFinite(resetData?.ttlMs) ? resetData.ttlMs : 3_600_000;
+  if (!resetData || Date.now() - resetData.createdAt > fenetre) {
     return new Response(JSON.stringify({ error: 'Ce lien est invalide ou expiré. Demandez-en un nouveau.' }), { status: 400, headers: H });
   }
 
