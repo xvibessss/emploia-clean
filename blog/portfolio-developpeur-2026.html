@@ -11,7 +11,10 @@
   <meta property="og:description" content="Comment construire un portfolio dev qui attire les recruteurs : projets à inclure, GitHub, démo live, et ce que les CTO regardent vraiment."/>
   <meta property="og:type" content="article"/>
   <meta property="og:url" content="https://emploia.eu/blog/portfolio-developpeur-2026"/>
-  <meta property="og:image" content="https://emploia.eu/opengraph.svg"/>
+  <meta property="og:image" content="https://emploia.eu/og-image.png"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt" content="Emploia — le copilote IA qui candidate à votre place"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6E48BE"/>
@@ -42,8 +45,6 @@
     .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
     .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
     .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
-    .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
-    .blog-back:hover { color: var(--t1); }
     .toc { background: var(--bg2); border: 1px solid var(--brd); border-radius: 16px; padding: 24px 28px; margin: 32px 0; }
     .toc-title { font-size: 13px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
     .toc ol { padding-left: 20px; margin: 0; }
@@ -86,7 +87,37 @@
     .score-bar-track { flex: 1; height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
     .score-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#6366f1,#3b82f6); }
     @media(max-width:600px){ .newsletter-form{flex-direction:column;} .newsletter-form button{width:100%;} }
+  
+    .breadcrumb{padding:20px 0 0;margin-bottom:32px;font-size:13px;color:var(--t3)}
+    .breadcrumb a{color:var(--t3);text-decoration:none}
+    .breadcrumb a:hover{color:var(--t2)}
   </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Accueil",
+      "item": "https://emploia.eu"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://emploia.eu/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Portfolio développeur",
+      "item": "https://emploia.eu/blog/portfolio-developpeur-2026"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="read-progress" id="readProgress"></div>
@@ -112,7 +143,7 @@
 </div>
 
 <div class="blog-layout page-enter">
-  <a href="/blog" class="blog-back">← Retour au blog</a>
+  <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Portfolio développeur</div>
   <div class="blog-category">Dev & Tech</div>
   <h1 class="blog-title">Créer un portfolio développeur qui impressionne les recruteurs en 2026</h1>
   <div class="blog-meta">

@@ -99,6 +99,8 @@ jobs:
         run: node scripts/pricing/bareme.test.mjs
       - name: Assertions de la sonde prod (aiguilles de contenu vs fichiers du dépôt)
         run: node scripts/smoke/assertions.test.mjs
+      - name: Achat anonyme (le webhook n'abandonne jamais un paiement en silence)
+        run: node scripts/billing/achat-anonyme.test.mjs
       - name: Billing probes (checkout mode + webhook grant/rejeu + commissions)
         run: |
           node scripts/billing/probe-checkout.mjs

@@ -25,6 +25,7 @@ const checkoutSrc = readFileSync(new URL('../../api/stripe-checkout.js', import.
 const webhookSrc = readFileSync(new URL('../../api/stripe-webhook.js', import.meta.url), 'utf8');
 const authSrc = readFileSync(new URL('../../api/_lib/auth.js', import.meta.url), 'utf8');
 const referralSrc = readFileSync(new URL('../../api/referral.js', import.meta.url), 'utf8');
+const grantSrc = readFileSync(new URL('../../api/_lib/grant.js', import.meta.url), 'utf8');
 
 console.log('\n[1] extendPro — le mécanisme d\'octroi proUntil');
 
@@ -143,9 +144,28 @@ test('le verrou provoque une sortie anticipée sur rejeu', () => {
 });
 
 test('le chemin payment octroie proUntil via extendPro, +90 jours', () => {
+  // L'octroi a déménagé dans `_lib/grant.js` : il est désormais partagé par
+  // l'acheteur qui a un compte et par celui dont le compte est créé à la
+  // réception du paiement. L'invariant est inchangé — extendPro sur le
+  // proUntil existant, 90 jours — mais il se vérifie là où le code vit
+  // maintenant. Ce qui compte davantage est contrôlé juste en dessous : qu'il
+  // n'existe qu'UNE seule implémentation de l'octroi.
+  assert.match(grantSrc, /extendPro\(user\.proUntil, CAMPAGNE_DAYS\)/, 'doit appeler extendPro sur le proUntil existant');
+  assert.match(grantSrc, /export const CAMPAGNE_DAYS = 90/, 'le Pack vaut 90 jours');
   const branch = webhookSrc.slice(webhookSrc.indexOf("session.mode === 'payment'"));
-  assert.match(branch, /extendPro\(user\.proUntil, CAMPAGNE_DAYS\)/, 'doit appeler extendPro sur le proUntil existant');
-  assert.match(webhookSrc, /const CAMPAGNE_DAYS = 90/, 'le Pack vaut 90 jours');
+  assert.match(branch, /appliquerOctroiCampagne\(user, session\)/, 'la branche payment doit passer par l\'octroi partagé');
+});
+
+// Le point qui protège vraiment : deux implémentations de l'octroi auraient
+// divergé au premier changement, et la branche la moins empruntée — celle de
+// l'acheteur anonyme — est précisément celle que personne ne relit.
+test('il n\'existe qu\'UN seul chemin d\'octroi du Pack', () => {
+  const appels = webhookSrc.match(/extendPro\(/g) || [];
+  assert.equal(appels.length, 0, 'le webhook ne doit plus appeler extendPro directement : il passe par appliquerOctroiCampagne');
+  const octrois = grantSrc.match(/extendPro\(/g) || [];
+  assert.equal(octrois.length, 1, 'un seul appel à extendPro dans _lib/grant.js');
+  const fns = grantSrc.match(/export async function appliquerOctroiCampagne\(/g) || [];
+  assert.equal(fns.length, 1, 'une seule fonction d\'octroi');
 });
 
 test('le chemin payment ne crée ni abonnement ni plan payant en KV', () => {
@@ -156,8 +176,21 @@ test('le chemin payment ne crée ni abonnement ni plan payant en KV', () => {
   assert.ok(end > start, 'la branche payment doit être délimitée');
   const branch = webhookSrc.slice(start, end);
   assert.doesNotMatch(branch, /subscriptionId/, 'aucun subscriptionId ne doit être stocké pour un paiement unique');
-  assert.doesNotMatch(branch, /plan:\s*plan|plan,/, "la branche ne doit pas écrire plan (sinon getCurrentUser ignore le grant)");
-  assert.match(branch, /proUntil,/, 'la branche doit écrire proUntil');
+  // L'invariant porte sur ce qui est ÉCRIT SUR LE COMPTE, pas sur la présence
+  // du mot « plan » dans la branche : celle-ci transmet légitimement le nom du
+  // plan à l'enregistrement d'un paiement orphelin et à l'évènement de
+  // tracking. L'écriture du compte vit maintenant dans `_lib/grant.js`, donc
+  // c'est là que la vérification doit mordre — sinon elle rougit sur du code
+  // juste, et c'est ainsi qu'un test finit désarmé.
+  const ecriture = grantSrc.slice(grantSrc.indexOf('const compteAJour = {'));
+  const corps = ecriture.slice(0, ecriture.indexOf('};'));
+  assert.doesNotMatch(corps, /\bplan\s*:/, "l'octroi ne doit pas écrire plan (sinon getCurrentUser ignore le grant)");
+  assert.doesNotMatch(corps, /subscriptionId/, "l'octroi ne doit pas écrire de subscriptionId");
+  assert.match(corps, /proUntil,/, 'l\'octroi doit écrire proUntil');
+  // Et le compte CRÉÉ part en `free`, pas en plan payant : c'est le grant
+  // proUntil qui donne l'accès, exactement comme pour un compte existant.
+  const creation = grantSrc.slice(grantSrc.indexOf('const user = {'));
+  assert.match(creation.slice(0, creation.indexOf('};')), /plan: 'free'/, 'un compte créé par un achat part en free');
 });
 
 test('getCurrentUser n\'honore le grant que si le plan est free/absent', () => {
