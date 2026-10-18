@@ -844,7 +844,60 @@ try {
   }
 } catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
 
-// ── 17. icônes d'application : servies, et au format que l'OS sait lire ───
+// ── 17. image de partage : servie, raster, et à jour ──────────────────────
+// Un lien d'EmploiA partagé sur TikTok, LinkedIn ou WhatsApp n'affichait
+// aucune image, et de deux façons à la fois. 165 pages désignaient
+// `opengraph.svg` : aucune plateforme n'accepte `image/svg+xml`. Les 4 autres,
+// dont la page d'accueil, désignaient `og-image.svg` — un fichier qui n'existe
+// pas, et qui répondait 404 en production.
+//
+// Le SVG reste la source éditable ; le PNG servi en est dérivé par
+// `npm run assets:og`. Rien ne lie mécaniquement les deux, et c'est cette
+// dérive qui a laissé l'image annoncer « Gratuit / 9€ » longtemps après les
+// passages à 19 € puis 24 €, afficher `emploia.fr` — un domaine qui n'a jamais
+// appartenu au projet — et répéter « 100% français », la formule que la sonde
+// RGPD a retirée de 75 fichiers mais qu'elle ne pouvait pas voir ici : elle ne
+// balaie que .html, .js, .css et .json.
+//
+// Ce garde compare une empreinte, pas des pixels : la CI n'a pas besoin de
+// Chrome pour l'exécuter.
+console.log('\n[17] image de partage — servie, raster et à jour');
+try {
+  const RASTER = /\.(png|jpe?g|webp|gif)$/i;
+  const pages = walk('.').filter(
+    (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
+  );
+  let mauvais = 0, sans = 0;
+  for (const f of pages) {
+    const src = readAll(f);
+    if (/name="robots"[^>]*noindex/.test(src)) continue;
+    const m = src.match(/property="og:image"\s+content="([^"]+)"/);
+    if (!m) { fail(`${f} : page indexable sans og:image — carte de partage sans visuel`); sans++; continue; }
+    let chemin;
+    try { chemin = new URL(m[1]).pathname; } catch { fail(`${f} : og:image « ${m[1]} » n'est pas une URL absolue`); mauvais++; continue; }
+    const local = '.' + chemin;
+    if (!exists(local)) { fail(`${f} : og:image vers ${chemin} — ce fichier n'existe pas, la carte restera vide`); mauvais++; continue; }
+    if (!RASTER.test(chemin)) { fail(`${f} : og:image en ${chemin.split('.').pop()} — aucune plateforme ne rend ce format, il faut du PNG, JPEG ou WebP`); mauvais++; continue; }
+    // Sans dimensions déclarées, Facebook et LinkedIn montrent une première
+    // carte sans image, le temps de télécharger le fichier pour les déduire.
+    if (!/property="og:image:width"/.test(src) || !/property="og:image:height"/.test(src)) {
+      fail(`${f} : og:image sans og:image:width/height — première carte affichée sans visuel`);
+      mauvais++;
+    }
+  }
+
+  // Le PNG servi correspond-il encore au SVG source ?
+  const { empreinteSvg, SVG, HASH } = await import('./assets/og-image.mjs');
+  const enregistree = exists(HASH) ? readAll(HASH).trim() : null;
+  const courante = empreinteSvg();
+  if (enregistree !== courante) {
+    fail(`${SVG} a changé depuis la dernière rasterisation (${enregistree ?? 'aucune empreinte'} ≠ ${courante}) — régénérer avec : npm run assets:og`);
+    mauvais++;
+  }
+
+  if (!mauvais && !sans) ok(`toutes les pages indexables pointent vers une image servie et rasterisée, à jour avec ${SVG}`);
+} catch (e) { fail("contrôle de l'image de partage impossible : " + e.message); }
+// ── 18. icônes d'application : servies, et au format que l'OS sait lire ───
 // `apple-touch-icon` désignait `favicon.svg`. iOS n'accepte pas le SVG pour
 // cette balise : Safari exige du PNG. Un candidat qui ajoute EmploiA à son
 // écran d'accueil — le geste naturel pour un outil qu'on rouvre chaque jour
@@ -855,7 +908,7 @@ try {
 // Les PNG sont dérivés de `favicon.svg` par `npm run assets:icones`, et
 // l'empreinte enregistrée détecte la dérive sans Chrome en CI, comme pour
 // l'image de partage.
-console.log("\n[17] icônes d'application — servies et au bon format");
+console.log("\n[18] icônes d'application — servies et au bon format");
 try {
   const pages = walk('.').filter(
     (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
@@ -918,6 +971,27 @@ try {
 
   if (!mauvais) ok(`${pages.length} pages déclarent une icône et une apple-touch-icon servies, et le manifeste porte ses PNG`);
 } catch (e) { fail("contrôle des icônes impossible : " + e.message); }
+
+// ── 19. ce fichier se contrôle lui-même : numéros uniques et continus ─────
+// Deux sessions travaillant en parallèle ont pris le numéro [15] chacune de
+// leur côté — l'une pour les tests dormants, l'autre pour l'image de partage
+// — et les deux ont été fusionnées dans main. Rien ne l'a signalé : les deux
+// sections tournent, seul leur étiquetage ment. Le coût est réel quand on
+// lit un journal de CI ou qu'on dit « le garde [15] a échoué » sans savoir
+// duquel on parle.
+//
+// Le contrôle est cosmétique et tient en six lignes ; il a sa place ici
+// précisément parce que personne ne pensera à le faire à la main.
+console.log('\n[19] numérotation des sections — unique et continue');
+try {
+  const src = readAll('scripts/ci-guards.mjs');
+  const nums = [...src.matchAll(/console\.log\(["']\\n\[(\d+)\]/g)].map((m) => Number(m[1]));
+  const doublons = nums.filter((n, i) => nums.indexOf(n) !== i);
+  const trous = nums.map((n, i) => (i && n !== nums[i - 1] + 1 ? `${nums[i - 1]}→${n}` : null)).filter(Boolean);
+  if (doublons.length) fail(`numéro(s) de section en double : ${[...new Set(doublons)].join(', ')}`);
+  if (trous.length) fail(`numérotation discontinue : ${trous.join(', ')}`);
+  if (!doublons.length && !trous.length) ok(`${nums.length} sections numérotées de 1 à ${nums[nums.length - 1]}, sans doublon ni trou`);
+} catch (e) { fail('contrôle de la numérotation impossible : ' + e.message); }
 
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

@@ -13,7 +13,10 @@
   <meta property="og:description" content="Self-introduction, questions RH, vocabulaire business : le guide complet pour décrocher le poste même avec un anglais intermédiaire."/>
   <meta property="og:type" content="article"/>
   <meta property="og:url" content="https://emploia.eu/blog/entretien-en-anglais"/>
-  <meta property="og:image" content="https://emploia.eu/opengraph.svg"/>
+  <meta property="og:image" content="https://emploia.eu/og-image.png"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt" content="Emploia — le copilote IA qui candidate à votre place"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#6E48BE"/>
@@ -26,7 +29,7 @@
     "dateModified": "2026-05-10",
     "author": {"@type": "Organization", "name": "Emploia", "url": "https://emploia.eu"},
     "publisher": {"@type": "Organization", "name": "Emploia", "url": "https://emploia.eu"},
-    "image": "https://emploia.eu/opengraph.svg",
+    "image": "https://emploia.eu/og-image.png",
     "url": "https://emploia.eu/blog/entretien-en-anglais"
   }</script>
   <script type="application/ld+json">{
@@ -91,7 +94,37 @@
     .toc a{color:var(--inb);font-size:14px;text-decoration:none}
     .toc a:hover{text-decoration:underline}
     .read-progress{position:fixed;top:0;left:0;height:3px;background:var(--grad-primary);z-index:9999;transition:width .1s}
+  
+    .breadcrumb{padding:20px 0 0;font-size:13px;color:var(--t3)}
+    .breadcrumb a{color:var(--t3);text-decoration:none}
+    .breadcrumb a:hover{color:var(--t2)}
   </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Accueil",
+      "item": "https://emploia.eu"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://emploia.eu/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Entretien en anglais",
+      "item": "https://emploia.eu/blog/entretien-en-anglais"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="read-progress" id="read-progress"></div>
@@ -117,7 +150,8 @@
 </div>
 
 <div class="blog-layout page-enter">
-  <a href="/blog" class="blog-back">← Retour au blog</a>
+    <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Entretien en anglais</div>
+<a href="/blog" class="blog-back">← Retour au blog</a>
   <div class="blog-category">🎤 Entretien</div>
   <h1 class="blog-title">Réussir un entretien en anglais : phrases clés, 20 questions types et pièges (2026)</h1>
   <div class="blog-meta">
