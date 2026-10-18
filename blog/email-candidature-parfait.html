@@ -134,8 +134,6 @@
     .blog-footer { border-top: 1px solid var(--brd); margin-top: 60px; padding-top: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--t3); }
     .blog-
 .blog-
-.blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
-    .blog-back:hover { color: var(--t1); }
     .faq-block { margin: 12px 0; }
     .faq-block summary { font-weight: 700; cursor: pointer; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--t1); font-size: 16px; }
     .faq-block summary::after { content: "+"; font-size: 20px; color: var(--inb); transition: transform .2s; }
@@ -144,7 +142,7 @@
     details p { padding: 0 0 16px; color: var(--t2); font-size: 15px; line-height: 1.7; }
     .objet-tag { display: inline-block; background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.25); color: var(--inb); border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 600; margin: 2px 3px; }
   
-    .breadcrumb{padding:20px 0 0;font-size:13px;color:var(--t3)}
+    .breadcrumb{padding:20px 0 0;margin-bottom:32px;font-size:13px;color:var(--t3)}
     .breadcrumb a{color:var(--t3);text-decoration:none}
     .breadcrumb a:hover{color:var(--t2)}
   </style>
@@ -199,8 +197,7 @@
 </div>
 
 <div class="blog-layout page-enter">
-    <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Email de candidature</div>
-<a href="/blog" class="blog-back">← Retour au blog</a>
+  <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Email de candidature</div>
   <div class="blog-category">Candidature</div>
   <h1 class="blog-title">L'email de candidature parfait en 2026 : objet, structure et exemples</h1>
   <div class="blog-meta">
