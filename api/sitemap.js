@@ -18,6 +18,7 @@ export default function handler(req, res) {
     { loc: `${base}/app`,                 changefreq: 'weekly',  priority: '0.9', lastmod: today },
     { loc: `${base}/referral`,            changefreq: 'monthly', priority: '0.6', lastmod: today },
     { loc: `${base}/employeurs`,          changefreq: 'weekly',  priority: '0.85', lastmod: today },
+    { loc: `${base}/createurs`,        changefreq: 'monthly', priority: '0.6', lastmod: today },
     { loc: `${base}/ecoles`,              changefreq: 'monthly', priority: '0.85', lastmod: today },
     { loc: `${base}/sous-traitants`,      changefreq: 'monthly', priority: '0.30', lastmod: today },
     { loc: `${base}/about`,              changefreq: 'monthly', priority: '0.7' },
