@@ -46,8 +46,6 @@
     .blog-cta { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(59,130,246,.08)); border: 1px solid rgba(99,102,241,.2); border-radius: 20px; padding: 36px; text-align: center; margin-top: 60px; }
     .blog-cta h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
     .blog-cta p { font-size: 14px; color: var(--t2); margin-bottom: 24px; }
-    .blog-back { display: inline-flex; align-items: center; gap: 8px; color: var(--t3); font-size: 13px; text-decoration: none; margin-bottom: 32px; transition: color .15s; }
-    .blog-back:hover { color: var(--t1); }
     .toc { background: var(--bg2); border: 1px solid var(--brd); border-radius: 16px; padding: 24px 28px; margin: 32px 0; }
     .toc-title { font-size: 13px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
     .toc ol { padding-left: 20px; margin: 0; }
@@ -83,7 +81,7 @@
     .related-card .rc-title { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.4; }
     @media(max-width:600px){ .newsletter-form{flex-direction:column;} .newsletter-form button{width:100%;} }
   
-    .breadcrumb{padding:20px 0 0;font-size:13px;color:var(--t3)}
+    .breadcrumb{padding:20px 0 0;margin-bottom:32px;font-size:13px;color:var(--t3)}
     .breadcrumb a{color:var(--t3);text-decoration:none}
     .breadcrumb a:hover{color:var(--t2)}
   </style>
@@ -138,8 +136,7 @@
 </div>
 
 <div class="blog-layout page-enter">
-    <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Préparer un entretien technique</div>
-<a href="/blog" class="blog-back">← Retour au blog</a>
+  <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › Préparer un entretien technique</div>
   <div class="blog-category">Entretien</div>
   <h1 class="blog-title">Comment préparer un entretien technique (dev, data, DevOps) en 2026</h1>
   <div class="blog-meta">
