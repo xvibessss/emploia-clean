@@ -1,7 +1,9 @@
 # Prototype — collecteur Greenhouse en direct
 
-**Relevé du 2026-10-19.** Branche `proto/greenhouse-ats`. Rien n'est déployé,
-rien n'est branché dans `api/jobs.js`.
+**Relevé du 2026-10-19.** Branche `proto/greenhouse-ats`. **Mise à jour :** le
+collecteur est désormais intégré — cron d'ingest, clé KV, lecture dans
+`api/jobs.js` — voir la section 8. Rien n'est déployé ni poussé ; la condition
+bloquante de la section 6 est levée par cette intégration.
 
 **Question posée :** un collecteur qui crawle l'ATS Greenhouse à la source
 apporte-t-il à emploia des offres françaises que les huit API tierces
@@ -223,7 +225,7 @@ mesurait 10 à 19 offres pertinentes par page SEO, c'est un ordre de grandeur.
 
 Mais trois conditions, et la première est bloquante.
 
-### Condition 1 — ne jamais l'appeler dans le chemin de la requête *(bloquante)*
+### Condition 1 — ne jamais l'appeler dans le chemin de la requête *(bloquante — levée, voir §8)*
 
 `api/jobs.js` tourne en runtime Edge avec des `withTimeout(…, 10000)` par
 source. La collecte des 28 boards prend **10,1 s** à elle seule. Branchée comme
@@ -285,3 +287,74 @@ qu'elle verrouille, dans l'ordre : deux boards en échec sur trois n'empêchent
 pas le troisième de rendre ; « Unlimited Contract » reste un CDI ; un lieu non
 reconnu ne devient pas la France ; la forme de sortie est celle des huit
 autres collecteurs.
+
+---
+
+## 8. L'intégration livrée
+
+La condition bloquante de la section 6 est tenue : **le collecteur ne tourne
+jamais dans le chemin de la requête.**
+
+```
+/api/cron/collect-greenhouse   toutes les 6 h   28 boards → filtre FR → clé KV
+         ↓
+   greenhouse_jobs  (TTL 36 h, ~218 Ko)
+         ↓
+/api/jobs  →  fetchGreenhouse()  =  un kvGet, pas 28 requêtes HTTP
+```
+
+C'est la forme qu'avaient déjà les offres déposées par les employeurs
+(`employer_jobs` + `fetchEmployerJobs`) ; la clé est simplement remplie par un
+crawl au lieu d'un formulaire.
+
+**Le cron** (`api/cron/collect-greenhouse.js`) refuse tout appel sans
+`Authorization: Bearer $CRON_SECRET`, ne stocke que les offres dont le pays est
+**établi** comme la France, et borne le relevé à 600 offres — mesuré à 668
+octets par offre, soit 218 Ko aujourd'hui mais ~1,5 Mo à 200 boards, au-delà de
+ce qu'un enregistrement Upstash accepte. La troncature est journalisée au lieu
+d'être découverte par une écriture qui échoue.
+
+**Deux gardes de sûreté, chacun pour une panne précise.**
+
+*Une collecte vide n'écrase pas la clé précédente.* Si les 28 boards tombent
+ensemble, écrire `offres: []` remplacerait un relevé valide par du vide, et la
+page afficherait zéro offre Greenhouse en répondant 200. L'ancienne valeur vit
+sur son TTL : périmée mais vraie.
+
+*La clé expire au lieu de vivre indéfiniment.* 36 h pour un cron qui tourne
+toutes les 6 h : cinq collectes consécutives peuvent échouer avant que la
+source bascule dans `sourcesEnEchec` avec la cause **`collecte_absente`** — un
+jeton ajouté au vocabulaire fermé, distinct de `cle_absente` qui se lirait
+« il manque une variable d'environnement » et enverrait chercher la panne au
+mauvais endroit. Un TTL infini aurait servi éternellement le dernier relevé
+réussi, et une panne de cron serait restée invisible.
+
+**Greenhouse est placé avant les sources tierces dans la liste des
+collecteurs**, et six vérifications le verrouillent. `deduplicate()` garde la
+première occurrence de chaque couple titre+entreprise : une offre vue à la fois
+ici et chez un agrégateur sort donc avec l'URL de la page carrière de
+l'employeur. Si l'ordre s'inversait un jour, tout l'intérêt de crawler la
+source serait perdu en silence — d'où le test.
+
+**Une absence déclarée.** `scripts/smoke/sources.mjs` fait échouer la sonde
+pour tout collecteur absent sans raison écrite. `Greenhouse` y est inscrit avec
+la sienne, et avec le délai au bout duquel elle cesse d'être tolérable : la clé
+n'existe pas avant la première exécution du cron suivant un déploiement, et
+au-delà de 36 h ce n'est plus une absence normale mais une panne de cron.
+
+La sonde est passée de 62 à **88 vérifications** : 26 de plus pour
+l'intégration seule, dont la pagination à dix offres par page — sans elle, les
+334 offres françaises passeraient toutes devant les huit autres sources, que
+`prioritize` classe après la France.
+
+### Ce qu'il reste à faire, et qui n'est pas du code
+
+1. **`CRON_SECRET` doit exister dans l'environnement Vercel du projet.** Les
+   neuf autres crons s'en servent déjà, donc la variable est probablement là —
+   à vérifier avant de considérer le cron actif.
+2. **Vérifier la première exécution.** Jusqu'à elle, `/api/jobs` déclarera
+   `Greenhouse` en `collecte_absente`, ce qui est le comportement correct et
+   non une panne. `npm run smoke:sources` le dira.
+3. **Le catalogue reste le vrai levier** (section 6, condition 2), et
+   **Lever est la cible suivante** : Greenhouse ne rend que 5,2 % d'offres
+   françaises, et les scale-ups FR y sont toutes en 404.

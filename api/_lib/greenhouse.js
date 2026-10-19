@@ -1,5 +1,6 @@
 // ── COLLECTEUR GREENHOUSE (crawl direct de l'ATS) ────────────────────────────
-// Les huit collecteurs d'`api/jobs.js` sont tous des API tierces : elles
+// Les huit AUTRES collecteurs d'`api/jobs.js` sont tous des API tierces :
+// elles
 // republient des offres qu'elles ont elles-mêmes agrégées, avec une clé, un
 // quota et un coût — et les mêmes offres repostées que tout le monde ramasse.
 //

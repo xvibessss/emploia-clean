@@ -29,7 +29,7 @@ export const FILTRE_VERS_CONTRAT = {
 // Dernier verrou avant qu'une étiquette entre dans une offre : ce qui n'est
 // pas du vocabulaire fermé devient `null`. Même rôle que `causePublique` pour
 // les causes d'échec — la garantie est appliquée en un point, pas confiée à la
-// discipline des huit collecteurs ni à celle du prochain qu'on ajoutera.
+// discipline des neuf collecteurs ni à celle du prochain qu'on ajoutera.
 export function contratPublic(v) {
   return CONTRATS.has(v) ? v : null;
 }

@@ -10,10 +10,13 @@
 //   2. « Unlimited Contract » reste un CDI — le piège de l'inversion.
 //   3. Un lieu non reconnu ne devient pas « France ».
 //   4. La forme de sortie est celle des huit autres collecteurs.
+import fs from 'node:fs';
+import vm from 'node:vm';
 import {
   collecterBoard, collecterGreenhouse, normaliserOffre, paysGreenhouse,
   texteDeContenu, segmentsDeLieu, offreExploitable,
 } from '../../api/_lib/greenhouse.js';
+import { CLE_KV, TTL_SECONDES, MAX_OFFRES } from '../../api/cron/collect-greenhouse.js';
 import { BOARDS, RELEVE } from '../../api/_lib/greenhouse-boards.js';
 import { CONTRATS, contratGreenhouse, tempsGreenhouse } from '../../api/_lib/contrat.js';
 
@@ -175,6 +178,127 @@ check('chaque board porte un relevé chiffré d’offres françaises',
 check('la date du relevé est inscrite', /^\d{4}-\d{2}-\d{2}$/.test(RELEVE), RELEVE);
 check('les board ids sont des slugs sûrs en URL',
   BOARDS.every(b => /^[a-z0-9-]+$/.test(b.board)));
+
+// ── L'INTÉGRATION ────────────────────────────────────────────────────────────
+// Le collecteur ne sert à rien s'il n'est pas branché, et il nuit s'il est mal
+// branché. Cette section lit le VRAI `api/jobs.js` et le VRAI cron, et en
+// extrait les fonctions pour les exécuter — pas une copie de leur logique, qui
+// resterait verte en divergeant du fichier servi.
+console.log('\n── Branchement dans api/jobs.js ─────────────────────');
+const jobsSrc = fs.readFileSync(new URL('../../api/jobs.js', import.meta.url), 'utf8');
+const cronSrc = fs.readFileSync(new URL('../../api/cron/collect-greenhouse.js', import.meta.url), 'utf8');
+const vercel = JSON.parse(fs.readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'));
+
+function extraire(src, nom) {
+  const i = src.indexOf(`async function ${nom}(`) >= 0
+    ? src.indexOf(`async function ${nom}(`)
+    : src.indexOf(`function ${nom}(`);
+  if (i < 0) return null;
+  let profondeur = 0;
+  const debut = src.indexOf('{', i);
+  for (let j = debut; j < src.length; j++) {
+    if (src[j] === '{') profondeur++;
+    else if (src[j] === '}' && --profondeur === 0) return src.slice(i, j + 1);
+  }
+  return null;
+}
+
+const blocFetch = extraire(jobsSrc, 'fetchGreenhouse');
+check('api/jobs.js porte un collecteur Greenhouse', Boolean(blocFetch));
+
+// LA DÉCISION QUI SE VÉRIFIE ICI : Greenhouse est placé AVANT les sources
+// tierces, parce que `deduplicate()` garde la PREMIÈRE occurrence. Si l'ordre
+// s'inversait un jour, une offre vue des deux côtés sortirait avec l'URL de
+// l'agrégateur au lieu de celle de l'employeur — et tout l'intérêt de crawler
+// la source serait perdu en silence, sans qu'aucun test ne rougisse.
+const ordre = [...jobsSrc.matchAll(/\['([^']+)',\s+\(\) =>/g)].map(m => m[1]);
+check('Greenhouse est dans la liste des collecteurs', ordre.includes('Greenhouse'), ordre.join(' → '));
+const iGH = ordre.indexOf('Greenhouse');
+for (const tiers of ['France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow']) {
+  const i = ordre.indexOf(tiers);
+  check(`Greenhouse passe avant ${tiers} (le dédoublonnage garde la 1re occurrence)`,
+    iGH >= 0 && i >= 0 && iGH < i);
+}
+
+// Exécution réelle de la fonction extraite, avec un KV simulé.
+async function appeler(contenuKV, { q = '', type = '', location = '', page = 0 } = {}) {
+  const journal = [];
+  const bac = {
+    console,
+    kvGet: async () => contenuKV,
+    muet: (j, source, raison, cause) => { j?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
+    FILTRE_VERS_CONTRAT: { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' },
+    resultat: null, journal,
+  };
+  vm.createContext(bac);
+  vm.runInContext(`${blocFetch}; resultat = fetchGreenhouse(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal);`, bac);
+  return { offres: await bac.resultat, journal };
+}
+
+const offreKV = (p = {}) => ({
+  id: 'gh_acme_1', title: 'Développeur Backend', company: 'Acme', location: 'Paris, Paris, France',
+  type: 'CDI', salary: null, description: 'Node.js', url: 'https://job-boards.greenhouse.io/acme/jobs/1',
+  date: '2026-10-01T08:00:00Z', remote: false, source: 'Greenhouse', logo: null, country: 'FR', ...p,
+});
+
+// Le cas qui décide si une panne de cron est visible ou silencieuse.
+const absente = await appeler(null);
+check('une clé KV absente n’est PAS une liste vide — la source est déclarée en échec',
+  absente.offres.length === 0 && absente.journal.at(-1)?.cause === 'collecte_absente',
+  absente.journal.at(-1)?.cause);
+const illisible = await appeler({ offres: 'pas un tableau' });
+check('une clé illisible est déclarée en échec, pas servie',
+  illisible.journal.at(-1)?.cause === 'collecte_absente');
+
+const normal = await appeler({ offres: [offreKV()] });
+check('une clé valide rend ses offres', normal.offres.length === 1 && normal.journal.length === 0);
+
+// La règle du contrat, appliquée à ce collecteur comme aux huit autres.
+const avecInconnu = { offres: [offreKV(), offreKV({ id: 'gh_acme_2', title: 'Account Executive', type: null })] };
+const sousCDI = await appeler(avecInconnu, { type: 'cdi' });
+check('sous filtre CDI, seule l’offre au contrat LU est rendue',
+  sousCDI.offres.length === 1 && sousCDI.offres[0].type === 'CDI');
+const sousCDD = await appeler(avecInconnu, { type: 'cdd' });
+check('sous filtre CDD, une offre au contrat inconnu n’est pas servie comme CDD',
+  sousCDD.offres.length === 0);
+const sansFiltre = await appeler(avecInconnu);
+check('hors filtre, l’offre au contrat inconnu est servie telle quelle',
+  sansFiltre.offres.length === 2);
+
+// La pagination : sans elle, 334 offres françaises passeraient toutes devant
+// les huit autres sources, que `prioritize` classe après la France.
+const cent = { offres: Array.from({ length: 100 }, (_, i) => offreKV({ id: `gh_acme_${i}`, title: `Poste ${i}`, date: `2026-10-${String((i % 28) + 1).padStart(2, '0')}T08:00:00Z` })) };
+const p0 = await appeler(cent);
+const p1 = await appeler(cent, { page: 1 });
+check('une page rend au plus dix offres', p0.offres.length === 10, `${p0.offres.length}`);
+check('deux pages consécutives ne se recouvrent pas',
+  !p0.offres.some(a => p1.offres.some(b => b.id === a.id)));
+check('les plus récentes d’abord',
+  new Date(p0.offres[0].date) >= new Date(p0.offres.at(-1).date));
+const filtreQ = await appeler(cent, { q: 'Poste 7' });
+check('le terme de recherche filtre vraiment', filtreQ.offres.every(o => /Poste 7/.test(o.title)));
+
+console.log('\n── Le cron d’ingest ─────────────────────────────────');
+check('le cron est déclaré dans vercel.json',
+  (vercel.crons || []).some(c => c.path === '/api/cron/collect-greenhouse'),
+  (vercel.crons || []).find(c => c.path === '/api/cron/collect-greenhouse')?.schedule);
+check('le cron tourne plus souvent que la clé n’expire',
+  TTL_SECONDES > 6 * 3600, `TTL ${TTL_SECONDES / 3600} h pour un cron toutes les 6 h`);
+check('la clé lue par jobs.js est celle qu’écrit le cron',
+  CLE_KV === 'greenhouse_jobs' && jobsSrc.includes("kvGet('greenhouse_jobs')"));
+check('le cron refuse un appel sans CRON_SECRET',
+  /CRON_SECRET/.test(cronSrc) && /status: 401/.test(cronSrc));
+check('le cron ne stocke que ce dont le pays est établi comme la France',
+  /country === 'FR'/.test(cronSrc));
+// Le garde qui protège le relevé : si les 28 boards tombent ensemble, écrire
+// une liste vide remplacerait un relevé valide par du vide, et la page
+// afficherait zéro offre en répondant 200.
+check('une collecte vide n’écrase PAS la clé précédente',
+  /if \(!retenues\.length\)/.test(cronSrc) && cronSrc.indexOf('if (!retenues.length)') < cronSrc.indexOf('await kvSet(CLE_KV'));
+check('la borne de taille est posée et journalisée si atteinte',
+  MAX_OFFRES > 0 && /francaises\.length > MAX_OFFRES/.test(cronSrc), `${MAX_OFFRES} offres`);
+check('le jeton collecte_absente est dans le vocabulaire fermé du handler',
+  /const CAUSES = new Set\(\[[^\]]*'collecte_absente'/.test(jobsSrc));
 
 if (failed) { console.error(`\n❌ sonde Greenhouse : ${failed} échec(s)\n`); process.exit(1); }
 console.log(`\n✅ sonde Greenhouse : ${passed} vérifications OK\n`);

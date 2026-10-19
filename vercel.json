@@ -18,6 +18,10 @@
       "schedule": "0 18 * * 0"
     },
     {
+      "path": "/api/cron/collect-greenhouse",
+      "schedule": "0 */6 * * *"
+    },
+    {
       "path": "/api/cron/send-alerts",
       "schedule": "0 7 * * *"
     },
