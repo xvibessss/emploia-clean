@@ -995,7 +995,7 @@ try {
 } catch (e) { fail('contrôle de la numérotation impossible : ' + e.message); }
 
 
-// ── 17. aucun `pull_request` restreint par un filtre de branches ───────────
+// ── 20. aucun `pull_request` restreint par un filtre de branches ───────────
 // Le filtre `branches:` d'un `pull_request` porte sur la branche CIBLE, jamais
 // sur la source. `.github/workflows/ci.yml` a porté `branches: [main]` sous son
 // `pull_request` : toute PR empilée — celle qui vise une autre PR plutôt que
@@ -1018,7 +1018,7 @@ try {
 // scripts/ci/declencheurs.test.mjs sur des extraits construits à la main : la
 // détection doit tenir la différence entre une clé `branches:` et un
 // commentaire qui la cite, et ci.yml est plein de ces commentaires-là.
-console.log('\n[17] aucun pull_request restreint par un filtre de branches');
+console.log('\n[20] aucun pull_request restreint par un filtre de branches');
 try {
   const wfDir = '.github/workflows';
   const workflows = fs.existsSync(wfDir)
@@ -1026,13 +1026,13 @@ try {
     : [];
   if (!workflows.length) fail('aucun workflow dans .github/workflows — motif à revoir');
 
-  let bad17 = 0, declencheurs = 0;
+  let bad20 = 0, declencheurs = 0;
   for (const w of workflows) {
     const texte = fs.readFileSync(`${wfDir}/${w}`, 'utf8');
     declencheurs += analyserDeclencheurs(texte).pullRequest.length;
     for (const f of filtresDeBranches(texte)) {
       fail(`${wfDir}/${w} ligne ${f.ligne} : ${f.declencheur} est restreint par \`${f.cle}:\` — ce filtre porte sur la branche CIBLE, donc aucune PR empilée ne déclencherait ce workflow, et un job qui ne se déclenche pas ne s'affiche nulle part (la panne de la PR 83)`);
-      bad17++;
+      bad20++;
     }
   }
 
@@ -1040,13 +1040,13 @@ try {
   // filtré. Le résultat est identique — les quatre jobs ne tournent sur aucune
   // PR — et tout aussi invisible.
   const ci = `${wfDir}/ci.yml`;
-  if (!exists(ci)) { fail(`${ci} absent — c'est lui qui porte les quatre jobs de PR`); bad17++; }
+  if (!exists(ci)) { fail(`${ci} absent — c'est lui qui porte les quatre jobs de PR`); bad20++; }
   else if (!aDeclencheurPullRequest(fs.readFileSync(ci, 'utf8'))) {
     fail(`${ci} ne se déclenche plus sur pull_request — les quatre jobs ne tourneraient sur aucune PR, sans qu'aucun check ne vire au rouge`);
-    bad17++;
+    bad20++;
   }
 
-  if (!bad17) ok(`${workflows.length} workflows, ${declencheurs} déclencheur(s) pull_request, aucun restreint par branches:`);
+  if (!bad20) ok(`${workflows.length} workflows, ${declencheurs} déclencheur(s) pull_request, aucun restreint par branches:`);
 } catch (e) { fail('contrôle des déclencheurs impossible : ' + e.message); }
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

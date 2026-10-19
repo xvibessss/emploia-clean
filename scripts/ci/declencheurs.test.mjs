@@ -1,6 +1,6 @@
 // Garde des déclencheurs de workflow — le test de la détection elle-même.
 //
-// Le garde [17] de scripts/ci-guards.mjs refuse qu'un `pull_request` soit
+// Le garde [20] de scripts/ci-guards.mjs refuse qu'un `pull_request` soit
 // restreint par `branches:`, parce qu'un tel filtre porte sur la branche CIBLE
 // et laisse toute PR empilée sans aucun des quatre jobs (la panne de la PR 83,
 // mergée avec un garde tarifaire que le job `guards` n'a jamais exécuté).
@@ -228,7 +228,7 @@ try {
   workflows = fs.readdirSync(new URL(WF, ROOT)).filter((n) => /\.ya?ml$/.test(n));
 } catch (e) { ko('lecture de .github/workflows impossible', e.message); }
 
-if (!workflows.length) ko('aucun workflow trouvé', 'motif à revoir — le garde [17] n\'aurait rien à contrôler');
+if (!workflows.length) ko('aucun workflow trouvé', 'motif à revoir — le garde [20] n\'aurait rien à contrôler');
 for (const w of workflows) {
   const trouves = filtresDeBranches(lire(`${WF}/${w}`));
   if (!trouves.length) ok(`${WF}/${w}`, 'aucun pull_request restreint');
