@@ -35,7 +35,11 @@ const walk = (dir, out = []) => {
     if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
     const rel = `${dir}/${e.name}`.replace(/^\.\//, '');
     if (e.isDirectory()) walk(rel, out);
-    else if (/\.(html|js|css|json)$/.test(e.name)) out.push(rel);
+    // .svg inclus : `opengraph.svg` — l'image de partage servie sur toutes
+    // les pages — répétait « 100% français » sans que cette sonde puisse le
+    // voir, son filtre s'arrêtant au JSON. Une image porte du texte comme
+    // une page, et celle-là est la première chose qu'un prospect voit.
+    else if (/\.(html|js|css|json|svg)$/.test(e.name)) out.push(rel);
   }
   return out;
 };

@@ -32,13 +32,17 @@
   <text x="160" y="104" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-0.5">Emploia</text>
 
   <!-- France flag indicator -->
-  <rect x="260" y="80" width="32" height="32" rx="8" fill="rgba(255,255,255,0.08)"/>
-  <text x="276" y="102" font-size="18" text-anchor="middle">🇫🇷</text>
+  <clipPath id="flagClip"><rect x="260" y="80" width="32" height="32" rx="8"/></clipPath>
+  <g clip-path="url(#flagClip)">
+    <rect x="260" y="80" width="10.67" height="32" fill="#0055A4"/>
+    <rect x="270.67" y="80" width="10.67" height="32" fill="#F5F5F5"/>
+    <rect x="281.33" y="80" width="10.67" height="32" fill="#EF4135"/>
+  </g>
 
   <!-- Main headline -->
   <text x="80" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="900" fill="white" letter-spacing="-2.5">Le copilote IA</text>
-  <text x="80" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="900" fill="url(#badge)" letter-spacing="-2.5">100% français</text>
-  <text x="80" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="900" fill="white" letter-spacing="-2.5">pour l'emploi.</text>
+  <text x="80" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="900" fill="url(#badge)" letter-spacing="-2.5">qui candidate</text>
+  <text x="80" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="900" fill="white" letter-spacing="-2.5">à votre place.</text>
 
   <!-- Subline -->
   <text x="80" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#94a3b8" letter-spacing="-0.3">CV ATS-optimisé · Lettre de motivation · Coaching entretien</text>
@@ -48,10 +52,10 @@
   <text x="190" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#a5b4fc" text-anchor="middle">30 secondes / CV</text>
 
   <rect x="316" y="500" width="210" height="52" rx="12" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
-  <text x="421" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#6ee7b7" text-anchor="middle">2.4× d'entretiens</text>
+  <text x="421" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#6ee7b7" text-anchor="middle">Sans carte bancaire</text>
 
-  <rect x="542" y="500" width="180" height="52" rx="12" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
-  <text x="632" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#93c5fd" text-anchor="middle">Gratuit / 9€</text>
+  <rect x="542" y="500" width="216" height="52" rx="12" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+  <text x="650" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#93c5fd" text-anchor="middle">5 générations offertes</text>
 
   <!-- Right side — score card visual -->
   <rect x="820" y="160" width="320" height="300" rx="20" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
@@ -71,6 +75,6 @@
   <rect x="973" y="335" width="105" height="30" rx="8" fill="rgba(99,102,241,0.15)"/>
   <text x="1025" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#a5b4fc" text-anchor="middle">Mots-clés ✓</text>
 
-  <!-- emploia.fr watermark -->
-  <text x="1160" y="598" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569" text-anchor="end" letter-spacing="-0.3">emploia.fr</text>
+  <!-- emploia.eu watermark -->
+  <text x="1160" y="598" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#475569" text-anchor="end" letter-spacing="-0.3">emploia.eu</text>
 </svg>
