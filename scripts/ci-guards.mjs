@@ -8,6 +8,7 @@
 ═══════════════════════════════════════════════════════════════════ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { analyserDeclencheurs, filtresDeBranches, aDeclencheurPullRequest } from './ci/declencheurs.mjs';
 
 let fails = 0;
 const fail = m => { console.error('  ✗ ' + m); fails++; };
@@ -521,6 +522,24 @@ try {
     }
   }
 
+  // Une pastille de notification annonce un message en attente. Celle du
+  // widget de support était écrite en dur — `<span id="emp-sw-badge">1</span>`
+  // — en rouge et pulsante, sur les 181 pages chargeant shared.js, alors que
+  // le panneau s'ouvrait sur un accueil générique : aucun message n'existait.
+  // Ce n'est pas un nombre tiré au hasard, c'est un nombre simplement faux, et
+  // c'est le premier visiteur — donc tout visiteur venu de TikTok — qui le voit.
+  // Restreint aux .js : une pastille écrite dans le HTML d'une page est du
+  // contenu rédigé — les « 27 » et « 16 » de blog.html comptent les articles
+  // d'une catégorie, et c'est juste. Une pastille fabriquée par du code avec
+  // un chiffre LITTÉRAL, elle, n'a par construction aucune source de données.
+  for (const f of visibles.filter((p) => p.endsWith('.js'))) {
+    const src = readAll(f);
+    for (const m of src.matchAll(/<span[^>]*\b(?:id|class)="[^"${]*badge[^"${]*"[^>]*>(\d+)<\/span>/gi)) {
+      fail(`${f} : pastille de notification fabriquée avec le littéral « ${m[1]} » — rien ne la calcule, elle annonce un message qui n'existe pas`);
+      simules++;
+    }
+  }
+
   // Chaque entrée porte ce qu'elle affirmait et pourquoi elle est partie.
   const RETIREES = [
     [/2\s?847/, 'nombre d\'utilisateurs inventé — retiré d\'employeurs.html par 9b214e0, puis de sa rangée STATS et d\'un email'],
@@ -826,7 +845,7 @@ try {
   }
 } catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
 
-// ── 15. image de partage : servie, raster, et à jour ──────────────────────
+// ── 17. image de partage : servie, raster, et à jour ──────────────────────
 // Un lien d'EmploiA partagé sur TikTok, LinkedIn ou WhatsApp n'affichait
 // aucune image, et de deux façons à la fois. 165 pages désignaient
 // `opengraph.svg` : aucune plateforme n'accepte `image/svg+xml`. Les 4 autres,
@@ -843,7 +862,7 @@ try {
 //
 // Ce garde compare une empreinte, pas des pixels : la CI n'a pas besoin de
 // Chrome pour l'exécuter.
-console.log('\n[15] image de partage — servie, raster et à jour');
+console.log('\n[17] image de partage — servie, raster et à jour');
 try {
   const RASTER = /\.(png|jpe?g|webp|gif)$/i;
   const pages = walk('.').filter(
@@ -879,7 +898,157 @@ try {
 
   if (!mauvais && !sans) ok(`toutes les pages indexables pointent vers une image servie et rasterisée, à jour avec ${SVG}`);
 } catch (e) { fail("contrôle de l'image de partage impossible : " + e.message); }
-// ── 17. l'alerte de régression SEO reste exerçable, et pas affaiblie ──────
+// ── 18. icônes d'application : servies, et au format que l'OS sait lire ───
+// `apple-touch-icon` désignait `favicon.svg`. iOS n'accepte pas le SVG pour
+// cette balise : Safari exige du PNG. Un candidat qui ajoute EmploiA à son
+// écran d'accueil — le geste naturel pour un outil qu'on rouvre chaque jour
+// pendant une recherche — n'y trouvait donc pas le logo, mais une vignette
+// produite par le système. Même défaut de format que l'og:image du [15], sur
+// une autre surface que personne ne regarde depuis un poste de travail.
+//
+// Les PNG sont dérivés de `favicon.svg` par `npm run assets:icones`, et
+// l'empreinte enregistrée détecte la dérive sans Chrome en CI, comme pour
+// l'image de partage.
+console.log("\n[18] icônes d'application — servies et au bon format");
+try {
+  const pages = walk('.').filter(
+    (p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes('chrome-extension'),
+  );
+  // rel → formats que le consommateur sait lire. `icon` accepte le SVG depuis
+  // longtemps dans tous les navigateurs de bureau et mobiles ; `apple-touch-icon`
+  // non, et c'est toute la différence.
+  const ATTENDU = {
+    'apple-touch-icon': { re: /\.(png|jpe?g)$/i, pourquoi: 'iOS exige du PNG pour cette balise' },
+    icon: { re: /\.(svg|png|ico)$/i, pourquoi: 'format non reconnu comme favicon' },
+    manifest: { re: /\.(json|webmanifest)$/i, pourquoi: 'le manifeste doit être du JSON' },
+  };
+  let mauvais = 0;
+  for (const f of pages) {
+    const src = readAll(f);
+    for (const [rel, { re, pourquoi }] of Object.entries(ATTENDU)) {
+      const m = src.match(new RegExp(`<link[^>]*rel="${rel}"[^>]*href="([^"]+)"`));
+      if (!m) {
+        if (rel === 'manifest') continue; // facultatif : toutes les pages ne sont pas installables
+        fail(`${f} : aucun <link rel="${rel}"> — l'OS devra deviner`);
+        mauvais++;
+        continue;
+      }
+      const href = m[1];
+      if (!href.startsWith('/')) {
+        fail(`${f} : rel="${rel}" en chemin relatif « ${href} » — résolu depuis le dossier de la page, cassé dès qu'elle bouge`);
+        mauvais++;
+        continue;
+      }
+      if (!exists('.' + href.split('?')[0])) {
+        fail(`${f} : rel="${rel}" vers ${href} — ce fichier n'existe pas`);
+        mauvais++;
+        continue;
+      }
+      if (!re.test(href.split('?')[0])) {
+        fail(`${f} : rel="${rel}" en ${href.split('.').pop()} — ${pourquoi}`);
+        mauvais++;
+      }
+    }
+  }
+
+  // Le manifeste doit proposer au moins un PNG de 192 et un de 512 : ce sont
+  // les deux seuils que tous ses consommateurs savent lire, `sizes="any"` ou pas.
+  const man = JSON.parse(readAll('manifest.json'));
+  for (const taille of ['192x192', '512x512']) {
+    const i = (man.icons || []).find((x) => x.sizes === taille && /png$/i.test(x.src || ''));
+    if (!i) { fail(`manifest.json : aucune icône PNG ${taille}`); mauvais++; }
+    else if (!exists('.' + i.src)) { fail(`manifest.json : ${i.src} déclarée mais absente`); mauvais++; }
+  }
+
+  const { empreinteSource, SOURCE, HASH, CIBLES } = await import('./assets/icones.mjs');
+  for (const { fichier } of CIBLES) {
+    if (!exists(fichier)) { fail(`${fichier} absente — régénérer avec : npm run assets:icones`); mauvais++; }
+  }
+  const enregistree = exists(HASH) ? readAll(HASH).trim() : null;
+  if (enregistree !== empreinteSource()) {
+    fail(`${SOURCE} a changé depuis la dernière rasterisation — régénérer avec : npm run assets:icones`);
+    mauvais++;
+  }
+
+  if (!mauvais) ok(`${pages.length} pages déclarent une icône et une apple-touch-icon servies, et le manifeste porte ses PNG`);
+} catch (e) { fail("contrôle des icônes impossible : " + e.message); }
+
+// ── 19. ce fichier se contrôle lui-même : numéros uniques et continus ─────
+// Deux sessions travaillant en parallèle ont pris le numéro [15] chacune de
+// leur côté — l'une pour les tests dormants, l'autre pour l'image de partage
+// — et les deux ont été fusionnées dans main. Rien ne l'a signalé : les deux
+// sections tournent, seul leur étiquetage ment. Le coût est réel quand on
+// lit un journal de CI ou qu'on dit « le garde [15] a échoué » sans savoir
+// duquel on parle.
+//
+// Le contrôle est cosmétique et tient en six lignes ; il a sa place ici
+// précisément parce que personne ne pensera à le faire à la main.
+console.log('\n[19] numérotation des sections — unique et continue');
+try {
+  const src = readAll('scripts/ci-guards.mjs');
+  const nums = [...src.matchAll(/console\.log\(["']\\n\[(\d+)\]/g)].map((m) => Number(m[1]));
+  const doublons = nums.filter((n, i) => nums.indexOf(n) !== i);
+  const trous = nums.map((n, i) => (i && n !== nums[i - 1] + 1 ? `${nums[i - 1]}→${n}` : null)).filter(Boolean);
+  if (doublons.length) fail(`numéro(s) de section en double : ${[...new Set(doublons)].join(', ')}`);
+  if (trous.length) fail(`numérotation discontinue : ${trous.join(', ')}`);
+  if (!doublons.length && !trous.length) ok(`${nums.length} sections numérotées de 1 à ${nums[nums.length - 1]}, sans doublon ni trou`);
+} catch (e) { fail('contrôle de la numérotation impossible : ' + e.message); }
+
+
+// ── 20. aucun `pull_request` restreint par un filtre de branches ───────────
+// Le filtre `branches:` d'un `pull_request` porte sur la branche CIBLE, jamais
+// sur la source. `.github/workflows/ci.yml` a porté `branches: [main]` sous son
+// `pull_request` : toute PR empilée — celle qui vise une autre PR plutôt que
+// main — ne déclenchait AUCUN des quatre jobs. Rien ne virait au rouge, parce
+// que GitHub n'affiche pas un job qui ne se déclenche pas ; seuls les checks
+// Vercel apparaissaient, verts, et la PR avait l'air gardée.
+//
+// La PR 83 en a été la victime : elle ajoutait un garde tarifaire câblé dans le
+// job `guards`, ce job n'a jamais tourné dessus, et elle a été mergée ainsi.
+// La PR 86 a retiré le filtre — une ligne de YAML, qu'une autre ligne de YAML
+// peut réintroduire et qu'un nouveau workflow peut recopier. Sa disparition
+// serait exactement aussi silencieuse que la panne d'origine : c'est pourquoi
+// le correctif se double d'un garde.
+//
+// Même famille que [15] : un contrôle câblé mais jamais exécuté ne garde rien.
+// [15] vérifie que les tests sont câblés dans un workflow, celui-ci vérifie que
+// le workflow qui les porte se déclenche bien.
+//
+// La lecture du YAML vit dans scripts/ci/declencheurs.mjs, éprouvée par
+// scripts/ci/declencheurs.test.mjs sur des extraits construits à la main : la
+// détection doit tenir la différence entre une clé `branches:` et un
+// commentaire qui la cite, et ci.yml est plein de ces commentaires-là.
+console.log('\n[20] aucun pull_request restreint par un filtre de branches');
+try {
+  const wfDir = '.github/workflows';
+  const workflows = fs.existsSync(wfDir)
+    ? fs.readdirSync(wfDir).filter(n => /\.ya?ml$/.test(n))
+    : [];
+  if (!workflows.length) fail('aucun workflow dans .github/workflows — motif à revoir');
+
+  let bad20 = 0, declencheurs = 0;
+  for (const w of workflows) {
+    const texte = fs.readFileSync(`${wfDir}/${w}`, 'utf8');
+    declencheurs += analyserDeclencheurs(texte).pullRequest.length;
+    for (const f of filtresDeBranches(texte)) {
+      fail(`${wfDir}/${w} ligne ${f.ligne} : ${f.declencheur} est restreint par \`${f.cle}:\` — ce filtre porte sur la branche CIBLE, donc aucune PR empilée ne déclencherait ce workflow, et un job qui ne se déclenche pas ne s'affiche nulle part (la panne de la PR 83)`);
+      bad20++;
+    }
+  }
+
+  // L'autre moitié de la même panne : le déclencheur retiré au lieu d'être
+  // filtré. Le résultat est identique — les quatre jobs ne tournent sur aucune
+  // PR — et tout aussi invisible.
+  const ci = `${wfDir}/ci.yml`;
+  if (!exists(ci)) { fail(`${ci} absent — c'est lui qui porte les quatre jobs de PR`); bad20++; }
+  else if (!aDeclencheurPullRequest(fs.readFileSync(ci, 'utf8'))) {
+    fail(`${ci} ne se déclenche plus sur pull_request — les quatre jobs ne tourneraient sur aucune PR, sans qu'aucun check ne vire au rouge`);
+    bad20++;
+  }
+
+  if (!bad20) ok(`${workflows.length} workflows, ${declencheurs} déclencheur(s) pull_request, aucun restreint par branches:`);
+} catch (e) { fail('contrôle des déclencheurs impossible : ' + e.message); }
+// ── 21. l'alerte de régression SEO reste exerçable, et pas affaiblie ──────
 // Même famille que le garde [15] : un contrôle câblé mais jamais exécuté ne
 // garde rien. L'étape « Ouvrir une issue en cas d'échec » de
 // seo-regression.yml n'avait jamais tourné une seule fois — le workflow audite
@@ -894,64 +1063,64 @@ try {
 // vraie. Ce garde est structurel pour qu'aucune des trois ne passe par
 // inadvertance : la forme est ce qui se dégrade en silence sous une
 // correction pressée.
-console.log('\n[17] alerte de régression SEO : exerçable sans être affaiblie');
+console.log('\n[21] alerte de régression SEO : exerçable sans être affaiblie');
 try {
   const MODULE = 'scripts/seo/alerte-regression.cjs';
   const CONDITION_REELLE = "if: failure() && github.event_name == 'schedule'";
   const wf = readAll('.github/workflows/seo-regression.yml');
   const moduleSrc = readAll(MODULE);
-  let bad17 = 0;
+  let bad21 = 0;
 
   if (!moduleSrc) {
     fail(`${MODULE} absent — le corps de l'alerte doit vivre dans un module exerçable, pas inline dans le YAML`);
-    bad17++;
+    bad21++;
   } else if (/process\.env/.test(moduleSrc)) {
     fail(`${MODULE} lit l'environnement — le mode répétition doit rester un paramètre, sinon une variable mal posée fait taire l'alerte`);
-    bad17++;
+    bad21++;
   }
 
   if (!wf) {
     fail('.github/workflows/seo-regression.yml introuvable — motif à revoir');
-    bad17++;
+    bad21++;
   } else {
     // Chaque étape du fichier commence par six espaces, un tiret, une espace.
     const etapes = wf.split(/\n {6}- /).slice(1);
     const reelle = etapes.find(e => /Ouvrir une issue en cas d/.test(e));
     const repetition = etapes.find(e => /repetition: true/.test(e));
 
-    if (!reelle) { fail("l'étape « Ouvrir une issue en cas d'échec » a disparu de seo-regression.yml"); bad17++; }
+    if (!reelle) { fail("l'étape « Ouvrir une issue en cas d'échec » a disparu de seo-regression.yml"); bad21++; }
     else {
       if (!reelle.includes(CONDITION_REELLE)) {
         fail(`la condition de l'alerte réelle n'est plus « ${CONDITION_REELLE} » — l'élargir pour la tester la ferait se déclencher à tort, la rétrécir la rendrait muette`);
-        bad17++;
+        bad21++;
       }
       if (/repetition/.test(reelle)) {
         fail("l'étape d'alerte réelle mentionne la répétition — elle ne doit porter aucun interrupteur, sinon une entrée de workflow peut la faire taire");
-        bad17++;
+        bad21++;
       }
-      if (!reelle.includes(MODULE)) { fail(`l'étape d'alerte réelle n'appelle pas ${MODULE}`); bad17++; }
+      if (!reelle.includes(MODULE)) { fail(`l'étape d'alerte réelle n'appelle pas ${MODULE}`); bad21++; }
     }
 
-    if (!repetition) { fail("l'étape de répétition a disparu — l'alerte redeviendrait intestable autrement qu'en attendant une panne"); bad17++; }
+    if (!repetition) { fail("l'étape de répétition a disparu — l'alerte redeviendrait intestable autrement qu'en attendant une panne"); bad21++; }
     else {
       if (!/github\.event_name == 'workflow_dispatch'/.test(repetition)) {
         fail("l'étape de répétition ne se limite pas au workflow_dispatch — elle doit être hors d'atteinte d'un `schedule`");
-        bad17++;
+        bad21++;
       }
       if (!repetition.includes(MODULE)) {
         fail(`l'étape de répétition n'appelle pas ${MODULE} — elle répéterait autre chose que l'alerte réelle`);
-        bad17++;
+        bad21++;
       }
     }
 
     const armements = (wf.match(/repetition: true/g) || []).length;
     if (armements !== 1) {
       fail(`${armements} étape(s) arment le mode répétition, une seule est attendue`);
-      bad17++;
+      bad21++;
     }
   }
 
-  if (!bad17) ok("condition de l'alerte réelle intacte, répétition réservée au workflow_dispatch, drapeau passé en paramètre");
+  if (!bad21) ok("condition de l'alerte réelle intacte, répétition réservée au workflow_dispatch, drapeau passé en paramètre");
 } catch (e) { fail("contrôle de l'alerte de régression SEO impossible : " + e.message); }
 
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
