@@ -19,17 +19,36 @@ import { BOARDS } from '../_lib/greenhouse-boards.js';
 
 export const CLE_KV = 'greenhouse_jobs';
 
-// 36 heures, pour un cron qui tourne toutes les 6 heures. Le rapport est
-// délibéré : cinq collectes consécutives peuvent échouer avant que la clé
-// disparaisse, et à la sixième la source bascule dans `sourcesEnEchec` avec la
-// cause `collecte_absente`.
+// 72 heures, pour un cron QUOTIDIEN. Le rapport est délibéré : deux collectes
+// consécutives peuvent échouer avant que la clé disparaisse, et à la troisième
+// la source bascule dans `sourcesEnEchec` avec la cause `collecte_absente`.
 //
-// C'est le point : la clé EXPIRE au lieu de vivre indéfiniment. Un TTL infini
-// aurait servi éternellement le dernier relevé réussi, et une panne de cron
-// serait restée invisible — exactement le silence que `causesEnEchec` est venu
-// retirer pour les huit sources amont. Mieux vaut une source déclarée morte
-// qu'une source qui sert du périmé sans le dire.
-export const TTL_SECONDES = 36 * 3600;
+// Pourquoi quotidien et pas toutes les six heures, qui était le premier choix :
+// LE PLAN VERCEL L'INTERDIT. Le compte est en Hobby, où un cron ne peut tourner
+// qu'une fois par jour — « Cron expressions that would run more frequently will
+// fail during deployment ». Ce n'est pas un avertissement : `0 */6 * * *` a fait
+// ÉCHOUER le déploiement de la PR 99 sur les deux projets, avant même le build.
+// Les neuf autres crons du dépôt sont tous quotidiens ou hebdomadaires, ce qui
+// explique qu'aucun ne l'ait jamais rencontré. `scripts/smoke/greenhouse.test.mjs`
+// vérifie désormais la fréquence en local, pour que cette contrainte se découvre
+// avant la poussée plutôt qu'en lisant un lien d'erreur.
+//
+// Le coût est réel et il faut le dire : les offres sont rafraîchies une fois par
+// jour, pas quatre. C'est acceptable pour des offres d'emploi, qui restent
+// ouvertes des semaines — mais une offre pourvue peut rester servie jusqu'à 24 h
+// de plus qu'avec le réglage voulu. Passer en Pro lèverait la contrainte.
+//
+// Et l'heure n'est pas indifférente : 4 h du matin, donc AVANT le cron
+// d'alertes de 7 h, pour que les emails d'alerte lisent un relevé du jour et
+// non celui de la veille. Hobby ne garantit la précision qu'à l'heure près
+// (±59 min), ce qui laisse encore deux heures de marge.
+//
+// C'est le point du TTL : la clé EXPIRE au lieu de vivre indéfiniment. Un TTL
+// infini aurait servi éternellement le dernier relevé réussi, et une panne de
+// cron serait restée invisible — exactement le silence que `causesEnEchec` est
+// venu retirer pour les huit sources amont. Mieux vaut une source déclarée
+// morte qu'une source qui sert du périmé sans le dire.
+export const TTL_SECONDES = 72 * 3600;
 
 // MESURÉ : 668 octets par offre, soit 218 Ko pour les 334 offres du relevé du
 // 2026-10-19. La borne existe parce que ce chiffre est fonction du catalogue :

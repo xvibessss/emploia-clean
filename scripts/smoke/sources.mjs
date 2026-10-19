@@ -37,11 +37,12 @@ const ABSENCES_CONNUES = {
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
   // la clé `greenhouse_jobs` est remplie par `api/cron/collect-greenhouse`, et
   // elle n'existe pas avant la première exécution du cron suivant un
-  // déploiement. Elle expire ensuite au bout de 36 h, soit six collectes : si
-  // cette absence persiste au-delà, le cron ne tourne plus et ce n'est PAS une
-  // absence tolérable — l'entrée dit le délai au bout duquel elle devient une
-  // panne, pour ne pas devenir le silence qu'elle est censée éviter.
-  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-greenhouse ; au-delà de 36 h, c'est une panne de cron",
+  // déploiement. Elle expire ensuite au bout de 72 h, soit trois exécutions du
+  // cron quotidien : si cette absence persiste au-delà, le cron ne tourne plus
+  // et ce n'est PAS une absence tolérable — l'entrée dit le délai au bout
+  // duquel elle devient une panne, pour ne pas devenir le silence qu'elle est
+  // censée éviter.
+  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-greenhouse ; au-delà de 72 h, c'est une panne de cron",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et

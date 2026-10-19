@@ -296,12 +296,35 @@ La condition bloquante de la section 6 est tenue : **le collecteur ne tourne
 jamais dans le chemin de la requête.**
 
 ```
-/api/cron/collect-greenhouse   toutes les 6 h   28 boards → filtre FR → clé KV
+/api/cron/collect-greenhouse   1×/jour à 4 h   28 boards → filtre FR → clé KV
          ↓
-   greenhouse_jobs  (TTL 36 h, ~218 Ko)
+   greenhouse_jobs  (TTL 72 h, ~218 Ko)
          ↓
 /api/jobs  →  fetchGreenhouse()  =  un kvGet, pas 28 requêtes HTTP
 ```
+
+**La fréquence est imposée par le plan, pas choisie.** Le premier réglage était
+`0 */6 * * *`, et il a fait **échouer le déploiement** de la PR 99 sur les deux
+projets Vercel, avant même le build : le compte est en plan **Hobby**, où un
+cron ne peut tourner qu'une fois par jour — *« cron expressions that would run
+more frequently will fail during deployment »*. Les neuf autres crons du dépôt
+sont tous quotidiens ou hebdomadaires, ce qui explique que personne n'avait
+rencontré la contrainte.
+
+Le coût est réel : les offres sont rafraîchies une fois par jour et non quatre,
+donc une offre pourvue peut rester servie jusqu'à 24 h de plus. C'est
+acceptable pour des offres d'emploi, qui restent ouvertes des semaines ; passer
+en Pro lèverait la contrainte. L'heure n'est pas indifférente — 4 h du matin,
+soit **avant** le cron d'alertes de 7 h, pour que les emails lisent un relevé
+du jour. Hobby ne garantit la précision qu'à l'heure près (±59 min), ce qui
+laisse deux heures de marge.
+
+Et surtout : **la contrainte est désormais un test**. Une fréquence trop élevée
+ne casse pas un test, elle casse un *déploiement*, ce qui ne se découvre
+qu'après la poussée. `scripts/smoke/greenhouse.test.mjs` vérifie maintenant la
+forme de l'expression cron — pour les **dix** crons du dépôt, pas seulement
+celui-ci, parce qu'un garde qui ne couvre que le dernier ajouté laisserait le
+prochain retomber dedans.
 
 C'est la forme qu'avaient déjà les offres déposées par les employeurs
 (`employer_jobs` + `fetchEmployerJobs`) ; la clé est simplement remplie par un
@@ -321,8 +344,8 @@ ensemble, écrire `offres: []` remplacerait un relevé valide par du vide, et la
 page afficherait zéro offre Greenhouse en répondant 200. L'ancienne valeur vit
 sur son TTL : périmée mais vraie.
 
-*La clé expire au lieu de vivre indéfiniment.* 36 h pour un cron qui tourne
-toutes les 6 h : cinq collectes consécutives peuvent échouer avant que la
+*La clé expire au lieu de vivre indéfiniment.* 72 h pour un cron quotidien :
+deux collectes consécutives peuvent échouer avant que la
 source bascule dans `sourcesEnEchec` avec la cause **`collecte_absente`** — un
 jeton ajouté au vocabulaire fermé, distinct de `cle_absente` qui se lirait
 « il manque une variable d'environnement » et enverrait chercher la panne au
@@ -340,9 +363,9 @@ source serait perdu en silence — d'où le test.
 pour tout collecteur absent sans raison écrite. `Greenhouse` y est inscrit avec
 la sienne, et avec le délai au bout duquel elle cesse d'être tolérable : la clé
 n'existe pas avant la première exécution du cron suivant un déploiement, et
-au-delà de 36 h ce n'est plus une absence normale mais une panne de cron.
+au-delà de 72 h ce n'est plus une absence normale mais une panne de cron.
 
-La sonde est passée de 62 à **88 vérifications** : 26 de plus pour
+La sonde est passée de 62 à **93 vérifications** : 31 de plus pour
 l'intégration seule, dont la pagination à dix offres par page — sans elle, les
 334 offres françaises passeraient toutes devant les huit autres sources, que
 `prioritize` classe après la France.
@@ -352,9 +375,9 @@ l'intégration seule, dont la pagination à dix offres par page — sans elle, l
 1. **`CRON_SECRET` doit exister dans l'environnement Vercel du projet.** Les
    neuf autres crons s'en servent déjà, donc la variable est probablement là —
    à vérifier avant de considérer le cron actif.
-2. **Vérifier la première exécution.** Jusqu'à elle, `/api/jobs` déclarera
-   `Greenhouse` en `collecte_absente`, ce qui est le comportement correct et
-   non une panne. `npm run smoke:sources` le dira.
+2. **Vérifier la première exécution** (le lendemain 4 h au plus tard). Jusqu'à
+   elle, `/api/jobs` déclarera `Greenhouse` en `collecte_absente`, ce qui est
+   le comportement correct et non une panne. `npm run smoke:sources` le dira.
 3. **Le catalogue reste le vrai levier** (section 6, condition 2), et
    **Lever est la cible suivante** : Greenhouse ne rend que 5,2 % d'offres
    françaises, et les scale-ups FR y sont toutes en 404.

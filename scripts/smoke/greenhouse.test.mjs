@@ -282,8 +282,56 @@ console.log('\n── Le cron d’ingest ─────────────
 check('le cron est déclaré dans vercel.json',
   (vercel.crons || []).some(c => c.path === '/api/cron/collect-greenhouse'),
   (vercel.crons || []).find(c => c.path === '/api/cron/collect-greenhouse')?.schedule);
-check('le cron tourne plus souvent que la clé n’expire',
-  TTL_SECONDES > 6 * 3600, `TTL ${TTL_SECONDES / 3600} h pour un cron toutes les 6 h`);
+// LE GARDE QUI VIENT D'UN ÉCHEC RÉEL. Le premier réglage était `0 */6 * * *`,
+// et il a fait échouer le déploiement de la PR 99 sur les deux projets Vercel,
+// avant même le build : le compte est en plan Hobby, où « cron jobs can only
+// run once per day » et « cron expressions that would run more frequently will
+// fail during deployment ».
+//
+// Les neuf autres crons du dépôt sont tous quotidiens ou hebdomadaires, donc
+// personne n'avait rencontré la contrainte — et rien ne la disait. Une
+// fréquence trop élevée ne casse pas un test, elle casse un DÉPLOIEMENT, ce
+// qui se découvre après la poussée en ouvrant un lien d'erreur. Ce garde la
+// ramène en local.
+//
+// Il vérifie la forme d'un cron quotidien : minute et heure fixes, jour, mois
+// et jour de semaine à `*`. Tout pas (`*/6`), toute liste (`1,13`), tout
+// intervalle (`0-12`) et tout `*` dans le champ des heures tournent plus d'une
+// fois par jour et sont refusés.
+const cronGH = (vercel.crons || []).find(c => c.path === '/api/cron/collect-greenhouse');
+const champs = String(cronGH?.schedule ?? '').trim().split(/\s+/);
+check('le cron a une expression à cinq champs', champs.length === 5, cronGH?.schedule);
+const [minute, heure, jour, mois, semaine] = champs;
+check('le plan Hobby n’autorise qu’une exécution par jour : minute et heure fixes',
+  /^\d{1,2}$/.test(minute) && /^\d{1,2}$/.test(heure),
+  `minute="${minute}" heure="${heure}"`);
+check('et les champs jour / mois / jour-de-semaine ne restreignent pas le quotidien',
+  jour === '*' && mois === '*' && semaine === '*');
+// La règle vaut pour TOUS les crons du dépôt, pas seulement le nôtre : le
+// déploiement échoue pour n'importe lequel, et un garde qui ne couvre que le
+// dernier ajouté laisserait le prochain retomber dedans.
+const tropFrequents = (vercel.crons || []).filter(c => {
+  const f = String(c.schedule ?? '').trim().split(/\s+/);
+  if (f.length !== 5) return true;
+  // Hebdomadaire ou mensuel : moins d'une fois par jour, donc permis.
+  const quotidienOuMoins = /^\d{1,2}$/.test(f[0]) && /^\d{1,2}$/.test(f[1]);
+  return !quotidienOuMoins;
+});
+check('aucun cron du dépôt ne tourne plus d’une fois par jour (plan Hobby)',
+  tropFrequents.length === 0,
+  tropFrequents.length ? tropFrequents.map(c => `${c.path} → ${c.schedule}`).join(', ') : `${(vercel.crons || []).length} crons vérifiés`);
+
+check('la clé survit à plusieurs exécutions manquées du cron quotidien',
+  TTL_SECONDES > 24 * 3600, `TTL ${TTL_SECONDES / 3600} h pour un cron quotidien`);
+// Le cron de collecte doit précéder celui des alertes, sinon les emails du
+// matin lisent le relevé de la veille.
+const cronAlertes = (vercel.crons || []).find(c => c.path === '/api/cron/send-alerts');
+if (cronAlertes) {
+  const hGH = Number(String(cronGH?.schedule).trim().split(/\s+/)[1]);
+  const hAl = Number(String(cronAlertes.schedule).trim().split(/\s+/)[1]);
+  check('la collecte tourne avant l’envoi des alertes',
+    Number.isFinite(hGH) && Number.isFinite(hAl) && hGH < hAl, `collecte ${hGH} h, alertes ${hAl} h`);
+}
 check('la clé lue par jobs.js est celle qu’écrit le cron',
   CLE_KV === 'greenhouse_jobs' && jobsSrc.includes("kvGet('greenhouse_jobs')"));
 check('le cron refuse un appel sans CRON_SECRET',

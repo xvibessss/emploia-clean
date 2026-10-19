@@ -110,8 +110,8 @@ function muet(journal, source, raison, cause) {
 // `collecte_absente` est le jeton du collecteur Greenhouse, et il dit une
 // chose que les autres ne savaient pas dire : la source n'a pas échoué, elle
 // n'a RIEN À LIRE. Sa clé KV est remplie par `api/cron/collect-greenhouse` et
-// expire au bout de 36 h ; absente, c'est que le cron n'a pas tourné depuis
-// six collectes. Réutiliser `cle_absente` se serait lu « il manque une
+// expire au bout de 72 h ; absente, c'est que le cron quotidien n'a pas tourné
+// depuis trois jours. Réutiliser `cle_absente` se serait lu « il manque une
 // variable d'environnement » et aurait envoyé chercher la panne au mauvais
 // endroit.
 const CAUSES = new Set(['cle_absente', 'collecte_absente', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
@@ -538,8 +538,9 @@ async function fetchFranceTravail(q, type, location, page, journal) {
 
 // ── GREENHOUSE (crawl direct des ATS, via Upstash KV) ─
 // Le seul collecteur qui ne sorte pas sur le réseau. Les 28 boards Greenhouse
-// sont crawlés par `api/cron/collect-greenhouse` toutes les six heures, et ce
-// qu'on lit ici est le relevé qu'il a déposé. La raison est mesurée : la
+// sont crawlés une fois par jour par `api/cron/collect-greenhouse` — le plan
+// Hobby n'autorise pas plus souvent — et ce qu'on lit ici est le relevé qu'il
+// a déposé. La raison est mesurée : la
 // collecte prend 10,1 s, le handler borne chaque source à 10 s, et la durée
 // d'un crawl ATS croît avec le nombre d'entreprises — ce qu'une requête
 // utilisateur ne peut pas se permettre.
