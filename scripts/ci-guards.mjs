@@ -8,6 +8,7 @@
 ═══════════════════════════════════════════════════════════════════ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { analyserDeclencheurs, filtresDeBranches, aDeclencheurPullRequest } from './ci/declencheurs.mjs';
 
 let fails = 0;
 const fail = m => { console.error('  ✗ ' + m); fails++; };
@@ -993,5 +994,59 @@ try {
   if (!doublons.length && !trous.length) ok(`${nums.length} sections numérotées de 1 à ${nums[nums.length - 1]}, sans doublon ni trou`);
 } catch (e) { fail('contrôle de la numérotation impossible : ' + e.message); }
 
+
+// ── 20. aucun `pull_request` restreint par un filtre de branches ───────────
+// Le filtre `branches:` d'un `pull_request` porte sur la branche CIBLE, jamais
+// sur la source. `.github/workflows/ci.yml` a porté `branches: [main]` sous son
+// `pull_request` : toute PR empilée — celle qui vise une autre PR plutôt que
+// main — ne déclenchait AUCUN des quatre jobs. Rien ne virait au rouge, parce
+// que GitHub n'affiche pas un job qui ne se déclenche pas ; seuls les checks
+// Vercel apparaissaient, verts, et la PR avait l'air gardée.
+//
+// La PR 83 en a été la victime : elle ajoutait un garde tarifaire câblé dans le
+// job `guards`, ce job n'a jamais tourné dessus, et elle a été mergée ainsi.
+// La PR 86 a retiré le filtre — une ligne de YAML, qu'une autre ligne de YAML
+// peut réintroduire et qu'un nouveau workflow peut recopier. Sa disparition
+// serait exactement aussi silencieuse que la panne d'origine : c'est pourquoi
+// le correctif se double d'un garde.
+//
+// Même famille que [15] : un contrôle câblé mais jamais exécuté ne garde rien.
+// [15] vérifie que les tests sont câblés dans un workflow, celui-ci vérifie que
+// le workflow qui les porte se déclenche bien.
+//
+// La lecture du YAML vit dans scripts/ci/declencheurs.mjs, éprouvée par
+// scripts/ci/declencheurs.test.mjs sur des extraits construits à la main : la
+// détection doit tenir la différence entre une clé `branches:` et un
+// commentaire qui la cite, et ci.yml est plein de ces commentaires-là.
+console.log('\n[20] aucun pull_request restreint par un filtre de branches');
+try {
+  const wfDir = '.github/workflows';
+  const workflows = fs.existsSync(wfDir)
+    ? fs.readdirSync(wfDir).filter(n => /\.ya?ml$/.test(n))
+    : [];
+  if (!workflows.length) fail('aucun workflow dans .github/workflows — motif à revoir');
+
+  let bad20 = 0, declencheurs = 0;
+  for (const w of workflows) {
+    const texte = fs.readFileSync(`${wfDir}/${w}`, 'utf8');
+    declencheurs += analyserDeclencheurs(texte).pullRequest.length;
+    for (const f of filtresDeBranches(texte)) {
+      fail(`${wfDir}/${w} ligne ${f.ligne} : ${f.declencheur} est restreint par \`${f.cle}:\` — ce filtre porte sur la branche CIBLE, donc aucune PR empilée ne déclencherait ce workflow, et un job qui ne se déclenche pas ne s'affiche nulle part (la panne de la PR 83)`);
+      bad20++;
+    }
+  }
+
+  // L'autre moitié de la même panne : le déclencheur retiré au lieu d'être
+  // filtré. Le résultat est identique — les quatre jobs ne tournent sur aucune
+  // PR — et tout aussi invisible.
+  const ci = `${wfDir}/ci.yml`;
+  if (!exists(ci)) { fail(`${ci} absent — c'est lui qui porte les quatre jobs de PR`); bad20++; }
+  else if (!aDeclencheurPullRequest(fs.readFileSync(ci, 'utf8'))) {
+    fail(`${ci} ne se déclenche plus sur pull_request — les quatre jobs ne tourneraient sur aucune PR, sans qu'aucun check ne vire au rouge`);
+    bad20++;
+  }
+
+  if (!bad20) ok(`${workflows.length} workflows, ${declencheurs} déclencheur(s) pull_request, aucun restreint par branches:`);
+} catch (e) { fail('contrôle des déclencheurs impossible : ' + e.message); }
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
