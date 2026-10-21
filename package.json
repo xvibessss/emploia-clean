@@ -12,6 +12,7 @@
     "test:assertions": "node scripts/smoke/assertions.test.mjs",
     "test:contrat": "node scripts/smoke/contrat.test.mjs",
     "test:greenhouse": "node scripts/smoke/greenhouse.test.mjs",
+    "test:rapidapi": "node scripts/smoke/rapidapi.test.mjs",
     "test:email": "node scripts/billing/email.test.mjs",
     "test:achat": "node scripts/billing/achat-anonyme.test.mjs",
     "test:billing": "node scripts/billing/email.test.mjs && node scripts/billing/campagne.test.mjs && node scripts/billing/probe-checkout.mjs && node scripts/billing/probe-webhook.mjs && node scripts/billing/probe-affiliate.mjs && node scripts/billing/achat-anonyme.test.mjs",

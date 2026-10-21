@@ -57,7 +57,15 @@ console.log('\n[A] Les trois pannes réelles du 2026-10-11 sont nommables');
 check('clés France Travail absentes → cle_absente',
   borner_cause('clés absentes : FRANCE_TRAVAIL_CLIENT_ID / _SECRET') === 'cle_absente');
 check('quota French Job Market → http_429', borner_cause('HTTP 429') === 'http_429');
-check('abonnement Internships → http_404', borner_cause('HTTP 404') === 'http_404');
+// Le 404 d'Internships n'est plus atteignable : la source a été retirée, son
+// API l'ayant été par son fournisseur le 2026-08-03. Le cas reste vérifié
+// parce que `borner_cause` doit savoir nommer n'importe quel statut HTTP —
+// c'est la propriété, pas l'anecdote de la source qui l'a révélée.
+check('un 404 amont → http_404', borner_cause('HTTP 404') === 'http_404');
+// Le quota mensuel d'un plan gratuit a désormais son propre jeton, distinct du
+// http_429 que l'appel en ligne rendait : le 429 disait vrai sans dire que la
+// cause était un plafond MENSUEL plutôt qu'un pic de trafic.
+check('quota_epuise est un jeton du vocabulaire', causePublique('quota_epuise') === 'quota_epuise');
 check('timeout JSearch → timeout', borner_cause('timeout') === 'timeout');
 check('jeton OAuth refusé → jeton_refuse', borner_cause('jeton OAuth refusé') === 'jeton_refuse');
 check('réponse non-JSON → reponse_illisible',
@@ -121,9 +129,26 @@ check('la cause entre en cache', /kvSet\(cacheKey, \{[^}]*causesEnEchec/.test(sr
 // déploiement antérieur rendrait `{}` — lisible comme « aucune cause ».
 check('la lecture du cache repasse par causePublique',
   /\(cached\.sourcesEnEchec \|\| \[\]\)\.map\(s => \[s, causePublique\(brut\[s\]\)\]\)/.test(src));
-check('les sites HTTP déclarent leur code explicitement',
-  (src.match(/`http_\$\{(res|jobsRes)\.status\}`/g) || []).length === 7,
-  `${(src.match(/`http_\$\{(res|jobsRes)\.status\}`/g) || []).length}/7`);
+// Le compte était de 7 et il est de 4 ici, pour une raison qui est le sujet de
+// la PR et non une tolérance : JSearch et French Job Market ont migré vers
+// \`_lib/rapidapi.js\`, où leurs DEUX sites d'échec fusionnent en UN — le helper
+// \`appeler\` est partagé — et Internships a été retirée, son API l'ayant été par
+// son fournisseur le 2026-08-03.
+//
+// La propriété vérifiée, elle, ne bouge pas : partout où un statut HTTP devient
+// une cause, le code est ÉCRIT, jamais déduit d'un message d'exception. Elle est
+// donc vérifiée sur les deux fichiers, parce que la déplacer sans la vérifier là
+// où elle a atterri l'aurait simplement perdue.
+const MOTIF_HTTP = /`http_\$\{(res|jobsRes)\.status\}`/g;
+const libSrc = fs.readFileSync(new URL('../../api/_lib/rapidapi.js', import.meta.url), 'utf8');
+const sitesHandler = (src.match(MOTIF_HTTP) || []).length;
+const sitesCollecteur = (libSrc.match(MOTIF_HTTP) || []).length;
+check('les sites HTTP du handler déclarent leur code explicitement',
+  sitesHandler === 4, `${sitesHandler}/4`);
+check('le collecteur RapidAPI déclare le sien de la même façon',
+  sitesCollecteur === 1, `${sitesCollecteur}/1`);
+check('aucun site ne construit sa cause depuis un message d’exception',
+  !/cause: *e\.message/.test(src) && !/cause: *e\.message/.test(libSrc));
 check('la raison complète reste dans les journaux',
   src.includes("console.error('jobs: sources en échec — ' + JSON.stringify(journal))"));
 

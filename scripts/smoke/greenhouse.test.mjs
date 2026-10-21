@@ -206,6 +206,19 @@ function extraire(src, nom) {
 const blocFetch = extraire(jobsSrc, 'fetchGreenhouse');
 check('api/jobs.js porte un collecteur Greenhouse', Boolean(blocFetch));
 
+// `fetchGreenhouse` ne porte plus le travail de lecture : filtrer, trier,
+// paginer vit dans `servirReservoir`, partagé avec les deux sources RapidAPI
+// devenues des réservoirs KV elles aussi. Les trois lisaient sinon la même
+// donnée de trois façons, et ce fichier a déjà vu ce que coûte la divergence :
+// `?type=cdd` était propagé par trois collecteurs sur huit.
+//
+// La sonde exécute donc le filtre PARTAGÉ, pas une copie — ce qui élargit ce
+// qu'elle garantit : les cas vérifiés plus bas valent désormais pour les trois
+// réservoirs, pas pour Greenhouse seule.
+const blocParPage = /const PAR_PAGE = \d+;/.exec(jobsSrc)?.[0];
+const blocServir = extraire(jobsSrc, 'servirReservoir');
+check('api/jobs.js porte le filtre de lecture partagé', Boolean(blocServir && blocParPage));
+
 // LA DÉCISION QUI SE VÉRIFIE ICI : Greenhouse est placé AVANT les sources
 // tierces, parce que `deduplicate()` garde la PREMIÈRE occurrence. Si l'ordre
 // s'inversait un jour, une offre vue des deux côtés sortirait avec l'URL de
@@ -231,7 +244,7 @@ async function appeler(contenuKV, { q = '', type = '', location = '', page = 0 }
     resultat: null, journal,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocFetch}; resultat = fetchGreenhouse(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal);`, bac);
+  vm.runInContext(`${blocParPage}\n${blocServir}\n${blocFetch}; resultat = fetchGreenhouse(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal);`, bac);
   return { offres: await bac.resultat, journal };
 }
 

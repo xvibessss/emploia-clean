@@ -1,4 +1,8 @@
 import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
+// Les bornes du réservoir RapidAPI sont DÉCLARÉES dans `_lib/rapidapi.js`, pas
+// dans le cron qui le remplit : un handler ne doit pas importer un cron pour
+// savoir au bout de combien de temps une collecte est périmée.
+import { CLE_KV as CLE_RAPIDAPI, AGE_MAX_SECONDES } from './_lib/rapidapi.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
 // Toute transformation d'une donnée amont en type de contrat vit dans
 // `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
@@ -7,7 +11,7 @@ import { isJobLive, toPublicJob } from './_lib/employer.js';
 import {
   FILTRE_VERS_CONTRAT, detectType,
   contratAdzuna, tempsAdzuna, contratArbeitnow, tempsArbeitnow,
-  contratJSearch, tempsJSearch, contratFrenchMarket, contratFranceTravail,
+  contratFranceTravail,
   contratPublic, formaterSalaireAnnuel, estSalaireEstime,
 } from './_lib/contrat.js';
 
@@ -114,7 +118,22 @@ function muet(journal, source, raison, cause) {
 // depuis trois jours. Réutiliser `cle_absente` se serait lu « il manque une
 // variable d'environnement » et aurait envoyé chercher la panne au mauvais
 // endroit.
-const CAUSES = new Set(['cle_absente', 'collecte_absente', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
+//
+// `quota_epuise` est le jeton des deux sources RapidAPI, et il dit ce
+// qu'aucun autre ne savait dire : la collecte a bien eu lieu, le fournisseur
+// l'a REFUSÉE faute de quota mensuel. Les trois lectures possibles d'un
+// réservoir vide appellent trois actions différentes, et c'est pourquoi elles
+// ne partagent pas un jeton :
+//
+//   collecte_absente  le cron n'a pas tourné    → regarder les crons Vercel
+//   quota_epuise      le plan est épuisé        → décision d'abonnement
+//   cle_absente       RAPIDAPI_KEY non posée    → poser la variable
+//
+// Avant cette PR, le symptôme public était `http_429` — exact, mais rendu une
+// fois par requête utilisateur, et sans dire que la cause était un plafond
+// MENSUEL plutôt qu'un pic de trafic. Le mesurer a pris une sonde dédiée ;
+// `quota_epuise` le dit en un mot.
+const CAUSES = new Set(['cle_absente', 'collecte_absente', 'quota_epuise', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
 
 // Déduit un jeton d'une raison libre, pour les `catch` qui n'en déclarent pas.
 // Le test porte sur la forme du message, jamais sur son contenu : seule la
@@ -147,172 +166,37 @@ function causePublique(cause) {
   return CAUSES.has(c) ? c : 'inconnue';
 }
 
-async function fetchJSearch(q, type, location, page, journal) {
-  const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'JSearch', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
-  try {
-    const typeMap = { stage:'INTERN', alternance:'INTERN', cdd:'CONTRACTOR', cdi:'FULLTIME', freelance:'CONTRACTOR' };
-    const locStr = location || 'Paris France';
-    const query = [
-      q || 'emploi CDI',
-      type === 'stage' ? 'stage internship' : type === 'alternance' ? 'alternance' : '',
-    ].filter(Boolean).join(' ') + ' ' + locStr;
-    const params = new URLSearchParams({
-      query,
-      num_pages: '1',
-      page: String(page + 1),
-      country: 'fr',
-      date_posted: 'month',
-      ...(typeMap[type] ? { employment_type: typeMap[type] } : {}),
-    });
-    const res = await withTimeout(
-      fetch(`https://jsearch.p.rapidapi.com/search?${params}`, {
-        headers: { 'x-rapidapi-host': 'jsearch.p.rapidapi.com', 'x-rapidapi-key': key }
-      }), 10000
-    );
-    if (!res.ok) return muet(journal, 'JSearch', `HTTP ${res.status}`, `http_${res.status}`);
-    const data = await res.json();
-    return (data.data || []).map(j => ({
-      id: 'js_' + j.job_id,
-      title: j.job_title,
-      company: j.employer_name || 'Confidentiel',
-      location: [j.job_city, j.job_country].filter(Boolean).join(', ') || 'France',
-      type: contratJSearch(j),
-      // `FULLTIME` / `PARTTIME` sont des durées de travail, pas des contrats :
-      // ils sortent du champ `type` et entrent dans le leur.
-      workTime: tempsJSearch(j),
-      salary: j.job_min_salary
-        ? `${Math.round(j.job_min_salary)}–${Math.round(j.job_max_salary||j.job_min_salary)} ${j.job_salary_currency||'€'}`
-        : null,
-      description: (j.job_description || '').slice(0, 300),
-      url: j.job_apply_link || j.job_google_link || '',
-      date: j.job_posted_at_datetime_utc || new Date().toISOString(),
-      remote: j.job_is_remote || false,
-      source: j.job_publisher || 'Indeed',
-      logo: j.employer_logo || null,
-      country: 'FR',
-    }));
-  } catch (e) { return muet(journal, 'JSearch', e.message || String(e)); }
+async function fetchJSearch(q, type, location, page, journal, reservoir) {
+  const cause = causeReservoir(reservoir?.jsearch, 'jsearch');
+  if (cause) return muet(journal, 'JSearch', `réservoir jsearch indisponible (${cause})`, cause);
+  return servirReservoir(reservoir.jsearch.offres, q, type, location, page);
 }
 
 // ── FRENCH JOB MARKET (APEC + HelloWork + Free-Work) ─
-async function fetchFrenchMarket(q, type, location, page, journal) {
-  const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'French Job Market', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
-  try {
-    const typeMap = {
-      cdi: ['permanent'], cdd: ['temporary'], stage: ['internship'],
-      alternance: ['apprenticeship'], freelance: ['freelance']
-    };
-    const body = {
-      query: q || 'développeur',
-      location: location || 'France',
-      num_pages: 1,
-      page: page + 1,
-      ...(typeMap[type] ? { employment_type: typeMap[type] } : {}),
-    };
-    const res = await withTimeout(
-      fetch('https://french-job-market.p.rapidapi.com/v1/jobs/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-rapidapi-host': 'french-job-market.p.rapidapi.com',
-          'x-rapidapi-key': key,
-        },
-        body: JSON.stringify(body),
-      }), 10000
-    );
-    if (!res.ok) return muet(journal, 'French Job Market', `HTTP ${res.status}`, `http_${res.status}`);
-    const data = await res.json();
-    const DOM_TOM = ['martinique', 'guadeloupe', 'guyane', 'réunion', 'reunion', 'mayotte', 'lamentin', 'cayenne', 'saint-denis - 97'];
-    return (data.data || [])
-      .filter(j => {
-        const loc = (j.location || '').toLowerCase();
-        return !DOM_TOM.some(d => loc.includes(d));
-      })
-      .map(j => ({
-      id: 'fm_' + j.job_id,
-      title: j.title,
-      company: j.company || 'Confidentiel',
-      location: j.location || 'France',
-      // Ce collecteur propage DÉJÀ `employment_type` en amont, pour les cinq
-      // valeurs — et écrasait quand même l'étiquette par `detectType`. C'est
-      // la preuve que propager le filtre ne suffit pas : il faut cesser
-      // d'écrire l'étiquette depuis la requête.
-      type: contratFrenchMarket(j),
-      salary: null,
-      description: (j.short_description || '').slice(0, 300),
-      url: j.source_url || '',
-      date: j.posted_at || new Date().toISOString(),
-      remote: j.remote === true || (j.remote || '').includes('full'),
-      source: j.source_platform || 'APEC',
-      logo: null,
-      country: 'FR',
-    }));
-  } catch (e) { return muet(journal, 'French Job Market', e.message || String(e)); }
+async function fetchFrenchMarket(q, type, location, page, journal, reservoir) {
+  const cause = causeReservoir(reservoir?.frenchmarket, 'frenchmarket');
+  if (cause) return muet(journal, 'French Job Market', `réservoir frenchmarket indisponible (${cause})`, cause);
+  return servirReservoir(reservoir.frenchmarket.offres, q, type, location, page);
 }
 
-// ── INTERNSHIPS API ───────────────────────────────────
-async function fetchInternships(q, type, location, journal) {
-  if (type && !['stage', 'alternance', 'tous', ''].includes(type)) return [];
-  const key = process.env.RAPIDAPI_KEY;
-  if (!key) return muet(journal, 'Internships', 'clé absente : RAPIDAPI_KEY', 'cle_absente');
-  try {
-    const params = new URLSearchParams({
-      location_filter: location || 'France',
-      limit: '15',
-      description_type: 'text',
-    });
-    if (q) params.set('title_filter', q);
-    const res = await withTimeout(
-      fetch(`https://internships-api.p.rapidapi.com/active-jb-7d?${params}`, {
-        headers: {
-          'x-rapidapi-host': 'internships-api.p.rapidapi.com',
-          'x-rapidapi-key': key,
-        }
-      }), 10000
-    );
-    if (!res.ok) return muet(journal, 'Internships', `HTTP ${res.status}`, `http_${res.status}`);
-    const data = await res.json();
-    const jobs = Array.isArray(data) ? data : (data.data || []);
-    return jobs
-      .filter(j => {
-        const countries = (j.countries_derived || []).map(c => c.toLowerCase());
-        const isFR = countries.some(c => ['france','fr'].includes(c));
-        const isRemote = j.remote_derived === true;
-        return isFR || isRemote;
-      })
-      .slice(0, 10)
-      .map(j => {
-        const loc = (j.locations_derived || j.cities_derived || [])[0] || 'France';
-        const empType = (j.employment_type || '').toUpperCase();
-        const isAlternance = j.title?.toLowerCase().includes('alternance') || j.title?.toLowerCase().includes('apprenti');
-        return {
-          id: 'int_' + j.id,
-          title: j.title,
-          company: j.organization || 'Confidentiel',
-          location: j.remote_derived ? 'Remote · France' : loc,
-          // Les deux branches rendaient « Stage » : le ternaire sur
-          // `employment_type` était décoratif. Le titre et `employment_type`
-          // sont les deux seuls indices réels ; ce qui ne dit ni l'un ni
-          // l'autre vaut `null`.
-          type: contratPublic(
-            isAlternance ? 'Alternance'
-            : empType.includes('INTERN') ? 'Stage'
-            : detectType(j.title)
-          ),
-          salary: j.salary_raw || null,
-          description: (j.linkedin_org_slogan || j.linkedin_org_description || '').slice(0, 300),
-          url: j.url || j.external_apply_url || '',
-          date: j.date_posted || new Date().toISOString(),
-          remote: j.remote_derived || false,
-          source: 'LinkedIn Internships',
-          logo: j.organization_logo || null,
-          country: 'FR',
-        };
-      });
-  } catch (e) { return muet(journal, 'Internships', e.message || String(e)); }
-}
+// ── INTERNSHIPS : SOURCE RETIRÉE ────────────────────────────────────────────
+// Il y avait ici un neuvième collecteur, appelant
+// `internships-api.p.rapidapi.com/active-jb-7d`. Il rendait `http_404` en
+// production, et ce n'était ni un chemin mal construit ni un abonnement à
+// renouveler : la fiche RapidAPI de l'API porte, relevée le 2026-10-21, la
+// mention « This API is no longer available » et l'avis du fournisseur
+// « This API is deprecated and will no longer serve jobs starting August 3rd
+// 2026 ». L'API est retirée depuis deux mois et demi ; aucune correction de
+// code ne la ramène.
+//
+// Fantastic.jobs redirige vers deux remplaçantes payantes au même quota
+// partagé. Elles n'ont pas été reprises, et le chiffre le dit mieux qu'un
+// argument : ce collecteur était borné à `.slice(0, 10)`, soit DIX offres de
+// stage au maximum, là où le collecteur Greenhouse de la PR #99 ramène 6 484
+// offres crawlées en direct sur les ATS d'employeurs, sans clé et sans quota —
+// la même nature de donnée (pages carrière), gratuite. Rouvrir un abonnement
+// pour dix offres aurait ajouté de la pression sur le quota qui fait tomber
+// JSearch et French Job Market, en échange de ce qu'on obtient déjà.
 
 // ── REMOTIVE ──────────────────────────────────────────
 async function fetchRemotive(q, type, journal) {
@@ -558,6 +442,63 @@ async function fetchFranceTravail(q, type, location, page, journal) {
 // chez un agrégateur sort donc avec l'URL de la page carrière de l'employeur
 // plutôt qu'avec celle du republicateur. C'est tout l'intérêt de crawler la
 // source.
+const PAR_PAGE = 10;
+
+// ── SERVIR UN RÉSERVOIR KV ──────────────────────────────────────────────────
+// Trois sources sont désormais des réservoirs remplis par cron et lus en KV :
+// Greenhouse, JSearch, French Job Market. Le travail de LECTURE est le même
+// pour les trois — filtrer sur la requête, trier par date, paginer — et il
+// n'était écrit que pour Greenhouse. L'écrire deux fois de plus garantirait
+// qu'elles divergent, et la divergence a déjà un précédent dans ce fichier :
+// `?type=cdd` était propagé par trois collecteurs sur huit et ignoré par les
+// cinq autres. Il vit donc ici, une seule fois.
+//
+// Paginé à dix comme les sources réseau le sont, et pour la même raison :
+// rendre tout un réservoir d'un coup noierait les autres collecteurs dans un
+// agrégat où il passerait devant.
+function servirReservoir(offres, q, type, location, page) {
+  let jobs = offres;
+  if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+    // Une offre au contrat inconnu est écartée sous filtre, comme partout
+    // ailleurs : la servir en réponse à « CDI » serait l'affirmation sans
+    // preuve que `_lib/contrat.js` interdit.
+    jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+  }
+  if (q) {
+    const ql = q.toLowerCase();
+    jobs = jobs.filter(j =>
+      (j.title || '').toLowerCase().includes(ql) ||
+      (j.company || '').toLowerCase().includes(ql) ||
+      (j.description || '').toLowerCase().includes(ql)
+    );
+  }
+  if (location) {
+    const ll = location.toLowerCase();
+    jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+  }
+  return jobs
+    .slice()
+    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+    .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+}
+
+// Une source de réservoir a trois façons d'être absente, et les confondre
+// envoie chercher la panne au mauvais endroit — c'est toute la raison d'être du
+// vocabulaire borné. Rend `null` quand le réservoir est frais et servable.
+//
+// La vérification porte sur le `collecteLe` DE LA SOURCE, pas sur le TTL de la
+// clé. Les deux sources RapidAPI partagent une clé que le cron réécrit chaque
+// jour : son TTL resterait neuf même si French Job Market était refusée depuis
+// six semaines, et le réservoir servirait du périmé sans le dire.
+function causeReservoir(entree, source) {
+  if (!entree) return 'collecte_absente';
+  if (entree.etat === 'cle_absente') return 'cle_absente';
+  const perime = entree.etat === 'quota' ? 'quota_epuise' : 'collecte_absente';
+  if (!entree.collecteLe || !entree.offres?.length) return perime;
+  const age = (Date.now() - new Date(entree.collecteLe).getTime()) / 1000;
+  return age > AGE_MAX_SECONDES[source] ? perime : null;
+}
+
 async function fetchGreenhouse(q, type, location, page, journal) {
   try {
     const collecte = await kvGet('greenhouse_jobs');
@@ -566,37 +507,7 @@ async function fetchGreenhouse(q, type, location, page, journal) {
     // nu ferait disparaître la source en silence — le défaut exact que
     // `causesEnEchec` est venu retirer pour les sept sources réseau.
     if (!offres) return muet(journal, 'Greenhouse', 'clé greenhouse_jobs absente ou illisible', 'collecte_absente');
-
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // Une offre au contrat inconnu est écartée sous filtre, comme partout
-      // ailleurs : 57,8 % des offres Greenhouse sortent avec `type: null`, et
-      // les servir en réponse à « CDI » serait l'affirmation sans preuve que
-      // `_lib/contrat.js` interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    // Paginé comme les sources réseau le sont, et pour la même raison : rendre
-    // les 334 offres d'un coup noierait les huit autres collecteurs dans un
-    // agrégat où elles passeraient toutes devant — `prioritize` classe la
-    // France au premier rang. Dix par page les rend accessibles sans
-    // déséquilibrer la liste.
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Greenhouse', e.message || String(e)); }
 }
 
@@ -813,14 +724,23 @@ export default async function handler(req) {
   // seule liste, donc un seul ordre à tenir à jour — l'ancienne version en
   // tenait deux, celui du lancement et celui de la fusion.
   const journal = [];
+
+  // Lu UNE fois, pour les deux sources que la clé porte. Deux `kvGet` de la
+  // même clé dans la même requête seraient deux allers-retours pour la même
+  // valeur ; et un memo de module serait partagé entre requêtes concurrentes,
+  // ce que ce fichier s'interdit déjà pour `journal`.
+  //
+  // Une lecture KV en échec ne fait pas tomber la requête : elle vaut `null`,
+  // et les deux sources rendront `collecte_absente` comme si la clé était vide.
+  const reservoirRapidapi = await kvGet(CLE_RAPIDAPI).catch(() => null);
+
   const collecteurs = [
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
-    ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal)],
-    ['JSearch',           () => fetchJSearch(q, type, location, page, journal)],
+    ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
+    ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],
     ['Adzuna',            () => fetchAdzuna(q, type, location, page, journal)],
-    ['Internships',       () => fetchInternships(q, type, location, journal)],
     ['Remotive',          () => fetchRemotive(q, type, journal)],
     ['Arbeitnow',         () => fetchArbeitnow(q, type, page, journal)],
   ];
@@ -844,6 +764,13 @@ export default async function handler(req) {
     // sur le plan Hobby. Une panne survenue la nuit était illisible au matin,
     // et c'est ainsi que le 429 de French Job Market et le 404 d'Internships
     // ont dû être relevés à la main au lieu de sortir de `smoke:sources`.
+    //
+    // Ces deux pannes ont été instruites depuis : Internships était une API
+    // RETIRÉE par son fournisseur le 2026-08-03, et les deux 429 étaient des
+    // plafonds MENSUELS de plan gratuit (200 et 30 requêtes). Le `http_429`
+    // rendu ici disait vrai sans être actionnable — il ne distinguait pas un
+    // pic de trafic d'un quota épuisé. D'où `quota_epuise`, et d'où le passage
+    // des deux sources au réservoir KV qui borne les appels au calendrier.
     if (journal.length) console.error('jobs: sources en échec — ' + JSON.stringify(journal));
     // Une source peut échouer plusieurs fois dans la même requête (pagination,
     // deux appels) : on garde la première cause vue par source, et le nom reste
