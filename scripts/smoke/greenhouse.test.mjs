@@ -16,7 +16,7 @@ import {
   collecterBoard, collecterGreenhouse, normaliserOffre, paysGreenhouse,
   texteDeContenu, segmentsDeLieu, offreExploitable,
 } from '../../api/_lib/greenhouse.js';
-import { CLE_KV, TTL_SECONDES, MAX_OFFRES } from '../../api/cron/collect-greenhouse.js';
+import { TTL_SECONDES, MAX_OFFRES, FOURNISSEURS } from '../../api/_lib/ats.js';
 import { BOARDS, RELEVE } from '../../api/_lib/greenhouse-boards.js';
 import { CONTRATS, contratGreenhouse, tempsGreenhouse } from '../../api/_lib/contrat.js';
 
@@ -186,7 +186,14 @@ check('les board ids sont des slugs sûrs en URL',
 // resterait verte en divergeant du fichier servi.
 console.log('\n── Branchement dans api/jobs.js ─────────────────────');
 const jobsSrc = fs.readFileSync(new URL('../../api/jobs.js', import.meta.url), 'utf8');
-const cronSrc = fs.readFileSync(new URL('../../api/cron/collect-greenhouse.js', import.meta.url), 'utf8');
+// Le cron de collecte est désormais UNIQUE pour tous les ATS : il parcourt le
+// registre de `_lib/ats.js`, qui porte les trois gardes. Les assertions lisent
+// donc les DEUX fichiers — celui qui ordonnance et celui qui garde — parce que
+// c'est là que les garanties vivent maintenant, et qu'un garde déplacé sans que
+// la sonde suive est un garde qu'on croit avoir.
+const cronSrc = fs.readFileSync(new URL('../../api/cron/collect-ats.js', import.meta.url), 'utf8');
+const atsSrc = fs.readFileSync(new URL('../../api/_lib/ats.js', import.meta.url), 'utf8');
+const CLE_KV = FOURNISSEURS.find(f => f.nom === 'Greenhouse')?.cle;
 const vercel = JSON.parse(fs.readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'));
 
 function extraire(src, nom) {
@@ -292,9 +299,11 @@ const filtreQ = await appeler(cent, { q: 'Poste 7' });
 check('le terme de recherche filtre vraiment', filtreQ.offres.every(o => /Poste 7/.test(o.title)));
 
 console.log('\n── Le cron d’ingest ─────────────────────────────────');
-check('le cron est déclaré dans vercel.json',
-  (vercel.crons || []).some(c => c.path === '/api/cron/collect-greenhouse'),
-  (vercel.crons || []).find(c => c.path === '/api/cron/collect-greenhouse')?.schedule);
+check('le cron de collecte ATS est déclaré dans vercel.json',
+  (vercel.crons || []).some(c => c.path === '/api/cron/collect-ats'),
+  (vercel.crons || []).find(c => c.path === '/api/cron/collect-ats')?.schedule);
+check('Greenhouse est inscrit au registre des fournisseurs',
+  FOURNISSEURS.some(f => f.nom === 'Greenhouse' && f.cle === 'greenhouse_jobs'));
 // LE GARDE QUI VIENT D'UN ÉCHEC RÉEL. Le premier réglage était `0 */6 * * *`,
 // et il a fait échouer le déploiement de la PR 99 sur les deux projets Vercel,
 // avant même le build : le compte est en plan Hobby, où « cron jobs can only
@@ -311,7 +320,7 @@ check('le cron est déclaré dans vercel.json',
 // et jour de semaine à `*`. Tout pas (`*/6`), toute liste (`1,13`), tout
 // intervalle (`0-12`) et tout `*` dans le champ des heures tournent plus d'une
 // fois par jour et sont refusés.
-const cronGH = (vercel.crons || []).find(c => c.path === '/api/cron/collect-greenhouse');
+const cronGH = (vercel.crons || []).find(c => c.path === '/api/cron/collect-ats');
 const champs = String(cronGH?.schedule ?? '').trim().split(/\s+/);
 check('le cron a une expression à cinq champs', champs.length === 5, cronGH?.schedule);
 const [minute, heure, jour, mois, semaine] = champs;
@@ -348,16 +357,33 @@ if (cronAlertes) {
 check('la clé lue par jobs.js est celle qu’écrit le cron',
   CLE_KV === 'greenhouse_jobs' && jobsSrc.includes("kvGet('greenhouse_jobs')"));
 check('le cron refuse un appel sans CRON_SECRET',
-  /CRON_SECRET/.test(cronSrc) && /status: 401/.test(cronSrc));
-check('le cron ne stocke que ce dont le pays est établi comme la France',
-  /country === 'FR'/.test(cronSrc));
+  /CRON_SECRET/.test(cronSrc) && /\b401\b/.test(cronSrc));
+check('la collecte ne stocke que ce dont le pays est établi comme la France',
+  /country === 'FR'/.test(atsSrc));
 // Le garde qui protège le relevé : si les 28 boards tombent ensemble, écrire
 // une liste vide remplacerait un relevé valide par du vide, et la page
 // afficherait zéro offre en répondant 200.
+// Le garde qui protège le relevé : si tous les boards tombent ensemble, écrire
+// une liste vide remplacerait un relevé valide par du vide, et la page
+// afficherait zéro offre en répondant 200.
 check('une collecte vide n’écrase PAS la clé précédente',
-  /if \(!retenues\.length\)/.test(cronSrc) && cronSrc.indexOf('if (!retenues.length)') < cronSrc.indexOf('await kvSet(CLE_KV'));
+  /if \(!collecte\.ecrire\)/.test(cronSrc) &&
+  cronSrc.indexOf('if (!collecte.ecrire)') < cronSrc.indexOf('await kvSet('));
+check('et « écrire » est bien conditionné à ce qui a été retenu',
+  /ecrire: retenues\.length > 0/.test(atsSrc));
 check('la borne de taille est posée et journalisée si atteinte',
-  MAX_OFFRES > 0 && /francaises\.length > MAX_OFFRES/.test(cronSrc), `${MAX_OFFRES} offres`);
+  MAX_OFFRES > 0 && /francaises\.length > MAX_OFFRES/.test(atsSrc), `${MAX_OFFRES} offres`);
+// LA CONTRAINTE QUI NE CASSE PAS UN TEST MAIS UN DÉPLOIEMENT, deuxième
+// édition. Mesuré : Greenhouse 10,1 s + Lever 23,6 s ≈ 34 s. Une fonction en
+// runtime Edge « must begin sending a response within 25 seconds » : le cron
+// unique y serait tué en pleine collecte Lever, et la clé `lever_jobs` ne
+// serait jamais écrite. Ce garde refuse donc le runtime Edge sur CE cron, et
+// vérifie que la durée lui est réservée dans vercel.json.
+check('le cron de collecte n’est PAS en runtime Edge (≈34 s mesurées > 25 s)',
+  !/runtime:\s*'edge'/.test(cronSrc));
+const dureeAts = (vercel.functions || {})['api/cron/collect-ats.js']?.maxDuration;
+check('une durée est réservée au cron de collecte, au-delà de la borne générale',
+  Number(dureeAts) >= 120, `maxDuration ${dureeAts} s`);
 check('le jeton collecte_absente est dans le vocabulaire fermé du handler',
   /const CAUSES = new Set\(\[[^\]]*'collecte_absente'/.test(jobsSrc));
 

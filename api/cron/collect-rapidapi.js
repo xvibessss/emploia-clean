@@ -1,6 +1,6 @@
 // ── INGEST JSEARCH + FRENCH JOB MARKET → UNE CLÉ KV ─────────────────────────
 //
-// Même forme que `collect-greenhouse`, pour une raison différente. Greenhouse
+// Même forme que `collect-ats`, pour une raison différente. Greenhouse
 // est passée au cron parce que sa collecte dure 10,1 s et ne tient pas dans la
 // borne de 10 s par source du handler. Ces deux sources y passent parce que
 // leur PLAFOND MENSUEL ne tient pas dans le trafic : 200 requêtes/mois pour
@@ -38,7 +38,7 @@ export function estJourDeCollecte(source, maintenant = new Date()) {
 }
 
 // Une collecte vide n'écrase pas la précédente, par SOURCE. Le garde de
-// `collect-greenhouse` porte sur une clé entière ; ici la clé porte deux
+// `collect-ats` porte sur une clé entière ; ici la clé porte deux
 // sources dont une seule est collectée la plupart des jours, donc appliquer le
 // garde globalement effacerait French Job Market six jours sur sept.
 //

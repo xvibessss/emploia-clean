@@ -171,7 +171,7 @@ check('French Job Market respecte son propre budget, plus petit que celui de JSe
   BUDGETS.frenchmarket.pagesParCollecte < BUDGETS.jsearch.pagesParCollecte);
 
 // ── 5. LE GARDE ANTI-ÉCRASEMENT, PAR SOURCE ─────────────────────────────────
-// Le garde de `collect-greenhouse` porte sur une clé entière. Ici la clé porte
+// Le garde de `collect-ats` porte sur une clé entière. Ici la clé porte
 // DEUX sources dont une seule est collectée six jours sur sept : l'appliquer
 // globalement effacerait French Job Market tous les autres jours.
 console.log('\n── Garde anti-écrasement ──');
