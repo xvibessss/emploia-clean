@@ -275,9 +275,20 @@ check('chaque fournisseur porte une clé KV, un catalogue et un collecteur',
 // exact que `causesEnEchec` est venu retirer.
 check('aucune clé KV partagée entre deux fournisseurs',
   new Set(FOURNISSEURS.map(f => f.cle)).size === FOURNISSEURS.length);
+// L'invariant est « UN cron pour tous les ATS », pas « un seul cron nommé
+// collect- ». Le prédicat a d'abord été écrit sur /collect-/, et il est devenu
+// faux au merge : `collect-rapidapi` est un réservoir de sources TIERCES, pas
+// un ATS, et le compter ici aurait fait rougir un test que rien ne cassait.
+// L'élargir en le supprimant aurait laissé passer le `collect-teamtailor` du
+// prochain ATS, qui est exactement ce qu'il est là pour refuser. Il est donc
+// resserré sur ce qu'il protège : le cron ATS est unique, et AUCUN cron ne
+// porte le nom d'un fournisseur du registre.
+const cronsATS = (vercel.crons || []).filter(c => c.path === '/api/cron/collect-ats');
+const cronsParFournisseur = (vercel.crons || []).filter(c =>
+  FOURNISSEURS.some(f => c.path === `/api/cron/collect-${f.nom.toLowerCase()}`));
 check('un seul cron de collecte pour tous les ATS',
-  (vercel.crons || []).filter(c => /collect-/.test(c.path)).length === 1,
-  (vercel.crons || []).filter(c => /collect-/.test(c.path)).map(c => c.path).join(', '));
+  cronsATS.length === 1 && cronsParFournisseur.length === 0,
+  [...cronsATS, ...cronsParFournisseur].map(c => c.path).join(', '));
 
 // Les trois gardes, exécutés — pas seulement cherchés dans le texte.
 const fauxLever = {

@@ -19,6 +19,10 @@
       "schedule": "0 18 * * 0"
     },
     {
+      "path": "/api/cron/collect-rapidapi",
+      "schedule": "0 3 * * *"
+    },
+    {
       "path": "/api/cron/collect-ats",
       "schedule": "0 4 * * *"
     },

@@ -11,6 +11,11 @@
 // Travail jamais configuré, Internships en 404, Adzuna en 400 — et le seul
 // moyen de s'en apercevoir était de compter les sources à la main.
 //
+// Internships a depuis été RETIRÉE du handler : son API a été retirée par son
+// fournisseur le 2026-08-03, et une source morte qui reste déclarée figure en
+// échec perpétuel, ce qui dilue la liste des pannes réelles jusqu'à ce que
+// plus personne ne la lise. Le handler interroge donc huit collecteurs.
+//
 // La sonde de surface ne pouvait pas l'attraper : elle vérifie qu'un handler
 // ne répond ni 500 ni 404, et /api/jobs répondait 200. C'est une panne de
 // contenu, pas de disponibilité, et il lui faut son propre contrôle.
@@ -32,7 +37,6 @@ const REQUETES = [
 // grossir en silence jusqu'à ne plus rien prouver.
 const ABSENCES_CONNUES = {
   'France Travail': 'FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés — compte à ouvrir sur francetravail.io',
-  Internships: 'HTTP 404 sur internships-api.p.rapidapi.com/active-jb-7d — abonnement ou chemin à revoir sur RapidAPI',
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
   // les clés `greenhouse_jobs` et `lever_jobs` sont remplies par
@@ -50,6 +54,20 @@ const ABSENCES_CONNUES = {
   // Greenhouse, ou l'inverse.
   Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
   Lever: "clé lever_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
+
+  // Les deux sources RapidAPI sont devenues des réservoirs remplis par
+  // /api/cron/collect-rapidapi, pour une raison de QUOTA et non de durée :
+  // leurs plans gratuits plafonnent à 200 et 30 requêtes par MOIS (relevé du
+  // 2026-10-21, « Hard Limit »), quand un seul passage de crawler sur les 86
+  // pages SEO en coûtait 86. L'appel en ligne était impossible par
+  // arithmétique ; le cron borne les appels au calendrier.
+  //
+  // Leur cause distingue trois choses, et c'est ce qui rend ces entrées
+  // tolérables sans devenir un silence : `collecte_absente` dit que le cron
+  // n'a pas tourné, `quota_epuise` que le plan a refusé la collecte — une
+  // décision d'abonnement — et `cle_absente` que RAPIDAPI_KEY n'est pas posée.
+  JSearch: "réservoir rapidapi_jobs pas encore écrit — normal jusqu'à la première exécution de /api/cron/collect-rapidapi ; au-delà de 72 h c'est une panne de cron, et quota_epuise désigne le plafond du plan (200 requêtes/mois), pas le cron",
+  'French Job Market': "même réservoir, collecté le LUNDI seulement — 30 requêtes/mois n'autorisent pas un appel par jour sur 31 ; tolérance 16 jours, soit deux lundis manqués, au-delà c'est une panne de cron ou un quota épuisé",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
