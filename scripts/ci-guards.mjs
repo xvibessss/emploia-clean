@@ -1048,5 +1048,80 @@ try {
 
   if (!bad20) ok(`${workflows.length} workflows, ${declencheurs} déclencheur(s) pull_request, aucun restreint par branches:`);
 } catch (e) { fail('contrôle des déclencheurs impossible : ' + e.message); }
+// ── 21. l'alerte de régression SEO reste exerçable, et pas affaiblie ──────
+// Même famille que le garde [15] : un contrôle câblé mais jamais exécuté ne
+// garde rien. L'étape « Ouvrir une issue en cas d'échec » de
+// seo-regression.yml n'avait jamais tourné une seule fois — le workflow audite
+// la production, donc il ne tourne pas sur les pull requests, et sa condition
+// exige un `schedule` en échec. Elle a été rendue exerçable : corps sorti dans
+// un module, sonde hors ligne à chaque PR, étape de répétition à la demande.
+//
+// Le danger de cette ouverture est qu'elle rende l'alerte muette le jour où
+// elle sert. Il suffirait que la condition réelle accepte l'entrée de
+// répétition, que l'étape réelle hérite du drapeau, ou que le module aille
+// chercher ce drapeau dans l'environnement — où une chaîne `'false'` est
+// vraie. Ce garde est structurel pour qu'aucune des trois ne passe par
+// inadvertance : la forme est ce qui se dégrade en silence sous une
+// correction pressée.
+console.log('\n[21] alerte de régression SEO : exerçable sans être affaiblie');
+try {
+  const MODULE = 'scripts/seo/alerte-regression.cjs';
+  const CONDITION_REELLE = "if: failure() && github.event_name == 'schedule'";
+  const wf = readAll('.github/workflows/seo-regression.yml');
+  const moduleSrc = readAll(MODULE);
+  let bad21 = 0;
+
+  if (!moduleSrc) {
+    fail(`${MODULE} absent — le corps de l'alerte doit vivre dans un module exerçable, pas inline dans le YAML`);
+    bad21++;
+  } else if (/process\.env/.test(moduleSrc)) {
+    fail(`${MODULE} lit l'environnement — le mode répétition doit rester un paramètre, sinon une variable mal posée fait taire l'alerte`);
+    bad21++;
+  }
+
+  if (!wf) {
+    fail('.github/workflows/seo-regression.yml introuvable — motif à revoir');
+    bad21++;
+  } else {
+    // Chaque étape du fichier commence par six espaces, un tiret, une espace.
+    const etapes = wf.split(/\n {6}- /).slice(1);
+    const reelle = etapes.find(e => /Ouvrir une issue en cas d/.test(e));
+    const repetition = etapes.find(e => /repetition: true/.test(e));
+
+    if (!reelle) { fail("l'étape « Ouvrir une issue en cas d'échec » a disparu de seo-regression.yml"); bad21++; }
+    else {
+      if (!reelle.includes(CONDITION_REELLE)) {
+        fail(`la condition de l'alerte réelle n'est plus « ${CONDITION_REELLE} » — l'élargir pour la tester la ferait se déclencher à tort, la rétrécir la rendrait muette`);
+        bad21++;
+      }
+      if (/repetition/.test(reelle)) {
+        fail("l'étape d'alerte réelle mentionne la répétition — elle ne doit porter aucun interrupteur, sinon une entrée de workflow peut la faire taire");
+        bad21++;
+      }
+      if (!reelle.includes(MODULE)) { fail(`l'étape d'alerte réelle n'appelle pas ${MODULE}`); bad21++; }
+    }
+
+    if (!repetition) { fail("l'étape de répétition a disparu — l'alerte redeviendrait intestable autrement qu'en attendant une panne"); bad21++; }
+    else {
+      if (!/github\.event_name == 'workflow_dispatch'/.test(repetition)) {
+        fail("l'étape de répétition ne se limite pas au workflow_dispatch — elle doit être hors d'atteinte d'un `schedule`");
+        bad21++;
+      }
+      if (!repetition.includes(MODULE)) {
+        fail(`l'étape de répétition n'appelle pas ${MODULE} — elle répéterait autre chose que l'alerte réelle`);
+        bad21++;
+      }
+    }
+
+    const armements = (wf.match(/repetition: true/g) || []).length;
+    if (armements !== 1) {
+      fail(`${armements} étape(s) arment le mode répétition, une seule est attendue`);
+      bad21++;
+    }
+  }
+
+  if (!bad21) ok("condition de l'alerte réelle intacte, répétition réservée au workflow_dispatch, drapeau passé en paramètre");
+} catch (e) { fail("contrôle de l'alerte de régression SEO impossible : " + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
