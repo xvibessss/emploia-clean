@@ -4,7 +4,7 @@
 //   node scripts/smoke/sources.mjs                 # emploia.eu
 //   node scripts/smoke/sources.mjs https://autre   # autre base
 //
-// Pourquoi cette sonde existe. /api/jobs interroge huit collecteurs en
+// Pourquoi cette sonde existe. /api/jobs interroge neuf collecteurs en
 // parallèle et rend ce qui revient. Un collecteur qui tombe ne fait donc pas
 // tomber la réponse : elle reste 200, la page affiche des offres, et personne
 // ne voit qu'il en manque. Trois des huit ne renvoyaient plus rien — France
@@ -34,6 +34,15 @@ const ABSENCES_CONNUES = {
   'France Travail': 'FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés — compte à ouvrir sur francetravail.io',
   Internships: 'HTTP 404 sur internships-api.p.rapidapi.com/active-jb-7d — abonnement ou chemin à revoir sur RapidAPI',
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
+  // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
+  // la clé `greenhouse_jobs` est remplie par `api/cron/collect-greenhouse`, et
+  // elle n'existe pas avant la première exécution du cron suivant un
+  // déploiement. Elle expire ensuite au bout de 72 h, soit trois exécutions du
+  // cron quotidien : si cette absence persiste au-delà, le cron ne tourne plus
+  // et ce n'est PAS une absence tolérable — l'entrée dit le délai au bout
+  // duquel elle devient une panne, pour ne pas devenir le silence qu'elle est
+  // censée éviter.
+  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-greenhouse ; au-delà de 72 h, c'est une panne de cron",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
@@ -80,8 +89,8 @@ for (const { chemin, attendu } of REQUETES) {
   } catch (e) { ko(chemin, e.name === 'TimeoutError' ? 'délai dépassé' : e.message); continue; }
 
   // `demo: true` est le repli codé en dur du handler : il signifie que les
-  // huit collecteurs sont revenus vides. C'est le pire cas, et il est muet.
-  if (rep.demo) { ko(chemin, 'réponse de démonstration — les huit collecteurs sont revenus vides'); continue; }
+  // neuf collecteurs sont revenus vides. C'est le pire cas, et il est muet.
+  if (rep.demo) { ko(chemin, 'réponse de démonstration — les neuf collecteurs sont revenus vides'); continue; }
   if (!rep.total) { ko(chemin, 'aucune offre'); continue; }
 
   // Le filtre fonctionne-t-il ? Une recherche qui rend des offres sans rapport

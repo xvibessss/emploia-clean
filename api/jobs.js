@@ -80,7 +80,7 @@ function isGermanJob(title, desc) {
 }
 
 // ── JSEARCH (Indeed + LinkedIn + Glassdoor) ───────────
-// Une source indisponible ne doit pas faire tomber la recherche : les sept
+// Une source indisponible ne doit pas faire tomber la recherche : les huit
 // autres ont des offres à rendre. Mais elle ne doit plus tomber en silence.
 // Chaque échec se terminait par un `return []` nu, si bien que trois des huit
 // sources n'ont rien renvoyé pendant des mois sans que rien ne le signale —
@@ -107,7 +107,14 @@ function muet(journal, source, raison, cause) {
 // chiffres : il ne peut rien divulguer. Les autres cas se réduisent à un jeton
 // d'un ensemble fermé. Rien de ce qui sort d'ici ne dépend du contenu d'un
 // message d'exception ou d'un corps de réponse amont.
-const CAUSES = new Set(['cle_absente', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
+// `collecte_absente` est le jeton du collecteur Greenhouse, et il dit une
+// chose que les autres ne savaient pas dire : la source n'a pas échoué, elle
+// n'a RIEN À LIRE. Sa clé KV est remplie par `api/cron/collect-greenhouse` et
+// expire au bout de 72 h ; absente, c'est que le cron quotidien n'a pas tourné
+// depuis trois jours. Réutiliser `cle_absente` se serait lu « il manque une
+// variable d'environnement » et aurait envoyé chercher la panne au mauvais
+// endroit.
+const CAUSES = new Set(['cle_absente', 'collecte_absente', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
 
 // Déduit un jeton d'une raison libre, pour les `catch` qui n'en déclarent pas.
 // Le test porte sur la forme du message, jamais sur son contenu : seule la
@@ -529,6 +536,70 @@ async function fetchFranceTravail(q, type, location, page, journal) {
   } catch (e) { return muet(journal, 'France Travail', e.message || String(e)); }
 }
 
+// ── GREENHOUSE (crawl direct des ATS, via Upstash KV) ─
+// Le seul collecteur qui ne sorte pas sur le réseau. Les 28 boards Greenhouse
+// sont crawlés une fois par jour par `api/cron/collect-greenhouse` — le plan
+// Hobby n'autorise pas plus souvent — et ce qu'on lit ici est le relevé qu'il
+// a déposé. La raison est mesurée : la
+// collecte prend 10,1 s, le handler borne chaque source à 10 s, et la durée
+// d'un crawl ATS croît avec le nombre d'entreprises — ce qu'une requête
+// utilisateur ne peut pas se permettre.
+//
+// Ce que ce collecteur apporte, mesuré le 2026-10-19 contre la production :
+// 257 de ses 334 offres françaises (76,9 %) n'étaient servies par aucune des
+// huit autres sources, y compris en les interrogeant entreprise par
+// entreprise par leur nom exact et en paginant jusqu'au bout. Ce ne sont pas
+// les entreprises qui manquaient — 26 des 28 apparaissaient déjà — ce sont
+// leurs offres.
+//
+// Il est placé AVANT les sources tierces dans la liste des collecteurs, et
+// c'est une décision, pas un hasard : `deduplicate()` garde la PREMIÈRE
+// occurrence de chaque couple titre+entreprise. Une offre vue à la fois ici et
+// chez un agrégateur sort donc avec l'URL de la page carrière de l'employeur
+// plutôt qu'avec celle du republicateur. C'est tout l'intérêt de crawler la
+// source.
+async function fetchGreenhouse(q, type, location, page, journal) {
+  try {
+    const collecte = await kvGet('greenhouse_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    // Absente ou illisible, la clé ne vaut pas une liste vide. Un `return []`
+    // nu ferait disparaître la source en silence — le défaut exact que
+    // `causesEnEchec` est venu retirer pour les sept sources réseau.
+    if (!offres) return muet(journal, 'Greenhouse', 'clé greenhouse_jobs absente ou illisible', 'collecte_absente');
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      // Une offre au contrat inconnu est écartée sous filtre, comme partout
+      // ailleurs : 57,8 % des offres Greenhouse sortent avec `type: null`, et
+      // les servir en réponse à « CDI » serait l'affirmation sans preuve que
+      // `_lib/contrat.js` interdit.
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    // Paginé comme les sources réseau le sont, et pour la même raison : rendre
+    // les 334 offres d'un coup noierait les huit autres collecteurs dans un
+    // agrégat où elles passeraient toutes devant — `prioritize` classe la
+    // France au premier rang. Dix par page les rend accessibles sans
+    // déséquilibrer la liste.
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'Greenhouse', e.message || String(e)); }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location, journal) {
   try {
@@ -574,7 +645,7 @@ function prioritize(jobs) {
 }
 
 // ── PERTINENCE ────────────────────────────────────────
-// Deux des huit collecteurs ignorent purement et simplement le terme de
+// Deux des neuf collecteurs ignorent purement et simplement le terme de
 // recherche. Mesuré sur l'API publique de Remotive, qui rend les mêmes 18
 // offres et le même premier titre pour `search=coiffeur`, `search=boulanger`,
 // `search=nurse` et `search=python` ; Arbeitnow se comporte de même. Leur
@@ -744,6 +815,7 @@ export default async function handler(req) {
   const journal = [];
   const collecteurs = [
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
+    ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal)],

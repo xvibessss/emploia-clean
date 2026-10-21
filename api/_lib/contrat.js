@@ -29,7 +29,7 @@ export const FILTRE_VERS_CONTRAT = {
 // Dernier verrou avant qu'une étiquette entre dans une offre : ce qui n'est
 // pas du vocabulaire fermé devient `null`. Même rôle que `causePublique` pour
 // les causes d'échec — la garantie est appliquée en un point, pas confiée à la
-// discipline des huit collecteurs ni à celle du prochain qu'on ajoutera.
+// discipline des neuf collecteurs ni à celle du prochain qu'on ajoutera.
 export function contratPublic(v) {
   return CONTRATS.has(v) ? v : null;
 }
@@ -107,10 +107,19 @@ export function tempsAdzuna(j) {
 // CONTIENT « befristeter » (à durée déterminée). Un test par sous-chaîne dans
 // le mauvais ordre rend CDD pour les 28 offres les plus clairement CDI du lot.
 // Le préfixe est donc testé d'abord, et il sort immédiatement.
-function contratDepuisTexte(t) {
+export function contratDepuisTexte(t) {
   if (/\bunbefristet/.test(t)) return 'CDI';            // à tester AVANT befristet
   if (/\bbefristet/.test(t)) return 'CDD';
   if (/\bpermanent\b/.test(t)) return 'CDI';
+  // LE MÊME PIÈGE, dans l'autre langue, et il est arrivé par Greenhouse :
+  // « Unlimited Contract » (contrat à durée ILLIMITÉE, donc un CDI) CONTIENT
+  // « contract ». Mesuré sur huit boards Greenhouse, 747 offres : c'est la
+  // valeur la PLUS fréquente du champ `Employment Type` — 108 des 145 offres
+  // qui le portent. Sans ce garde, le collecteur le plus riche en CDI
+  // déclarés les publierait tous en CDD, et ce serait une inversion de sens,
+  // pas une imprécision. Testé AVANT `contract`, comme `unbefristet` l'est
+  // avant `befristet`, et pour exactement la même raison.
+  if (/\bunlimited\b/.test(t)) return 'CDI';
   if (/\b(contract|temporary|zeitarbeit)\b/.test(t)) return 'CDD';
   if (/\b(internship|intern|praktikum|stage)\b/.test(t)) return 'Stage';
   if (/\b(apprenticeship|ausbildung|alternance|apprenti)\b/.test(t)) return 'Alternance';
@@ -187,6 +196,47 @@ const FT_CONTRAT = {
 export function contratFranceTravail(j) {
   const code = String(j?.typeContrat ?? '').trim().toUpperCase();
   return contratPublic(FT_CONTRAT[code] || detectType(j?.intitule));
+}
+
+// ── GREENHOUSE ───────────────────────────────────────────────────────────────
+// Greenhouse ne publie AUCUN champ de contrat dans son API de boards. Ce qui
+// s'en approche est `metadata`, un tableau de champs que l'employeur configure
+// lui-même : la plupart des boards n'en posent aucun, certains en posent
+// d'étrangers au sujet (« Headcount # »), et une minorité y met un
+// « Employment Type ».
+//
+// MESURÉ sur huit boards et 747 offres : 145 offres le portent, soit 19,4 %,
+// et elles viennent toutes d'UN SEUL board. Les sept autres n'en ont pas une.
+// Le champ est donc un signal réel mais rare, et c'est pour cela qu'il vaut
+// `null` partout ailleurs plutôt qu'un repli : quatre offres Greenhouse sur
+// cinq n'ont pas de contrat lisible, et le dire est l'information.
+//
+// La valeur est du texte libre tapé par l'employeur, pas une énumération — les
+// quatre valeurs relevées sont « Unlimited Contract » (108), « Intern » (33),
+// « Unbefristeter Vertrag » (2) et « Working Student » (2). Elle passe donc par
+// `contratDepuisTexte`, le même lecteur que les valeurs libres d'Arbeitnow, au
+// lieu d'une table de correspondance qui serait fausse à la cinquième valeur.
+// « Working Student » y reste `null`, comme « Werkstudent » : le statut
+// étudiant allemand n'est ni un stage ni une alternance au sens français.
+export function contratGreenhouse(j) {
+  const champ = champMetadata(j, 'employment type');
+  const parMetadata = champ ? contratDepuisTexte(normaliserValeur(champ)) : null;
+  return contratPublic(parMetadata || detectType(j?.title));
+}
+
+export function tempsGreenhouse(j) {
+  const champ = champMetadata(j, 'employment type');
+  return champ ? lireTemps(normaliserValeur(champ)) : null;
+}
+
+// Un champ `metadata` par son nom. `value` n'est une chaîne que pour un champ
+// rempli : un champ non rempli vaut `null`, et un multi-select non rempli vaut
+// le tableau vide. Toute forme qui n'est pas une chaîne est traitée comme
+// absente — il n'y a rien à y lire, et en tirer quelque chose serait inventer.
+export function champMetadata(j, nom) {
+  const champs = Array.isArray(j?.metadata) ? j.metadata : [];
+  const trouve = champs.find(c => String(c?.name ?? '').trim().toLowerCase() === nom);
+  return typeof trouve?.value === 'string' && trouve.value.trim() ? trouve.value : null;
 }
 
 // ── SALAIRE ──────────────────────────────────────────────────────────────────
