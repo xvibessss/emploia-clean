@@ -109,7 +109,7 @@ function muet(journal, source, raison, cause) {
 // message d'exception ou d'un corps de réponse amont.
 // `collecte_absente` est le jeton du collecteur Greenhouse, et il dit une
 // chose que les autres ne savaient pas dire : la source n'a pas échoué, elle
-// n'a RIEN À LIRE. Sa clé KV est remplie par `api/cron/collect-greenhouse` et
+// n'a RIEN À LIRE. Sa clé KV est remplie par `api/cron/collect-ats` et
 // expire au bout de 72 h ; absente, c'est que le cron quotidien n'a pas tourné
 // depuis trois jours. Réutiliser `cle_absente` se serait lu « il manque une
 // variable d'environnement » et aurait envoyé chercher la panne au mauvais
@@ -538,7 +538,7 @@ async function fetchFranceTravail(q, type, location, page, journal) {
 
 // ── GREENHOUSE (crawl direct des ATS, via Upstash KV) ─
 // Le seul collecteur qui ne sorte pas sur le réseau. Les 28 boards Greenhouse
-// sont crawlés une fois par jour par `api/cron/collect-greenhouse` — le plan
+// sont crawlés une fois par jour par `api/cron/collect-ats` — le plan
 // Hobby n'autorise pas plus souvent — et ce qu'on lit ici est le relevé qu'il
 // a déposé. La raison est mesurée : la
 // collecte prend 10,1 s, le handler borne chaque source à 10 s, et la durée
@@ -598,6 +598,68 @@ async function fetchGreenhouse(q, type, location, page, journal) {
       .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
       .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
   } catch (e) { return muet(journal, 'Greenhouse', e.message || String(e)); }
+}
+
+// ── LEVER (crawl direct des ATS, via Upstash KV) ──────
+// Le second collecteur qui ne sorte pas sur le réseau, après Greenhouse, et il
+// vise le gisement que Greenhouse n'avait pas : 5,2 % seulement des offres
+// Greenhouse étaient en France, et les scale-ups françaises évidentes y
+// répondaient 404. Lever porte 17 boards vivants pour 358 offres françaises,
+// soit 18,5 % de sa collecte — trois fois la densité de Greenhouse.
+//
+// Ce que ce collecteur apporte, mesuré le 2026-10-21 contre la production, en
+// interrogeant entreprise par entreprise par le nom exact ET EN PAGINANT
+// jusqu'à épuisement : voir `RAPPORT-lever-2026-10-21.md`. Le relevé sur la
+// seule `page=0` donnait 90,2 % d'offres absentes ; la mesure paginée corrige
+// ce chiffre, et c'est elle qui compte — la production borne chaque source par
+// page, donc mesurer une page mesure la taille d'une page, pas la couverture.
+//
+// Il est placé AVANT les sources tierces, comme Greenhouse et pour la même
+// raison : `deduplicate()` garde la PREMIÈRE occurrence de chaque couple
+// titre+entreprise. Une offre vue à la fois ici et chez un agrégateur sort donc
+// avec l'URL de la page de candidature de l'employeur plutôt qu'avec celle du
+// republicateur. C'est l'apport qui subsiste même là où le recouvrement est
+// total.
+async function fetchLever(q, type, location, page, journal) {
+  try {
+    const collecte = await kvGet('lever_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    // Absente ou illisible, la clé ne vaut pas une liste vide. Un `return []`
+    // nu ferait disparaître la source en silence — le défaut exact que
+    // `causesEnEchec` est venu retirer pour les sources réseau.
+    if (!offres) return muet(journal, 'Lever', 'clé lever_jobs absente ou illisible', 'collecte_absente');
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      // Une offre au contrat inconnu est écartée sous filtre, comme partout
+      // ailleurs : 45,3 % des offres Lever sortent avec `type: null`, et les
+      // servir en réponse à « CDI » serait l'affirmation sans preuve que
+      // `_lib/contrat.js` interdit.
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    // Paginé comme les sources réseau le sont, et pour la même raison : rendre
+    // les 358 offres d'un coup noierait les autres collecteurs dans un agrégat
+    // où elles passeraient toutes devant — `prioritize` classe la France au
+    // premier rang. Dix par page les rend accessibles sans déséquilibrer la
+    // liste.
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'Lever', e.message || String(e)); }
 }
 
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
@@ -816,6 +878,7 @@ export default async function handler(req) {
   const collecteurs = [
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal)],
+    ['Lever',             () => fetchLever(q, type, location, page, journal)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal)],

@@ -6,6 +6,7 @@
   "installCommand": "echo ok",
   "regions": ["cdg1"],
   "functions": {
+    "api/cron/collect-ats.js": { "maxDuration": 300 },
     "api/**/*.js": { "maxDuration": 60 }
   },
   "crons": [
@@ -18,7 +19,7 @@
       "schedule": "0 18 * * 0"
     },
     {
-      "path": "/api/cron/collect-greenhouse",
+      "path": "/api/cron/collect-ats",
       "schedule": "0 4 * * *"
     },
     {

@@ -91,6 +91,8 @@ jobs:
         run: node scripts/smoke/contrat.test.mjs
       - name: Collecteur Greenhouse (un board en échec n'emporte pas les autres)
         run: node scripts/smoke/greenhouse.test.mjs
+      - name: Collecteur Lever (indéterminée ≠ déterminée, un bureau FR ne rend pas FR)
+        run: node scripts/smoke/lever.test.mjs
       - name: Helper d'envoi d'emails (reply_to présent, refus Resend remontés)
         run: node scripts/billing/email.test.mjs
       - name: Billing tests (Pack Campagne, grille tarifaire)

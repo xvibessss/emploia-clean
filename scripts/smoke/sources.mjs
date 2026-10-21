@@ -35,14 +35,21 @@ const ABSENCES_CONNUES = {
   Internships: 'HTTP 404 sur internships-api.p.rapidapi.com/active-jb-7d — abonnement ou chemin à revoir sur RapidAPI',
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
-  // la clé `greenhouse_jobs` est remplie par `api/cron/collect-greenhouse`, et
-  // elle n'existe pas avant la première exécution du cron suivant un
-  // déploiement. Elle expire ensuite au bout de 72 h, soit trois exécutions du
-  // cron quotidien : si cette absence persiste au-delà, le cron ne tourne plus
-  // et ce n'est PAS une absence tolérable — l'entrée dit le délai au bout
-  // duquel elle devient une panne, pour ne pas devenir le silence qu'elle est
-  // censée éviter.
-  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-greenhouse ; au-delà de 72 h, c'est une panne de cron",
+  // les clés `greenhouse_jobs` et `lever_jobs` sont remplies par
+  // `api/cron/collect-ats`, et elles n'existent pas avant la première exécution
+  // du cron suivant un déploiement. Elles expirent ensuite au bout de 72 h,
+  // soit trois exécutions du cron quotidien : si l'absence persiste au-delà, le
+  // cron ne tourne plus et ce n'est PAS une absence tolérable — l'entrée dit le
+  // délai au bout duquel elle devient une panne, pour ne pas devenir le silence
+  // qu'elle est censée éviter.
+  //
+  // Les deux ATS ont une entrée SÉPARÉE, et c'est le point d'avoir une clé KV
+  // par fournisseur : le cron peut écrire l'une et pas l'autre — un fournisseur
+  // dont la collecte échoue laisse sa clé intacte et passe la main au suivant.
+  // Une entrée commune ferait lire une panne de Lever comme une panne de
+  // Greenhouse, ou l'inverse.
+  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
+  Lever: "clé lever_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
