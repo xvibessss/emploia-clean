@@ -120,10 +120,33 @@ export function contratDepuisTexte(t) {
   // pas une imprécision. Testé AVANT `contract`, comme `unbefristet` l'est
   // avant `befristet`, et pour exactement la même raison.
   if (/\bunlimited\b/.test(t)) return 'CDI';
+  // LE MÊME PIÈGE UNE TROISIÈME FOIS, EN FRANÇAIS, et il arrive par Lever :
+  // « contrat à durée INdéterminée » (un CDI) contient « déterminée » (un CDD).
+  // Le mot long porte le mot court, et un test par sous-chaîne dans le mauvais
+  // ordre inverse le sens de l'offre. Les bornes `\b` suffiraient ici —
+  // « indeterminee » n'offre pas de frontière de mot devant « determinee » —
+  // mais l'ordre est posé EXPLICITEMENT, comme pour `unbefristet` et pour
+  // `unlimited`, parce que c'est l'ordre qui protège et non la chance.
+  //
+  // MESURÉ sur les 31 boards Lever vivants, 2 044 offres :
+  // `categories.commitment` porte 38 valeurs distinctes de texte libre, dont
+  // « CDI », « CDD », « CDI / Permanent position », « Permanent contract »,
+  // « Fixed-term contract » et « Freelancer ». Sans ce bloc, « CDI » et
+  // « CDD » valaient tous les deux `null` : le vocabulaire français n'était
+  // écrit nulle part, sur un site d'emploi français.
+  if (/\bcdi\b/.test(t) || /\bindetermine(e|es|s)?\b/.test(t)) return 'CDI';  // avant determine
+  if (/\bcdd\b/.test(t) || /\bdetermine(e|es|s)?\b/.test(t)) return 'CDD';
+  // « Fixed term » et « Fixed-Term » sans le mot « contract » : la
+  // normalisation rend « fixed term », que le motif `contract` ne voit pas.
+  if (/\bfixed term\b/.test(t)) return 'CDD';
+  // « Contractor » n'est pas « contract » pour une borne de mot, et Lever
+  // écrit les deux. Le dépôt a déjà tranché ce sens pour JSearch
+  // (`contractor: 'CDD'`) ; on ne le tranche pas une seconde fois ailleurs.
+  if (/\bcontractors?\b/.test(t)) return 'CDD';
   if (/\b(contract|temporary|zeitarbeit)\b/.test(t)) return 'CDD';
   if (/\b(internship|intern|praktikum|stage)\b/.test(t)) return 'Stage';
   if (/\b(apprenticeship|ausbildung|alternance|apprenti)\b/.test(t)) return 'Alternance';
-  if (/\b(freelance|freiberufler|selbststandiger)\b/.test(t)) return 'Freelance';
+  if (/\b(freelancer?|freiberufler|selbststandiger)\b/.test(t)) return 'Freelance';
   // « Werkstudent » / « working student » est un statut étudiant allemand qui
   // n'est ni un stage ni une alternance au sens français. Il reste `null` :
   // le rapprocher serait commode et faux.
@@ -227,6 +250,41 @@ export function contratGreenhouse(j) {
 export function tempsGreenhouse(j) {
   const champ = champMetadata(j, 'employment type');
   return champ ? lireTemps(normaliserValeur(champ)) : null;
+}
+
+// ── LEVER ────────────────────────────────────────────────────────────────────
+// Lever est plus structuré que Greenhouse : `categories.commitment` porte un
+// type d'engagement sur PRESQUE TOUTES les offres, là où le `metadata` de
+// Greenhouse n'était rempli que par une offre sur cinq. Mais c'est du TEXTE
+// LIBRE choisi par l'employeur, pas une énumération — 38 valeurs distinctes
+// relevées sur 31 boards — donc il passe par `contratDepuisTexte`, le même
+// lecteur que les valeurs libres d'Arbeitnow et de Greenhouse, et non par une
+// table de correspondance qui serait fausse à la trente-neuvième valeur.
+//
+// CE QUI RESTE `null` À DESSEIN, et ce n'est pas une lacune :
+//   · « Remote » — relevé DANS le champ commitment. Ce n'est pas un contrat,
+//     c'est un lieu de travail, et il sort par `remote` depuis
+//     `workplaceType`. C'est exactement la faute que le collecteur Remotive
+//     commettait en écrivant « Remote » dans le champ contrat.
+//   · « Full Time », « Part-Time » — une durée de travail, pas un contrat.
+//     Elles sortent par `tempsLever`, dans leur propre champ.
+//   · « Interim » — une mission d'intérim n'est aucun de nos cinq contrats.
+//     Le dépôt l'a déjà tranché pour France Travail, dont les codes `MIS` et
+//     `SAI` valent `null` ; on ne décide pas l'inverse ici.
+//   · « Working Student », « CLT », « GE Employee », « FR Executive/Cadre »,
+//     « Short term » — un statut étudiant allemand, un régime brésilien, deux
+//     catégories internes et une durée vague. Les rapprocher de nos cinq
+//     libellés serait commode et faux.
+export function contratLever(p) {
+  const engagement = p?.categories?.commitment;
+  const parEngagement = engagement ? contratDepuisTexte(normaliserValeur(engagement)) : null;
+  // Le titre d'une offre Lever est dans `text`, pas dans `title`.
+  return contratPublic(parEngagement || detectType(p?.text));
+}
+
+export function tempsLever(p) {
+  const engagement = p?.categories?.commitment;
+  return engagement ? lireTemps(normaliserValeur(engagement)) : null;
 }
 
 // Un champ `metadata` par son nom. `value` n'est une chaîne que pour un champ
