@@ -187,5 +187,18 @@ check('la règle est « au moins une contribution », pas « à chaque requête 
 check('une absence déclarée reste tolérée mais visible',
   /à zéro sans échouer — /.test(sonde));
 
+// L'invariant n'est PROUVABLE que si la sonde interroge au moins une requête
+// large. Mesuré le 2026-10-22 : les réservoirs KV rendent zéro sur les trois
+// requêtes étroites de la sonde — « infirmier », « developpeur », « boulanger »
+// ne matchent rien dans des crawls d'ATS anglophones, dont les offres
+// s'intitulent « Engineer » ou « Nurse » — et dix chacun sur une requête sans
+// `q`. Sans cette quatrième requête, l'invariant déclarerait Greenhouse et
+// Lever muets à tort, et la sonde serait une fausse alerte permanente.
+check('la sonde interroge au moins une requête large, sans aiguille',
+  /\{ chemin: '\/api\/jobs', attendu: null \}/.test(sonde),
+  'sinon l’invariant de contribution est infalsifiable');
+check('la pertinence n’est exigée que des requêtes qui portent une aiguille',
+  /if \(attendu && !pertinentes\)/.test(sonde));
+
 if (failed) { console.error(`\n❌ sonde du décompte : ${failed} échec(s) sur ${passed + failed}\n`); process.exit(1); }
 console.log(`\n✅ sonde du décompte : ${passed} vérifications OK\n`);

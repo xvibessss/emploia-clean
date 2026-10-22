@@ -30,6 +30,23 @@ const REQUETES = [
   { chemin: '/api/jobs?q=infirmier', attendu: 'infirmi' },
   { chemin: '/api/jobs?q=developpeur&location=Lyon', attendu: 'lyon' },
   { chemin: '/api/jobs?q=boulanger', attendu: 'boulang' },
+  // Une requête LARGE, sans `q`, et elle a un rôle que les trois autres ne
+  // peuvent pas tenir : c'est la seule sous laquelle tout collecteur vivant
+  // DOIT se montrer. Les réservoirs KV (Greenhouse, Lever) filtrent leur
+  // réservoir localement, par sous-chaîne sur le titre ; mesuré le 2026-10-22,
+  // ils rendent zéro sur les trois requêtes ci-dessus et dix chacun ici.
+  //
+  // La raison est linguistique : ce sont des crawls d'ATS anglophones, où
+  // « infirmier », « developpeur » et « boulanger » ne matchent rien — leurs
+  // offres s'intitulent « Engineer », « Nurse », « Baker ». Leur zéro est donc
+  // légitime sur une requête étroite, et sans cette quatrième requête
+  // l'invariant de contribution les déclarerait muets à tort, ce qui aurait
+  // transformé la sonde en fausse alerte permanente.
+  //
+  // Pas d'aiguille de pertinence pour celle-ci : sans `q`, il n'y a rien à
+  // attendre dans les titres, et en exiger une reviendrait à inventer un
+  // critère. C'est la contribution des collecteurs qu'elle mesure, pas le filtre.
+  { chemin: '/api/jobs', attendu: null },
 ];
 
 // Les collecteurs qu'on sait absents, chacun avec sa raison. Une absence sans
@@ -70,8 +87,8 @@ const ABSENCES_CONNUES = {
   // tolérables sans devenir un silence : `collecte_absente` dit que le cron
   // n'a pas tourné, `quota_epuise` que le plan a refusé la collecte — une
   // décision d'abonnement — et `cle_absente` que RAPIDAPI_KEY n'est pas posée.
-  JSearch: "réservoir rapidapi_jobs pas encore écrit — normal jusqu'à la première exécution de /api/cron/collect-rapidapi ; au-delà de 72 h c'est une panne de cron, et quota_epuise désigne le plafond du plan (200 requêtes/mois), pas le cron",
-  'French Job Market': "même réservoir, collecté le LUNDI seulement — 30 requêtes/mois n'autorisent pas un appel par jour sur 31 ; tolérance 16 jours, soit deux lundis manqués, au-delà c'est une panne de cron ou un quota épuisé",
+  JSearch: "collecte_absente : réservoir rapidapi_jobs pas encore écrit — normal jusqu'à la première exécution de /api/cron/collect-rapidapi ; au-delà de 72 h c'est une panne de cron, et quota_epuise désigne le plafond du plan (200 requêtes/mois), pas le cron",
+  'French Job Market': "collecte_absente : même réservoir, collecté le LUNDI seulement — 30 requêtes/mois n'autorisent pas un appel par jour sur 31 ; tolérance 16 jours, soit deux lundis manqués, au-delà c'est une panne de cron ou un quota épuisé",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
@@ -137,9 +154,12 @@ for (const { chemin, attendu } of REQUETES) {
 
   // Le filtre fonctionne-t-il ? Une recherche qui rend des offres sans rapport
   // est aussi cassée qu'une recherche vide, mais elle en a l'air moins.
-  const pertinentes = (rep.jobs || []).filter((j) =>
-    `${j.title} ${j.location}`.toLowerCase().includes(attendu)).length;
-  if (!pertinentes) { ko(chemin, `${rep.total} offres, aucune ne mentionne « ${attendu} »`); continue; }
+  // `attendu: null` est la requête large : elle ne porte pas de `q`, donc elle
+  // n'a pas d'aiguille, et le filtre n'est pas ce qu'elle vérifie.
+  const pertinentes = attendu
+    ? (rep.jobs || []).filter((j) => `${j.title} ${j.location}`.toLowerCase().includes(attendu)).length
+    : null;
+  if (attendu && !pertinentes) { ko(chemin, `${rep.total} offres, aucune ne mentionne « ${attendu} »`); continue; }
 
   if (Array.isArray(rep.sourcesEnEchec)) champPresent = true;
   for (const s of rep.sourcesEnEchec || []) absencesRencontrees.add(s);
@@ -159,7 +179,9 @@ for (const { chemin, attendu } of REQUETES) {
       if (Number(n) > 0) ontContribue.add(nom);
     }
   }
-  ok(chemin, `${rep.total} offres · ${pertinentes} pertinentes dans la première page`);
+  ok(chemin, pertinentes === null
+    ? `${rep.total} offres · requête large, contribution des collecteurs`
+    : `${rep.total} offres · ${pertinentes} pertinentes dans la première page`);
 }
 
 console.log('');
