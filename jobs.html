@@ -621,10 +621,15 @@
   // Mesuré le 2026-10-22 sur les 20 métiers que le site publie en SEO : le
   // repli se déclenche sur UN d'entre eux (« secrétaire », 14 offres servies,
   // zéro pertinente). Rare, donc, mais parfaitement muet quand il se produit.
-  function avisPertinence(data, q) {
+  // `cible` est la requête OU le lieu : `motsDeRecherche` tire ses mots des
+  // deux, donc une page de ville sans offre déclenche le repli sans qu'aucun
+  // `q` n'ait été saisi. Les deux vides ne peuvent pas abandonner — sans mot,
+  // le filtre est `inactif`.
+  function avisPertinence(data, q, loc) {
     if (data?.filtre !== 'abandonne') return '';
     const n = data.total || 0;
-    const pour = q ? ` à « ${q} »` : '';
+    const cible = q || loc || '';
+    const pour = cible ? ` à « ${cible} »` : '';
     return `<div class="jb-avis">Aucune offre ne correspond${pour}. Voici les ${n.toLocaleString('fr-FR')} dernière${n > 1 ? 's' : ''} offre${n > 1 ? 's' : ''} publiée${n > 1 ? 's' : ''}, tous métiers confondus.</div>`;
   }
 
@@ -652,7 +657,7 @@
       const label = abandonne ? 'publiées, tous métiers confondus'
         : q ? `pour "${q}"` : currentType !== 'tous' ? `en ${currentType}` : 'disponibles';
       document.getElementById('searchStats').innerHTML = abandonne
-        ? `<strong>0</strong> offre pour "${q}" · ${total.toLocaleString('fr-FR')} offres ${label}`
+        ? `<strong>0</strong> offre pour "${q || loc}" · ${total.toLocaleString('fr-FR')} offres ${label}`
         : `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${label}`;
       document.getElementById('resultCount').innerHTML = `<strong style="color:var(--ink)">${total.toLocaleString('fr-FR')}</strong> offres${couvertureContrat(data.couvertureContrat)}`;
       if (!data.jobs?.length) {
@@ -663,7 +668,7 @@
       let filteredJobs = data.jobs;
       if (salaryFilter) { const [minS, maxS] = salaryFilter.split('-'); const minK = minS ? parseInt(minS)*1000 : 0; const maxK = maxS ? parseInt(maxS)*1000 : Infinity; filteredJobs = data.jobs.filter(j => { const s = j.salary_min || j.salary_max; if (!s) return true; return s >= minK && s <= maxK; }); }
       allJobs = filteredJobs;
-      document.getElementById('jobsList').innerHTML = avisPertinence(data, q) + filteredJobs.map(renderJob).join('');
+      document.getElementById('jobsList').innerHTML = avisPertinence(data, q, loc) + filteredJobs.map(renderJob).join('');
       renderPagination(filteredJobs.length, salaryFilter ? filteredJobs.length : total);
       requestAnimationFrame(() => autoScoreAllJobs(filteredJobs));
     } catch(e) {

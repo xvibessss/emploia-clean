@@ -113,7 +113,19 @@ check('jobs.html porte une fonction d’avis sur le repli', Boolean(avis));
 check('l’avis est piloté par le drapeau, pas deviné',
   /data\?\.filtre !== 'abandonne'/.test(avis || ''));
 check('l’avis est rendu AU-DESSUS de la liste',
-  /avisPertinence\(data, q\) \+ filteredJobs\.map\(renderJob\)/.test(jobsHtml));
+  /avisPertinence\(data, q, loc\) \+ filteredJobs\.map\(renderJob\)/.test(jobsHtml));
+
+// `motsDeRecherche` tire ses mots de la requête ET du lieu : une page de ville
+// sans offre déclenche donc le repli sans qu'aucun `q` n'ait été saisi, et
+// « 0 offre pour "" » serait une phrase cassée. Les deux vides ne peuvent pas
+// abandonner — ce qui est vérifié juste en dessous sur le vrai filtre.
+check('la cible nommée est la requête OU le lieu',
+  /const cible = q \|\| loc \|\| '';/.test(jobsHtml) && /\$\{q \|\| loc\}/.test(jobsHtml));
+const surLieuSeul = filtrerPertinence([offre({ location: 'Paris' })], '', 'Carcassonne');
+check('le repli se déclenche bien sur le lieu seul',
+  surLieuSeul.filtre === 'abandonne');
+check('sans requête NI lieu, le filtre est inactif et ne peut pas abandonner',
+  filtrerPertinence([offre()], '', '').filtre === 'inactif');
 check('l’avis dit ce que la liste est vraiment',
   /Aucune offre ne correspond/.test(avis || '') && /tous métiers confondus/.test(avis || ''));
 
