@@ -4,6 +4,10 @@ import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 // savoir au bout de combien de temps une collecte est périmée.
 import { CLE_KV as CLE_RAPIDAPI, AGE_MAX_SECONDES } from './_lib/rapidapi.js';
 import { collecterFranceTravail } from './_lib/france-travail.js';
+// La règle de lecture de la balise ATS vit dans `_lib/ats.js`, à côté de la
+// règle qui l'écrit : deux moitiés d'une même convention ne doivent pas
+// pouvoir diverger.
+import { CLE_BALISE as CLE_BALISE_ATS, causeDepuisBalise } from './_lib/ats-balise.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
 // Toute transformation d'une donnée amont en type de contrat vit dans
 // `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
@@ -509,14 +513,28 @@ function causeReservoir(entree, source) {
   return age > AGE_MAX_SECONDES[source] ? perime : null;
 }
 
-async function fetchGreenhouse(q, type, location, page, journal) {
+// `!offres.length` est AJOUTÉ au test, et ce n'est pas de la prudence
+// décorative : le commentaire d'origine disait déjà « la clé ne vaut pas une
+// liste vide », mais le code ne le faisait pas. `Array.isArray([])` est vrai et
+// `![]` est faux, donc une clé portant `offres: []` traversait le garde et
+// partait dans `servirReservoir`, qui rendait zéro offre SANS publier de cause
+// — le silence exact que `causesEnEchec` existe pour retirer. Le cas est
+// aujourd'hui inatteignable parce que le cron refuse d'écrire une collecte
+// vide, mais une clé écrite par un déploiement antérieur, ou à la main, y
+// arriverait. Le commentaire avait raison avant le code.
+//
+// Et la cause ne vaut plus `collecte_absente` d'office : la BALISE de passage
+// dit si le cron est venu. Clé absente + balise muette, il n'est pas passé ;
+// clé absente + balise qui déclare un échec, il est passé et le crawl n'a rien
+// ramené. Deux écrans différents à aller regarder.
+async function fetchGreenhouse(q, type, location, page, journal, lireBalise) {
   try {
     const collecte = await kvGet('greenhouse_jobs');
     const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
-    // Absente ou illisible, la clé ne vaut pas une liste vide. Un `return []`
-    // nu ferait disparaître la source en silence — le défaut exact que
-    // `causesEnEchec` est venu retirer pour les sept sources réseau.
-    if (!offres) return muet(journal, 'Greenhouse', 'clé greenhouse_jobs absente ou illisible', 'collecte_absente');
+    if (!offres || !offres.length) {
+      return muet(journal, 'Greenhouse', 'réservoir greenhouse_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Greenhouse'));
+    }
     return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Greenhouse', e.message || String(e)); }
 }
@@ -541,14 +559,17 @@ async function fetchGreenhouse(q, type, location, page, journal) {
 // avec l'URL de la page de candidature de l'employeur plutôt qu'avec celle du
 // republicateur. C'est l'apport qui subsiste même là où le recouvrement est
 // total.
-async function fetchLever(q, type, location, page, journal) {
+// Même garde et même balise que Greenhouse, et c'est le point d'avoir une clé
+// d'offres PAR fournisseur : Lever peut être muette pendant que Greenhouse
+// sert, et la balise le dit fournisseur par fournisseur plutôt qu'en bloc.
+async function fetchLever(q, type, location, page, journal, lireBalise) {
   try {
     const collecte = await kvGet('lever_jobs');
     const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
-    // Absente ou illisible, la clé ne vaut pas une liste vide. Un `return []`
-    // nu ferait disparaître la source en silence — le défaut exact que
-    // `causesEnEchec` est venu retirer pour les sources réseau.
-    if (!offres) return muet(journal, 'Lever', 'clé lever_jobs absente ou illisible', 'collecte_absente');
+    if (!offres || !offres.length) {
+      return muet(journal, 'Lever', 'réservoir lever_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Lever'));
+    }
 
     let jobs = offres;
     if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
@@ -806,10 +827,18 @@ export default async function handler(req) {
   // et les deux sources rendront `collecte_absente` comme si la clé était vide.
   const reservoirRapidapi = await kvGet(CLE_RAPIDAPI).catch(() => null);
 
+  // La balise ATS est lue PARESSEUSEMENT, et une seule fois pour les deux
+  // fournisseurs. Une source saine ne paie donc rien : la lecture ne part que
+  // si une clé d'offres ne donne rien, c'est-à-dire seulement quand il y a une
+  // panne à expliquer. Le réservoir RapidAPI, lui, est lu d'avance parce que
+  // ses offres SONT dans la clé ; ici la balise n'en porte aucune.
+  let baliseAts;
+  const lireBaliseAts = () => (baliseAts ??= kvGet(CLE_BALISE_ATS).catch(() => null));
+
   const collecteurs = [
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
-    ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal)],
-    ['Lever',             () => fetchLever(q, type, location, page, journal)],
+    ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal, lireBaliseAts)],
+    ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],
