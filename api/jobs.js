@@ -3,6 +3,7 @@ import { checkRateLimit, kvGet, kvSet, withTimeout } from './_lib/auth.js';
 // dans le cron qui le remplit : un handler ne doit pas importer un cron pour
 // savoir au bout de combien de temps une collecte est périmée.
 import { CLE_KV as CLE_RAPIDAPI, AGE_MAX_SECONDES } from './_lib/rapidapi.js';
+import { collecterFranceTravail } from './_lib/france-travail.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
 // Toute transformation d'une donnée amont en type de contrat vit dans
 // `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
@@ -133,7 +134,33 @@ function muet(journal, source, raison, cause) {
 // fois par requête utilisateur, et sans dire que la cause était un plafond
 // MENSUEL plutôt qu'un pic de trafic. Le mesurer a pris une sonde dédiée ;
 // `quota_epuise` le dit en un mot.
-const CAUSES = new Set(['cle_absente', 'collecte_absente', 'quota_epuise', 'timeout', 'reponse_illisible', 'jeton_refuse', 'erreur_reseau', 'inconnue']);
+// `identifiants_refuses`, `droits_insuffisants`, `forme_inattendue` et
+// `filtre_non_servi` sont les jetons de France Travail, la seule source qui
+// s'authentifie. Elle rendait `cle_absente`, et derrière cette unique cause se
+// cachaient quatre situations qui n'appellent pas le même geste :
+//
+//   cle_absente           la variable n'est pas posée  → la poser dans Vercel
+//   identifiants_refuses  posée mais fausse            → la corriger
+//   droits_insuffisants   bonne, mais l'application
+//                         n'est pas abonnée à l'API    → s'abonner sur
+//                                                        francetravail.io
+//   forme_inattendue      l'API répond 2xx sans la
+//                         forme attendue               → relire son contrat
+//
+// Les deux du milieu sont ceux qui comptent, parce que ce sont les deux qu'on
+// confond : la documentation de France Travail sépare `invalid_client`
+// (identifiant ou secret erroné) de `invalid_scope` (« scope pour lequel vous
+// ne disposez pas des droits »), et le second se produit avec des identifiants
+// parfaitement valides. Sous un jeton commun, on revérifierait ses variables
+// pendant que la panne serait un abonnement manquant.
+//
+// `forme_inattendue` remplace un silence, pas une autre cause : le code lisait
+// `(data.resultats || [])`, donc une réponse dont la forme aurait changé
+// rendait zéro offre sans figurer nulle part. `filtre_non_servi` remplace
+// l'autre silence, le `return []` muet sous le filtre « stage ». Ni l'un ni
+// l'autre n'est un échec de l'API — ce sont des zéros DÉCLARÉS, et c'est toute
+// la différence avec un zéro.
+const CAUSES = new Set(['cle_absente', 'collecte_absente', 'quota_epuise', 'timeout', 'reponse_illisible', 'jeton_refuse', 'identifiants_refuses', 'droits_insuffisants', 'forme_inattendue', 'filtre_non_servi', 'erreur_reseau', 'inconnue']);
 
 // Déduit un jeton d'une raison libre, pour les `catch` qui n'en déclarent pas.
 // Le test porte sur la forme du message, jamais sur son contenu : seule la
@@ -352,72 +379,22 @@ async function fetchAdzuna(q, type, location, page, journal) {
   } catch (e) { return muet(journal, 'Adzuna', e.message || String(e)); }
 }
 
-// ── FRANCE TRAVAIL (OAuth2 + Offres API) ─────────────
-async function getFranceTravailToken(clientId, clientSecret) {
-  // Cache token for 55 min — FT tokens are valid for 3600s
-  const cached = await kvGet('ft_token');
-  if (cached) return cached;
-  const tokenRes = await withTimeout(
-    fetch('https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: 'api_offresdemploiv2 o2dsoffre',
-      }).toString(),
-    }), 7000
-  );
-  if (!tokenRes.ok) return null;
-  const { access_token } = await tokenRes.json();
-  if (!access_token) return null;
-  kvSet('ft_token', access_token, 3300).catch(() => {});
-  return access_token;
-}
-
+// ── FRANCE TRAVAIL (OAuth2 + Offres d'emploi v2) ─────
+// Le corps du collecteur vit dans `_lib/france-travail.js`. Il en est sorti
+// parce qu'il s'authentifie : c'est le seul du lot dont la panne peut venir de
+// trois endroits — la variable absente, le serveur d'autorisation qui refuse,
+// l'API qui répond autrement que prévu — et ces trois-là ne se distinguent
+// qu'avec une sonde, que du code écrit en ligne dans ce handler interdisait.
 async function fetchFranceTravail(q, type, location, page, journal) {
-  const clientId = process.env.FRANCE_TRAVAIL_CLIENT_ID;
-  const clientSecret = process.env.FRANCE_TRAVAIL_CLIENT_SECRET;
-  if (!clientId || !clientSecret) return muet(journal, 'France Travail', 'clés absentes : FRANCE_TRAVAIL_CLIENT_ID / _SECRET', 'cle_absente');
-  if (type === 'stage') return []; // stages not well represented
-  try {
-    const access_token = await getFranceTravailToken(clientId, clientSecret);
-    if (!access_token) return muet(journal, 'France Travail', 'jeton OAuth refusé', 'jeton_refuse');
-
-    const typeMap = { cdi: 'CDI', cdd: 'CDD', alternance: 'CA,CP', freelance: 'LIB' };
-    const start = page * 10;
-    const keywords = [q || 'emploi', location || ''].filter(Boolean).join(' ');
-    const params = new URLSearchParams({ motsCles: keywords, range: `${start}-${start + 9}`, sort: '1' });
-    if (typeMap[type]) params.set('typeContrat', typeMap[type]);
-
-    const jobsRes = await withTimeout(
-      fetch(`https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?${params}`, {
-        headers: { Authorization: `Bearer ${access_token}`, Accept: 'application/json' },
-      }), 10000
-    );
-    if (!jobsRes.ok) return muet(journal, 'France Travail', `HTTP ${jobsRes.status}`, `http_${jobsRes.status}`);
-    const data = await jobsRes.json();
-    return (data.resultats || []).slice(0, 8).map(j => ({
-      id: 'ft_' + j.id,
-      title: j.intitule,
-      company: j.entreprise?.nom || 'Confidentiel',
-      location: j.lieuTravail?.libelle || location || 'France',
-      // `typeContrat` est un code d'un référentiel fermé ; `typeContratLibelle`
-      // est un libellé libre (« Contrat à durée indéterminée ») exact mais hors
-      // du vocabulaire des cinq badges, donc illisible pour un filtre comme
-      // pour `typeBadgeClass`. On lit le code.
-      type: contratFranceTravail(j),
-      salary: j.salaire?.libelle || null,
-      description: (j.description || '').slice(0, 300),
-      url: `https://candidat.francetravail.fr/offres/recherche/detail/${j.id}`,
-      date: j.dateCreation || new Date().toISOString(),
-      remote: (j.lieuTravail?.libelle || '').toLowerCase().includes('télétravail'),
-      source: 'France Travail',
-      logo: null,
-      country: 'FR',
-    }));
-  } catch (e) { return muet(journal, 'France Travail', e.message || String(e)); }
+  const { offres, cause, raison } = await collecterFranceTravail({
+    q, type, location, page,
+    clientId: process.env.FRANCE_TRAVAIL_CLIENT_ID,
+    clientSecret: process.env.FRANCE_TRAVAIL_CLIENT_SECRET,
+    kvGet, kvSet,
+    contrat: contratFranceTravail,
+  });
+  if (cause) return muet(journal, 'France Travail', raison || cause, cause);
+  return offres;
 }
 
 // ── GREENHOUSE (crawl direct des ATS, via Upstash KV) ─

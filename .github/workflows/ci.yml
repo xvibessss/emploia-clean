@@ -95,6 +95,8 @@ jobs:
         run: node scripts/smoke/lever.test.mjs
       - name: Réservoir RapidAPI (budget sous le plafond mesuré, absence jamais masquée)
         run: node scripts/smoke/rapidapi.test.mjs
+      - name: Collecteur France Travail (jeton lu de expires_in, 4 causes distinctes)
+        run: node scripts/smoke/france-travail.test.mjs
       - name: Helper d'envoi d'emails (reply_to présent, refus Resend remontés)
         run: node scripts/billing/email.test.mjs
       - name: Billing tests (Pack Campagne, grille tarifaire)

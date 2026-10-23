@@ -36,7 +36,18 @@ const REQUETES = [
 // raison écrite ici fait échouer la sonde : c'est ce qui empêche la liste de
 // grossir en silence jusqu'à ne plus rien prouver.
 const ABSENCES_CONNUES = {
-  'France Travail': 'FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés — compte à ouvrir sur francetravail.io',
+  // L'absence est tolérée tant que la cause est `cle_absente` — les deux
+  // variables n'ont jamais été créées. Elle ne l'est PLUS dès que la cause
+  // change, et c'est tout l'intérêt des jetons ajoutés avec cette entrée :
+  //
+  //   cle_absente           les variables ne sont pas posées → les poser
+  //   identifiants_refuses  posées mais refusées (invalid_client) → les corriger
+  //   droits_insuffisants   bonnes, mais l'application n'est pas abonnée à
+  //                         l'API Offres d'emploi v2 (invalid_scope) → s'abonner
+  //
+  // La sonde signale de toute façon le changement, parce qu'elle rapproche la
+  // cause rencontrée de celle que cette entrée déclare.
+  'France Travail': 'cle_absente attendu — FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés (compte à ouvrir sur francetravail.io). Toute AUTRE cause est une panne : identifiants_refuses = variables fausses, droits_insuffisants = application non abonnée à l’API Offres v2',
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
   // les clés `greenhouse_jobs` et `lever_jobs` sont remplies par
