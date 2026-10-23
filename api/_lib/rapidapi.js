@@ -230,6 +230,25 @@ function normaliserFrenchMarket(j) {
 }
 
 // ── JSEARCH ─────────────────────────────────────────────────────────────────
+// L'état d'une collecte, vu de la source entière — et non appel par appel.
+//
+// POURQUOI CE N'EST PAS `quota ? 'quota' : 'ok'`. C'était l'ancienne forme, et
+// elle déclarait `ok` une collecte dont les six appels avaient échoué : les
+// refus non-429 sont consignés dans le journal puis écartés par `parLots`, qui
+// ne regarde que `quota` et `ok`. Une API totalement en panne rendait donc zéro
+// offre sous l'étiquette `ok`, que `causeReservoir` traduisait en
+// `collecte_absente` — « le cron n'a pas tourné ». Le cron avait tourné, et
+// c'est l'API qui était tombée. Deux pannes, deux écrans à aller regarder.
+//
+// `aboutis` compte les appels qui ont RÉPONDU correctement. Aucun abouti alors
+// qu'on a appelé, et sans refus de quota, c'est une panne de l'API : `erreur`.
+// Une collecte partielle reste `ok` — elle a ramené ce qu'elle a pu.
+function etatDeCollecte(quota, aboutis, appels) {
+  if (quota) return 'quota';
+  if (appels > 0 && aboutis.length === 0) return 'erreur';
+  return 'ok';
+}
+
 export async function collecterJSearch({ cle, fetchImpl = fetch, journal, familles = FAMILLES } = {}) {
   if (!cle) return { etat: 'cle_absente', offres: [], appels: 0 };
 
@@ -254,7 +273,7 @@ export async function collecterJSearch({ cle, fetchImpl = fetch, journal, famill
   for (const donnees of aboutis) {
     for (const j of (donnees?.data || [])) offres.push(normaliserJSearch(j));
   }
-  return { etat: quota ? 'quota' : 'ok', offres, appels };
+  return { etat: etatDeCollecte(quota, aboutis, appels), offres, appels };
 }
 
 // ── FRENCH JOB MARKET (APEC + HelloWork + Free-Work) ────────────────────────
@@ -287,5 +306,5 @@ export async function collecterFrenchMarket({ cle, fetchImpl = fetch, journal, f
       offres.push(normaliserFrenchMarket(j));
     }
   }
-  return { etat: quota ? 'quota' : 'ok', offres, appels };
+  return { etat: etatDeCollecte(quota, aboutis, appels), offres, appels };
 }

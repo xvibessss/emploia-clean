@@ -160,7 +160,23 @@ function muet(journal, source, raison, cause) {
 // l'autre silence, le `return []` muet sous le filtre « stage ». Ni l'un ni
 // l'autre n'est un échec de l'API — ce sont des zéros DÉCLARÉS, et c'est toute
 // la différence avec un zéro.
-const CAUSES = new Set(['cle_absente', 'collecte_absente', 'quota_epuise', 'timeout', 'reponse_illisible', 'jeton_refuse', 'identifiants_refuses', 'droits_insuffisants', 'forme_inattendue', 'filtre_non_servi', 'erreur_reseau', 'inconnue']);
+// `collecte_en_echec` est le dernier jeton de la famille des réservoirs, et il
+// comble le trou que JSearch a révélé le 2026-10-22. Les quatre se lisent
+// maintenant comme quatre gestes, et c'est la seule raison pour laquelle ils
+// sont quatre :
+//
+//   collecte_absente    le cron n'a pas tourné        → les crons Vercel
+//   collecte_en_echec   il a tourné, l'API a mal
+//                       répondu sur TOUS ses appels   → le fournisseur
+//   quota_epuise        il a tourné, le plafond a
+//                       refusé                        → décision d'abonnement
+//   cle_absente         RAPIDAPI_KEY non posée        → poser la variable
+//
+// Les trois derniers se présentaient en `collecte_absente`, parce que le cron
+// n'écrivait pas sa clé quand la collecte ne ramenait rien : sans clé, pas
+// d'entrée, et sans entrée la lecture n'a qu'un mot. On cherchait la panne du
+// côté des crons pendant qu'elle était ailleurs.
+const CAUSES = new Set(['cle_absente', 'collecte_absente', 'collecte_en_echec', 'quota_epuise', 'timeout', 'reponse_illisible', 'jeton_refuse', 'identifiants_refuses', 'droits_insuffisants', 'forme_inattendue', 'filtre_non_servi', 'erreur_reseau', 'inconnue']);
 
 // Déduit un jeton d'une raison libre, pour les `catch` qui n'en déclarent pas.
 // Le test porte sur la forme du message, jamais sur son contenu : seule la
@@ -467,10 +483,27 @@ function servirReservoir(offres, q, type, location, page) {
 // clé. Les deux sources RapidAPI partagent une clé que le cron réécrit chaque
 // jour : son TTL resterait neuf même si French Job Market était refusée depuis
 // six semaines, et le réservoir servirait du périmé sans le dire.
+// `!entree` veut dire que la clé KV n'existe pas, et depuis que
+// `collect-rapidapi` écrit sa clé INCONDITIONNELLEMENT, ça ne veut plus dire
+// qu'une chose : le cron n'a pas tourné. Avant, ça en voulait dire quatre — le
+// cron écartait l'écriture dès qu'une collecte ne ramenait aucune offre, donc
+// un refus de quota, une clé non posée et une API en panne arrivaient tous ici
+// sous la forme d'une clé absente. Le diagnostic était calculé par `fusionner`,
+// puis jeté avant d'atteindre KV ; `quota_epuise` n'était publiable que si une
+// collecte ANTÉRIEURE avait laissé une clé pour le porter, donc jamais au
+// premier passage — exactement le moment où on en a besoin. C'est ce qui a fait
+// lire `collecte_absente` sur JSearch le 2026-10-22 alors que son cron avait
+// bien tourné à 3 h.
 function causeReservoir(entree, source) {
   if (!entree) return 'collecte_absente';
   if (entree.etat === 'cle_absente') return 'cle_absente';
-  const perime = entree.etat === 'quota' ? 'quota_epuise' : 'collecte_absente';
+  // `erreur` : la collecte a eu lieu et AUCUN de ses appels n'a abouti. Ce
+  // n'est ni un plafond atteint (`quota_epuise` → décision d'abonnement) ni un
+  // cron muet (`collecte_absente` → voir les crons Vercel) : c'est l'API qui
+  // répond mal, et ça s'instruit chez le fournisseur.
+  const perime = entree.etat === 'quota' ? 'quota_epuise'
+    : entree.etat === 'erreur' ? 'collecte_en_echec'
+    : 'collecte_absente';
   if (!entree.collecteLe || !entree.offres?.length) return perime;
   const age = (Date.now() - new Date(entree.collecteLe).getTime()) / 1000;
   return age > AGE_MAX_SECONDES[source] ? perime : null;

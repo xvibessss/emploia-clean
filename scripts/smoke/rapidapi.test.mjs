@@ -25,7 +25,7 @@ import {
   BUDGETS, FAMILLES, MAX_OFFRES_PAR_SOURCE, AGE_MAX_SECONDES, TTL_SECONDES,
   collecterJSearch, collecterFrenchMarket,
 } from '../../api/_lib/rapidapi.js';
-import { CLE_KV, estJourDeCollecte, fusionner } from '../../api/cron/collect-rapidapi.js';
+import { CLE_KV, estJourDeCollecte, fusionner, collecterEtEcrire } from '../../api/cron/collect-rapidapi.js';
 
 let passed = 0, failed = 0;
 function check(label, condition, detail) {
@@ -332,8 +332,125 @@ const cronSrc = fs.readFileSync(new URL('../../api/cron/collect-rapidapi.js', im
 check('le cron refuse un appel sans CRON_SECRET',
   /req\.headers\.get\('authorization'\) !== `Bearer \$\{cronSecret\}`/.test(cronSrc) &&
   /status: 401/.test(cronSrc));
-check('une collecte totalement vide n’écrit pas la clé',
-  cronSrc.indexOf('if (!offres)') < cronSrc.indexOf('await kvSet(CLE_KV'));
+// ── 11. LA CLÉ EST ÉCRITE MÊME QUAND LA COLLECTE NE RAMÈNE RIEN ─────────────
+// Il y avait ici l'assertion EXACTEMENT INVERSE : « une collecte totalement
+// vide n'écrit pas la clé ». Elle épinglait un défaut en le prenant pour une
+// intention, et c'est pour ça qu'il a tenu.
+//
+// Ce que ce défaut coûtait, relevé en production le 2026-10-22 : JSearch
+// publiait `collecte_absente` — « le cron n'a pas tourné » — alors que son cron
+// de 3 h avait bien tourné. Il avait appelé, s'était fait refuser, et comme il
+// ne ramenait aucune offre il n'écrivait pas sa clé ; sans clé, la lecture n'a
+// qu'un seul mot pour quatre situations.
+//
+// Le plus instructif est ailleurs dans ce même fichier : la section 5 vérifie
+// déjà que `fusionner` met l'état à jour sur une collecte vide, avec le
+// commentaire « sinon `quota_epuise` serait indicible à la lecture ».
+// `quota_epuise` ÉTAIT indicible — mais pas à cause de `fusionner`, qui faisait
+// son travail. Le handler jetait son résultat une ligne plus loin. La sonde
+// prouvait la bonne propriété sur la mauvaise moitié du chemin, et c'est
+// pourquoi cette section-ci exerce le handler ENTIER plutôt qu'une fonction.
+console.log('\n── Le cron écrit sa clé même à vide ──');
+
+check('plus aucun chemin ne saute l’écriture',
+  !/if \(!offres\) \{[\s\S]{0,400}?return new Response/.test(cronSrc),
+  'l’écriture est inconditionnelle');
+check('l’écriture précède le journal de collecte vide',
+  cronSrc.indexOf('await ecrire(CLE_KV') < cronSrc.lastIndexOf('if (!offres)'));
+
+// Le handler est exercé pour de vrai : KV de papier, réseau injecté, aucune
+// requête sortante et aucune variable d'environnement lue.
+const kvDePapier = (initial = {}) => {
+  const boite = { ...initial };
+  const ecritures = [];
+  return {
+    boite, ecritures,
+    kvGet: async (k) => (k in boite ? boite[k] : null),
+    kvSet: async (k, v, ttl) => { boite[k] = v; ecritures.push({ k, v, ttl }); },
+  };
+};
+const reponseHttp = (status, corps) => ({
+  ok: status >= 200 && status < 300, status, json: async () => corps,
+});
+
+// Un lundi, pour que les DEUX sources soient collectées dans le même passage.
+const LUNDI_UTC = new Date('2026-10-26T03:00:00.000Z');
+
+for (const [libelle, statut, etatAttendu, causeAttendue] of [
+  ['quota épuisé (429)', 429, 'quota', 'quota_epuise'],
+  ['API en panne (500)', 500, 'erreur', 'collecte_en_echec'],
+]) {
+  const kv = kvDePapier();
+  const { valeur, offres } = await collecterEtEcrire({
+    cle: 'UNE-CLE-DE-TEST', fetchImpl: async () => reponseHttp(statut, null),
+    ...kv, maintenant: LUNDI_UTC,
+  });
+  check(`${libelle} : la clé est ÉCRITE malgré zéro offre`,
+    kv.ecritures.length === 1 && !!kv.boite[CLE_KV], `${offres} offre(s) servable(s)`);
+  check(`${libelle} : l’état de JSearch est conservé`,
+    valeur.jsearch?.etat === etatAttendu, valeur.jsearch?.etat);
+  check(`${libelle} : la lecture publie « ${causeAttendue} », pas « collecte_absente »`,
+    causeReservoir(valeur.jsearch, 'jsearch') === causeAttendue,
+    causeReservoir(valeur.jsearch, 'jsearch'));
+  check(`${libelle} : la clé date le passage du cron`,
+    valeur.collecteLe === LUNDI_UTC.toISOString(),
+    'une balise de passage, même sans offre');
+}
+
+// La contrepartie, sans laquelle « clé absente » ne voudrait toujours rien
+// dire : une clé absente doit rester le signe que le cron N'A PAS tourné.
+check('clé absente → collecte_absente, et ça ne veut plus dire que ça',
+  causeReservoir(undefined, 'jsearch') === 'collecte_absente');
+
+// RAPIDAPI_KEY non posée : la collecte n'appelle personne, mais le passage du
+// cron est quand même consigné — sinon la variable manquante se lirait, elle
+// aussi, comme un cron muet.
+{
+  const kv = kvDePapier();
+  let sorties = 0;
+  const { valeur } = await collecterEtEcrire({
+    cle: '', fetchImpl: async () => { sorties++; return reponseHttp(200, {}); },
+    ...kv, maintenant: LUNDI_UTC,
+  });
+  check('clé RAPIDAPI_KEY absente : aucun appel sortant', sorties === 0);
+  check('clé RAPIDAPI_KEY absente : la clé KV est quand même écrite',
+    kv.ecritures.length === 1);
+  check('clé RAPIDAPI_KEY absente → cle_absente, pas collecte_absente',
+    causeReservoir(valeur.jsearch, 'jsearch') === 'cle_absente',
+    causeReservoir(valeur.jsearch, 'jsearch'));
+}
+
+// Une collecte qui aboutit ne doit évidemment pas régresser.
+{
+  const kv = kvDePapier();
+  const offre = { job_id: 'abc', job_title: 'Développeur', employer_name: 'ACME', job_city: 'Paris' };
+  const { valeur, offres } = await collecterEtEcrire({
+    cle: 'UNE-CLE-DE-TEST',
+    fetchImpl: async () => reponseHttp(200, { data: [offre] }),
+    ...kv, maintenant: LUNDI_UTC,
+  });
+  check('collecte réussie : des offres sont servies', offres > 0, `${offres} offre(s)`);
+  check('collecte réussie : l’état est ok', valeur.jsearch.etat === 'ok');
+  check('collecte réussie : aucune cause n’est publiée',
+    causeReservoir(valeur.jsearch, 'jsearch') === null);
+}
+
+// Une panne PARTIELLE reste `ok` : la collecte a ramené ce qu'elle a pu, et la
+// dire en échec ferait clignoter une source qui sert.
+{
+  let n = 0;
+  const kv = kvDePapier();
+  const { valeur } = await collecterEtEcrire({
+    cle: 'UNE-CLE-DE-TEST',
+    fetchImpl: async () => (++n === 1
+      ? reponseHttp(200, { data: [{ job_id: 'x', job_title: 'Dev' }] })
+      : reponseHttp(500, null)),
+    ...kv, maintenant: LUNDI_UTC,
+  });
+  check('un seul appel abouti sur six → ok, pas collecte_en_echec',
+    valeur.jsearch.etat === 'ok', valeur.jsearch.etat);
+  check('… et la source est servie', causeReservoir(valeur.jsearch, 'jsearch') === null);
+}
 
 if (failed) { console.error(`\n❌ sonde RapidAPI : ${failed} échec(s) sur ${passed + failed}\n`); process.exit(1); }
 console.log(`\n✅ sonde RapidAPI : ${passed} vérifications OK\n`);
