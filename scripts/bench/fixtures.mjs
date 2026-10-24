@@ -82,3 +82,50 @@ Licence informatique — Université de Lyon (2022)
 COMPÉTENCES
 JavaScript, React, HTML, CSS, Git`,
 };
+
+// Embellishment case, taken from a real generation on the demo account (22/10/2026):
+// the profile says "anglais niveau B2" and a consumer telecom agency; the CV came back
+// with "Anglais courant", "Conseillère Clientèle B2B" and a client-company portfolio,
+// all words lifted from the offer. Facts were not invented, they were upgraded.
+export const EMBELLISH = {
+  profile: `Camille Martin
+Conseillère clientèle, 3 ans d'expérience.
+2022-2025 : conseillère clientèle en agence chez un opérateur télécom, 60 appels par jour, traitement des réclamations, suivi dans Salesforce.
+2021-2022 : alternance en service commercial, préparation de devis.
+Compétences : Excel (RECHERCHEV, tableaux croisés), Salesforce, gestion des réclamations, anglais niveau B2.
+Formation : BTS NDRC (Négociation et digitalisation de la relation client).`,
+  offer: `Chargé·e de clientèle B2B (H/F) — CDI — Lyon
+Au sein d'une PME de distribution de matériel professionnel, tu gères un portefeuille d'une centaine de clients entreprises.
+Missions : relation client (téléphone, e-mail, visio), suivi des commandes et des litiges dans le CRM, reportings mensuels sous Excel.
+Profil : 2 ans d'expérience minimum en relation client B2B, maîtrise d'Excel (tableaux croisés dynamiques), anglais courant, autonomie.`,
+  // What the generator produced (excerpt, verbatim).
+  planted: `# CAMILLE MARTIN
+
+## PROFIL
+Conseillère clientèle B2B avec 3 ans d'expérience en relation client et gestion de portefeuilles. Maîtrise confirmée d'Excel (tableaux croisés dynamiques, RECHERCHEV). Anglais courant pour la communication avec clients européens.
+
+## EXPÉRIENCES PROFESSIONNELLES
+**Conseillère Clientèle B2B — Opérateur Télécom** | 2022 – 2025 (3 ans)
+- Géré un portefeuille de clients entreprises en relation client au quotidien
+- Traité en moyenne 60 appels par jour
+
+## LANGUES
+Anglais : courant`,
+  // The honest version: same facts, offer words only where the profile supports them.
+  clean: `CAMILLE MARTIN — Chargée de clientèle
+[à compléter : email] · [à compléter : téléphone]
+
+PROFIL
+Conseillère clientèle, 3 ans d'expérience en relation client et traitement des réclamations, à l'aise sur Excel (tableaux croisés, RECHERCHEV) et Salesforce.
+
+EXPÉRIENCES
+Opérateur télécom — Conseillère clientèle en agence (2022-2025)
+- Traité 60 appels par jour et les réclamations associées
+- Assuré le suivi client dans Salesforce (CRM)
+
+LANGUES
+Anglais : B2
+
+À PRÉCISER AVANT D'ENVOYER
+- L'offre demande une expérience B2B et un anglais courant : à ajouter seulement si c'est vrai.`,
+};
