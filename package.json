@@ -13,6 +13,7 @@
     "test:contrat": "node scripts/smoke/contrat.test.mjs",
     "test:greenhouse": "node scripts/smoke/greenhouse.test.mjs",
     "test:lever": "node scripts/smoke/lever.test.mjs",
+    "test:teamtailor": "node scripts/smoke/teamtailor.test.mjs",
     "test:rapidapi": "node scripts/smoke/rapidapi.test.mjs",
     "test:france-travail": "node scripts/smoke/france-travail.test.mjs",
     "test:email": "node scripts/billing/email.test.mjs",
