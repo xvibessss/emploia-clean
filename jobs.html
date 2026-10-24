@@ -116,6 +116,7 @@
     /* Couverture du contrat : une ligne discrète sous le compteur, qui dit ce
        que la liste contient au lieu de le laisser supposer. */
     .jb-couverture { font-size: 11px; color: var(--stone); margin-top: 4px; }
+    .jb-avis { font-size: 13px; line-height: 1.5; color: var(--ink); background: #fff8e6; border: 1px solid #f0d68a; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
     .jb-card-desc { font-size: 12px; color: var(--stone); line-height: 1.7; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .jb-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .jb-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -604,6 +605,34 @@
     return '';
   }
 
+  // ── LE REPLI DU FILTRE DE PERTINENCE, DIT À L'UTILISATEUR ─────────────────
+  // `filtre: 'abandonne'` signifie qu'AUCUNE offre de l'agrégat ne correspondait
+  // à la requête, et que le serveur a servi la liste entière plutôt qu'une page
+  // blanche. C'est une décision assumée côté serveur — mieux vaut du bruit
+  // qu'un trou — et elle tient à UNE condition : que le bruit soit VISIBLE.
+  //
+  // Il ne l'était pas. La seule trace était un `console.error` dans les
+  // journaux Vercel, dont la rétention est d'une heure sur le plan Hobby, et un
+  // champ `filtre` que cette page ne lisait pas. Pendant ce temps elle
+  // annonçait « 14 offres pour "secrétaire" » — une affirmation que la donnée
+  // ne soutient pas, exactement ce que `couvertureContrat` est venu retirer
+  // juste au-dessus pour le type de contrat.
+  //
+  // Mesuré le 2026-10-22 sur les 20 métiers que le site publie en SEO : le
+  // repli se déclenche sur UN d'entre eux (« secrétaire », 14 offres servies,
+  // zéro pertinente). Rare, donc, mais parfaitement muet quand il se produit.
+  // `cible` est la requête OU le lieu : `motsDeRecherche` tire ses mots des
+  // deux, donc une page de ville sans offre déclenche le repli sans qu'aucun
+  // `q` n'ait été saisi. Les deux vides ne peuvent pas abandonner — sans mot,
+  // le filtre est `inactif`.
+  function avisPertinence(data, q, loc) {
+    if (data?.filtre !== 'abandonne') return '';
+    const n = data.total || 0;
+    const cible = q || loc || '';
+    const pour = cible ? ` à « ${cible} »` : '';
+    return `<div class="jb-avis">Aucune offre ne correspond${pour}. Voici les ${n.toLocaleString('fr-FR')} dernière${n > 1 ? 's' : ''} offre${n > 1 ? 's' : ''} publiée${n > 1 ? 's' : ''}, tous métiers confondus.</div>`;
+  }
+
   async function loadJobs() {
     const q = document.getElementById('searchInput').value.trim();
     const loc = document.getElementById('locationInput').value.trim();
@@ -622,8 +651,14 @@
       document.getElementById('liveBadge').style.display = isDemo ? 'none' : 'inline-flex';
       document.getElementById('demoBadge').style.display = isDemo ? 'inline-flex' : 'none';
       const total = data.total || 0;
-      const label = q ? `pour "${q}"` : currentType !== 'tous' ? `en ${currentType}` : 'disponibles';
-      document.getElementById('searchStats').innerHTML = `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${label}`;
+      const abandonne = data.filtre === 'abandonne';
+      // Sous repli, « ${total} offres pour "${q}" » serait faux : aucune de ces
+      // offres ne correspond à `q`. On annonce ce que la liste est vraiment.
+      const label = abandonne ? 'publiées, tous métiers confondus'
+        : q ? `pour "${q}"` : currentType !== 'tous' ? `en ${currentType}` : 'disponibles';
+      document.getElementById('searchStats').innerHTML = abandonne
+        ? `<strong>0</strong> offre pour "${q || loc}" · ${total.toLocaleString('fr-FR')} offres ${label}`
+        : `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${label}`;
       document.getElementById('resultCount').innerHTML = `<strong style="color:var(--ink)">${total.toLocaleString('fr-FR')}</strong> offres${couvertureContrat(data.couvertureContrat)}`;
       if (!data.jobs?.length) {
         document.getElementById('jobsList').innerHTML = `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">🔍</div><h3>Aucune offre trouvée</h3><p>Essayez d'autres mots-clés ou un autre type de contrat.</p><button onclick="resetFilters()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Voir toutes les offres</button></div>`;
@@ -633,7 +668,7 @@
       let filteredJobs = data.jobs;
       if (salaryFilter) { const [minS, maxS] = salaryFilter.split('-'); const minK = minS ? parseInt(minS)*1000 : 0; const maxK = maxS ? parseInt(maxS)*1000 : Infinity; filteredJobs = data.jobs.filter(j => { const s = j.salary_min || j.salary_max; if (!s) return true; return s >= minK && s <= maxK; }); }
       allJobs = filteredJobs;
-      document.getElementById('jobsList').innerHTML = filteredJobs.map(renderJob).join('');
+      document.getElementById('jobsList').innerHTML = avisPertinence(data, q, loc) + filteredJobs.map(renderJob).join('');
       renderPagination(filteredJobs.length, salaryFilter ? filteredJobs.length : total);
       requestAnimationFrame(() => autoScoreAllJobs(filteredJobs));
     } catch(e) {

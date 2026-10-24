@@ -171,7 +171,7 @@
       g.innerHTML='';
       if(!jobs.length){g.innerHTML='<div class="loading-state">Aucune offre — <a href="/jobs" style="color:var(--blb);margin-left:6px">voir toutes les offres</a></div>';document.getElementById('jobCount').textContent='Aucune offre';return;}
       jobs.forEach(j=>g.appendChild(renderJob(j)));
-      document.getElementById('jobCount').textContent=(d.total||jobs.length).toLocaleString('fr-FR')+' offres trouvées';
+      document.getElementById('jobCount').textContent=d.filtre==='abandonne'?'Aucune offre ne correspond · '+(d.total||jobs.length).toLocaleString('fr-FR')+' dernières offres publiées':(d.total||jobs.length).toLocaleString('fr-FR')+' offres trouvées';
       document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
     }catch{g.innerHTML='<div class="loading-state"><a href="/jobs" style="color:var(--blb)">Voir toutes les offres</a></div>';}
   }
