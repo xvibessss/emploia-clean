@@ -21,6 +21,7 @@ import {
   texteDeContenu, dateDeParution, estDistanciel, offreExploitable,
 } from '../../api/_lib/lever.js';
 import { FOURNISSEURS, TTL_SECONDES, MAX_OFFRES, collecterFournisseur } from '../../api/_lib/ats.js';
+import { causeDepuisBalise, construireBalise } from '../../api/_lib/ats-balise.js';
 import { BOARDS, RELEVE } from '../../api/_lib/lever-boards.js';
 import { CONTRATS, contratLever, tempsLever, contratDepuisTexte } from '../../api/_lib/contrat.js';
 
@@ -315,8 +316,14 @@ check('api/jobs.js porte un collecteur Lever', /async function fetchLever\(/.tes
 check('et il lit la clé qu’écrit le cron',
   jobsSrc.includes("kvGet('lever_jobs')") &&
   FOURNISSEURS.find(f => f.nom === 'Lever')?.cle === 'lever_jobs');
+// La cause n'est plus écrite EN DUR : elle est déduite de la balise de passage
+// du cron. L'assertion vérifie donc la propriété plus forte — le lecteur
+// déclare la source en échec, et il demande à la balise LAQUELLE des deux
+// pannes c'est (cron jamais passé, ou passé et crawl mort).
 check('une clé absente déclare la source en échec, elle ne rend pas une liste vide',
-  /muet\(journal, 'Lever'[^)]*'collecte_absente'\)/.test(jobsSrc));
+  /muet\(journal, 'Lever',[\s\S]{0,120}?causeDepuisBalise\(await lireBalise\(\), 'Lever'\)\)/.test(jobsSrc));
+check('… et le vide est traité comme l’absence, pas servi en silence',
+  /!offres \|\| !offres\.length/.test(jobsSrc));
 
 // LA DÉCISION QUI SE VÉRIFIE ICI : Lever est placé AVANT les sources tierces,
 // parce que `deduplicate()` garde la PREMIÈRE occurrence. Si l'ordre
@@ -347,17 +354,21 @@ function extraire(src, nom) {
 const blocFetch = extraire(jobsSrc, 'fetchLever');
 check('le collecteur du handler est extractible pour être exécuté', Boolean(blocFetch));
 
-async function appeler(contenuKV, { q = '', type = '', location = '', page = 0 } = {}) {
+async function appeler(contenuKV, { q = '', type = '', location = '', page = 0, balise = null } = {}) {
   const j = [];
   const bac = {
     console,
     kvGet: async () => contenuKV,
     muet: (jj, source, raison, cause) => { jj?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
     FILTRE_VERS_CONTRAT: { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' },
+    // La VRAIE règle de lecture de la balise, importée et non recopiée :
+    // une copie resterait verte en divergeant du module.
+    causeDepuisBalise,
+    lireBalise: async () => balise,
     resultat: null, journal: j,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocFetch}; resultat = fetchLever(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal);`, bac);
+  vm.runInContext(`${blocFetch}; resultat = fetchLever(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal, lireBalise);`, bac);
   return { offres: await bac.resultat, journal: j };
 }
 
