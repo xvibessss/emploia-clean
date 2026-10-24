@@ -147,14 +147,24 @@ check('la lecture du cache repasse par causePublique',
 // où elle a atterri l'aurait simplement perdue.
 const MOTIF_HTTP = /`http_\$\{(res|jobsRes)\.status\}`/g;
 const libSrc = fs.readFileSync(new URL('../../api/_lib/rapidapi.js', import.meta.url), 'utf8');
+const ftSrc = fs.readFileSync(new URL('../../api/_lib/france-travail.js', import.meta.url), 'utf8');
 const sitesHandler = (src.match(MOTIF_HTTP) || []).length;
 const sitesCollecteur = (libSrc.match(MOTIF_HTTP) || []).length;
+const sitesFT = (ftSrc.match(MOTIF_HTTP) || []).length;
+// Le compte passe de 4 à 3 pour la même raison que la fois précédente : le
+// collecteur France Travail a migré vers `_lib/france-travail.js`, parce qu'il
+// s'authentifie et qu'un collecteur écrit en ligne dans le handler ne peut pas
+// être sondé hors réseau. La propriété, elle, ne bouge pas — elle est
+// simplement vérifiée là où le site a atterri.
 check('les sites HTTP du handler déclarent leur code explicitement',
-  sitesHandler === 4, `${sitesHandler}/4`);
+  sitesHandler === 3, `${sitesHandler}/3`);
 check('le collecteur RapidAPI déclare le sien de la même façon',
   sitesCollecteur === 1, `${sitesCollecteur}/1`);
+check('le collecteur France Travail déclare le sien de la même façon',
+  sitesFT === 1, `${sitesFT}/1`);
 check('aucun site ne construit sa cause depuis un message d’exception',
-  !/cause: *e\.message/.test(src) && !/cause: *e\.message/.test(libSrc));
+  !/cause: *e\.message/.test(src) && !/cause: *e\.message/.test(libSrc) &&
+  !/cause: *e\.message/.test(ftSrc));
 check('la raison complète reste dans les journaux',
   src.includes("console.error('jobs: sources en échec — ' + JSON.stringify(journal))"));
 

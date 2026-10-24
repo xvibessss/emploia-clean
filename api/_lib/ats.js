@@ -30,6 +30,7 @@
 // crawl Lever ne doit pas se lire comme une panne de Greenhouse, ni se
 // masquer derrière ses offres. Une seule clé commune rendrait les deux pannes
 // indiscernables — précisément le silence que `causesEnEchec` est venu retirer.
+import { TTL_OFFRES_SECONDES } from './ats-balise.js';
 import { collecterGreenhouse } from './greenhouse.js';
 import { BOARDS as BOARDS_GREENHOUSE, RELEVE as RELEVE_GREENHOUSE } from './greenhouse-boards.js';
 import { collecterLever } from './lever.js';
@@ -44,7 +45,9 @@ import { BOARDS as BOARDS_LEVER, RELEVE as RELEVE_LEVER } from './lever-boards.j
 // cron serait restée invisible — exactement le silence que `causesEnEchec` est
 // venu retirer pour les sources amont. Mieux vaut une source déclarée morte
 // qu'une source qui sert du périmé sans le dire.
-export const TTL_SECONDES = 72 * 3600;
+// Une seule définition, dans `_lib/ats-balise.js`, parce que la balise en
+// dépend et qu'elle ne peut pas importer ce fichier (voir l'en-tête là-bas).
+export const TTL_SECONDES = TTL_OFFRES_SECONDES;
 
 // MESURÉ chez Greenhouse : 668 octets par offre, soit 218 Ko pour 334 offres.
 // La borne existe parce que ce chiffre est fonction du catalogue : à 200 boards
@@ -142,3 +145,6 @@ export async function collecterFournisseur(fournisseur, options = {}) {
     },
   };
 }
+
+// Réexportées pour que le cron n'ait qu'un seul import à faire.
+export { CLE_BALISE, TTL_BALISE_SECONDES, construireBalise, causeDepuisBalise } from './ats-balise.js';

@@ -47,7 +47,10 @@
 export const config = { runtime: 'nodejs', regions: ['cdg1'] };
 
 import { kvSet } from '../_lib/auth.js';
-import { FOURNISSEURS, TTL_SECONDES, collecterFournisseur } from '../_lib/ats.js';
+import {
+  FOURNISSEURS, TTL_SECONDES, collecterFournisseur,
+  CLE_BALISE, TTL_BALISE_SECONDES, construireBalise,
+} from '../_lib/ats.js';
 
 export default async function handler(req, res) {
   // Vercel injecte `Authorization: Bearer <CRON_SECRET>` sur les appels
@@ -109,6 +112,25 @@ export default async function handler(req, res) {
       source: fournisseur.nom, ok: true, ecrit: true, cle: collecte.cle,
       boardsEnEchec: collecte.valeur.boardsEnEchec, ...collecte.stats,
     });
+  }
+
+  // ── LA BALISE DE PASSAGE ──────────────────────────────────────────────────
+  // Écrite INCONDITIONNELLEMENT, et c'est tout l'objet de cette PR. Les clés
+  // d'offres, elles, restent sous leur garde : une collecte vide ne les écrase
+  // pas, parce qu'elles portent des offres servies en ce moment et qu'un crawl
+  // raté ne doit pas mettre une source hors ligne.
+  //
+  // Mais sans cette balise, laisser la clé intacte efface aussi la preuve que
+  // le cron est passé : au bout de 72 h elle expire, et « jamais passé » devient
+  // indiscernable de « passé trois nuits, crawl mort ». La balise ne porte
+  // aucune offre — la réécrire chaque nuit ne peut donc rien mettre hors ligne.
+  //
+  // Un échec d'écriture de la balise ne fait pas échouer le cron : elle
+  // explique les pannes, elle n'en est pas une.
+  try {
+    await kvSet(CLE_BALISE, construireBalise(rapport), TTL_BALISE_SECONDES);
+  } catch (e) {
+    console.error(`collect-ats: balise de passage non écrite — ${e?.message || e}`);
   }
 
   // `ok` au niveau du cron veut dire « au moins un fournisseur a écrit ». Le
