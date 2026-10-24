@@ -604,6 +604,67 @@ async function fetchLever(q, type, location, page, journal, lireBalise) {
   } catch (e) { return muet(journal, 'Lever', e.message || String(e)); }
 }
 
+// ── TEAMTAILOR (crawl direct des ATS, via Upstash KV) ─
+// Le troisième collecteur qui ne sorte pas sur le réseau, et celui qui ÉLARGIT
+// le catalogue au lieu de l'épaissir. Lever avait rendu 331 offres françaises
+// sans une seule entreprise nouvelle ; Teamtailor rend moins d'offres mais des
+// employeurs qu'emploia ne servait pas — Skello, Hublo, Foodles, Spiko,
+// Ornikar, Innovorder, Memo Bank, Leocare. Chiffres complets dans
+// `PROTO-teamtailor-ats-2026-10-23.md`.
+//
+// C'est aussi la collecte la plus dense en France des trois : 228 offres FR
+// sur 322, soit 70,8 %, contre 17,4 % chez Lever et 5,2 % chez Greenhouse. Et
+// la plus rapide — 5,1 s pour 19 boards — parce que ces entreprises sont plus
+// petites.
+//
+// Le seul des trois à publier un SALAIRE : 26 offres françaises en portent un,
+// et seulement celles libellées en euros ET annuelles. Le mensuel est écarté
+// plutôt que multiplié par douze (voir `salaireSchemaOrg`).
+//
+// Placé APRÈS Greenhouse et Lever mais AVANT les sources tierces : l'ordre
+// entre les trois ATS est sans conséquence puisqu'ils ne partagent aucun
+// employeur, et ce qui compte est que les trois passent avant les
+// republicateurs, pour que `deduplicate()` garde l'URL de l'employeur.
+// Même garde et même balise que les deux autres.
+async function fetchTeamtailor(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('teamtailor_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'Teamtailor', 'réservoir teamtailor_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Teamtailor'));
+    }
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      // Une offre au contrat inconnu est écartée sous filtre, comme partout
+      // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
+      // des offres Teamtailor sortent avec `type: null`, parce que le champ
+      // `employmentType` que le standard schema.org définit est servi ZÉRO
+      // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
+      // sans preuve que `_lib/contrat.js` interdit.
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'Teamtailor', e.message || String(e)); }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location, journal) {
   try {
@@ -839,6 +900,7 @@ export default async function handler(req) {
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal, lireBaliseAts)],
     ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
+    ['Teamtailor',        () => fetchTeamtailor(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],
