@@ -138,6 +138,46 @@ function muet(journal, source, raison, cause) {
 // fois par requête utilisateur, et sans dire que la cause était un plafond
 // MENSUEL plutôt qu'un pic de trafic. Le mesurer a pris une sonde dédiée ;
 // `quota_epuise` le dit en un mot.
+// ── LES COLLECTEURS, NOMMÉS UNE FOIS ──────────────────────────────────────
+// Déclarés ici parce qu'ils servent à DEUX endroits séparés par un retour
+// anticipé : la liste d'appels, construite plus bas, et le filtrage de
+// `offresParCollecteur` à la lecture du cache, qui se produit avant. Une
+// entrée de cache écrite par un déploiement antérieur — ou altérée — ne peut
+// donc pas introduire une clé inconnue dans la réponse publique.
+//
+// La liste d'appels DOIT porter exactement ces neuf noms, et
+// `scripts/smoke/contribution.test.mjs` le vérifie : deux listes qu'on espère
+// synchronisées finissent par diverger, et c'est ce fichier qui a déjà
+// documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
+// collecteurs sur huit et ignoré par les cinq autres.
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+
+// Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
+//
+// `sources` est bâti sur `final.map(j => j.source)` : les étiquettes de
+// PUBLISHER des offres survivantes. Ce n'est pas le même vocabulaire que
+// `sourcesEnEchec`, qui porte les noms des COLLECTEURS — les offres de JSearch
+// sortent sous « Indeed » ou « LinkedIn », celles de French Job Market sous
+// « APEC » ou « HelloWork ». On ne peut donc pas soustraire l'une de l'autre
+// pour savoir quel collecteur n'a rien rendu, et c'était le trou : un
+// collecteur qui rend `[]` sans appeler `muet` n'apparaît NI dans `sources`
+// (vocabulaire différent, et ses offres peuvent avoir été filtrées) NI dans
+// `sourcesEnEchec` (il n'a pas échoué). Il est invisible, et la sonde des
+// sources le déclare vert.
+//
+// C'est exactement la forme de la panne que ce dépôt a déjà payée : /api/jobs-search
+// a répondu 200 avec zéro offre pendant cinq mois.
+//
+// Le compte est pris AVANT le dédoublonnage et les filtres, délibérément : la
+// question à laquelle il répond est « ce collecteur a-t-il rendu quelque
+// chose », pas « l'utilisateur en a-t-il vu ». Les deux sont utiles et elles
+// se lisent ensemble — un collecteur à 10 ici et absent de `sources` dit « il
+// a marché, les filtres ont écarté ses offres », ce qu'aucun des deux chiffres
+// ne disait seul.
+//
+// Rien de ce qui sort d'ici ne dépend d'un contenu amont : les clés sont des
+// noms écrits dans ce fichier, les valeurs des entiers.
+
 // `identifiants_refuses`, `droits_insuffisants`, `forme_inattendue` et
 // `filtre_non_servi` sont les jetons de France Travail, la seule source qui
 // s'authentifie. Elle rendait `cle_absente`, et derrière cette unique cause se
@@ -211,6 +251,27 @@ function causePublique(cause) {
   const c = String(cause || '');
   if (/^http_\d{3}$/.test(c)) return c;
   return CAUSES.has(c) ? c : 'inconnue';
+}
+
+// Le même verrou, pour le décompte par collecteur. Une entrée de cache est une
+// donnée qui revient de l'extérieur du processus : ce qui n'est pas un nom de
+// collecteur ÉCRIT DANS CE FICHIER ne traverse pas, et ce qui n'est pas un
+// entier ne traverse pas non plus.
+//
+// Le test est strict sur le type — `typeof === 'number'` — et non une coercion.
+// `Number(null)` vaut 0 : une clé à `null` serait rendue « 0 offre », donc une
+// affirmation à la place d'une absence. C'est la règle du dépôt : ce qu'on ne
+// sait pas lire vaut `null`, pas zéro.
+//
+// Un objet sans aucune clé reconnue rend `null` et non `{}`, parce qu'un objet
+// vide se lirait « les neuf collecteurs ont rendu zéro » — l'affirmation la
+// plus trompeuse possible ici.
+function contributionPublique(brut) {
+  if (!brut || typeof brut !== 'object') return null;
+  const retenu = COLLECTEURS
+    .filter(nom => typeof brut[nom] === 'number' && Number.isFinite(brut[nom]))
+    .map(nom => [nom, Math.max(0, Math.trunc(brut[nom]))]);
+  return retenu.length ? Object.fromEntries(retenu) : null;
 }
 
 async function fetchJSearch(q, type, location, page, journal, reservoir) {
@@ -805,8 +866,11 @@ export default async function handler(req) {
       // vient de rendre visible. Absente, elle vaut `null`, et l'interface
       // n'affiche alors rien plutôt qu'un zéro inventé.
       const couvertureContrat = cached.couvertureContrat || null;
+      // Et le même raisonnement une troisième fois, par le verrou qui filtre ce
+      // décompte en un seul endroit plutôt qu'à chaque chemin de réponse.
+      const offresParCollecteur = contributionPublique(cached.offresParCollecteur);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, offresParCollecteur, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -854,6 +918,12 @@ export default async function handler(req) {
       if (r.status === 'fulfilled') allJobs.push(...r.value);
       else journal.push({ source: collecteurs[i][0], raison: r.reason?.message || String(r.reason), cause: borner_cause(r.reason?.message || String(r.reason)) });
     });
+
+    // Un collecteur qui n'a pas échoué et n'a rien rendu est désormais LISIBLE,
+    // à zéro, au lieu d'être absent des deux listes.
+    const offresParCollecteur = Object.fromEntries(
+      collecteurs.map(([nom], i) => [nom, resultats[i].status === 'fulfilled' ? resultats[i].value.length : 0])
+    );
 
     // Deux niveaux, délibérément. La raison complète part dans les logs
     // d'exécution, où elle est lisible par qui a accès au compte Vercel ; la
@@ -927,11 +997,11 @@ export default async function handler(req) {
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, offresParCollecteur, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, offresParCollecteur, filtre: pertinence.filtre, couvertureContrat }),
         { status: 200, headers: H }
       );
     }

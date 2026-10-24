@@ -9,6 +9,7 @@
     "test:declencheurs": "node scripts/ci/declencheurs.test.mjs",
     "test:rgpd": "node scripts/rgpd/localisation.test.mjs",
     "test:causes": "node scripts/smoke/causes.test.mjs",
+    "test:contribution": "node scripts/smoke/contribution.test.mjs",
     "test:assertions": "node scripts/smoke/assertions.test.mjs",
     "test:contrat": "node scripts/smoke/contrat.test.mjs",
     "test:greenhouse": "node scripts/smoke/greenhouse.test.mjs",
