@@ -324,6 +324,77 @@ export function formaterSalaireAnnuel(min, max) {
   return bas === haut ? `${bas}k€/an` : `${bas}k–${haut}k€/an`;
 }
 
+// ── SALAIRE SCHEMA.ORG (JSON-LD `baseSalary`) ────────────────────────────────
+// Posé ICI, à côté de `formaterSalaireAnnuel`, et pas dans le collecteur
+// Teamtailor qui l'a fait apparaître — pour la même raison que les pièges de
+// contrat : `schema.org/JobPosting` est un format STANDARD, le prochain
+// collecteur qui lira du JSON-LD rencontrera exactement la même forme, et un
+// garde recopié est un garde qui diverge.
+//
+// LE PIÈGE, et il est d'unité, donc du même genre que `unbefristet` /
+// `befristet` : il ne rend pas la valeur imprécise, il la rend FAUSSE d'un
+// facteur douze. `baseSalary.value.unitText` vaut `YEAR` ou `MONTH`, et
+// `formaterSalaireAnnuel` affiche des « k€/an ». Mesuré sur les cinq boards
+// Teamtailor qui publient un salaire, 50 offres : 17 sont mensuelles, et ce
+// sont des gratifications de stage ou des temps partiels — 640 €, 1 250 €,
+// 1 327 €, 1 618,50 €. Passées telles quelles, elles s'afficheraient
+// « 1k€/an », « 1k€/an », « 1k€/an », « 2k€/an ». Un candidat lirait qu'un
+// poste paie mille euros PAR AN.
+//
+// On ne les annualise pas pour autant. Multiplier par douze serait de
+// l'arithmétique, pas une lecture : la source ne dit ni treize mois, ni brut,
+// ni la durée du contrat, et le dépôt n'a aucun affichage mensuel. Une valeur
+// mensuelle vaut donc `null` — ce qu'on ne sait pas publier, on ne le publie
+// pas.
+//
+// La devise aussi : l'affichage est en euros, en dur. Sur les mêmes 50
+// offres, 6 sont en USD ou GBP et 2 n'ont aucune devise. Les publier
+// attribuerait des euros à un montant qui n'en est pas. Elles valent `null`.
+//
+// Restent 25 offres sur 50 — et c'est la PREMIÈRE fois qu'un collecteur de la
+// famille ATS publie un salaire : ni Greenhouse ni Lever n'ont de champ de
+// salaire du tout.
+export function salaireSchemaOrg(base) {
+  if (base?.currency !== 'EUR') return null;
+  const v = base?.value;
+  if (v?.unitText !== 'YEAR') return null;
+  // `minValue` / `maxValue` pour une fourchette, `value` seul pour un montant
+  // unique — les deux formes sont servies, et les nombres arrivent en CHAÎNES.
+  const bas = Number(v.minValue ?? v.value);
+  const haut = Number(v.maxValue ?? v.value);
+  if (!Number.isFinite(bas) || !Number.isFinite(haut)) return null;
+  return formaterSalaireAnnuel(bas, haut);
+}
+
+// ── TEAMTAILOR ───────────────────────────────────────────────────────────────
+// Teamtailor sert un JSON Feed dont chaque entrée porte un `_jobposting` en
+// `schema.org/JobPosting`. Le standard DÉFINIT `employmentType`, avec une
+// énumération fermée (`FULL_TIME`, `PART_TIME`, `CONTRACTOR`, `TEMPORARY`,
+// `INTERN`…), et c'est tentant de s'y fier.
+//
+// MESURÉ : le champ est absent de 602 offres sur 602, sur les 40 boards
+// vivants. ZÉRO. Qu'un standard définisse un champ ne veut pas dire que
+// l'implémentation le remplit, et c'est le genre de supposition que ce fichier
+// existe pour refuser. Le contrat d'une offre Teamtailor retombe donc sur le
+// titre, et vaut `null` quand le titre est muet.
+//
+// Le lecteur est quand même branché, et il ne coûte rien : `contratDepuisTexte`
+// couvre déjà tout le vocabulaire de l'énumération — `contractor` et
+// `temporary` rendent CDD, `intern` rend Stage, et `full time` / `part time`
+// ne rendent AUCUN contrat mais une durée de travail, dans son propre champ.
+// Si Teamtailor se met à remplir le champ, il sera lu ; tant qu'il ne le
+// remplit pas, le relevé ci-dessus dit pourquoi ce n'est pas une lacune.
+export function contratTeamtailor(j) {
+  const declare = j?._jobposting?.employmentType;
+  const parChamp = declare ? contratDepuisTexte(normaliserValeur(declare)) : null;
+  return contratPublic(parChamp || detectType(j?.title));
+}
+
+export function tempsTeamtailor(j) {
+  const declare = j?._jobposting?.employmentType;
+  return declare ? lireTemps(normaliserValeur(declare)) : null;
+}
+
 // `salary_is_predicted` d'Adzuna : une fourchette estimée statistiquement par
 // Adzuna, pas un montant publié par l'employeur. Le drapeau est posé quand
 // l'annonce ne publie aucune fourchette et qu'Adzuna l'estime depuis des
