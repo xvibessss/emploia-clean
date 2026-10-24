@@ -17,6 +17,7 @@ import {
   texteDeContenu, segmentsDeLieu, offreExploitable,
 } from '../../api/_lib/greenhouse.js';
 import { TTL_SECONDES, MAX_OFFRES, FOURNISSEURS } from '../../api/_lib/ats.js';
+import { causeDepuisBalise, construireBalise, TTL_BALISE_SECONDES } from '../../api/_lib/ats-balise.js';
 import { BOARDS, RELEVE } from '../../api/_lib/greenhouse-boards.js';
 import { CONTRATS, contratGreenhouse, tempsGreenhouse } from '../../api/_lib/contrat.js';
 
@@ -241,17 +242,21 @@ for (const tiers of ['France Travail', 'French Job Market', 'JSearch', 'Adzuna',
 }
 
 // Exécution réelle de la fonction extraite, avec un KV simulé.
-async function appeler(contenuKV, { q = '', type = '', location = '', page = 0 } = {}) {
+async function appeler(contenuKV, { q = '', type = '', location = '', page = 0, balise = null } = {}) {
   const journal = [];
   const bac = {
     console,
     kvGet: async () => contenuKV,
     muet: (j, source, raison, cause) => { j?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
     FILTRE_VERS_CONTRAT: { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' },
+    // La VRAIE règle de lecture de la balise, importée et non recopiée :
+    // une copie resterait verte en divergeant du module.
+    causeDepuisBalise,
+    lireBalise: async () => balise,
     resultat: null, journal,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocParPage}\n${blocServir}\n${blocFetch}; resultat = fetchGreenhouse(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal);`, bac);
+  vm.runInContext(`${blocParPage}\n${blocServir}\n${blocFetch}; resultat = fetchGreenhouse(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal, lireBalise);`, bac);
   return { offres: await bac.resultat, journal };
 }
 
@@ -386,6 +391,104 @@ check('une durée est réservée au cron de collecte, au-delà de la borne gén�
   Number(dureeAts) >= 120, `maxDuration ${dureeAts} s`);
 check('le jeton collecte_absente est dans le vocabulaire fermé du handler',
   /const CAUSES = new Set\(\[[^\]]*'collecte_absente'/.test(jobsSrc));
+
+// ── LA BALISE DE PASSAGE, ET CE QU'ELLE N'A PAS LE DROIT DE CASSER ──────────
+// Deux propriétés, et la PREMIÈRE est la plus importante des deux.
+//
+// 1. Le garde qui protège les offres reste en place. `greenhouse_jobs` porte
+//    des centaines d'offres servies en ce moment ; si une panne de crawl
+//    passagère écrivait `offres: []` par-dessus, Greenhouse disparaîtrait du
+//    site pour vingt-quatre heures. On n'aurait pas rendu une panne lisible :
+//    on en aurait créé une. C'est la dissymétrie avec le réservoir RapidAPI de
+//    la PR #105, où l'écriture à vide était inoffensive parce que
+//    `causeReservoir` refuse de servir une entrée sans offre.
+//
+// 2. Le passage du cron se date quand même — dans une clé SÉPARÉE, qui ne
+//    porte aucune offre et ne peut donc rien mettre hors ligne.
+console.log('\n── Balise de passage du cron ATS ────────────────────');
+
+check('le garde qui épargne la clé d’offres est toujours là',
+  /if \(!collecte\.ecrire\) \{/.test(cronSrc),
+  'sans lui, un crawl raté met une source hors ligne');
+check('une collecte vide ne demande toujours pas l’écriture des offres',
+  /ecrire: retenues\.length > 0/.test(fs.readFileSync(new URL('../../api/_lib/ats.js', import.meta.url), 'utf8')));
+// Le `^\\s*…;$` n'est pas décoratif : une simple recherche de la sous-chaîne
+// restait verte sur `if (false) await kvSet(CLE_BALISE, …)`. C'est la passe de
+// mutation qui l'a montré. L'assertion exige donc une instruction NUE — rien
+// avant elle sur sa ligne, donc aucune condition ne la garde.
+check('la balise s’écrit, elle, INCONDITIONNELLEMENT',
+  /^\s*await kvSet\(CLE_BALISE, construireBalise\(rapport\), TTL_BALISE_SECONDES\);$/m.test(cronSrc),
+  'instruction nue, non gardée par une condition');
+check('la balise n’est pas écrite dans la boucle des fournisseurs',
+  cronSrc.indexOf('await kvSet(CLE_BALISE') > cronSrc.lastIndexOf('for (const fournisseur of FOURNISSEURS)'));
+check('la balise survit aux clés d’offres qu’elle doit expliquer',
+  TTL_BALISE_SECONDES > TTL_SECONDES,
+  `balise ${TTL_BALISE_SECONDES / 3600} h > offres ${TTL_SECONDES / 3600} h`);
+// Vérifié sur la VALEUR construite et non sur le texte du module : ma première
+// version cherchait deux motifs précis dans la source et restait verte dès
+// qu'une troisième façon d'y mettre des offres apparaissait. La passe de
+// mutation l'a montré. Ici on lui DONNE des offres et on vérifie qu'elle n'en
+// ressort aucune — c'est ce qui rend la balise inoffensive : la réécrire chaque
+// nuit ne peut rien mettre hors ligne.
+{
+  const avecOffres = construireBalise([{
+    source: 'Greenhouse', ok: true, offresStockees: 334, boards: 28, boardsEnEchec: 0,
+    valeur: { offres: [offreKV(), offreKV({ id: 'gh_acme_2' })] },
+  }], new Date('2026-10-23T04:00:00.000Z'));
+  check('la balise ne porte AUCUNE offre, même si le rapport en charrie',
+    typeof avecOffres.fournisseurs.Greenhouse.offres === 'number' &&
+    !JSON.stringify(avecOffres).includes('gh_acme_'),
+    `${JSON.stringify(avecOffres).length} octets`);
+  check('elle ne garde qu’un décompte', avecOffres.fournisseurs.Greenhouse.offres === 334);
+}
+// Le module de la balise est lu par `api/jobs.js`, qui tourne en Edge : s'il
+// importait `_lib/ats.js`, les deux collecteurs et les deux catalogues de
+// boards entreraient dans le bundle de la route la plus chaude du site.
+check('le module de la balise n’importe rien',
+  !/^import /m.test(fs.readFileSync(new URL('../../api/_lib/ats-balise.js', import.meta.url), 'utf8')));
+check('api/jobs.js prend la balise dans le module léger, pas dans le registre',
+  jobsSrc.includes("from './_lib/ats-balise.js'") && !jobsSrc.includes("from './_lib/ats.js'"));
+
+// La règle de lecture, exercée sur la vraie fonction.
+const PASSE = new Date('2026-10-23T04:00:00.000Z').getTime();
+const baliseVide = construireBalise([
+  { source: 'Greenhouse', ok: false, raison: 'collecte_vide', boards: 28, boardsEnEchec: 28 },
+  { source: 'Lever', ok: true, offresStockees: 331, boards: 17, boardsEnEchec: 0 },
+], new Date(PASSE));
+
+check('sans balise → collecte_absente : le cron n’est pas passé',
+  causeDepuisBalise(null, 'Greenhouse', PASSE) === 'collecte_absente');
+check('balise qui déclare un crawl vide → collecte_en_echec, PAS collecte_absente',
+  causeDepuisBalise(baliseVide, 'Greenhouse', PASSE) === 'collecte_en_echec',
+  'il est passé, le crawl n’a rien ramené');
+check('… et le fournisseur voisin n’est pas contaminé',
+  causeDepuisBalise(baliseVide, 'Lever', PASSE) === 'collecte_absente',
+  'Lever avait écrit : si sa clé manque, c’est autre chose');
+check('un fournisseur absent de la balise → collecte_absente',
+  causeDepuisBalise(baliseVide, 'Teamtailor', PASSE) === 'collecte_absente');
+// Une balise plus vieille que le TTL des offres n'explique plus rien : si elle
+// date de dix jours, l'information est que le cron n'est pas passé depuis.
+check('une balise périmée cesse d’expliquer et redevient collecte_absente',
+  causeDepuisBalise(baliseVide, 'Greenhouse', PASSE + (TTL_SECONDES + 60) * 1000) === 'collecte_absente',
+  `au-delà de ${TTL_SECONDES / 3600} h`);
+check('une balise sans date n’explique rien',
+  causeDepuisBalise({ fournisseurs: { Greenhouse: { ok: false } } }, 'Greenhouse', PASSE) === 'collecte_absente');
+
+// Et le bout en bout : clé d'offres absente + balise qui accuse le crawl.
+const sansCle = await appeler(null, { balise: baliseVide });
+check('bout en bout : clé absente + balise → la source publie collecte_en_echec',
+  sansCle.journal[0]?.cause === 'collecte_en_echec', sansCle.journal[0]?.cause);
+const sansRien = await appeler(null);
+check('bout en bout : clé absente sans balise → collecte_absente',
+  sansRien.journal[0]?.cause === 'collecte_absente', sansRien.journal[0]?.cause);
+
+// Le trou que le commentaire du lecteur décrivait sans que le code le ferme :
+// `Array.isArray([])` est vrai et `![]` est faux, donc une clé portant une
+// liste vide traversait le garde et sortait zéro offre SANS cause.
+const videServie = await appeler({ offres: [] }, { balise: baliseVide });
+check('une clé portant une liste VIDE est déclarée, pas servie en silence',
+  videServie.offres.length === 0 && videServie.journal.length === 1,
+  videServie.journal[0]?.cause || 'aucune cause publiée');
 
 if (failed) { console.error(`\n❌ sonde Greenhouse : ${failed} échec(s)\n`); process.exit(1); }
 console.log(`\n✅ sonde Greenhouse : ${passed} vérifications OK\n`);

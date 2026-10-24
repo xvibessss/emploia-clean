@@ -63,27 +63,57 @@ export function fusionner(precedent, source, resultat) {
   return { collecteLe: new Date().toISOString(), etat, appels, offres: retenues };
 }
 
-export default async function handler(req) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-
-  const cle = process.env.RAPIDAPI_KEY;
-  const journal = [];
-  const debut = Date.now();
-  const maintenant = new Date();
-
+// ── CE QUI EST ÉCRIT, ET POURQUOI C'EST ÉCRIT MÊME À VIDE ───────────────────
+// Extrait du handler pour que la sonde puisse l'exercer hors ligne : KV et
+// réseau injectés. Un handler non injectable ne peut pas être sondé, et c'est
+// précisément ce qui a laissé passer le défaut que cette fonction corrige.
+//
+// LE DÉFAUT. Le handler écartait l'écriture quand la collecte ne ramenait
+// aucune offre :
+//
+//     if (!offres) { … return { ecrit: false }; }   // la clé n'était pas écrite
+//
+// Son commentaire disait « on laisse l'absence être une absence, et
+// `collecte_absente` la dira ». Mais l'absence d'OFFRES n'est pas l'absence de
+// COLLECTE, et les confondre rend trois pannes indicibles d'un coup : un refus
+// de quota, une clé RAPIDAPI_KEY non posée et une API en panne produisent tous
+// zéro offre, donc aucune écriture, donc `collecte_absente` — « le cron n'a pas
+// tourné ». Le cron avait tourné.
+//
+// Le plus dur à voir : `fusionner` CALCULE déjà le bon état (`quota`,
+// `cle_absente`), et `causeReservoir` sait déjà le traduire. Le diagnostic
+// était produit puis jeté une ligne plus loin. `quota_epuise` ne pouvait être
+// publié que si une collecte ANTÉRIEURE avait laissé une clé pour le porter —
+// donc jamais au premier passage, qui est exactement le moment où on en a
+// besoin.
+//
+// La crainte d'origine était qu'une clé vide « fasse apparaître un réservoir là
+// où il n'y en a pas ». Elle est infondée, et `causeReservoir` le montre :
+// `if (!entree.collecteLe || !entree.offres?.length) return perime;` — une
+// entrée sans offre rend une CAUSE, elle n'est jamais servie. Le garde
+// protégeait d'un risque qui n'existait pas, en détruisant le diagnostic.
+//
+// Et la clé écrite est aussi une BALISE DE PASSAGE : `collecteLe` à sa racine
+// date le dernier tour du cron, quel qu'en soit le résultat. C'est ce qui rend
+// les deux lectures enfin distinctes, sans logs :
+//
+//     clé absente              le cron n'a pas tourné        → voir les crons Vercel
+//     clé présente, etat quota le cron a tourné, refusé      → décision d'abonnement
+//
+export async function collecterEtEcrire({
+  cle, fetchImpl = fetch, kvGet: lire, kvSet: ecrire,
+  maintenant = new Date(), journal = [],
+} = {}) {
   // La valeur précédente est relue AVANT la collecte : c'est elle qui sera
   // conservée si une source rend zéro offre.
-  const precedent = await kvGet(CLE_KV);
+  const precedent = await lire(CLE_KV);
 
   const resultats = {};
   if (estJourDeCollecte('jsearch', maintenant)) {
-    resultats.jsearch = await collecterJSearch({ cle, journal });
+    resultats.jsearch = await collecterJSearch({ cle, fetchImpl, journal });
   }
   if (estJourDeCollecte('frenchmarket', maintenant)) {
-    resultats.frenchmarket = await collecterFrenchMarket({ cle, journal });
+    resultats.frenchmarket = await collecterFrenchMarket({ cle, fetchImpl, journal });
   }
 
   const valeur = {
@@ -95,24 +125,37 @@ export default async function handler(req) {
   const appels = Object.values(resultats).reduce((n, r) => n + (r?.appels || 0), 0);
   const offres = ['jsearch', 'frenchmarket'].reduce((n, s) => n + (valeur[s]?.offres?.length || 0), 0);
 
-  // Rien du tout dans les deux sources, ni maintenant ni avant : écrire une clé
-  // vide ferait apparaître un réservoir là où il n'y en a pas. On laisse
-  // l'absence être une absence, et `collecte_absente` la dira.
-  if (!offres) {
-    console.error(`collect-rapidapi: aucune offre, ni collectée ni conservée (${appels} appel(s), journal: ${JSON.stringify(journal)}) — clé non écrite.`);
-    return new Response(JSON.stringify({
-      ok: false, raison: 'collecte_vide', appels, journal, ecrit: false,
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-  }
+  // Inconditionnel. C'est toute la correction.
+  await ecrire(CLE_KV, valeur, TTL_SECONDES);
 
+  if (!offres) {
+    console.error(`collect-rapidapi: aucune offre servable (${appels} appel(s), journal: ${JSON.stringify(journal)}) — clé écrite quand même, pour que l'état de chaque source reste lisible.`);
+  }
   if (journal.length) console.error('collect-rapidapi: échecs — ' + JSON.stringify(journal));
 
-  await kvSet(CLE_KV, valeur, TTL_SECONDES);
+  return { valeur, appels, offres, journal };
+}
+
+export default async function handler(req) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const debut = Date.now();
+  const { valeur, appels, offres, journal } = await collecterEtEcrire({
+    cle: process.env.RAPIDAPI_KEY, kvGet, kvSet,
+  });
 
   return new Response(JSON.stringify({
     ok: true,
     ms: Date.now() - debut,
     appels,
+    // `ecrit` est toujours vrai depuis que l'écriture est inconditionnelle ; il
+    // reste pour que la sonde de production puisse le lire. `servable` dit ce
+    // que `ecrit` disait avant, mais sans mentir sur l'écriture.
+    ecrit: true,
+    servable: offres > 0,
     budgets: {
       jsearch: `${BUDGETS.jsearch.pagesParCollecte}/collecte, plafond ${BUDGETS.jsearch.plafondMensuel}/mois`,
       frenchmarket: `${BUDGETS.frenchmarket.pagesParCollecte}/collecte hebdomadaire, plafond ${BUDGETS.frenchmarket.plafondMensuel}/mois`,
