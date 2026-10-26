@@ -253,7 +253,7 @@
         return;
       }
       jobs.forEach(j => grid.appendChild(renderJob(j)));
-      document.getElementById('jobCount').textContent = `${(data.total||jobs.length).toLocaleString('fr-FR')} offres à Montpellier`;
+      document.getElementById('jobCount').textContent = data.filtre === 'abandonne' ? `Aucune offre ne correspond · ${(data.total||jobs.length).toLocaleString('fr-FR')} dernières offres publiées` : `${(data.total||jobs.length).toLocaleString('fr-FR')} offres à Montpellier`;
       document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
     } catch {
       grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3);grid-column:1/-1"><a href="/jobs" style="color:var(--blb)">Voir toutes les offres</a></div>';

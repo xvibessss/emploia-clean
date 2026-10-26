@@ -89,6 +89,8 @@ jobs:
         run: node scripts/smoke/causes.test.mjs
       - name: Type de contrat et salaire (lus depuis la donnée, jamais fabriqués)
         run: node scripts/smoke/contrat.test.mjs
+      - name: Repli du filtre de pertinence (aucune page n'annonce d'offres qu'elle n'a pas)
+        run: node scripts/smoke/pertinence.test.mjs
       - name: Collecteur Greenhouse (un board en échec n'emporte pas les autres)
         run: node scripts/smoke/greenhouse.test.mjs
       - name: Collecteur Lever (indéterminée ≠ déterminée, un bureau FR ne rend pas FR)
