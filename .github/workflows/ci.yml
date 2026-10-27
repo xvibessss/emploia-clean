@@ -87,6 +87,8 @@ jobs:
         run: node scripts/rgpd/localisation.test.mjs
       - name: Bounded failure causes (aucun message d'exception dans /api/jobs)
         run: node scripts/smoke/causes.test.mjs
+      - name: Décompte par collecteur (un zéro n'est jamais silencieux)
+        run: node scripts/smoke/contribution.test.mjs
       - name: Type de contrat et salaire (lus depuis la donnée, jamais fabriqués)
         run: node scripts/smoke/contrat.test.mjs
       - name: Repli du filtre de pertinence (aucune page n'annonce d'offres qu'elle n'a pas)
