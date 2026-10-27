@@ -34,7 +34,9 @@ import { TTL_OFFRES_SECONDES } from './ats-balise.js';
 import { collecterGreenhouse } from './greenhouse.js';
 import { BOARDS as BOARDS_GREENHOUSE, RELEVE as RELEVE_GREENHOUSE } from './greenhouse-boards.js';
 import { collecterLever } from './lever.js';
+import { collecterAshby } from './ashby.js';
 import { BOARDS as BOARDS_LEVER, RELEVE as RELEVE_LEVER } from './lever-boards.js';
+import { BOARDS as BOARDS_ASHBY, RELEVE as RELEVE_ASHBY } from './ashby-boards.js';
 
 // 72 heures, pour un cron QUOTIDIEN. Le rapport est délibéré : deux collectes
 // consécutives peuvent échouer avant que la clé disparaisse, et à la troisième
@@ -80,6 +82,18 @@ export const FOURNISSEURS = [
     // offres de `qonto`, ~27 ko par offre. Cinq boards de front suffisent à
     // saturer le décodage JSON sans ouvrir vingt connexions lourdes.
     concurrence: 5,
+  },
+  {
+    nom: 'Ashby',
+    cle: 'ashby_jobs',
+    boards: BOARDS_ASHBY,
+    releve: RELEVE_ASHBY,
+    collecter: collecterAshby,
+    // Six, et la collecte tient en 5,9 s pour 33 boards — malgré 2 918 offres
+    // et ~18 ko par offre, Ashby servant la description deux fois (HTML et
+    // texte). Le cron passe de ~34 s à ~40 s, loin sous les 300 s réservées
+    // dans vercel.json.
+    concurrence: 6,
   },
 ];
 

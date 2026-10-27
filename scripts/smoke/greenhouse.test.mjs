@@ -450,7 +450,23 @@ check('api/jobs.js prend la balise dans le module léger, pas dans le registre',
   jobsSrc.includes("from './_lib/ats-balise.js'") && !jobsSrc.includes("from './_lib/ats.js'"));
 
 // La règle de lecture, exercée sur la vraie fonction.
-const PASSE = new Date('2026-10-23T04:00:00.000Z').getTime();
+// L'HEURE DE PASSAGE EST RELATIVE À MAINTENANT, et ce n'est pas un détail de
+// style : la valeur était figée à `2026-10-23T04:00:00.000Z`, et cette sonde a
+// rougi d'elle-même le 2026-10-26, soit 72 h plus tard — la durée exacte du
+// TTL des clés d'offres.
+//
+// La raison : l'assertion de bout en bout appelle le VRAI `fetchGreenhouse`,
+// qui appelle `causeDepuisBalise(balise, 'Greenhouse')` SANS troisième
+// argument, donc avec `Date.now()`. Passé le TTL, la balise cesse d'expliquer
+// quoi que ce soit — c'est le comportement voulu — et la cause retombe à
+// `collecte_absente`. Le test était donc vert le jour où il a été écrit et
+// faux trois jours après, sans qu'une ligne de code ait changé.
+//
+// Une sonde qui pourrit au calendrier est pire qu'une sonde absente : elle
+// occupe la place, puis elle accuse la première branche qui passe. Les
+// assertions qui veulent une balise PÉRIMÉE le disent explicitement en
+// ajoutant le TTL à cette base.
+const PASSE = Date.now() - 3600 * 1000;   // il y a une heure, donc toujours fraîche
 const baliseVide = construireBalise([
   { source: 'Greenhouse', ok: false, raison: 'collecte_vide', boards: 28, boardsEnEchec: 28 },
   { source: 'Lever', ok: true, offresStockees: 331, boards: 17, boardsEnEchec: 0 },

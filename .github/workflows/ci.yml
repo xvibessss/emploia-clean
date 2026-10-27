@@ -95,6 +95,8 @@ jobs:
         run: node scripts/smoke/greenhouse.test.mjs
       - name: Collecteur Lever (indéterminée ≠ déterminée, un bureau FR ne rend pas FR)
         run: node scripts/smoke/lever.test.mjs
+      - name: Collecteur Ashby (isRemote n'est pas du distanciel, l'equity n'est pas un salaire)
+        run: node scripts/smoke/ashby.test.mjs
       - name: Réservoir RapidAPI (budget sous le plafond mesuré, absence jamais masquée)
         run: node scripts/smoke/rapidapi.test.mjs
       - name: Collecteur France Travail (jeton lu de expires_in, 4 causes distinctes)
