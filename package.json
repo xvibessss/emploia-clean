@@ -14,6 +14,7 @@
     "test:pertinence": "node scripts/smoke/pertinence.test.mjs",
     "test:greenhouse": "node scripts/smoke/greenhouse.test.mjs",
     "test:lever": "node scripts/smoke/lever.test.mjs",
+    "test:ashby": "node scripts/smoke/ashby.test.mjs",
     "test:rapidapi": "node scripts/smoke/rapidapi.test.mjs",
     "test:france-travail": "node scripts/smoke/france-travail.test.mjs",
     "test:email": "node scripts/billing/email.test.mjs",
