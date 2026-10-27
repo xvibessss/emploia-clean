@@ -346,3 +346,72 @@ export function formaterSalaireAnnuel(min, max) {
 export function estSalaireEstime(v) {
   return String(v) === '1';
 }
+
+// ── ASHBY ────────────────────────────────────────────────────────────────────
+// Posé en FIN de fichier, et c'est délibéré : la PR 108 (Teamtailor) ajoute
+// `salaireSchemaOrg` dans la section SALAIRE plus haut, et les deux branches
+// sont indépendantes. Écrire ici réduit le conflit textuel à rien si les deux
+// atterrissent.
+//
+// `employmentType` est une énumération PROPRE à Ashby — `FullTime`,
+// `PartTime`, `Intern`, `Contract`, `Temporary` — et elle est servie sur
+// presque toutes les offres, contrairement au champ homonyme de schema.org
+// chez Teamtailor qui était vide 602 fois sur 602.
+//
+// Elle passe par `contratDepuisTexte` sans une ligne de vocabulaire nouveau,
+// et c'est le troisième ATS d'affilée pour lequel c'est vrai : `Contract` et
+// `Temporary` rendent CDD, `Intern` rend Stage, `FullTime` et `PartTime` ne
+// rendent AUCUN contrat mais une durée de travail, dans son propre champ.
+export function contratAshby(j) {
+  const declare = j?.employmentType;
+  const parChamp = declare ? contratDepuisTexte(normaliserValeur(declare)) : null;
+  return contratPublic(parChamp || detectType(j?.title));
+}
+
+export function tempsAshby(j) {
+  const declare = j?.employmentType;
+  return declare ? lireTemps(normaliserValeur(declare)) : null;
+}
+
+// ── SALAIRE ASHBY, et il se heurte à un CHOIX DE L'EMPLOYEUR ─────────────────
+// Ashby est le seul des quatre ATS à poser un drapeau de consentement :
+// `shouldDisplayCompensationOnJobPostings`. L'employeur y déclare s'il veut
+// que la rémunération paraisse sur l'annonce.
+//
+// MESURÉ sur `alan`, 126 offres : le drapeau est à `true` sur 5 offres, qui
+// portent toutes des données, et à `false` sur 121, dont AUCUNE n'en porte.
+// Ashby caviarde donc lui-même. On vérifie le drapeau quand même, parce que
+// s'en remettre au caviardage de l'API serait s'en remettre à un détail
+// d'implémentation pour respecter une décision humaine — et le jour où il
+// changerait, emploia publierait un montant que l'employeur avait refusé de
+// montrer.
+//
+// DEUX AUTRES PIÈGES, et le premier est une faute de catégorie.
+//
+// `compensationTierSummary` est une chaîne toute faite — « €46K – €53K •
+// €18K – €27K Equity » — qui MÉLANGE le salaire et l'equity. La publier comme
+// salaire présenterait 27 k€ d'actions comme de la paie. On ne la lit pas :
+// on descend dans `summaryComponents`, où chaque composant porte son
+// `compensationType`, et on ne retient que `Salary`. `EquityCashValue` est
+// une information réelle, mais ce n'est pas un salaire et le dépôt n'a pas de
+// champ pour elle.
+//
+// Et l'intervalle, comme chez Teamtailor : `formaterSalaireAnnuel` affiche des
+// « k€/an », donc seul `1 YEAR` est publiable. La devise de même : l'affichage
+// est en euros, en dur.
+const ASHBY_SALAIRE_ANNUEL = '1 YEAR';
+
+export function salaireAshby(j) {
+  if (!j?.shouldDisplayCompensationOnJobPostings) return null;
+  const composants = Array.isArray(j?.compensation?.summaryComponents)
+    ? j.compensation.summaryComponents : [];
+  const salaire = composants.find(c =>
+    c?.compensationType === 'Salary' &&
+    c?.interval === ASHBY_SALAIRE_ANNUEL &&
+    c?.currencyCode === 'EUR');
+  if (!salaire) return null;
+  const bas = Number(salaire.minValue ?? salaire.maxValue);
+  const haut = Number(salaire.maxValue ?? salaire.minValue);
+  if (!Number.isFinite(bas) || !Number.isFinite(haut)) return null;
+  return formaterSalaireAnnuel(bas, haut);
+}
