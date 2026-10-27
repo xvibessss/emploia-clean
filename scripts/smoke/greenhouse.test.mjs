@@ -450,7 +450,17 @@ check('api/jobs.js prend la balise dans le module léger, pas dans le registre',
   jobsSrc.includes("from './_lib/ats-balise.js'") && !jobsSrc.includes("from './_lib/ats.js'"));
 
 // La règle de lecture, exercée sur la vraie fonction.
-const PASSE = new Date('2026-10-23T04:00:00.000Z').getTime();
+// `PASSE` est RELATIF à l'horloge réelle, et il doit le rester. Les assertions
+// ci-dessous reçoivent leur « maintenant » en paramètre et sont donc stables,
+// mais l'appel bout en bout plus bas traverse le vrai lecteur, qui lit
+// `Date.now()`. Avec une date fixe, la balise franchissait le TTL de 72 h
+// quelques jours après l'écriture du test : `collecte_en_echec` redevenait
+// `collecte_absente` et la sonde rougissait SEULE, sans qu'une ligne de code
+// ait changé. Constaté le 2026-10-26 sur une balise datée du 23 — le test est
+// resté vert trois jours puis a cassé `main` sans coupable.
+// Une heure avant maintenant : assez frais pour le lecteur, et la règle de
+// péremption reste exercée en ajoutant `TTL_SECONDES` à cette base.
+const PASSE = Date.now() - 3600 * 1000;
 const baliseVide = construireBalise([
   { source: 'Greenhouse', ok: false, raison: 'collecte_vide', boards: 28, boardsEnEchec: 28 },
   { source: 'Lever', ok: true, offresStockees: 331, boards: 17, boardsEnEchec: 0 },
