@@ -30,6 +30,23 @@ const REQUETES = [
   { chemin: '/api/jobs?q=infirmier', attendu: 'infirmi' },
   { chemin: '/api/jobs?q=developpeur&location=Lyon', attendu: 'lyon' },
   { chemin: '/api/jobs?q=boulanger', attendu: 'boulang' },
+  // Une requête LARGE, sans `q`, et elle a un rôle que les trois autres ne
+  // peuvent pas tenir : c'est la seule sous laquelle tout collecteur vivant
+  // DOIT se montrer. Les réservoirs KV (Greenhouse, Lever) filtrent leur
+  // réservoir localement, par sous-chaîne sur le titre ; mesuré le 2026-10-22,
+  // ils rendent zéro sur les trois requêtes ci-dessus et dix chacun ici.
+  //
+  // La raison est linguistique : ce sont des crawls d'ATS anglophones, où
+  // « infirmier », « developpeur » et « boulanger » ne matchent rien — leurs
+  // offres s'intitulent « Engineer », « Nurse », « Baker ». Leur zéro est donc
+  // légitime sur une requête étroite, et sans cette quatrième requête
+  // l'invariant de contribution les déclarerait muets à tort, ce qui aurait
+  // transformé la sonde en fausse alerte permanente.
+  //
+  // Pas d'aiguille de pertinence pour celle-ci : sans `q`, il n'y a rien à
+  // attendre dans les titres, et en exiger une reviendrait à inventer un
+  // critère. C'est la contribution des collecteurs qu'elle mesure, pas le filtre.
+  { chemin: '/api/jobs', attendu: null },
 ];
 
 // Les collecteurs qu'on sait absents, chacun avec sa raison. Une absence sans
@@ -48,7 +65,11 @@ const ABSENCES_CONNUES = {
   // La sonde signale de toute façon le changement, parce qu'elle rapproche la
   // cause rencontrée de celle que cette entrée déclare.
   'France Travail': 'cle_absente attendu — FRANCE_TRAVAIL_CLIENT_ID / _SECRET jamais créés (compte à ouvrir sur francetravail.io). Toute AUTRE cause est une panne : identifiants_refuses = variables fausses, droits_insuffisants = application non abonnée à l’API Offres v2',
-  Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié",
+  // Emploia n'est pas en ÉCHEC : `fetchEmployerJobs` rend `[]` quand la clé
+  // `employer_jobs` est vide, sans passer par `muet`. C'est un zéro muet
+  // légitime, et il n'était visible nulle part avant `offresParCollecteur` —
+  // cette entrée ne pouvait donc jamais se vérifier.
+  Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié ; zéro muet, pas un échec",
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
   // les clés `greenhouse_jobs` et `lever_jobs` sont remplies par
   // `api/cron/collect-ats`, et elles n'existent pas avant la première exécution
@@ -78,8 +99,8 @@ const ABSENCES_CONNUES = {
   // tolérables sans devenir un silence : `collecte_absente` dit que le cron
   // n'a pas tourné, `quota_epuise` que le plan a refusé la collecte — une
   // décision d'abonnement — et `cle_absente` que RAPIDAPI_KEY n'est pas posée.
-  JSearch: "réservoir rapidapi_jobs pas encore écrit — normal jusqu'à la première exécution de /api/cron/collect-rapidapi ; au-delà de 72 h c'est une panne de cron, et quota_epuise désigne le plafond du plan (200 requêtes/mois), pas le cron",
-  'French Job Market': "même réservoir, collecté le LUNDI seulement — 30 requêtes/mois n'autorisent pas un appel par jour sur 31 ; tolérance 16 jours, soit deux lundis manqués, au-delà c'est une panne de cron ou un quota épuisé",
+  JSearch: "collecte_absente : réservoir rapidapi_jobs pas encore écrit — normal jusqu'à la première exécution de /api/cron/collect-rapidapi ; au-delà de 72 h c'est une panne de cron, et quota_epuise désigne le plafond du plan (200 requêtes/mois), pas le cron",
+  'French Job Market': "collecte_absente : même réservoir, collecté le LUNDI seulement — 30 requêtes/mois n'autorisent pas un appel par jour sur 31 ; tolérance 16 jours, soit deux lundis manqués, au-delà c'est une panne de cron ou un quota épuisé",
   // Pas d'entrée pour Adzuna. Il y en a eu une, « HTTP 503 intermittent côté
   // Adzuna — toléré », et elle n'était pas justifiée par les faits : l'audit du
   // 2026-10-10 relève Adzuna OK sur 7 appels consécutifs en production, et
@@ -116,6 +137,19 @@ const causesVues = new Map();
 // l'instrumentation. Sans ce drapeau, l'absence du champ se lirait comme
 // « aucun collecteur en échec » : la sonde dirait vert sur une panne.
 let champPresent = false;
+// Le trou que ces trois ensembles viennent fermer. Un collecteur qui rend `[]`
+// sans appeler `muet` n'apparaissait NI dans `sourcesEnEchec` (il n'a pas
+// échoué) NI de façon exploitable dans `sources` (vocabulaire de publisher, et
+// ses offres peuvent avoir été filtrées). La sonde le déclarait vert.
+//
+// C'est la forme exacte de la panne que ce dépôt a déjà payée : /api/jobs-search
+// a répondu 200 avec zéro offre pendant cinq mois. Le relevé du 2026-10-21 l'a
+// rencontrée sur Adzuna — qui s'est révélée SAINE à la mesure (présente sur 6
+// requêtes sur 6, 4 à 10 offres), ce qui est précisément le problème : rien ne
+// permettait de le savoir sans mesurer à la main.
+const collecteursConnus = new Set();
+const ontContribue = new Set();
+let contributionVue = false;
 
 for (const { chemin, attendu } of REQUETES) {
   let rep;
@@ -132,9 +166,12 @@ for (const { chemin, attendu } of REQUETES) {
 
   // Le filtre fonctionne-t-il ? Une recherche qui rend des offres sans rapport
   // est aussi cassée qu'une recherche vide, mais elle en a l'air moins.
-  const pertinentes = (rep.jobs || []).filter((j) =>
-    `${j.title} ${j.location}`.toLowerCase().includes(attendu)).length;
-  if (!pertinentes) { ko(chemin, `${rep.total} offres, aucune ne mentionne « ${attendu} »`); continue; }
+  // `attendu: null` est la requête large : elle ne porte pas de `q`, donc elle
+  // n'a pas d'aiguille, et le filtre n'est pas ce qu'elle vérifie.
+  const pertinentes = attendu
+    ? (rep.jobs || []).filter((j) => `${j.title} ${j.location}`.toLowerCase().includes(attendu)).length
+    : null;
+  if (attendu && !pertinentes) { ko(chemin, `${rep.total} offres, aucune ne mentionne « ${attendu} »`); continue; }
 
   if (Array.isArray(rep.sourcesEnEchec)) champPresent = true;
   for (const s of rep.sourcesEnEchec || []) absencesRencontrees.add(s);
@@ -144,7 +181,19 @@ for (const { chemin, attendu } of REQUETES) {
     if (!causesVues.has(s)) causesVues.set(s, c);
   }
   for (const s of rep.sources || []) vues.add(s);
-  ok(chemin, `${rep.total} offres · ${pertinentes} pertinentes dans la première page`);
+  // `rep.sources` porte les étiquettes de PUBLISHER (« Indeed », « APEC »),
+  // pas les noms des collecteurs. C'est pourquoi il ne pouvait pas servir à
+  // savoir qui n'avait rien rendu, et pourquoi `offresParCollecteur` existe.
+  if (rep.offresParCollecteur && typeof rep.offresParCollecteur === 'object') {
+    contributionVue = true;
+    for (const [nom, n] of Object.entries(rep.offresParCollecteur)) {
+      collecteursConnus.add(nom);
+      if (Number(n) > 0) ontContribue.add(nom);
+    }
+  }
+  ok(chemin, pertinentes === null
+    ? `${rep.total} offres · requête large, contribution des collecteurs`
+    : `${rep.total} offres · ${pertinentes} pertinentes dans la première page`);
 }
 
 console.log('');
@@ -173,7 +222,14 @@ for (const [nom, raison] of Object.entries(champPresent ? ABSENCES_CONNUES : {})
         && !(cause === 'cle_absente' && /clé|clés|jamais créé/i.test(raison))) {
       console.log(`    ↳ la cause observée (${cause}) ne correspond pas à la raison déclarée — entrée à revoir`);
     }
-  } else console.log(`  ↻ ${nom} ne figure plus parmi les échecs — retirer son entrée d'ABSENCES_CONNUES`);
+  } else if (contributionVue && collecteursConnus.has(nom) && !ontContribue.has(nom)) {
+    // Déclarée, à zéro, sans avoir échoué. L'entrée décrit un état RÉEL que
+    // `sourcesEnEchec` ne pouvait pas montrer, et c'est le cas d'Emploia :
+    // `fetchEmployerJobs` rend `[]` quand aucun employeur n'a publié, sans
+    // passer par `muet`. Son entrée était donc morte — la sonde réclamait son
+    // retrait à chaque passage, pour une absence parfaitement normale. Le bloc
+    // de réconciliation l'a déjà signalée ; ne pas suggérer de la retirer.
+  } else console.log(`  ↻ ${nom} ne figure plus parmi les échecs ni parmi les zéros — retirer son entrée d'ABSENCES_CONNUES`);
 }
 
 // Les causes des pannes non déclarées, regroupées : de quoi agir sans log.
@@ -181,6 +237,35 @@ const nonDeclarees = [...causesVues].filter(([s]) => !ABSENCES_CONNUES[s]);
 if (nonDeclarees.length) {
   console.log('\n  Causes observées, non déclarées :');
   for (const [s, c] of nonDeclarees) console.log(`    ${s} → ${c}`);
+}
+
+// ── CHAQUE COLLECTEUR REND DES COMPTES ─────────────────────────────────────
+// La règle : sur l'ensemble des requêtes de la sonde, un collecteur a soit
+// échoué (et sa cause est lisible), soit contribué au moins une fois. Un
+// collecteur qui n'a fait ni l'un ni l'autre est un zéro SILENCIEUX, et c'est
+// ce que cette sonde ne savait pas voir.
+//
+// « au moins une fois » et non « à chaque requête », délibérément : une requête
+// étroite peut légitimement ne rien rendre chez un agrégateur, et exiger une
+// contribution partout ferait rougir la sonde sur une source saine. Les trois
+// requêtes sont assez larges pour qu'un collecteur vivant en serve au moins une.
+if (!contributionVue) {
+  ko('la réponse ne porte pas `offresParCollecteur`',
+     "déploiement antérieur à l'instrumentation — un collecteur muet reste invisible");
+} else {
+  const muets = [...collecteursConnus]
+    .filter((s) => !ontContribue.has(s) && !absencesRencontrees.has(s));
+  const nonDeclares = muets.filter((s) => !ABSENCES_CONNUES[s]);
+  if (nonDeclares.length) {
+    ko(`${nonDeclares.length} collecteur(s) à zéro sans échouer ni être déclaré(s)`,
+       `${nonDeclares.join(', ')} — rendent [] sans cause : panne muette ou source à retirer`);
+  } else {
+    ok('aucun collecteur à zéro en silence',
+       `${ontContribue.size}/${collecteursConnus.size} ont contribué, ${absencesRencontrees.size} en échec déclaré`);
+  }
+  for (const nom of muets.filter((s) => ABSENCES_CONNUES[s])) {
+    console.log(`  ! ${nom} à zéro sans échouer — ${ABSENCES_CONNUES[nom]}`);
+  }
 }
 
 console.log(`\n${vues.size} source(s) distinctes ont fourni des offres`);
