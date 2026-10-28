@@ -150,7 +150,7 @@ function muet(journal, source, raison, cause) {
 // synchronisées finissent par diverger, et c'est ce fichier qui a déjà
 // documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
 // collecteurs sur huit et ignoré par les cinq autres.
-const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
 
 // Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
 //
