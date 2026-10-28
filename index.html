@@ -173,9 +173,6 @@
 .hiw-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;background:rgba(34,197,94,.1);color:#15803d;font-size:12px;font-weight:600;margin-top:12px;width:fit-content}
 
 /* Press logo refined */
-.press-logo{font-size:15px;font-weight:700;letter-spacing:-.3px;color:var(--slate,#64748B);opacity:.7;padding:10px 18px;border:1.5px solid rgba(0,0,0,.08);border-radius:8px;transition:opacity .2s}
-.press-logo:hover{opacity:1}
-.press-logos{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:24px}
 
 /* Hero gradient mesh overlay */
 .emp-hero-dark{position:relative;overflow:hidden}
@@ -195,13 +192,6 @@
 .powered-badge strong{color:rgba(255,255,255,.85);font-weight:600}
 
 /* Press section */
-.press-section{padding:56px 0 0}
-.press-logos{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;margin-top:28px}
-.press-logo{font-size:18px;font-weight:800;color:var(--slate);opacity:.45;letter-spacing:-.6px;font-family:Georgia,serif;transition:opacity .2s}
-.press-logo:hover{opacity:.8}
-.press-logo.sans{font-family:var(--f-ui);font-weight:700;letter-spacing:-.3px}
-.press-quote{max-width:620px;margin:36px auto 0;text-align:center;font-size:16px;color:var(--charcoal);line-height:1.6;font-style:italic}
-.press-quote cite{display:block;margin-top:10px;font-style:normal;font-size:13px;color:var(--steel);font-weight:600}
 
 /* Integrations */
 .integ-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:40px}
@@ -262,12 +252,6 @@
 .emp-nav.scrolled{box-shadow:0 1px 16px rgba(0,0,0,.09)}
 .emp-nav.scrolled #navLoginBtn{display:inline-flex!important}
 
-/* Logo marquee */
-.emp-logo-marquee{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#fff 15%,#fff 85%,transparent);mask:linear-gradient(90deg,transparent,#fff 15%,#fff 85%,transparent)}
-.emp-logo-track{display:flex;gap:48px;width:max-content;animation:marquee 28s linear infinite}
-.emp-logo-track:hover{animation-play-state:paused}
-.emp-logo-track span{font-size:15px;font-weight:600;color:var(--steel);white-space:nowrap;opacity:.7;letter-spacing:-.2px}
-@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* How it works */
 .hiw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
@@ -461,19 +445,6 @@
   </div>
 </section>
 
-<!-- ═════ LOGO WALL ═════ -->
-<section class="emp-logo-wall reveal" style="padding-top:160px">
-  <div class="container" style="text-align:center;margin-bottom:20px">
-    <div class="lbl">Approuvé par des candidats reçus chez</div>
-  </div>
-  <div class="emp-logo-marquee">
-    <div class="emp-logo-track">
-      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span><span>Payfit</span><span>Mirakl</span><span>Veepee</span><span>Contentsquare</span><span>Luko</span>
-      <span>Doctolib</span><span>Qonto</span><span>Alan</span><span>BlaBlaCar</span><span>Swile</span><span>Pennylane</span><span>Back Market</span><span>Payfit</span><span>Mirakl</span><span>Veepee</span><span>Contentsquare</span><span>Luko</span>
-    </div>
-  </div>
-</section>
-
 <!-- ═════ PRODUCT FACTS ═════ -->
 <section class="social-stats-wrap reveal">
   <div class="social-stats">
@@ -518,7 +489,7 @@
         <div>
           <h4>L'IA adapte chaque candidature</h4>
           <p>Collez une offre d'emploi — EmploiA génère un CV optimisé ATS, une lettre sur-mesure et prépare vos réponses aux questions probables.</p>
-          <div class="hiw-badge">🎯 Score ATS moyen : 89%</div>
+          <div class="hiw-badge">🎯 Score ATS affiché avant d'envoyer</div>
         </div>
       </div>
       <div class="hiw-step" data-delay="3">
@@ -526,7 +497,7 @@
         <div>
           <h4>Candidatez et suivez vos relances</h4>
           <p>Tableau Kanban, rappels automatiques, coach pré-entretien — tout est prêt. Vous n'avez plus qu'à cliquer "Envoyer".</p>
-          <div class="hiw-badge">📬 Premier retour en 14 jours en moyenne</div>
+          <div class="hiw-badge">📬 Relance proposée après 7 jours sans réponse</div>
         </div>
       </div>
     </div>
@@ -534,25 +505,6 @@
       <a href="/app" class="emp-btn emp-btn-primary emp-btn-lg">Commencer gratuitement</a>
       <div style="font-size:13px;color:var(--slate);margin-top:10px">Sans carte bancaire · Résultats en 30 secondes</div>
     </div>
-  </div>
-</section>
-
-<!-- ═════ PRESS ═════ -->
-<section class="press-section reveal">
-  <div class="container" style="text-align:center">
-    <p class="t-cap" style="color:var(--slate);margin-bottom:4px">Ils parlent de nous</p>
-    <div class="press-logos">
-      <span class="press-logo">Le Monde</span>
-      <span class="press-logo sans">BFM Business</span>
-      <span class="press-logo">Le Figaro</span>
-      <span class="press-logo sans">La Tribune</span>
-      <span class="press-logo">L'Express</span>
-      <span class="press-logo sans">Challenges</span>
-    </div>
-    <blockquote class="press-quote">
-      « EmploiA redéfinit la recherche d'emploi en France — là où les jobboards listent, le copilote IA agit. »
-      <cite>— La Tribune · Startup de la semaine</cite>
-    </blockquote>
   </div>
 </section>
 
