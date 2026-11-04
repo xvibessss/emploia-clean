@@ -553,6 +553,14 @@ try {
     [/Emploia[^.<]{0,140}(?:×|x)\s*plus d'entretiens/i, 'effet d\'Emploia sur les entretiens, jamais mesuré'],
     [/(?:×|x)\s*plus d'entretiens[^.<]{0,60}Emploia/i, 'même affirmation, formulée dans l\'autre sens'],
     [/\d+\s*offres personnalis[ée]es par jour/i, 'plafond quotidien inventé — le palier payant est illimité (auth.js)'],
+    // Retirés de index.html le 2026-10-22 : ils avaient survécu à la PR #28.
+    [/Ils parlent de nous/i, 'bandeau presse (Le Monde, BFM Business, Le Figaro, La Tribune…) sans parution identifiée'],
+    [/Startup de la semaine/i, 'citation attribuée à La Tribune, sans article identifié'],
+    [/candidats reçus chez/i, 'logos d\'entreprises qui suggèrent des embauches obtenues via Emploia, jamais mesurées'],
+    // Forme « badge » (deux-points + nombre) ou effet attribué à Emploia ; « un CV générique
+    // obtient un score ATS moyen de 40-50/100 » dans un article reste éditorial et n'est pas visé.
+    [/score ATS moyen\s*:\s*\d+|score ATS moyen passe de \d+/i, 'score moyen des utilisateurs d\'Emploia, jamais mesuré (la démo du 22/10 donnait 78 %)'],
+    [/premier retour en \d+\s*jours en moyenne/i, 'délai moyen de réponse des recruteurs aux utilisateurs, jamais mesuré'],
   ];
   let revenues = 0;
   for (const f of visibles) {

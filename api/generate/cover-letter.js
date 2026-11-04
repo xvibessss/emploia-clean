@@ -1,5 +1,6 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
 import { getCurrentUser, claimFreeGeneration, refundGeneration, FREE_LIMIT, sanitizeString, getAllowedOrigin, checkRateLimit, htmlEscape } from "../_lib/auth.js";
+import { LETTER_SYSTEM, buildLetterUserPrompt } from "../_lib/prompts-candidature.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -51,12 +52,10 @@ export default async function handler(req) {
         model: user.plan === 'free' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6',
         max_tokens: user.plan === 'free' ? 4096 : 8192,
         stream: true,
-        system: [{ type: 'text', text: "Tu es un expert senior en rédaction de lettres de motivation pour le marché français avec 15 ans d'expérience RH et cabinet de recrutement. Tu crées des lettres de motivation qui se distinguent : accroche mémorable (jamais générique), démonstration de valeur concrète avec chiffres, connaissance fine de l'entreprise, alignement parfait avec les termes exacts de l'offre. Règles absolues : entre 300 et 420 mots, vouvoiement, 3 paragraphes de fond (accroche/compétences alignées/motivation projet d'entreprise), formule de politesse professionnelle française. La lettre doit donner l'impression d'avoir été écrite spécifiquement pour CE recruteur et CE poste — jamais copier-coller.\n\nRÈGLE D'HONNÊTETÉ ABSOLUE : n'invente JAMAIS de faits sur le candidat. Utilise uniquement les éléments fournis dans son profil. N'attribue aucun employeur, diplôme, durée d'expérience, certification ni résultat chiffré qui n'y figure pas. Tu peux mettre en valeur et contextualiser des faits réels, mais si un chiffre ou un détail précis manque, reste qualitatif ou insère « [à compléter] » — ne fabrique jamais une donnée.", cache_control: { type: 'ephemeral' } }],
+        system: [{ type: 'text', text: LETTER_SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{
           role: "user",
-          content: user.plan === 'free'
-            ? `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère une lettre de motivation professionnelle et personnalisée en français. Elle doit:\n- Commencer par les coordonnées du candidat, la date, les coordonnées de l'entreprise et l'objet\n- Avoir une accroche percutante qui montre que tu connais l'entreprise\n- Développer 3 arguments forts qui montrent pourquoi le candidat est parfait pour CE poste\n- Utiliser les termes exacts de l'offre d'emploi\n- Être authentique et ne pas ressembler à une lettre générique\n- Se terminer par une phrase de conclusion professionnelle et une signature\n- Faire entre 300 et 400 mots\n- Utiliser le vouvoiement\n\nCommence directement par la lettre, sans commentaires.`
-            : `OFFRE D'EMPLOI:\n${jobOffer}\n\nPROFIL DU CANDIDAT:\n${profile}${profileHint ? `\n\nCONTEXTE CANDIDAT: ${profileHint}` : ''}\n\nGénère une lettre de motivation PREMIUM en français. Structure obligatoire :\n\n**EN-TÊTE** : Coordonnées candidat (prénom nom, ville, email, téléphone) | Date | Coordonnées entreprise | Objet percutant (pas "Candidature au poste de" — trouve quelque chose d'original)\n\n**ACCROCHE** (1 paragraphe, 2-3 phrases) : Commence par un fait, chiffre ou observation sur l'entreprise/secteur qui prouve que tu la connais. Pas "Je me permets de vous adresser". Incite à lire la suite.\n\n**CORPS** (2-3 paragraphes) : \n- Paragraphe 1 : Ta valeur ajoutée principale pour CE poste, avec réalisation chiffrée\n- Paragraphe 2 : Compétences clés alignées avec les 3 mots-clés critiques de l'offre\n- Paragraphe 3 : Motivation pour CETTE entreprise spécifiquement (culture, projet, ambition)\n\n**CONCLUSION** : Proposition d'entretien avec disponibilité, remerciement, formule de politesse complète\n\nContraintes : 320-400 mots. Vouvoiement. Aucun cliché ("dynamique", "motivé", "rigoureux"). Chaque phrase apporte de la valeur. Commence directement par la lettre.`,
+          content: buildLetterUserPrompt({ jobOffer, profile, profileHint, plan: user.plan }),
         }],
       }),
     });

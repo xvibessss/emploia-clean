@@ -81,6 +81,8 @@ jobs:
         run: node scripts/ci/declencheurs.test.mjs
       - name: Generation quality bench (detector self-test + prompt guard)
         run: node scripts/bench/run.mjs
+      - name: Détecteur d'embellissement (B2 → « courant », mots de l'offre pris pour des faits)
+        run: node scripts/bench/embellishment.test.mjs
       - name: Employer offer lifecycle tests
         run: node scripts/employer/expiry.test.mjs
       - name: Data-locality claims (RGPD, /sous-traitants)
