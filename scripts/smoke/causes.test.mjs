@@ -122,8 +122,14 @@ for (const code of ['http_200', 'http_404', 'http_429', 'http_503']) {
 
 // ── 4. Le handler branche bien la cause dans ses deux réponses ──────────────
 console.log('\n[D] Les deux chemins de réponse portent causesEnEchec');
-check('réponse fraîche', /sourcesEnEchec, causesEnEchec, filtre: pertinence\.filtre/.test(src));
-check('réponse depuis le cache', /causesEnEchec, filtre: cached\.filtre/.test(src));
+// Le motif tolère des champs INTERCALÉS entre `causesEnEchec` et `filtre`.
+// Il épinglait l'ordre exact, et c'est la deuxième fois qu'un ajout légitime à
+// la réponse le faisait rougir sans qu'aucune propriété ne soit en cause — la
+// première fois, c'était le compte des sites HTTP. Ce qui est vérifié ici est
+// que `causesEnEchec` est branché dans LES DEUX chemins de réponse, pas la
+// position du champ dans l'objet.
+check('réponse fraîche', /sourcesEnEchec, causesEnEchec,[^}]*filtre: pertinence\.filtre/.test(src));
+check('réponse depuis le cache', /causesEnEchec,[^}]*filtre: cached\.filtre/.test(src));
 check('la cause entre en cache', /kvSet\(cacheKey, \{[^}]*causesEnEchec/.test(src));
 // Sans ce filtrage à la lecture, une entrée de cache écrite par un
 // déploiement antérieur rendrait `{}` — lisible comme « aucune cause ».

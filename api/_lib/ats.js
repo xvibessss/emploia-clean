@@ -34,7 +34,9 @@ import { TTL_OFFRES_SECONDES } from './ats-balise.js';
 import { collecterGreenhouse } from './greenhouse.js';
 import { BOARDS as BOARDS_GREENHOUSE, RELEVE as RELEVE_GREENHOUSE } from './greenhouse-boards.js';
 import { collecterLever } from './lever.js';
+import { collecterTeamtailor } from './teamtailor.js';
 import { BOARDS as BOARDS_LEVER, RELEVE as RELEVE_LEVER } from './lever-boards.js';
+import { BOARDS as BOARDS_TEAMTAILOR, RELEVE as RELEVE_TEAMTAILOR } from './teamtailor-boards.js';
 
 // 72 heures, pour un cron QUOTIDIEN. Le rapport est délibéré : deux collectes
 // consécutives peuvent échouer avant que la clé disparaisse, et à la troisième
@@ -80,6 +82,18 @@ export const FOURNISSEURS = [
     // offres de `qonto`, ~27 ko par offre. Cinq boards de front suffisent à
     // saturer le décodage JSON sans ouvrir vingt connexions lourdes.
     concurrence: 5,
+  },
+  {
+    nom: 'Teamtailor',
+    cle: 'teamtailor_jobs',
+    boards: BOARDS_TEAMTAILOR,
+    releve: RELEVE_TEAMTAILOR,
+    collecter: collecterTeamtailor,
+    // Six, et la collecte tient en 5,1 s pour 19 boards — la plus rapide des
+    // trois, parce que ces entreprises sont plus petites : 322 offres au
+    // total, là où Lever en rend 1 900 et Greenhouse 6 500. Le cron passe donc
+    // de ~34 s à ~40 s, loin sous les 300 s réservées dans vercel.json.
+    concurrence: 6,
   },
 ];
 

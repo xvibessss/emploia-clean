@@ -138,6 +138,46 @@ function muet(journal, source, raison, cause) {
 // fois par requête utilisateur, et sans dire que la cause était un plafond
 // MENSUEL plutôt qu'un pic de trafic. Le mesurer a pris une sonde dédiée ;
 // `quota_epuise` le dit en un mot.
+// ── LES COLLECTEURS, NOMMÉS UNE FOIS ──────────────────────────────────────
+// Déclarés ici parce qu'ils servent à DEUX endroits séparés par un retour
+// anticipé : la liste d'appels, construite plus bas, et le filtrage de
+// `offresParCollecteur` à la lecture du cache, qui se produit avant. Une
+// entrée de cache écrite par un déploiement antérieur — ou altérée — ne peut
+// donc pas introduire une clé inconnue dans la réponse publique.
+//
+// La liste d'appels DOIT porter exactement ces neuf noms, et
+// `scripts/smoke/contribution.test.mjs` le vérifie : deux listes qu'on espère
+// synchronisées finissent par diverger, et c'est ce fichier qui a déjà
+// documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
+// collecteurs sur huit et ignoré par les cinq autres.
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+
+// Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
+//
+// `sources` est bâti sur `final.map(j => j.source)` : les étiquettes de
+// PUBLISHER des offres survivantes. Ce n'est pas le même vocabulaire que
+// `sourcesEnEchec`, qui porte les noms des COLLECTEURS — les offres de JSearch
+// sortent sous « Indeed » ou « LinkedIn », celles de French Job Market sous
+// « APEC » ou « HelloWork ». On ne peut donc pas soustraire l'une de l'autre
+// pour savoir quel collecteur n'a rien rendu, et c'était le trou : un
+// collecteur qui rend `[]` sans appeler `muet` n'apparaît NI dans `sources`
+// (vocabulaire différent, et ses offres peuvent avoir été filtrées) NI dans
+// `sourcesEnEchec` (il n'a pas échoué). Il est invisible, et la sonde des
+// sources le déclare vert.
+//
+// C'est exactement la forme de la panne que ce dépôt a déjà payée : /api/jobs-search
+// a répondu 200 avec zéro offre pendant cinq mois.
+//
+// Le compte est pris AVANT le dédoublonnage et les filtres, délibérément : la
+// question à laquelle il répond est « ce collecteur a-t-il rendu quelque
+// chose », pas « l'utilisateur en a-t-il vu ». Les deux sont utiles et elles
+// se lisent ensemble — un collecteur à 10 ici et absent de `sources` dit « il
+// a marché, les filtres ont écarté ses offres », ce qu'aucun des deux chiffres
+// ne disait seul.
+//
+// Rien de ce qui sort d'ici ne dépend d'un contenu amont : les clés sont des
+// noms écrits dans ce fichier, les valeurs des entiers.
+
 // `identifiants_refuses`, `droits_insuffisants`, `forme_inattendue` et
 // `filtre_non_servi` sont les jetons de France Travail, la seule source qui
 // s'authentifie. Elle rendait `cle_absente`, et derrière cette unique cause se
@@ -211,6 +251,27 @@ function causePublique(cause) {
   const c = String(cause || '');
   if (/^http_\d{3}$/.test(c)) return c;
   return CAUSES.has(c) ? c : 'inconnue';
+}
+
+// Le même verrou, pour le décompte par collecteur. Une entrée de cache est une
+// donnée qui revient de l'extérieur du processus : ce qui n'est pas un nom de
+// collecteur ÉCRIT DANS CE FICHIER ne traverse pas, et ce qui n'est pas un
+// entier ne traverse pas non plus.
+//
+// Le test est strict sur le type — `typeof === 'number'` — et non une coercion.
+// `Number(null)` vaut 0 : une clé à `null` serait rendue « 0 offre », donc une
+// affirmation à la place d'une absence. C'est la règle du dépôt : ce qu'on ne
+// sait pas lire vaut `null`, pas zéro.
+//
+// Un objet sans aucune clé reconnue rend `null` et non `{}`, parce qu'un objet
+// vide se lirait « les neuf collecteurs ont rendu zéro » — l'affirmation la
+// plus trompeuse possible ici.
+function contributionPublique(brut) {
+  if (!brut || typeof brut !== 'object') return null;
+  const retenu = COLLECTEURS
+    .filter(nom => typeof brut[nom] === 'number' && Number.isFinite(brut[nom]))
+    .map(nom => [nom, Math.max(0, Math.trunc(brut[nom]))]);
+  return retenu.length ? Object.fromEntries(retenu) : null;
 }
 
 async function fetchJSearch(q, type, location, page, journal, reservoir) {
@@ -604,6 +665,67 @@ async function fetchLever(q, type, location, page, journal, lireBalise) {
   } catch (e) { return muet(journal, 'Lever', e.message || String(e)); }
 }
 
+// ── TEAMTAILOR (crawl direct des ATS, via Upstash KV) ─
+// Le troisième collecteur qui ne sorte pas sur le réseau, et celui qui ÉLARGIT
+// le catalogue au lieu de l'épaissir. Lever avait rendu 331 offres françaises
+// sans une seule entreprise nouvelle ; Teamtailor rend moins d'offres mais des
+// employeurs qu'emploia ne servait pas — Skello, Hublo, Foodles, Spiko,
+// Ornikar, Innovorder, Memo Bank, Leocare. Chiffres complets dans
+// `PROTO-teamtailor-ats-2026-10-23.md`.
+//
+// C'est aussi la collecte la plus dense en France des trois : 228 offres FR
+// sur 322, soit 70,8 %, contre 17,4 % chez Lever et 5,2 % chez Greenhouse. Et
+// la plus rapide — 5,1 s pour 19 boards — parce que ces entreprises sont plus
+// petites.
+//
+// Le seul des trois à publier un SALAIRE : 26 offres françaises en portent un,
+// et seulement celles libellées en euros ET annuelles. Le mensuel est écarté
+// plutôt que multiplié par douze (voir `salaireSchemaOrg`).
+//
+// Placé APRÈS Greenhouse et Lever mais AVANT les sources tierces : l'ordre
+// entre les trois ATS est sans conséquence puisqu'ils ne partagent aucun
+// employeur, et ce qui compte est que les trois passent avant les
+// republicateurs, pour que `deduplicate()` garde l'URL de l'employeur.
+// Même garde et même balise que les deux autres.
+async function fetchTeamtailor(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('teamtailor_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'Teamtailor', 'réservoir teamtailor_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Teamtailor'));
+    }
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      // Une offre au contrat inconnu est écartée sous filtre, comme partout
+      // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
+      // des offres Teamtailor sortent avec `type: null`, parce que le champ
+      // `employmentType` que le standard schema.org définit est servi ZÉRO
+      // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
+      // sans preuve que `_lib/contrat.js` interdit.
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'Teamtailor', e.message || String(e)); }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location, journal) {
   try {
@@ -805,8 +927,11 @@ export default async function handler(req) {
       // vient de rendre visible. Absente, elle vaut `null`, et l'interface
       // n'affiche alors rien plutôt qu'un zéro inventé.
       const couvertureContrat = cached.couvertureContrat || null;
+      // Et le même raisonnement une troisième fois, par le verrou qui filtre ce
+      // décompte en un seul endroit plutôt qu'à chaque chemin de réponse.
+      const offresParCollecteur = contributionPublique(cached.offresParCollecteur);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources: cached.sources, sourcesEnEchec: cached.sourcesEnEchec || [], causesEnEchec, offresParCollecteur, filtre: cached.filtre || 'inconnu', couvertureContrat, cached: true }),
         { status: 200, headers: H }
       );
     }
@@ -839,6 +964,7 @@ export default async function handler(req) {
     ['Emploia',           () => fetchEmployerJobs(q, type, location, journal)],
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal, lireBaliseAts)],
     ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
+    ['Teamtailor',        () => fetchTeamtailor(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],
@@ -854,6 +980,12 @@ export default async function handler(req) {
       if (r.status === 'fulfilled') allJobs.push(...r.value);
       else journal.push({ source: collecteurs[i][0], raison: r.reason?.message || String(r.reason), cause: borner_cause(r.reason?.message || String(r.reason)) });
     });
+
+    // Un collecteur qui n'a pas échoué et n'a rien rendu est désormais LISIBLE,
+    // à zéro, au lieu d'être absent des deux listes.
+    const offresParCollecteur = Object.fromEntries(
+      collecteurs.map(([nom], i) => [nom, resultats[i].status === 'fulfilled' ? resultats[i].value.length : 0])
+    );
 
     // Deux niveaux, délibérément. La raison complète part dans les logs
     // d'exécution, où elle est lisible par qui a accès au compte Vercel ; la
@@ -927,11 +1059,11 @@ export default async function handler(req) {
       // Store in cache before applying remoteOnly so we can serve both variants from same entry
       // sourcesEnEchec entre aussi en cache : sans lui, une panne de source
       // disparaîtrait de la réponse pendant les cinq minutes suivantes.
-      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
+      kvSet(cacheKey, { jobs: final, sources, sourcesEnEchec, causesEnEchec, offresParCollecteur, filtre: pertinence.filtre, couvertureContrat }, 300).catch(() => {});
       if (remoteOnly) final = final.filter(j => j.remote === true);
       final = borner(final);
       return new Response(
-        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, filtre: pertinence.filtre, couvertureContrat }),
+        JSON.stringify({ jobs: final, total: final.length, page, demo: false, sources, sourcesEnEchec, causesEnEchec, offresParCollecteur, filtre: pertinence.filtre, couvertureContrat }),
         { status: 200, headers: H }
       );
     }
