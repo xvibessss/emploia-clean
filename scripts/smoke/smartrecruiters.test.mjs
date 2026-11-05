@@ -22,6 +22,7 @@ import {
 } from '../../api/_lib/smartrecruiters.js';
 import { FOURNISSEURS, MAX_OFFRES, collecterFournisseur } from '../../api/_lib/ats.js';
 import { causeDepuisBalise } from '../../api/_lib/ats-balise.js';
+import { lecteurPartage } from './_lecteur-partage.mjs';
 import { BOARDS, RELEVE } from '../../api/_lib/smartrecruiters-boards.js';
 import { CONTRATS, contratSmartRecruiters, tempsSmartRecruiters } from '../../api/_lib/contrat.js';
 
@@ -249,19 +250,17 @@ function extraire(src, nom) {
   return null;
 }
 const blocFetch = extraire(jobsSrc, 'fetchSmartRecruiters');
+// Le collecteur délègue sa lecture à `servirReservoir` et à `_lib/recherche.js`,
+// exécutés tels qu'écrits — voir `_lecteur-partage.mjs`.
+const lecteur = lecteurPartage(jobsSrc);
+check('le lecteur partagé des réservoirs est exécutable tel qu’écrit', lecteur.present);
 check('le collecteur du handler est extractible pour être exécuté', Boolean(blocFetch));
-// La garde des enseignes homonymes vit hors du collecteur ; on l'exécute telle
-// qu'écrite dans le handler, pas recopiée.
-const blocHomonymes = [
-  /const ENSEIGNES_HOMONYMES = new Set\([^)]*\);/s.exec(jobsSrc)?.[0],
-  /function indiceEntreprise\(company\) \{[\s\S]*?\n\}/.exec(jobsSrc)?.[0],
-];
-check('la garde des enseignes homonymes est extractible', blocHomonymes.every(Boolean));
 
 async function appeler(contenuKV, { q = '', type = '', location = '', page: p = 0, balise = null } = {}) {
   const j = [];
   const bac = {
     console,
+    ...lecteur.globaux,
     kvGet: async () => contenuKV,
     muet: (jj, source, raison, cause) => { jj?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
     causeDepuisBalise,
@@ -270,7 +269,7 @@ async function appeler(contenuKV, { q = '', type = '', location = '', page: p = 
     resultat: null, journal: j,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocHomonymes.join('\n')}\n${blocFetch}; resultat = fetchSmartRecruiters(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${p}, journal, lireBalise);`, bac);
+  vm.runInContext(`${lecteur.source}\n${blocFetch}; resultat = fetchSmartRecruiters(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${p}, journal, lireBalise);`, bac);
   return { offres: await bac.resultat, journal: j };
 }
 const offreKV = (p = {}) => ({ ...normaliserOffre(posting(), entree), ...p });

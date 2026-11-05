@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
+import * as recherche from '../../api/_lib/recherche.js';
 
 const racine = new URL('../../', import.meta.url);
 const src = fs.readFileSync(new URL('api/jobs.js', racine), 'utf8');
@@ -54,18 +55,20 @@ function extraire(source, nom) {
 // une copie de leur logique resterait verte en divergeant du handler.
 console.log('\n── Les trois états du filtre ──');
 
-const blocs = ['indiceEntreprise', 'normaliser', 'motsDeRecherche', 'estPertinente', 'filtrerPertinence']
-  .map(n => extraire(src, n));
-check('les cinq fonctions du filtre sont extractibles', blocs.every(Boolean));
+// `normaliser`, `motsDeRecherche` et la garde des enseignes homonymes vivent
+// dans `_lib/recherche.js`, partagés avec le lecteur des réservoirs : ils sont
+// importés tels quels. Les deux filtres de l'agrégat sont lus dans le handler.
+const blocs = ['estPertinente', 'filtrerPertinence'].map(n => extraire(src, n));
+check('les deux fonctions du filtre sont extractibles', blocs.every(Boolean));
+check('le handler importe la lecture de requête du module partagé',
+  /from '\.\/_lib\/recherche\.js'/.test(src));
 
-const motsVides = /const MOTS_VIDES = new Set\([^)]*\);/s.exec(src)?.[0];
-check('MOTS_VIDES est lisible', Boolean(motsVides));
-const homonymes = /const ENSEIGNES_HOMONYMES = new Set\([^)]*\);/s.exec(src)?.[0];
-check('ENSEIGNES_HOMONYMES est lisible', Boolean(homonymes));
+check('MOTS_VIDES est exporté', recherche.MOTS_VIDES instanceof Set && recherche.MOTS_VIDES.has('emploi'));
+check('ENSEIGNES_HOMONYMES est exporté', recherche.ENSEIGNES_HOMONYMES instanceof Set && recherche.ENSEIGNES_HOMONYMES.has('boulanger'));
 
-const bac = { console };
+const bac = { console, ...recherche };
 vm.createContext(bac);
-vm.runInContext(`${motsVides}\n${homonymes}\n${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
+vm.runInContext(`${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
 const { filtrerPertinence, motsDeRecherche } = bac;
 
 const offre = (p = {}) => ({ title: 'Développeur Backend', company: 'Acme', location: 'Paris', description: 'Node.js', ...p });

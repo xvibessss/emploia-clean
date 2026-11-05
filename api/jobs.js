@@ -9,6 +9,9 @@ import { collecterFranceTravail } from './_lib/france-travail.js';
 // pouvoir diverger.
 import { CLE_BALISE as CLE_BALISE_ATS, causeDepuisBalise } from './_lib/ats-balise.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
+// Lire une requête — ses mots, ses accents, les enseignes homonymes — est
+// partagé entre le filtre de l'agrégat et le lecteur des réservoirs.
+import { normaliser, motsDeRecherche, indiceEntreprise, rangerParRequete, lieuCorrespond } from './_lib/recherche.js';
 // Toute transformation d'une donnée amont en type de contrat vit dans
 // `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
 // notion de la même façon. La règle y est écrite une fois : ce qu'on
@@ -521,21 +524,11 @@ function servirReservoir(offres, q, type, location, page) {
     // preuve que `_lib/contrat.js` interdit.
     jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
   }
-  if (q) {
-    const ql = q.toLowerCase();
-    jobs = jobs.filter(j =>
-      (j.title || '').toLowerCase().includes(ql) ||
-      (j.company || '').toLowerCase().includes(ql) ||
-      (j.description || '').toLowerCase().includes(ql)
-    );
-  }
-  if (location) {
-    const ll = location.toLowerCase();
-    jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-  }
-  return jobs
-    .slice()
-    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  if (location) jobs = jobs.filter(j => lieuCorrespond(j, location));
+  // La requête est lue MOT À MOT, sans accent, et les offres sont rangées par
+  // pertinence avant d'être paginées — voir `rangerParRequete`. La chercher
+  // d'un bloc, comme avant, privait 34 des 37 pages /metier de toute offre ATS.
+  return rangerParRequete(jobs, q, location)
     .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
 }
 
@@ -631,36 +624,13 @@ async function fetchLever(q, type, location, page, journal, lireBalise) {
         causeDepuisBalise(await lireBalise(), 'Lever'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // Une offre au contrat inconnu est écartée sous filtre, comme partout
-      // ailleurs : 45,3 % des offres Lever sortent avec `type: null`, et les
-      // servir en réponse à « CDI » serait l'affirmation sans preuve que
-      // `_lib/contrat.js` interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    // Paginé comme les sources réseau le sont, et pour la même raison : rendre
-    // les 358 offres d'un coup noierait les autres collecteurs dans un agrégat
-    // où elles passeraient toutes devant — `prioritize` classe la France au
-    // premier rang. Dix par page les rend accessibles sans déséquilibrer la
-    // liste.
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // Une offre au contrat inconnu est écartée sous filtre, comme partout
+    // ailleurs : 45,3 % des offres Lever sortent avec `type: null`, et les
+    // servir en réponse à « CDI » serait l'affirmation sans preuve que
+    // `_lib/contrat.js` interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Lever', e.message || String(e)); }
 }
 
@@ -695,33 +665,15 @@ async function fetchTeamtailor(q, type, location, page, journal, lireBalise) {
         causeDepuisBalise(await lireBalise(), 'Teamtailor'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // Une offre au contrat inconnu est écartée sous filtre, comme partout
-      // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
-      // des offres Teamtailor sortent avec `type: null`, parce que le champ
-      // `employmentType` que le standard schema.org définit est servi ZÉRO
-      // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
-      // sans preuve que `_lib/contrat.js` interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // Une offre au contrat inconnu est écartée sous filtre, comme partout
+    // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
+    // des offres Teamtailor sortent avec `type: null`, parce que le champ
+    // `employmentType` que le standard schema.org définit est servi ZÉRO
+    // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
+    // sans preuve que `_lib/contrat.js` interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Teamtailor', e.message || String(e)); }
 }
 
@@ -751,28 +703,9 @@ async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise
         causeDepuisBalise(await lireBalise(), 'SmartRecruiters'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        // Voir ENSEIGNES_HOMONYMES : le catalogue porte « Boulanger ».
-        indiceEntreprise(j.company).toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'SmartRecruiters', e.message || String(e)); }
 }
 
@@ -806,32 +739,14 @@ async function fetchAshby(q, type, location, page, journal, lireBalise) {
         causeDepuisBalise(await lireBalise(), 'Ashby'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // 78,5 % des offres Ashby sortent avec `type: null`, et c'est correct :
-      // son `employmentType` vaut « FullTime » sur la grande majorité, ce qui
-      // est une DURÉE de travail et non un contrat. Les servir en réponse à
-      // « CDI » serait l'affirmation sans preuve que `_lib/contrat.js`
-      // interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // 78,5 % des offres Ashby sortent avec `type: null`, et c'est correct :
+    // son `employmentType` vaut « FullTime » sur la grande majorité, ce qui
+    // est une DURÉE de travail et non un contrat. Les servir en réponse à
+    // « CDI » serait l'affirmation sans preuve que `_lib/contrat.js`
+    // interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Ashby', e.message || String(e)); }
 }
 
@@ -845,19 +760,9 @@ async function fetchEmployerJobs(q, type, location, journal) {
     if (type && type !== 'tous') {
       if (FILTRE_VERS_CONTRAT[type]) jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
     }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    return jobs.slice(0, 5).map(toPublicJob);
+    if (location) jobs = jobs.filter(j => lieuCorrespond(j, location));
+    // Même lecture de la requête que les réservoirs : mot à mot, sans accent.
+    return rangerParRequete(jobs, q, location).slice(0, 5).map(toPublicJob);
   } catch (e) { return muet(journal, 'Emploia', e.message || String(e)); }
 }
 
@@ -913,48 +818,9 @@ function prioritize(jobs) {
 // mentionnant réellement la ville — et écarte presque exactement 11 offres par
 // page, vérifiées une à une sur Amiens comme étant 6 Remotive + 5 Arbeitnow.
 // Le bloc fixe, à l'unité, sans une seule offre légitime perdue.
-// ── ENSEIGNES HOMONYMES D'UN MÉTIER ──
-// « Boulanger » est une enseigne d'électroménager : 144 offres FR au catalogue
-// SmartRecruiters, toutes en vente et en logistique, aucune en boulangerie.
-// Or le filtre de pertinence lit le nom de l'entreprise, et « boulanger » est
-// le métier manuel de la sonde de production (`sources.mjs`). Sans cette
-// liste, une recherche « boulanger »
-// remontait des vendeurs d'électroménager, et le collecteur SmartRecruiters
-// les classait AVANT les vrais postes de boulanger, puisqu'il trie par date.
-//
-// Le nom d'une enseigne listée ici ne compte donc plus comme indice. Ses
-// offres restent servies — sur leur titre (« vendeur », « magasinier »), leur
-// lieu et leur description —, seule la coïncidence de nom est neutralisée. Le
-// prix, assumé : chercher « boulanger » pour trouver un emploi CHEZ Boulanger
-// ne marche plus. Sur un site d'emploi, ce mot désigne le métier.
-//
-// La comparaison porte sur le nom ENTIER, sans accent ni casse : « Boulanger »
-// est neutralisé, « Boulangerie Paul » ne l'est pas. N'y ajouter qu'une
-// enseigne dont le nom est EXACTEMENT un métier servi.
-const ENSEIGNES_HOMONYMES = new Set(['boulanger']);
-
-function indiceEntreprise(company) {
-  const c = String(company || '');
-  const cle = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  return ENSEIGNES_HOMONYMES.has(cle) ? '' : c;
-}
-
-function normaliser(s) {
-  return (s || '')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // « santé » → « sante »
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-// Mots trop courts ou trop communs pour porter du sens : les garder ferait
-// correspondre n'importe quoi (« de », « et », « job »).
-const MOTS_VIDES = new Set(['pour', 'avec', 'dans', 'chez', 'les', 'des', 'une', 'job', 'jobs', 'emploi', 'poste', 'offre', 'cdi', 'cdd']);
-
-function motsDeRecherche(q, location) {
-  return [...new Set([...normaliser(q).split(' '), ...normaliser(location).split(' ')])]
-    .filter(m => m.length >= 4 && !MOTS_VIDES.has(m));
-}
+// `normaliser`, `motsDeRecherche` et la garde des enseignes homonymes
+// (`indiceEntreprise`) vivent dans `_lib/recherche.js` : le lecteur des
+// réservoirs lit la requête de la même façon que ce filtre.
 
 // Une offre est retenue si l'un de ses champs porte l'un des mots de la
 // requête. On regarde le titre, l'entreprise, le lieu ET la description : une

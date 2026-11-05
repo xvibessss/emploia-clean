@@ -18,6 +18,7 @@ import {
 } from '../../api/_lib/greenhouse.js';
 import { TTL_SECONDES, MAX_OFFRES, FOURNISSEURS } from '../../api/_lib/ats.js';
 import { causeDepuisBalise, construireBalise, TTL_BALISE_SECONDES } from '../../api/_lib/ats-balise.js';
+import * as recherche from '../../api/_lib/recherche.js';
 import { BOARDS, RELEVE } from '../../api/_lib/greenhouse-boards.js';
 import { CONTRATS, contratGreenhouse, tempsGreenhouse } from '../../api/_lib/contrat.js';
 
@@ -246,6 +247,8 @@ async function appeler(contenuKV, { q = '', type = '', location = '', page = 0, 
   const journal = [];
   const bac = {
     console,
+    // `servirReservoir` lit la requête avec `_lib/recherche.js`, importé tel quel.
+    ...recherche,
     kvGet: async () => contenuKV,
     muet: (j, source, raison, cause) => { j?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
     FILTRE_VERS_CONTRAT: { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' },
