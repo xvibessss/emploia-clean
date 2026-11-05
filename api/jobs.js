@@ -759,7 +759,8 @@ async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise
       const ql = q.toLowerCase();
       jobs = jobs.filter(j =>
         j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
+        // Voir ENSEIGNES_HOMONYMES : le catalogue porte « Boulanger ».
+        indiceEntreprise(j.company).toLowerCase().includes(ql) ||
         (j.description || '').toLowerCase().includes(ql)
       );
     }
@@ -779,9 +780,13 @@ async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise
 // Le cinquième collecteur qui ne sorte pas sur le réseau, et celui qui ferme
 // une liste ouverte depuis trois relevés. Greenhouse, Lever et Teamtailor
 // avaient laissé huit scale-ups françaises introuvables ; Ashby en porte
-// QUATRE — Pennylane 153 offres FR, Alan 69, Back Market 29, Ledger 13, soit
-// 264 offres d'employeurs qu'emploia ne servait pas. Chiffres complets dans
-// `PROTO-ashby-ats-2026-10-27.md`.
+// QUATRE — Pennylane 153 offres FR, Alan 69, Back Market 29, Ledger 13. Mais
+// « introuvable » voulait dire « absente des ATS crawlés », pas « absente
+// d'emploia » : Alan, Back Market et Ledger étaient déjà servies par les
+// sources tierces. Seule Pennylane ne l'était pas — 153 offres, et non 264.
+// Chiffres complets, et cette correction, dans `PROTO-ashby-ats-2026-10-27.md`
+// (§5). Alan reste mal couverte (5 offres servies sur 69) : « déjà présente »
+// n'est pas « bien servie ».
 //
 // C'est aussi le seul des cinq à publier un salaire en nombre — 76 offres
 // françaises en portent un — et seulement après trois filtres : le drapeau de
@@ -908,6 +913,32 @@ function prioritize(jobs) {
 // mentionnant réellement la ville — et écarte presque exactement 11 offres par
 // page, vérifiées une à une sur Amiens comme étant 6 Remotive + 5 Arbeitnow.
 // Le bloc fixe, à l'unité, sans une seule offre légitime perdue.
+// ── ENSEIGNES HOMONYMES D'UN MÉTIER ──
+// « Boulanger » est une enseigne d'électroménager : 144 offres FR au catalogue
+// SmartRecruiters, toutes en vente et en logistique, aucune en boulangerie.
+// Or le filtre de pertinence lit le nom de l'entreprise, et « boulanger » est
+// le métier manuel de la sonde de production (`sources.mjs`). Sans cette
+// liste, une recherche « boulanger »
+// remontait des vendeurs d'électroménager, et le collecteur SmartRecruiters
+// les classait AVANT les vrais postes de boulanger, puisqu'il trie par date.
+//
+// Le nom d'une enseigne listée ici ne compte donc plus comme indice. Ses
+// offres restent servies — sur leur titre (« vendeur », « magasinier »), leur
+// lieu et leur description —, seule la coïncidence de nom est neutralisée. Le
+// prix, assumé : chercher « boulanger » pour trouver un emploi CHEZ Boulanger
+// ne marche plus. Sur un site d'emploi, ce mot désigne le métier.
+//
+// La comparaison porte sur le nom ENTIER, sans accent ni casse : « Boulanger »
+// est neutralisé, « Boulangerie Paul » ne l'est pas. N'y ajouter qu'une
+// enseigne dont le nom est EXACTEMENT un métier servi.
+const ENSEIGNES_HOMONYMES = new Set(['boulanger']);
+
+function indiceEntreprise(company) {
+  const c = String(company || '');
+  const cle = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  return ENSEIGNES_HOMONYMES.has(cle) ? '' : c;
+}
+
 function normaliser(s) {
   return (s || '')
     .toLowerCase()
@@ -930,7 +961,7 @@ function motsDeRecherche(q, location) {
 // offre d'aide-soignant peut ne pas porter « EHPAD » dans son titre.
 function estPertinente(job, mots) {
   if (!mots.length) return true;                     // pas de requête → tout passe
-  const foin = normaliser(`${job.title} ${job.company} ${job.location} ${job.description}`);
+  const foin = normaliser(`${job.title} ${indiceEntreprise(job.company)} ${job.location} ${job.description}`);
   return mots.some(m => foin.includes(m));
 }
 
