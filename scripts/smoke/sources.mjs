@@ -87,6 +87,7 @@ const ABSENCES_CONNUES = {
   Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
   Lever: "clé lever_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
   Teamtailor: "clé teamtailor_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
+  SmartRecruiters: "clé smartrecruiters_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
 
   // Les deux sources RapidAPI sont devenues des réservoirs remplis par
   // /api/cron/collect-rapidapi, pour une raison de QUOTA et non de durée :
