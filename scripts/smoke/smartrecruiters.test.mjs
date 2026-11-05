@@ -250,6 +250,13 @@ function extraire(src, nom) {
 }
 const blocFetch = extraire(jobsSrc, 'fetchSmartRecruiters');
 check('le collecteur du handler est extractible pour être exécuté', Boolean(blocFetch));
+// La garde des enseignes homonymes vit hors du collecteur ; on l'exécute telle
+// qu'écrite dans le handler, pas recopiée.
+const blocHomonymes = [
+  /const ENSEIGNES_HOMONYMES = new Set\([^)]*\);/s.exec(jobsSrc)?.[0],
+  /function indiceEntreprise\(company\) \{[\s\S]*?\n\}/.exec(jobsSrc)?.[0],
+];
+check('la garde des enseignes homonymes est extractible', blocHomonymes.every(Boolean));
 
 async function appeler(contenuKV, { q = '', type = '', location = '', page: p = 0, balise = null } = {}) {
   const j = [];
@@ -263,7 +270,7 @@ async function appeler(contenuKV, { q = '', type = '', location = '', page: p = 
     resultat: null, journal: j,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocFetch}; resultat = fetchSmartRecruiters(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${p}, journal, lireBalise);`, bac);
+  vm.runInContext(`${blocHomonymes.join('\n')}\n${blocFetch}; resultat = fetchSmartRecruiters(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${p}, journal, lireBalise);`, bac);
   return { offres: await bac.resultat, journal: j };
 }
 const offreKV = (p = {}) => ({ ...normaliserOffre(posting(), entree), ...p });
@@ -277,6 +284,17 @@ check('sous filtre CDI, seule l’offre au contrat LU est rendue', (await appele
 check('sous filtre CDD, une offre au contrat inconnu n’est pas servie', (await appeler(avecInconnu, { type: 'cdd' })).offres.length === 0);
 check('le terme de recherche lit le titre', (await appeler(avecInconnu, { q: 'chef de partie' })).offres.length === 1);
 check('le lieu filtre sur la ville', (await appeler(avecInconnu, { location: 'Lyon' })).offres.length === 0);
+// Boulanger est au catalogue : ses vendeurs ne répondent pas à « boulanger »,
+// et ne prennent donc pas la place des vrais postes, le tri étant par date.
+const avecEnseigne = { offres: [
+  offreKV({ id: 'sr_boulanger_1', title: 'Vendeur électroménager H/F', company: 'Boulanger', date: '2026-11-04T00:00:00.000Z' }),
+  offreKV({ id: 'sr_acme_3', title: 'Commis boulanger', date: '2026-10-01T00:00:00.000Z' }),
+] };
+const surBoulanger = await appeler(avecEnseigne, { q: 'boulanger' });
+check('« boulanger » ne remonte pas l’enseigne Boulanger sur son seul nom',
+  surBoulanger.offres.length === 1 && surBoulanger.offres[0].id === 'sr_acme_3');
+check('l’enseigne reste trouvable par le titre de ses offres',
+  (await appeler(avecEnseigne, { q: 'vendeur' })).offres.length === 1);
 const cent = { offres: Array.from({ length: 35 }, (_, i) => offreKV({ id: `sr_acme_${i}`, date: new Date(Date.UTC(2026, 9, 1 + i)).toISOString() })) };
 const p0 = await appeler(cent), p1 = await appeler(cent, { page: 1 });
 check('une page rend au plus dix offres', p0.offres.length === 10);

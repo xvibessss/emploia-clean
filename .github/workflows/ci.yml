@@ -105,6 +105,8 @@ jobs:
         run: node scripts/smoke/smartrecruiters.test.mjs
       - name: Collecteur Ashby (isRemote n'est pas du distanciel, l'equity n'est pas un salaire)
         run: node scripts/smoke/ashby.test.mjs
+      - name: Découverte des boards (le contenu décide, un réseau muet n'est pas une absence)
+        run: node scripts/smoke/decouverte.test.mjs
       - name: Réservoir RapidAPI (budget sous le plafond mesuré, absence jamais masquée)
         run: node scripts/smoke/rapidapi.test.mjs
       - name: Collecteur France Travail (jeton lu de expires_in, 4 causes distinctes)

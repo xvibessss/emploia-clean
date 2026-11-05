@@ -28,7 +28,9 @@
 // UN PIÈGE DE NOM, à connaître : « Boulanger » est une enseigne
 // d'électroménager. Ses 144 offres sont des postes de vente et de logistique,
 // pas de boulangerie. Le filtre de pertinence de `api/jobs.js` lit aussi le
-// nom de l'entreprise, donc une recherche « boulanger » remontera ces offres.
+// nom de l'entreprise : sans garde, une recherche « boulanger » remonterait
+// ces offres. La garde est `ENSEIGNES_HOMONYMES` dans `api/jobs.js` — une
+// enseigne homonyme d'un métier y est listée, et son nom cesse de compter.
 export const RELEVE = '2026-11-04';
 
 export const BOARDS = [
