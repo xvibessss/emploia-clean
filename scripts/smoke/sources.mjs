@@ -82,13 +82,14 @@ const ABSENCES_CONNUES = {
   // Teamtailor en ont eu une ; elles ont été retirées le 2026-11-04, la sonde
   // les ayant vus contribuer en production (« ↻ … retirer son entrée »). Les
   // garder aurait transformé une future panne de cron en ligne d'information
-  // — le silence que cette liste est censée éviter. Reste SmartRecruiters,
-  // ajouté le même jour et pas encore collecté.
+  // — le silence que cette liste est censée éviter. Restent SmartRecruiters
+  // et Ashby, branchés après et pas encore collectés.
   //
   // Une entrée par fournisseur, jamais commune : le cron peut écrire une clé
   // et pas l'autre, et une entrée partagée ferait lire une panne de l'un comme
   // une panne de l'autre.
   SmartRecruiters: "clé smartrecruiters_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
+  Ashby: "clé ashby_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
 
   // Les deux sources RapidAPI sont devenues des réservoirs remplis par
   // /api/cron/collect-rapidapi, pour une raison de QUOTA et non de durée :

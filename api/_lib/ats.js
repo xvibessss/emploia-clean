@@ -39,6 +39,8 @@ import { BOARDS as BOARDS_LEVER, RELEVE as RELEVE_LEVER } from './lever-boards.j
 import { BOARDS as BOARDS_TEAMTAILOR, RELEVE as RELEVE_TEAMTAILOR } from './teamtailor-boards.js';
 import { collecterSmartRecruiters } from './smartrecruiters.js';
 import { BOARDS as BOARDS_SMARTRECRUITERS, RELEVE as RELEVE_SMARTRECRUITERS } from './smartrecruiters-boards.js';
+import { collecterAshby } from './ashby.js';
+import { BOARDS as BOARDS_ASHBY, RELEVE as RELEVE_ASHBY } from './ashby-boards.js';
 
 // 72 heures, pour un cron QUOTIDIEN. Le rapport est délibéré : deux collectes
 // consécutives peuvent échouer avant que la clé disparaisse, et à la troisième
@@ -115,6 +117,18 @@ export const FOURNISSEURS = [
     // Laisser 600 aurait coupé 311 offres vraies pour tenir un nombre qui
     // n'est que le proxy d'un poids qu'on ne dépasse pas.
     maxOffres: 1000,
+  },
+  {
+    nom: 'Ashby',
+    cle: 'ashby_jobs',
+    boards: BOARDS_ASHBY,
+    releve: RELEVE_ASHBY,
+    collecter: collecterAshby,
+    // Six, et la collecte tient en 5,9 s pour 33 boards — malgré 2 918 offres
+    // et ~18 ko par offre, Ashby servant la description deux fois (HTML et
+    // texte). Le cron passe de ~48 s à ~54 s, loin sous les 300 s réservées
+    // dans vercel.json.
+    concurrence: 6,
   },
 ];
 

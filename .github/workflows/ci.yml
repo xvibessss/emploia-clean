@@ -103,6 +103,8 @@ jobs:
         run: node scripts/smoke/teamtailor.test.mjs
       - name: Collecteur SmartRecruiters (l'id « permanent » n'est jamais lu comme un CDI)
         run: node scripts/smoke/smartrecruiters.test.mjs
+      - name: Collecteur Ashby (isRemote n'est pas du distanciel, l'equity n'est pas un salaire)
+        run: node scripts/smoke/ashby.test.mjs
       - name: Réservoir RapidAPI (budget sous le plafond mesuré, absence jamais masquée)
         run: node scripts/smoke/rapidapi.test.mjs
       - name: Collecteur France Travail (jeton lu de expires_in, 4 causes distinctes)

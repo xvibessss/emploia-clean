@@ -144,12 +144,12 @@ function muet(journal, source, raison, cause) {
 // entrée de cache écrite par un déploiement antérieur — ou altérée — ne peut
 // donc pas introduire une clé inconnue dans la réponse publique.
 //
-// La liste d'appels DOIT porter exactement ces neuf noms, et
+// La liste d'appels DOIT porter exactement ces noms, dans cet ordre, et
 // `scripts/smoke/contribution.test.mjs` le vérifie : deux listes qu'on espère
 // synchronisées finissent par diverger, et c'est ce fichier qui a déjà
 // documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
 // collecteurs sur huit et ignoré par les cinq autres.
-const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'SmartRecruiters', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'SmartRecruiters', 'Ashby', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
 
 // Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
 //
@@ -775,6 +775,61 @@ async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise
   } catch (e) { return muet(journal, 'SmartRecruiters', e.message || String(e)); }
 }
 
+// ── ASHBY (crawl direct des ATS, via Upstash KV) ──────
+// Le cinquième collecteur qui ne sorte pas sur le réseau, et celui qui ferme
+// une liste ouverte depuis trois relevés. Greenhouse, Lever et Teamtailor
+// avaient laissé huit scale-ups françaises introuvables ; Ashby en porte
+// QUATRE — Pennylane 153 offres FR, Alan 69, Back Market 29, Ledger 13, soit
+// 264 offres d'employeurs qu'emploia ne servait pas. Chiffres complets dans
+// `PROTO-ashby-ats-2026-10-27.md`.
+//
+// C'est aussi le seul des cinq à publier un salaire en nombre — 76 offres
+// françaises en portent un — et seulement après trois filtres : le drapeau de
+// consentement de l'employeur, le type « Salary » (et non l'equity, le bonus
+// ou la commission), et l'intervalle annuel en euros.
+//
+// Placé APRÈS les autres ATS mais AVANT les sources tierces : l'ordre entre
+// ATS est sans conséquence, ce qui compte est qu'ils passent tous avant les
+// republicateurs pour que `deduplicate()` garde l'URL de l'employeur.
+// Même garde et même balise que les autres ATS.
+async function fetchAshby(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('ashby_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'Ashby', 'réservoir ashby_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Ashby'));
+    }
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      // 78,5 % des offres Ashby sortent avec `type: null`, et c'est correct :
+      // son `employmentType` vaut « FullTime » sur la grande majorité, ce qui
+      // est une DURÉE de travail et non un contrat. Les servir en réponse à
+      // « CDI » serait l'affirmation sans preuve que `_lib/contrat.js`
+      // interdit.
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'Ashby', e.message || String(e)); }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location, journal) {
   try {
@@ -1002,6 +1057,7 @@ export default async function handler(req) {
     ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
     ['Teamtailor',        () => fetchTeamtailor(q, type, location, page, journal, lireBaliseAts)],
     ['SmartRecruiters',   () => fetchSmartRecruiters(q, type, location, page, journal, lireBaliseAts)],
+    ['Ashby',             () => fetchAshby(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],
