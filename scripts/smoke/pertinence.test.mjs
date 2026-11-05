@@ -54,16 +54,18 @@ function extraire(source, nom) {
 // une copie de leur logique resterait verte en divergeant du handler.
 console.log('\n── Les trois états du filtre ──');
 
-const blocs = ['normaliser', 'motsDeRecherche', 'estPertinente', 'filtrerPertinence']
+const blocs = ['indiceEntreprise', 'normaliser', 'motsDeRecherche', 'estPertinente', 'filtrerPertinence']
   .map(n => extraire(src, n));
-check('les quatre fonctions du filtre sont extractibles', blocs.every(Boolean));
+check('les cinq fonctions du filtre sont extractibles', blocs.every(Boolean));
 
 const motsVides = /const MOTS_VIDES = new Set\([^)]*\);/s.exec(src)?.[0];
 check('MOTS_VIDES est lisible', Boolean(motsVides));
+const homonymes = /const ENSEIGNES_HOMONYMES = new Set\([^)]*\);/s.exec(src)?.[0];
+check('ENSEIGNES_HOMONYMES est lisible', Boolean(homonymes));
 
 const bac = { console };
 vm.createContext(bac);
-vm.runInContext(`${motsVides}\n${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
+vm.runInContext(`${motsVides}\n${homonymes}\n${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
 const { filtrerPertinence, motsDeRecherche } = bac;
 
 const offre = (p = {}) => ({ title: 'Développeur Backend', company: 'Acme', location: 'Paris', description: 'Node.js', ...p });
@@ -94,6 +96,20 @@ check('la correspondance est une sous-chaîne — « boulangerie » retient « b
   filtrerPertinence([offre({ title: 'Commis de boulangerie' })], 'boulanger', '').filtre === 'actif');
 check('les mots de moins de quatre lettres sont ignorés',
   !motsDeRecherche('cdi', '').length);
+
+// L'enseigne Boulanger (électroménager, catalogue SmartRecruiters) ne doit
+// pas passer pour une offre de boulanger sur la foi de son seul nom.
+const enseigne = offre({ title: 'Vendeur électroménager H/F', company: 'Boulanger', location: 'Lille', description: '' });
+const homonyme = filtrerPertinence([enseigne, offre({ title: 'Commis boulanger' })], 'boulanger', '');
+check('une enseigne homonyme d’un métier ne correspond pas par son seul nom',
+  homonyme.filtre === 'actif' && homonyme.jobs.length === 1 && homonyme.jobs[0].title === 'Commis boulanger',
+  `${homonyme.filtrees} écartée(s)`);
+check('ses offres restent trouvables par leur titre',
+  filtrerPertinence([enseigne, offre()], 'vendeur', '').jobs.length === 1);
+check('la neutralisation porte sur le nom ENTIER — « Boulangerie Paul » reste un indice',
+  filtrerPertinence([offre({ title: 'Vendeur', company: 'Boulangerie Paul' }), offre()], 'boulanger', '').jobs.length === 1);
+check('une entreprise ordinaire reste un indice — « Accor » trouve Accor',
+  filtrerPertinence([offre({ title: 'Réceptionniste', company: 'Accor' }), offre()], 'accor', '').jobs.length === 1);
 
 // ── 2. LE HANDLER LE DIT ENCORE AUX JOURNAUX ────────────────────────────────
 // La correction AJOUTE une visibilité, elle n'en retire pas.
