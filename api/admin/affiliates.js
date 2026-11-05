@@ -74,7 +74,7 @@ export default async function handler(req, res) {
         const paidSales = Number(paidVals[i]) || 0;
         // A payout counter ahead of the sales counter would otherwise produce
         // a negative balance; clamp so an over-recorded payout reads as zero
-        // owed rather than as the creator owing EmploiA money.
+        // owed rather than as the creator owing Emploia money.
         const unpaidSales = Math.max(0, sales - paidSales);
         return {
           code,
