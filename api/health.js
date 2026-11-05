@@ -1,4 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
+import { safeEqual } from './_lib/auth.js';
 
 async function pingUpstash() {
   const url = process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL;
@@ -25,10 +26,9 @@ export default async function handler(req) {
   };
 
   // Detailed checks require the internal secret — public callers only get status
-  const url = new URL(req.url);
-  const providedSecret = req.headers.get('x-health-secret') || url.searchParams.get('secret');
-  const healthSecret = process.env.HEALTH_SECRET;
-  const isInternal = healthSecret && providedSecret === healthSecret;
+  // En-tête uniquement : un secret passé en `?secret=` finit dans les journaux
+  // d'accès, l'historique du navigateur et les en-têtes Referer.
+  const isInternal = safeEqual(req.headers.get('x-health-secret') || '', process.env.HEALTH_SECRET || '');
 
   const coreOk = !!(process.env.ANTHROPIC_API_KEY && process.env.JWT_SECRET);
 

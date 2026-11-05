@@ -831,7 +831,7 @@
 </div>
 
 <div id="emp-scroll-prog"></div>
-<script src="/shared.js?v=45b5d4d0"></script>
+<script src="/shared.js?v=c78eda3b"></script>
 <script>
   /* ── CONSTANTS ─────────────────────────────────── */
   const STORAGE_KEY = 'emploia_chat_history';
@@ -861,7 +861,7 @@
       history.replaceState(null, '', '/chat');
       setTimeout(() => {
         const inp = document.getElementById('chatInput');
-        if (inp) { inp.value = decodeURIComponent(urlQ); sendMessage(); }
+        if (inp) { inp.value = urlQ; inp.focus(); } // pré-rempli, pas envoyé : un lien tiers ne doit pas parler à la place de l'utilisateur
       }, 400);
     }
   });

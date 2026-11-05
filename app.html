@@ -341,7 +341,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=45b5d4d0"></script>
+<script src="/shared.js?v=c78eda3b"></script>
 <script>
   let mode = 'cv';
   let lastResult = null;
@@ -770,7 +770,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
   if (offreParam && !prefill) {
     const jobInput = document.getElementById('jobInput');
     if (jobInput && !jobInput.value.trim()) {
-      jobInput.value = decodeURIComponent(offreParam);
+      jobInput.value = offreParam; // déjà décodé par URLSearchParams — un second decodeURIComponent levait URIError sur un « % » littéral
       updateLen();
       history.replaceState(null, '', '/app');
     }

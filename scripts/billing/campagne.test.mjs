@@ -24,7 +24,9 @@ const test = (name, fn) => { fn(); passed++; console.log('  ✓ ' + name); };
 const checkoutSrc = readFileSync(new URL('../../api/stripe-checkout.js', import.meta.url), 'utf8');
 const webhookSrc = readFileSync(new URL('../../api/stripe-webhook.js', import.meta.url), 'utf8');
 const authSrc = readFileSync(new URL('../../api/_lib/auth.js', import.meta.url), 'utf8');
-const referralSrc = readFileSync(new URL('../../api/referral.js', import.meta.url), 'utf8');
+// Le crédit de parrainage vit dans _lib/referral.js depuis qu'il a quitté
+// l'endpoint public POST /api/referral.
+const referralSrc = readFileSync(new URL('../../api/_lib/referral.js', import.meta.url), 'utf8');
 const grantSrc = readFileSync(new URL('../../api/_lib/grant.js', import.meta.url), 'utf8');
 
 console.log('\n[1] extendPro — le mécanisme d\'octroi proUntil');
@@ -67,8 +69,8 @@ test('extendPro est exporté par _lib/auth.js', () => {
 });
 
 test('referral.js importe extendPro au lieu de le redéfinir', () => {
-  assert.match(referralSrc, /import \{[^}]*extendPro[^}]*\} from '\.\/_lib\/auth\.js'/, 'referral.js doit importer extendPro');
-  assert.doesNotMatch(referralSrc, /const extendPro\s*=/, 'referral.js ne doit pas redéfinir extendPro');
+  assert.match(referralSrc, /import \{[^}]*extendPro[^}]*\} from '\.\/auth\.js'/, '_lib/referral.js doit importer extendPro');
+  assert.doesNotMatch(referralSrc, /const extendPro\s*=|function extendPro\(/, '_lib/referral.js ne doit pas redéfinir extendPro');
 });
 
 test('stripe-webhook.js importe extendPro au lieu de le redéfinir', () => {

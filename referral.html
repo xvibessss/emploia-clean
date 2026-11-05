@@ -731,7 +731,7 @@
         Quand est crédité le mois gratuit ?
         <span class="ref-faq-icon">+</span>
       </div>
-      <div class="ref-faq-a">Le mois gratuit est crédité automatiquement dès l'inscription de votre filleul. Il sera appliqué lors de votre prochain cycle de facturation ou renouvellement.</div>
+      <div class="ref-faq-a">Dès l'inscription de votre filleul, 30 jours d'accès Pro sont ajoutés à votre compte, automatiquement. Ils s'ajoutent à ceux que vous avez déjà : trois filleuls, c'est 90 jours d'affilée. Votre filleul, lui, reçoit 14 jours de Pro à son inscription.</div>
     </div>
     <div class="ref-faq-item">
       <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
@@ -745,14 +745,14 @@
         Les mois gratuits expirent-ils ?
         <span class="ref-faq-icon">+</span>
       </div>
-      <div class="ref-faq-a">Non, les mois gratuits gagnés sont cumulables et n'expirent pas tant que votre compte est actif. Ils s'appliquent automatiquement à votre prochain renouvellement.</div>
+      <div class="ref-faq-a">Ils sont cumulables, et ils s'écoulent à partir du jour où ils sont crédités : ce sont des jours d'accès Pro, pas un avoir mis de côté. Si vous avez déjà un abonnement payant, ils ne réduisent pas votre facture ; ils maintiennent votre accès Pro au-delà d'une éventuelle résiliation, tant qu'ils ne sont pas écoulés.</div>
     </div>
     <div class="ref-faq-item">
       <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
         Je suis sur le plan gratuit, puis-je parrainer ?
         <span class="ref-faq-icon">+</span>
       </div>
-      <div class="ref-faq-a">Oui ! Les mois gratuits accumulés ne sont pas perdus. Ils seront appliqués dès que vous souscrivez un abonnement payant.</div>
+      <div class="ref-faq-a">Oui ! C'est même là que le parrainage rapporte le plus : chaque filleul vous donne 30 jours d'accès Pro immédiat, sans abonnement ni carte bancaire.</div>
     </div>
     <div class="ref-faq-item">
       <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
@@ -824,7 +824,7 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=45b5d4d0"></script>
+<script src="/shared.js?v=c78eda3b"></script>
 <script>
   // Year
   document.querySelectorAll('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
@@ -897,8 +897,8 @@
 
   // Check URL ref param (when landing via a referral link)
   const urlRef = new URLSearchParams(window.location.search).get('ref');
-  if (urlRef) {
-    sessionStorage.setItem('emploia_ref', urlRef);
+  if (urlRef && /^[A-Z0-9]{8}$/i.test(urlRef)) {
+    sessionStorage.setItem('emploia_ref', urlRef.toUpperCase());
   }
 
   loadReferral();

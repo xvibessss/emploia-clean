@@ -120,7 +120,7 @@ check('l’avis est rendu AU-DESSUS de la liste',
 // « 0 offre pour "" » serait une phrase cassée. Les deux vides ne peuvent pas
 // abandonner — ce qui est vérifié juste en dessous sur le vrai filtre.
 check('la cible nommée est la requête OU le lieu',
-  /const cible = q \|\| loc \|\| '';/.test(jobsHtml) && /\$\{q \|\| loc\}/.test(jobsHtml));
+  /const cible = q \|\| loc \|\| '';/.test(jobsHtml) && /\$\{esc\(q \|\| loc\)\}/.test(jobsHtml));
 const surLieuSeul = filtrerPertinence([offre({ location: 'Paris' })], '', 'Carcassonne');
 check('le repli se déclenche bien sur le lieu seul',
   surLieuSeul.filtre === 'abandonne');
@@ -136,7 +136,7 @@ check('le compteur consulte le drapeau avant d’affirmer',
 check('sous repli, la page annonce zéro offre POUR la requête',
   /<strong>0<\/strong> offre pour/.test(jobsHtml));
 check('hors repli, le compteur est inchangé',
-  /<strong>\$\{total\.toLocaleString\('fr-FR'\)\}<\/strong> offres \$\{label\}/.test(jobsHtml));
+  /<strong>\$\{total\.toLocaleString\('fr-FR'\)\}<\/strong> offres \$\{esc\(label\)\}/.test(jobsHtml));
 
 // ── 4. AUCUNE PAGE N'AFFIRME PLUS UN COMPTEUR EN AVEUGLE ────────────────────
 // L'invariant porte sur les 85 pages, pas sur un échantillon : c'est la seule

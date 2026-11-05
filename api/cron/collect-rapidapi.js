@@ -12,7 +12,7 @@
 // fonction du calendrier et non du trafic, donc borné à l'avance.
 export const config = { runtime: 'edge', regions: ['cdg1'] };
 
-import { kvGet, kvSet } from '../_lib/auth.js';
+import { kvGet, kvSet, bearerMatches } from '../_lib/auth.js';
 import {
   CLE_KV, BUDGETS, MAX_OFFRES_PAR_SOURCE, TTL_SECONDES, AGE_MAX_SECONDES,
   collecterJSearch, collecterFrenchMarket,
@@ -138,7 +138,7 @@ export async function collecterEtEcrire({
 
 export default async function handler(req) {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  if (!bearerMatches(req, cronSecret)) {
     return new Response('Unauthorized', { status: 401 });
   }
 

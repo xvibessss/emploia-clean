@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvSmembers, kvMget, kvSet } from '../_lib/auth.js';
+import { kvSmembers, kvMget, kvSet, checkRateLimit, adminSecretMatches } from '../_lib/auth.js';
 
 // Creator / influencer programme, settled by hand.
 //
@@ -27,8 +27,10 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret || req.headers['x-admin-secret'] !== secret) {
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'admin', 30, 3600);
+  if (!rl.allowed) return res.status(429).json({ error: 'Trop de requêtes' });
+  if (!adminSecretMatches(req)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
