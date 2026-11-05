@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════════════
-   EmploiA — rasterisation de l'image de partage
+   Emploia — rasterisation de l'image de partage
 
    Pourquoi ce script existe. `opengraph.svg` était désigné directement
    comme `og:image` par 165 pages, et `og-image.svg` — un fichier qui

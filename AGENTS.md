@@ -1,4 +1,4 @@
-# EmploiA — AGENTS.md
+# Emploia — AGENTS.md
 
 Contrat d'exécution pour les agents autonomes (Hermes Agent en boucle externe,
 Claude Code en exécuteur). Chargé par Hermes depuis n'importe quel

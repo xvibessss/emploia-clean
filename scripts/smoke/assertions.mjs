@@ -86,6 +86,6 @@ export const PAGE_ASSERTIONS = [
     // et la franchise en base explique l'absence de TVA sur la facture.
     must: ['928 482 553', 'Entrepreneur individuel', '293 B', 'Conditions générales de vente', 'L221-28'],
     // Formes sociales et grilles périmées qui ne doivent pas réapparaître.
-    mustNot: ['EmploiA SAS', 'édité à titre personnel', 'Pro / Intensif'],
+    mustNot: ['EmploiA SAS', 'Emploia SAS', 'édité à titre personnel', 'Pro / Intensif'],
   },
 ];

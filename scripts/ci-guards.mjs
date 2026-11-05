@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════════════
-   EmploiA — CI guards (fast, dependency-free static checks)
+   Emploia — CI guards (fast, dependency-free static checks)
    Runs in CI on every PR to catch classes of bug the existing jobs miss:
    broken vercel.json rewrites (silent prod 404s), missing handler exports,
    and security-invariant regressions. Exit 0 = green.
@@ -500,7 +500,7 @@ try {
 // jamais alimenter de texte : elles ne déclenchent rien.
 //
 // Le second vise les chaînes déjà jugées, pour qu'un copier-coller ne les
-// réintroduise pas. Elles sont liées à EmploiA ou à sa base d'utilisateurs,
+// réintroduise pas. Elles sont liées à Emploia ou à sa base d'utilisateurs,
 // jamais à une statistique de marché : « 3× plus de réponses pour une offre
 // publiée depuis moins de 2 jours » dans un article reste un énoncé éditorial,
 // hors périmètre de ce garde.
@@ -571,6 +571,10 @@ try {
     // Retirés du blog le 2026-11-05.
     [/Rejoignez\s+[\d\s.,]+\+?\s*candidats/i, 'nombre d\'abonnés à la newsletter inventé — rien ne le calcule'],
     [/Score moyen\s*:\s*\d+\s*\/\s*100/i, 'score moyen des CV générés, jamais mesuré'],
+    // Retiré le 2026-11-05 : la recherche interroge une douzaine de sources à
+    // la demande (quelques milliers d'offres côté sites carrières), aucun
+    // index de 800 000 offres n'existe ni n'est « analysé en continu ».
+    [/800[\s\u00a0]?000\+?\s*(?:offres|annonces)|800\s?k\+?\s*(?:offres|annonces)|nos 800/i, 'volume d\'offres jamais mesuré'],
   ];
   let revenues = 0;
   for (const f of visibles) {
@@ -864,7 +868,7 @@ try {
 } catch (e) { fail('contrôle du type de contrat impossible : ' + e.message); }
 
 // ── 17. image de partage : servie, raster, et à jour ──────────────────────
-// Un lien d'EmploiA partagé sur TikTok, LinkedIn ou WhatsApp n'affichait
+// Un lien d'Emploia partagé sur TikTok, LinkedIn ou WhatsApp n'affichait
 // aucune image, et de deux façons à la fois. 165 pages désignaient
 // `opengraph.svg` : aucune plateforme n'accepte `image/svg+xml`. Les 4 autres,
 // dont la page d'accueil, désignaient `og-image.svg` — un fichier qui n'existe
@@ -918,7 +922,7 @@ try {
 } catch (e) { fail("contrôle de l'image de partage impossible : " + e.message); }
 // ── 18. icônes d'application : servies, et au format que l'OS sait lire ───
 // `apple-touch-icon` désignait `favicon.svg`. iOS n'accepte pas le SVG pour
-// cette balise : Safari exige du PNG. Un candidat qui ajoute EmploiA à son
+// cette balise : Safari exige du PNG. Un candidat qui ajoute Emploia à son
 // écran d'accueil — le geste naturel pour un outil qu'on rouvre chaque jour
 // pendant une recherche — n'y trouvait donc pas le logo, mais une vignette
 // produite par le système. Même défaut de format que l'og:image du [15], sur
