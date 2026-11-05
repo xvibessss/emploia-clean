@@ -376,8 +376,13 @@ check('une collecte vide n’écrase PAS la clé précédente',
   cronSrc.indexOf('if (!collecte.ecrire)') < cronSrc.indexOf('await kvSet('));
 check('et « écrire » est bien conditionné à ce qui a été retenu',
   /ecrire: retenues\.length > 0/.test(atsSrc));
+// La borne peut être propre au fournisseur depuis SmartRecruiters, dont les
+// offres pèsent 360 octets au lieu de 668 : ce qui est verrouillé ici est
+// qu'une borne s'applique TOUJOURS, la commune à défaut, et qu'elle est
+// journalisée quand elle mord.
 check('la borne de taille est posée et journalisée si atteinte',
-  MAX_OFFRES > 0 && /francaises\.length > MAX_OFFRES/.test(atsSrc), `${MAX_OFFRES} offres`);
+  MAX_OFFRES > 0 && /const borne = fournisseur\.maxOffres \?\? MAX_OFFRES/.test(atsSrc) &&
+  /francaises\.length > borne/.test(atsSrc), `${MAX_OFFRES} offres par défaut`);
 // LA CONTRAINTE QUI NE CASSE PAS UN TEST MAIS UN DÉPLOIEMENT, deuxième
 // édition. Mesuré : Greenhouse 10,1 s + Lever 23,6 s ≈ 34 s. Une fonction en
 // runtime Edge « must begin sending a response within 25 seconds » : le cron
