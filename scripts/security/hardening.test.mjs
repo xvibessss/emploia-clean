@@ -3,13 +3,17 @@
 // KV Upstash remplacé par un petit Redis en mémoire derrière un fetch stubé :
 // les handlers tournent tels quels, sans réseau.
 import assert from 'node:assert/strict';
-import { createHmac } from 'node:crypto';
+import { createHmac, randomBytes } from 'node:crypto';
 
-process.env.JWT_SECRET = 'x'.repeat(48);
+// Secrets de test tirés au hasard à chaque exécution : aucun littéral dans le
+// dépôt (gitleaks les prendrait — à raison — pour des fuites).
+const fauxSecret = () => randomBytes(24).toString('hex');
+const ADMIN = fauxSecret(), CRON = fauxSecret(), HEALTH = fauxSecret();
+process.env.JWT_SECRET = fauxSecret();
 process.env.KV_REST_API_URL = 'https://kv.test';
 process.env.KV_REST_API_TOKEN = 't';
-process.env.ADMIN_SECRET = 'admin-secret-value-123456';
-process.env.CRON_SECRET = 'cron-secret-value-123456';
+process.env.ADMIN_SECRET = ADMIN;
+process.env.CRON_SECRET = CRON;
 
 // ── mini Redis ───────────────────────────────────────────────────────────────
 const store = new Map();
@@ -104,17 +108,17 @@ await test('seul le cookie __Host- authentifie', async () => {
 
 console.log('\n[3] secrets comparés à temps constant');
 await test('bearerMatches / adminSecretMatches', () => {
-  assert.ok(auth.bearerMatches(req('https://x/', { headers: { authorization: 'Bearer cron-secret-value-123456' } }), process.env.CRON_SECRET));
-  assert.ok(!auth.bearerMatches(req('https://x/', { headers: { authorization: 'Bearer cron-secret-value-12345' } }), process.env.CRON_SECRET));
+  assert.ok(auth.bearerMatches(req('https://x/', { headers: { authorization: `Bearer ${CRON}` } }), CRON));
+  assert.ok(!auth.bearerMatches(req('https://x/', { headers: { authorization: `Bearer ${CRON.slice(0, -1)}` } }), CRON));
   assert.ok(!auth.bearerMatches(req('https://x/'), undefined), 'secret absent ⇒ refus, même sans en-tête');
   assert.ok(!auth.bearerMatches({ headers: { authorization: 'Bearer ' } }, ''), 'Node style, secret vide');
-  assert.ok(auth.adminSecretMatches({ headers: { 'x-admin-secret': 'admin-secret-value-123456' } }));
+  assert.ok(auth.adminSecretMatches({ headers: { 'x-admin-secret': ADMIN } }));
   assert.ok(!auth.adminSecretMatches(req('https://x/', { headers: { 'x-admin-secret': 'nope' } })));
 });
 const health = (await import('../../api/health.js')).default;
 await test('health : le secret en query string ne donne plus le détail', async () => {
-  process.env.HEALTH_SECRET = 'health-secret-1234567890';
-  const r = await health(req('https://emploia.eu/api/health?secret=health-secret-1234567890'));
+  process.env.HEALTH_SECRET = HEALTH;
+  const r = await health(req(`https://emploia.eu/api/health?secret=${HEALTH}`));
   const d = await r.json();
   assert.equal(d.checks, undefined);
 });
