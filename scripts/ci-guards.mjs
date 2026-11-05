@@ -1162,7 +1162,10 @@ try {
     if (js && !css) { fail(`${f} : shared.js sans shared.css — les composants injectés (modale, nav, logo) s'affichent sans style`); bad22++; }
     if (/class="emp-logo"|class="nav-bar"/.test(src)) { fail(`${f} : ancien en-tête (emp-logo / nav-bar), plus stylé par shared.css — reprendre l'en-tête emp-brand`); bad22++; }
     for (const bloc of src.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
-      const frag = bloc[1].match(/^\s*\.[A-Za-z][\w-]*-\s*$/m);
+      // Une ligne qui s'arrête sur « - » sans accolade, point-virgule ni virgule :
+      // sélecteur tronqué, qu'il porte une classe (« .btn- ») ou plusieurs
+      // (« .faq-item .faq- », qui avait échappé à la première version du motif).
+      const frag = bloc[1].match(/^\s*[.#][^{};,\n]*-\s*$/m);
       if (frag) { fail(`${f} : fragment de sélecteur « ${frag[0].trim()} » dans <style> — il neutralise la règle qui suit`); bad22++; break; }
     }
   }
