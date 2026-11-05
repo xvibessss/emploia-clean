@@ -149,7 +149,7 @@ function muet(journal, source, raison, cause) {
 // synchronisées finissent par diverger, et c'est ce fichier qui a déjà
 // documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
 // collecteurs sur huit et ignoré par les cinq autres.
-const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'SmartRecruiters', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
 
 // Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
 //
@@ -725,6 +725,56 @@ async function fetchTeamtailor(q, type, location, page, journal, lireBalise) {
   } catch (e) { return muet(journal, 'Teamtailor', e.message || String(e)); }
 }
 
+// ── SMARTRECRUITERS (crawl direct des ATS, via Upstash KV) ─
+// Le quatrième collecteur qui ne sorte pas sur le réseau, et le premier qui
+// apporte des MÉTIERS de terrain : réceptionniste, chef de partie, chef de
+// rang, barman (Accor, Groupe Barrière), vendeur, conseiller de vente,
+// magasinier (Kiabi, Conforama, Boulanger, Primark). Chiffres complets dans
+// `PROTO-smartrecruiters-ats-2026-11-04.md`.
+//
+// Deux différences avec les trois autres ATS, toutes deux mesurées :
+//   · la description est VIDE — la liste n'en porte pas, et la chercher
+//     coûterait un appel par offre. Le terme de recherche ne lit donc que le
+//     titre et l'entreprise ;
+//   · le contrat vient du TITRE SEUL — l'id `permanent` de la source couvre
+//     124 CDD (voir `contratSmartRecruiters`). 69 % des offres sortent donc
+//     `type: null`, et sont écartées sous filtre de contrat, comme partout.
+//
+// Placé après les trois autres ATS et avant les republicateurs, pour que
+// `deduplicate()` garde l'URL de l'ATS plutôt que celle d'un agrégateur.
+async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('smartrecruiters_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'SmartRecruiters', 'réservoir smartrecruiters_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'SmartRecruiters'));
+    }
+
+    let jobs = offres;
+    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
+      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
+    }
+    if (q) {
+      const ql = q.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(ql) ||
+        j.company.toLowerCase().includes(ql) ||
+        (j.description || '').toLowerCase().includes(ql)
+      );
+    }
+    if (location) {
+      const ll = location.toLowerCase();
+      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
+    }
+    const PAR_PAGE = 10;
+    return jobs
+      .slice()
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+  } catch (e) { return muet(journal, 'SmartRecruiters', e.message || String(e)); }
+}
+
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
 async function fetchEmployerJobs(q, type, location, journal) {
   try {
@@ -951,6 +1001,7 @@ export default async function handler(req) {
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal, lireBaliseAts)],
     ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
     ['Teamtailor',        () => fetchTeamtailor(q, type, location, page, journal, lireBaliseAts)],
+    ['SmartRecruiters',   () => fetchSmartRecruiters(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],

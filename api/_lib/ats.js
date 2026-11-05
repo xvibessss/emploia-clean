@@ -37,6 +37,8 @@ import { collecterLever } from './lever.js';
 import { collecterTeamtailor } from './teamtailor.js';
 import { BOARDS as BOARDS_LEVER, RELEVE as RELEVE_LEVER } from './lever-boards.js';
 import { BOARDS as BOARDS_TEAMTAILOR, RELEVE as RELEVE_TEAMTAILOR } from './teamtailor-boards.js';
+import { collecterSmartRecruiters } from './smartrecruiters.js';
+import { BOARDS as BOARDS_SMARTRECRUITERS, RELEVE as RELEVE_SMARTRECRUITERS } from './smartrecruiters-boards.js';
 
 // 72 heures, pour un cron QUOTIDIEN. Le rapport est délibéré : deux collectes
 // consécutives peuvent échouer avant que la clé disparaisse, et à la troisième
@@ -95,6 +97,25 @@ export const FOURNISSEURS = [
     // de ~34 s à ~40 s, loin sous les 300 s réservées dans vercel.json.
     concurrence: 6,
   },
+  {
+    nom: 'SmartRecruiters',
+    cle: 'smartrecruiters_jobs',
+    boards: BOARDS_SMARTRECRUITERS,
+    releve: RELEVE_SMARTRECRUITERS,
+    collecter: collecterSmartRecruiters,
+    // Quatre entreprises de front, et la collecte tient en 7,8 s pour 25
+    // entreprises et ~45 pages. Le cron passe de ~40 s à ~48 s.
+    concurrence: 4,
+    // LA SEULE BORNE QUI DIFFÈRE, et elle est mesurée en OCTETS, pas en
+    // offres. `MAX_OFFRES` a été calé sur 668 octets par offre Greenhouse :
+    // 600 offres ≈ 400 Ko. Une offre SmartRecruiters pèse 360 octets — la
+    // liste ne porte ni description ni salaire — donc 1 000 offres ≈ 360 Ko,
+    // SOUS le poids que la borne commune accepte déjà. Mesuré : 911 offres,
+    // 320 Ko, après la borne de 60 par entreprise de `smartrecruiters.js`.
+    // Laisser 600 aurait coupé 311 offres vraies pour tenir un nombre qui
+    // n'est que le proxy d'un poids qu'on ne dépasse pas.
+    maxOffres: 1000,
+  },
 ];
 
 // Une collecte, les trois gardes, un relevé prêt à écrire. Rendu séparément de
@@ -121,9 +142,12 @@ export async function collecterFournisseur(fournisseur, options = {}) {
   // lire. La stocker pour la servir « au cas où » reviendrait à la présenter
   // comme française.
   const francaises = toutes.filter(o => o.country === 'FR');
-  const retenues = francaises.slice(0, MAX_OFFRES);
-  if (francaises.length > MAX_OFFRES) {
-    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${MAX_OFFRES} — ${francaises.length - MAX_OFFRES} écartée(s). Le catalogue a dépassé ce qu'une seule clé KV peut porter : découper par clé.`);
+  // La borne est celle du fournisseur s'il en déclare une — calée sur le
+  // POIDS de ses offres, voir SmartRecruiters ci-dessus — sinon la commune.
+  const borne = fournisseur.maxOffres ?? MAX_OFFRES;
+  const retenues = francaises.slice(0, borne);
+  if (francaises.length > borne) {
+    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${borne} — ${francaises.length - borne} écartée(s). Le catalogue a dépassé ce qu'une seule clé KV peut porter : découper par clé.`);
   }
 
   return {

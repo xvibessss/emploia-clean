@@ -71,22 +71,24 @@ const ABSENCES_CONNUES = {
   // cette entrée ne pouvait donc jamais se vérifier.
   Emploia: "aucune offre déposée par un employeur pour l'instant — normal tant que personne n'a publié ; zéro muet, pas un échec",
   // Cause identifiée et vérifiable, comme la règle écrite plus bas l'exige :
-  // les clés `greenhouse_jobs` et `lever_jobs` sont remplies par
-  // `api/cron/collect-ats`, et elles n'existent pas avant la première exécution
-  // du cron suivant un déploiement. Elles expirent ensuite au bout de 72 h,
-  // soit trois exécutions du cron quotidien : si l'absence persiste au-delà, le
-  // cron ne tourne plus et ce n'est PAS une absence tolérable — l'entrée dit le
-  // délai au bout duquel elle devient une panne, pour ne pas devenir le silence
-  // qu'elle est censée éviter.
+  // chaque clé `<ats>_jobs` est remplie par `api/cron/collect-ats`, et elle
+  // n'existe pas avant la première exécution du cron suivant le déploiement du
+  // collecteur. Elle expire ensuite au bout de 72 h, soit trois exécutions du
+  // cron quotidien : si l'absence persiste au-delà, le cron ne tourne plus et
+  // ce n'est PAS une absence tolérable.
   //
-  // Les deux ATS ont une entrée SÉPARÉE, et c'est le point d'avoir une clé KV
-  // par fournisseur : le cron peut écrire l'une et pas l'autre — un fournisseur
-  // dont la collecte échoue laisse sa clé intacte et passe la main au suivant.
-  // Une entrée commune ferait lire une panne de Lever comme une panne de
-  // Greenhouse, ou l'inverse.
-  Greenhouse: "clé greenhouse_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
-  Lever: "clé lever_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
-  Teamtailor: "clé teamtailor_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
+  // L'entrée ne vit donc que le temps de la PREMIÈRE collecte, et elle se
+  // retire dès que la sonde l'a vue contribuer. Greenhouse, Lever et
+  // Teamtailor en ont eu une ; elles ont été retirées le 2026-11-04, la sonde
+  // les ayant vus contribuer en production (« ↻ … retirer son entrée »). Les
+  // garder aurait transformé une future panne de cron en ligne d'information
+  // — le silence que cette liste est censée éviter. Reste SmartRecruiters,
+  // ajouté le même jour et pas encore collecté.
+  //
+  // Une entrée par fournisseur, jamais commune : le cron peut écrire une clé
+  // et pas l'autre, et une entrée partagée ferait lire une panne de l'un comme
+  // une panne de l'autre.
+  SmartRecruiters: "clé smartrecruiters_jobs pas encore écrite — normal jusqu'à la première exécution de /api/cron/collect-ats ; au-delà de 72 h, c'est une panne de cron",
 
   // Les deux sources RapidAPI sont devenues des réservoirs remplis par
   // /api/cron/collect-rapidapi, pour une raison de QUOTA et non de durée :
