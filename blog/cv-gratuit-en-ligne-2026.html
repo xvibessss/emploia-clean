@@ -67,7 +67,7 @@
     ]
   }
   </script>
-  <link rel="stylesheet" href="/shared.css?v=c26b9bf9"/>
+  <link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
   <style>
     .read-progress { position: fixed; top: 0; left: 0; width: 0%; height: 3px; background: linear-gradient(90deg, #6366f1, #3b82f6); z-index: 9999; transition: width .1s; }
     .blog-layout { max-width: 760px; margin: 0 auto; padding: 100px 24px 80px; }
@@ -147,17 +147,29 @@
 </head>
 <body>
   <div class="read-progress" id="rp"></div>
-  <script src="/shared.js?v=c78eda3b" defer></script>
 
-  <nav class="nav-bar">
-    <a href="/" class="logo"><div class="logo-m">E</div>Emploia</a>
-    <div class="nav-links">
-      <a href="/jobs" class="nav-a">Offres</a>
-      <a href="/app" class="nav-a">Générer CV</a>
-      <a href="/blog" class="nav-a active">Blog</a>
-      <a href="/app" class="btn-nav">Commencer →</a>
+<nav class="emp-nav">
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs">Offres</a>
+      <a href="/app">Générer CV</a>
+      <a href="/blog" style="color:var(--primary);font-weight:600">Blog</a>
     </div>
-  </nav>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres</a>
+  <a href="/app">Générer CV</a>
+  <a href="/blog">Blog</a>
+  <a href="/app" class="mn-cta">Commencer gratuitement →</a>
+</div>
 
   <main class="blog-layout">
     <div class="breadcrumb">
@@ -394,16 +406,7 @@
     </article>
   </main>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand"><div class="logo-m">E</div><strong>Emploia</strong><span style="color:var(--t3);font-size:13px">Le copilote IA de votre recherche d'emploi</span></div>
-      <div class="footer-links">
-        <a href="/blog">Blog</a><a href="/jobs">Offres d'emploi</a><a href="/app">Créer un CV</a>
-        <a href="/contact">Contact</a><a href="/legal/privacy">Confidentialité</a><a href="/legal/cgu">CGU</a>
-      </div>
-      <div style="font-size:12px;color:var(--t3);margin-top:16px">© 2026 Emploia · emploia.eu</div>
-    </div>
-  </footer>
+  
 
   <script>
     const rp = document.getElementById('rp');
@@ -453,6 +456,6 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=c78eda3b"></script>
+<script src="/shared.js?v=2efc6d7c"></script>
 </body>
 </html>

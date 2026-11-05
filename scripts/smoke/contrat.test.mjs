@@ -130,6 +130,16 @@ for (const inconnu of ['part_time', 'full_time', 'seasonal', 'unknown', 'PERMANE
   check(`contract_type « ${inconnu} » non reconnu → null`,
     contratAdzuna({ contract_type: inconnu, title: 'Développeur' }) === null);
 }
+// `contract` = tout ce qui n'est pas permanent : le titre précise stage,
+// alternance ou freelance (observé en production le 2026-11-05).
+check('contract + titre « STAGE - … » → Stage, pas CDD',
+  contratAdzuna({ contract_type: 'contract', title: 'STAGE - Développeur/euse Full Stack' }) === 'Stage');
+check('contract + titre « … - Freelance » → Freelance, pas CDD',
+  contratAdzuna({ contract_type: 'contract', title: 'Développeur Python Senior - Freelance' }) === 'Freelance');
+check('contract + titre « Alternance … » → Alternance',
+  contratAdzuna({ contract_type: 'contract', title: 'Alternance chargé de communication' }) === 'Alternance');
+check('contract + titre « … - CDI » reste CDD (la source dit non permanent)',
+  contratAdzuna({ contract_type: 'contract', title: 'Développeur - CDI' }) === 'CDD');
 // Le champ structuré a priorité sur le titre : la donnée bat l'indice.
 check('contract_type permanent bat un titre trompeur',
   contratAdzuna({ contract_type: 'permanent', title: 'Mission freelance' }) === 'CDI');
@@ -247,8 +257,8 @@ for (let min = 0; min <= 2000; min += 7) {
 check('aucune des combinaisons balayées ne rend une borne à 0k', zero === 0, `${zero} fuite(s)`);
 // Le cas mitoyen, nommé : une borne basse sans information ne s'affiche pas
 // comme un plancher de zéro.
-check('(0, 999) ne s’affiche pas « 0k–1k »',
-  formaterSalaireAnnuel(0, 999) === "jusqu'à 1k€/an", String(formaterSalaireAnnuel(0, 999)));
+check('(0, 999) ne s’affiche pas « 0k–1k » — ni rien du tout, 999 € n’est pas annuel',
+  formaterSalaireAnnuel(0, 999) === null, String(formaterSalaireAnnuel(0, 999)));
 check('(100, 30000) garde sa borne haute et perd la basse, qui ne dit rien',
   formaterSalaireAnnuel(100, 30000) === "jusqu'à 30k€/an");
 // Les vrais salaires passent, eux : un garde qui bloque tout ne sert à rien.
@@ -257,7 +267,16 @@ check('une borne unique ne se répète pas', formaterSalaireAnnuel(45000, 45000)
 check('max absent reprend min', formaterSalaireAnnuel(45000, null) === '45k€/an');
 check('bornes inversées sont remises dans l’ordre',
   formaterSalaireAnnuel(55000, 45000) === '45k–55k€/an');
-check('500 arrondit à 1k, et s’affiche', formaterSalaireAnnuel(500, 500) === '1k€/an');
+// Plancher de plausibilité — observé en production le 2026-11-05 : un TJM de
+// 500 € s'affichait « 1k€/an », un salaire mensuel de 2 000 € « 2k€/an ».
+check('un TJM (500 €) ne s’affiche pas comme un salaire annuel', formaterSalaireAnnuel(500, 500) === null);
+check('un mensuel (2 000 €) ne s’affiche pas comme un salaire annuel', formaterSalaireAnnuel(2000, 2000) === null);
+check('une fourchette mensuelle (1 800–2 200 €) non plus', formaterSalaireAnnuel(1800, 2200) === null);
+check('une gratification de stage annualisée (15 000 €) passe', formaterSalaireAnnuel(15000, 15000) === '15k€/an');
+check('au plancher (6 000 €) → 6k€/an', formaterSalaireAnnuel(6000, 6000) === '6k€/an');
+check('une saisie absurde (5 000 000 €) est écartée', formaterSalaireAnnuel(5000000, 5000000) === null);
+check('mensuel en bas, annuel en haut → seule la borne haute parle',
+  formaterSalaireAnnuel(2500, 42000) === "jusqu'à 42k€/an");
 check('le handler n’arrondit plus en ligne',
   !/Math\.round\(j\.salary_min\/1000\)/.test(src));
 
