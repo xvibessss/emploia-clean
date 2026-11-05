@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#6E48BE"/>
     
   <link rel="dns-prefetch" href="https://plausible.io"/>
-  <link rel="stylesheet" href="/shared.css?v=c26b9bf9"/>
+  <link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
   <style>
     .profile-layout {
       max-width: 1100px;
@@ -378,7 +378,11 @@
     .upload-zone strong { color: var(--primary); }
 
     /* SAVE BAR */
+    /* Masquée tant que le formulaire ne diffère pas du profil enregistré
+       (voir refreshSaveBar) : elle annonçait « des modifications en attente »
+       en permanence, même sur un profil qui venait d'être chargé. */
     .save-bar {
+      display: none !important;
       position: sticky;
       bottom: 0;
       background: rgba(7,12,24,.97);
@@ -392,6 +396,10 @@
       z-index: 100;
     }
 
+    .save-bar.visible { display: flex !important; }
+    /* Le bouton de support flottant recouvrait « Sauvegarder les modifications ». */
+    body:has(.save-bar.visible) #emp-sw-btn { bottom: 96px !important; }
+    body:has(.save-bar.visible) #emp-scroll-top { bottom: 96px !important; }
     .save-bar p { font-size: 13px; color: var(--slate); }
 
     @media (max-width: 900px) {
@@ -428,7 +436,6 @@
   <a href="/app">Générer un CV</a>
   <a href="/dashboard">Dashboard</a>
   <a href="/profil">Mon profil</a>
-</div>
   <a href="/app" class="mn-cta">Commencer gratuitement →</a>
 </div>
 
@@ -805,7 +812,7 @@
 <div class="save-bar">
   <p>💾 Des modifications non sauvegardées sont en attente.</p>
   <div style="display:flex;gap:10px">
-    <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="empToast('Modifications annulées','info')">Annuler</button>
+    <button class="emp-btn emp-btn-ghost emp-btn-sm" onclick="cancelProfileChanges()" style="color:#fff">Annuler</button>
     <button class="emp-btn emp-btn-primary emp-btn-sm" id="saveProfileBtn" onclick="saveProfile()">Sauvegarder les modifications</button>
   </div>
 </div>
@@ -992,7 +999,7 @@
   </form>
 </dialog>
 
-<script src="/shared.js?v=c78eda3b"></script>
+<script src="/shared.js?v=2efc6d7c"></script>
 <script>
   // Section switching
   function showSection(id, btn) {
@@ -1211,17 +1218,41 @@
         });
         if (res.ok) {
           empToast('Profil sauvegardé dans votre compte ✓', 'success');
+          markProfileSaved();
         } else {
-          empToast('Profil sauvegardé localement (erreur serveur)', 'info');
+          // Seuls le titre, le résumé et les compétences vivent en local : dire
+          // « sauvegardé localement » laissait croire que tout l'était.
+          empToast('Échec de la sauvegarde — vos modifications sont toujours là, réessayez', 'error');
         }
       } catch {
-        empToast('Profil sauvegardé localement', 'info');
+        empToast('Connexion perdue — vos modifications sont toujours là, réessayez', 'error');
       }
     } else {
-      empToast('Profil sauvegardé localement — connectez-vous pour le synchroniser', 'success');
+      empToast('Connectez-vous pour enregistrer votre profil dans votre compte', 'info');
+      if (typeof empShowAuth === 'function') empShowAuth('login');
     }
     btn.disabled = false; btn.textContent = 'Sauvegarder les modifications';
   }
+
+  // ── Barre « modifications non sauvegardées » : affichée seulement quand le
+  // formulaire diffère vraiment du profil enregistré.
+  let savedProfileSnapshot = null;
+  function profileSnapshot() { try { return JSON.stringify(collectProfile()); } catch { return null; } }
+  function refreshSaveBar() {
+    const bar = document.querySelector('.save-bar');
+    if (!bar || savedProfileSnapshot === null) return;
+    bar.classList.toggle('visible', profileSnapshot() !== savedProfileSnapshot);
+  }
+  function markProfileSaved() { savedProfileSnapshot = profileSnapshot(); refreshSaveBar(); }
+  function cancelProfileChanges() {
+    if (!confirm('Abandonner les modifications non sauvegardées ?')) return;
+    savedProfileSnapshot = null; // pas de seconde confirmation au rechargement
+    location.reload();
+  }
+  ['input', 'change', 'click'].forEach(ev => document.addEventListener(ev, () => setTimeout(refreshSaveBar, 60), true));
+  window.addEventListener('beforeunload', e => {
+    if (savedProfileSnapshot !== null && profileSnapshot() !== savedProfileSnapshot) { e.preventDefault(); e.returnValue = ''; }
+  });
 
   // Load profile from KV if logged in
   async function loadProfileFromServer() {
@@ -1233,7 +1264,7 @@
       if (!data || typeof data !== 'object') return;
       fillProfileFromCV(data); // reuse same filler
       setTimeout(calculateCompletion, 200);
-      empToast('Profil chargé depuis votre compte', 'info');
+      setTimeout(markProfileSaved, 250);
     } catch {}
   }
 
@@ -1281,6 +1312,9 @@
   window.addEventListener('empAuthChange', e => {
     if (e.detail.user) { loadProfileFromServer(); showSubscriptionInfo(e.detail.user); }
   });
+  // Référence par défaut : le formulaire tel que la page l'a construit. Le
+  // chargement serveur la remplace dès qu'il a rempli les champs.
+  setTimeout(() => { if (savedProfileSnapshot === null) markProfileSaved(); }, 1500);
   setTimeout(async () => {
     loadProfileFromServer();
     loadStats();

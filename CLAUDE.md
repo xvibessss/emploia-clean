@@ -173,6 +173,16 @@ opening a PR are free; promoting is his call.
 - **IA anonyme** : plafond global quotidien (`ANON_AI_DAILY_CAP`, défaut 3000) sur `/api/chat` et `/api/agent/support` sans compte.
 - Sonde : `npm run test:security` (`scripts/security/hardening.test.mjs`), lancée en CI.
 
+## Interface — passe du 2026-11-05 (balayage navigateur des 220 pages)
+
+- **Salaires Adzuna** : `formaterSalaireAnnuel` refuse tout montant hors [6 000 € ; 500 000 €] — un mensuel (« 2k€/an ») ou un TJM (« 1k€/an ») n'est plus affiché comme annuel. `contract` Adzuna n'est plus toujours CDD : le titre précise Stage / Alternance / Freelance.
+- **En-tête** : 98 pages (villes, métiers, 15 articles) migrées de l'ancien `emp-logo` vers `emp-brand` + `emp-nav-right` ; elles n'avaient ni navigation mobile ni « Se connecter / Commencer gratuit ». Doublon « Se connecter » retiré de l'accueil.
+- **CSS manquant** ajouté dans `shared.css` : alias `.btn*` (≈120 pages), `.emp-bottom-nav` (87 pages), `.spin`, `.badge*`, `.text-grad`, règles de base des articles. Grille des tarifs à 4 colonnes (5 depuis le retrait d'Intensif).
+- **Blog** : `shared.css` ajouté à 8 articles (logo plein écran), `shared.js` dédoublé sur 26 (erreur JS), 56 fragments de sélecteur tronqués retirés de 35, 48 pieds de page en double retirés, catégorie « lettre » ajoutée (affichait « undefined »).
+- **Preuves non sourcées** retirées de l'accueil (témoignage 5★ signé du nom du compte de démo, « 3.4× d'entretiens », « −72 % », « 14j ») et d'un article (« 2,8x… selon nos utilisateurs ») ; garde [14] étendu.
+- Widget de support absent de `/jobs` et `/interview` (il recouvrait leur propre chat) ; bandeau « modifications non sauvegardées » de `/profil` branché sur un vrai état modifié.
+- Garde CI [22] : `shared.css`/`shared.js` chargés une fois, en-tête à jour, aucun sélecteur tronqué.
+
 ## Architecture decisions (do not change without discussion)
 
 - `claimFreeGeneration()` — pre-increment atomic, prevents race condition on 5 free generations

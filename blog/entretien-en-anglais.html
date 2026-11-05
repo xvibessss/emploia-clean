@@ -42,13 +42,12 @@
       {"@type": "Question", "name": "Faut-il parler anglais parfaitement pour passer un entretien en anglais ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Ce que les recruteurs évaluent, c'est votre capacité à communiquer clairement. Un niveau B2 est généralement suffisant si vous structurez bien vos réponses."}}
     ]
   }</script>
-  <link rel="stylesheet" href="/shared.css?v=c26b9bf9"/>
+  <link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
   <style>
     .blog-layout{max-width:760px;margin:0 auto;padding:100px 24px 80px}
     .blog-category{display:inline-flex;align-items:center;gap:8px;background:var(--ind2);border:1px solid rgba(99,102,241,.2);color:var(--inb);font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;margin-bottom:20px;text-transform:uppercase;letter-spacing:.5px}
     .blog-title{font-size:clamp(26px,4vw,42px);font-weight:900;line-height:1.2;letter-spacing:-1.5px;margin-bottom:20px;color:var(--t1)}
     .blog-meta{display:flex;gap:16px;align-items:center;font-size:13px;color:var(--t3);margin-bottom:40px;padding-bottom:32px;border-bottom:1px solid var(--brd);flex-wrap:wrap}
-    .blog-
 .blog-body h2{font-size:22px;font-weight:800;color:var(--t1);margin:40px 0 16px;letter-spacing:-.5px}
     .blog-body h3{font-size:17px;font-weight:700;color:var(--t1);margin:28px 0 12px}
     .blog-body p{margin-bottom:18px}
@@ -127,14 +126,19 @@
 <body>
 <div class="read-progress" id="read-progress"></div>
 <nav class="emp-nav">
-  <div class="emp-nav-inner">
-    <a href="/" class="emp-logo"><div class="emp-logo-mark">E</div>Emploia</a>
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+      Emploia
+    </a>
     <div class="emp-nav-links">
-      <a href="/jobs" class="emp-nav-a">Offres</a>
-      <a href="/blog" class="emp-nav-a">Blog</a>
-      <a href="/app" class="emp-nav-a">Générer CV</a>
-      <a href="/dashboard" class="emp-nav-a">Dashboard</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+      <a href="/jobs">Offres</a>
+      <a href="/blog">Blog</a>
+      <a href="/app">Générer CV</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -407,10 +411,6 @@
   </div>
 </div>
 
-<footer style="border-top:1px solid var(--brd);padding:32px 24px;text-align:center;">
-  <p style="font-size:12px;color:var(--t3)">© <script>document.write(new Date().getFullYear())</script> Emploia · <a href="/blog" style="color:var(--t3)">Blog</a> · <a href="/legal/privacy" style="color:var(--t3)">Confidentialité</a> · <a href="/contact" style="color:var(--t3)">Contact</a></p>
-</footer>
-<script src="/shared.js?v=c78eda3b"></script>
 <script>
 document.addEventListener('scroll',()=>{const h=document.documentElement;const el=document.getElementById('read-progress');if(el)el.style.width=Math.min((h.scrollTop/(h.scrollHeight-h.clientHeight))*100,100)+'%';});
 async function submitNW(e,f){e.preventDefault();const btn=f.querySelector('.nw-btn');btn.disabled=true;btn.textContent='...';try{const r=await fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.querySelector('.nw-input').value,source:'blog'})});if(r.ok){f.style.display='none';f.nextElementSibling.style.display='block';}}catch{}btn.disabled=false;btn.textContent="S'abonner →";}
@@ -455,6 +455,6 @@ async function submitNW(e,f){e.preventDefault();const btn=f.querySelector('.nw-b
   </div>
 </footer>
 
-<script src="/shared.js?v=c78eda3b"></script>
+<script src="/shared.js?v=2efc6d7c"></script>
 </body>
 </html>
