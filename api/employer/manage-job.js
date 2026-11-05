@@ -4,8 +4,11 @@ import { isJobLive, expiresAt, toPublicJob } from '../_lib/employer.js';
 
 // Self-service management of an employer offer via its capability token.
 //   GET  ?token=…            → offer status + public fields
-//   POST { token, action }   → action: 'close' | 'renew'
-const VALID_ACTIONS = ['close', 'renew'];
+//   POST { token, action }   → action: 'confirm' | 'close' | 'renew'
+// 'confirm' fait passer une offre neuve de 'pending' à 'active' : le jeton
+// n'arrive que dans l'email envoyé à contactEmail, son usage prouve que
+// l'auteur de l'offre contrôle cette adresse.
+const VALID_ACTIONS = ['confirm', 'close', 'renew'];
 
 function findByToken(jobs, token) {
   const idx = jobs.findIndex(j => j.manageToken && j.manageToken === token);
@@ -57,6 +60,8 @@ export default async function handler(req) {
   const stored = await kvGet('employer_jobs');
   const jobs = Array.isArray(stored) ? stored : [];
   const { idx, job } = findByToken(jobs, token);
+  // findByToken compare avec ===, mais le jeton fait 32 caractères aléatoires
+  // (128 bits) et l'endpoint est limité à 60 requêtes/h/IP : rien à mesurer.
   if (!job) return new Response(JSON.stringify({ error: 'Offre introuvable ou expirée' }), { status: 404, headers: H });
 
   if (req.method === 'GET') {
@@ -67,9 +72,20 @@ export default async function handler(req) {
   if (!VALID_ACTIONS.includes(action)) {
     return new Response(JSON.stringify({ error: 'Action invalide' }), { status: 400, headers: H });
   }
-  const patch = action === 'close'
-    ? { ...job, status: 'closed' }
-    : { ...job, status: 'active', renewedAt: new Date().toISOString() };
+  const nowIso = new Date().toISOString();
+  let patch;
+  if (action === 'confirm') {
+    if (job.status !== 'pending') {
+      return new Response(JSON.stringify({ ok: true, action, job: summarize(job) }), { status: 200, headers: H });
+    }
+    patch = { ...job, status: 'active', postedAt: nowIso, date: nowIso, confirmedAt: nowIso };
+  } else if (job.status === 'pending') {
+    return new Response(JSON.stringify({ error: 'Confirmez d\'abord la publication de cette offre.' }), { status: 409, headers: H });
+  } else {
+    patch = action === 'close'
+      ? { ...job, status: 'closed' }
+      : { ...job, status: 'active', renewedAt: nowIso };
+  }
   const updated = jobs.map((j, i) => (i === idx ? patch : j));
   await kvSet('employer_jobs', updated);
 

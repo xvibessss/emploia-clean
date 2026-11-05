@@ -1,6 +1,8 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvGet, kvSet, kvZadd } from './_lib/auth.js';
+import { kvGet, kvSet, kvZadd, checkRateLimit } from './_lib/auth.js';
+
+const UID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
 const MAX_BODY_SIZE = 2048;
 const ONE_YEAR_SECONDS = 365 * 86400;
@@ -12,9 +14,13 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(204).end();
 
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'nps', 20, 3600);
+  if (!rl.allowed) return res.status(429).json({ error: 'Too many requests' });
+
   if (req.method === 'GET') {
     const uid = req.query?.uid;
-    if (!uid) return res.status(400).json({ error: 'Missing uid parameter' });
+    if (!uid || typeof uid !== 'string' || !UID_RE.test(uid)) return res.status(400).json({ error: 'Missing uid parameter' });
     try {
       const done = await kvGet(`nps:done:${uid}`);
       return res.status(200).json({ alreadyAnswered: !!done });
@@ -36,19 +42,25 @@ export default async function handler(req, res) {
     }
 
     const { userId, score, comment } = body || {};
-    if (!userId || typeof userId !== 'string') return res.status(400).json({ error: 'userId is required' });
+    if (!userId || typeof userId !== 'string' || !UID_RE.test(userId)) return res.status(400).json({ error: 'userId is required' });
+    // 'anonymous' est l'identifiant que nps.html envoie sans ?uid= : le marquer
+    // « déjà répondu » bloquait toutes les réponses anonymes après la première.
+    const anonyme = userId === 'anonymous';
     if (score === undefined || score === null || typeof score !== 'number' || score < 0 || score > 10 || !Number.isInteger(score)) {
       return res.status(400).json({ error: 'score must be an integer between 0 and 10' });
     }
 
     try {
-      const alreadyDone = await kvGet(`nps:done:${userId}`);
-      if (alreadyDone) return res.status(409).json({ error: 'Already answered' });
+      if (!anonyme) {
+        const alreadyDone = await kvGet(`nps:done:${userId}`);
+        if (alreadyDone) return res.status(409).json({ error: 'Already answered' });
+      }
 
       const now = Date.now();
-      const member = JSON.stringify({ userId, score, comment: comment || '', date: new Date().toISOString() });
+      const safeComment = typeof comment === 'string' ? comment.slice(0, 1000) : '';
+      const member = JSON.stringify({ userId, score, comment: safeComment, date: new Date().toISOString() });
       await kvZadd('nps:scores', now, member);
-      await kvSet(`nps:done:${userId}`, '1', ONE_YEAR_SECONDS);
+      if (!anonyme) await kvSet(`nps:done:${userId}`, '1', ONE_YEAR_SECONDS);
       return res.status(200).json({ success: true });
     } catch (err) {
       console.error('[nps] KV POST error:', err);

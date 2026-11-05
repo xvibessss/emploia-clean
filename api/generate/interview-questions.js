@@ -1,4 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
+import { trackEvent } from '../_lib/track.js';
 import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, withTimeout, claimFreeGeneration, refundGeneration } from '../_lib/auth.js';
 
 export default async function handler(req) {
@@ -122,7 +123,7 @@ Réponds UNIQUEMENT en JSON valide :
     // Track event (fire and forget)
     {
       const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
-      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'interview_started', props: { plan: user.plan } }) }).catch(() => {});
+      trackEvent('interview_started', { plan: user.plan }).catch(() => {});
     }
     return new Response(JSON.stringify(result), { status: 200, headers: H });
   } catch {

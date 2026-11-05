@@ -316,7 +316,11 @@ window.empSwitchAuthTab = function(tab) {
   document.getElementById('empLoginError').style.display = 'none';
   document.getElementById('empRegisterError').style.display = 'none';
 };
-window.empGoogleLogin = function() { window.location.href = '/api/auth/google'; };
+window.empGoogleLogin = function() {
+  let ref = '';
+  try { ref = sessionStorage.getItem('emploia_ref') || ''; } catch (e) {}
+  window.location.href = '/api/auth/google' + (/^[A-Z0-9]{8}$/.test(ref) ? '?ref=' + ref : '');
+};
 window.empPwdStrength = function(pwd) {
   const bar = document.getElementById('empPwdBar');
   if (!bar) return;

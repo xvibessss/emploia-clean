@@ -46,7 +46,7 @@
 // de ne pas citer les motifs qu'il décrit.
 export const config = { runtime: 'nodejs', regions: ['cdg1'] };
 
-import { kvSet } from '../_lib/auth.js';
+import { kvSet, bearerMatches } from '../_lib/auth.js';
 import {
   FOURNISSEURS, TTL_SECONDES, collecterFournisseur,
   CLE_BALISE, TTL_BALISE_SECONDES, construireBalise,
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
   // programmés. Sans ce garde, n'importe qui pourrait déclencher les 45
   // requêtes sortantes du catalogue à volonté.
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers['authorization'] !== `Bearer ${cronSecret}`) {
+  if (!bearerMatches(req, cronSecret)) {
     return res.status(401).send('Unauthorized');
   }
 

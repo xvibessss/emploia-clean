@@ -42,6 +42,16 @@ export default async function handler(req) {
   if (!password)
     return new Response(JSON.stringify({ error: "Mot de passe requis" }), { status: 400, headers: H });
 
+  // Second verrou, par compte : la limite par IP seule n'arrête pas une
+  // attaque distribuée (credential stuffing) qui tourne sur des milliers d'IP
+  // contre une même adresse.
+  const rlAccount = await checkRateLimit(`email:${email}`, 'login', 20, 3600);
+  if (!rlAccount.allowed) {
+    return new Response(JSON.stringify({ error: "Trop de tentatives sur ce compte. Réessayez dans 1 heure ou réinitialisez votre mot de passe." }), {
+      status: 429, headers: { ...H, "Retry-After": "3600" }
+    });
+  }
+
   const user = await kvGet(`user:${email}`);
   if (!user) {
     // Run dummy hash to prevent timing-based email enumeration (PBKDF2 ≈ 100ms)
@@ -63,18 +73,20 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: "Email ou mot de passe incorrect" }), { status: 401, headers: H });
   }
 
-  // Upgrade legacy HMAC hashes (no passwordSalt) to PBKDF2 on successful login
+  // Une seule écriture : la mise à niveau d'un ancien hash HMAC (sans sel)
+  // vers PBKDF2, et lastLoginAt. Il y en avait deux, et la seconde repartait de
+  // l'objet `user` lu AVANT la mise à niveau : elle réécrivait l'ancien hash
+  // par-dessus le nouveau, si bien qu'aucun compte legacy n'était jamais migré.
+  const lastLoginAt = new Date().toISOString();
+  const patch = { lastLoginAt };
   if (!user.passwordSalt) {
     try {
-      const newSalt = await generateSalt();
-      const newHash = await hashPassword(password, newSalt);
-      const fullUser = await kvGet(`user:${email}`);
-      if (fullUser) await kvSet(`user:${email}`, { ...fullUser, passwordHash: newHash, passwordSalt: newSalt });
-    } catch {} // non-blocking
+      patch.passwordSalt = await generateSalt();
+      patch.passwordHash = await hashPassword(password, patch.passwordSalt);
+    } catch { delete patch.passwordSalt; delete patch.passwordHash; }
   }
-
-  const lastLoginAt = new Date().toISOString();
-  kvSet(`user:${email}`, { ...user, lastLoginAt }).catch(() => {});
+  const fresh = (await kvGet(`user:${email}`)) || user;
+  await kvSet(`user:${email}`, { ...fresh, ...patch }).catch(() => {});
 
   const token = await signToken(user.id);
   const safeUser = {

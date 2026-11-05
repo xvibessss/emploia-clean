@@ -256,7 +256,7 @@
         <span class="trust-chip-dot"></span> Gratuit pendant la bêta · Aucune CB requise
       </div>
       <h1>Recrutez des candidats<br/><span class="grad">pré-qualifiés par l'IA</span></h1>
-      <p class="hero-sub">Publiez votre offre en 2 minutes. Visible immédiatement par des candidats avec CV ATS-scorés et triés par compatibilité avec votre poste.</p>
+      <p class="hero-sub">Publiez votre offre en 2 minutes, confirmez-la d'un clic par email : elle est visible par des candidats avec CV ATS-scorés et triés par compatibilité avec votre poste.</p>
       <div class="hero-ctas">
         <a href="#poster-offre" class="btn-primary">Publier une offre gratuitement →</a>
         <a href="/jobs" class="btn-ghost-dark">Voir les offres en ligne</a>
@@ -476,9 +476,8 @@
       <div class="form-section reveal">
         <div class="form-success" id="formSuccess">
           <div class="success-icon">✅</div>
-          <h3>Votre offre est en ligne !</h3>
-          <p>Elle est visible immédiatement par les candidats sur <strong>emploia.eu/jobs</strong>. Un email de confirmation vous a été envoyé.</p>
-          <a href="/jobs" class="btn-primary" style="display:inline-block">Voir mon offre sur Emploia →</a>
+          <h3>Plus qu'un clic : confirmez par email</h3>
+          <p>Nous venons d'envoyer un lien à l'adresse indiquée. Votre offre sera visible par les candidats sur <strong>emploia.eu/jobs</strong> dès que vous aurez cliqué « Publier mon offre » dans cet email. Pensez à vérifier vos spams.</p>
         </div>
 
         <form id="jobForm" novalidate>
@@ -536,12 +535,12 @@
             </div>
 
             <div class="field">
-              <label>Email de contact RH</label>
-              <input type="email" id="contactEmail" placeholder="rh@entreprise.fr" maxlength="254"/>
-              <div class="field-hint">Les candidats vous écriront à cet email. Au moins un des deux champs est requis.</div>
+              <label>Email de contact RH *</label>
+              <input type="email" id="contactEmail" placeholder="rh@entreprise.fr" maxlength="254" required/>
+              <div class="field-hint">Nous y envoyons le lien qui confirme la publication. Sans URL de candidature, les candidats vous écriront à cette adresse.</div>
             </div>
             <div class="field">
-              <label>URL de candidature</label>
+              <label>URL de candidature (facultatif)</label>
               <input type="url" id="applyUrl" placeholder="https://www.joburl.fr/postuler" maxlength="500"/>
               <div class="field-hint">Lien direct vers votre formulaire de candidature ou votre ATS.</div>
             </div>
@@ -813,6 +812,27 @@
     const body = ov.querySelector('#manageBody');
     const card = (title, msg) => '<h2 style="font-size:19px;font-weight:800;color:#0f172a;margin:0 0 8px">' + esc(title) + '</h2><p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 18px">' + esc(msg) + '</p><a href="/employeurs" style="color:#6366f1;font-weight:600;font-size:14px">← Retour</a>';
     function show(job) {
+      const act = async (action) => {
+        const msg = body.querySelector('#mMsg'); msg.textContent = '…'; msg.style.color = '#64748b';
+        try {
+          const r = await fetch('/api/employer/manage-job', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, action }) });
+          const d = await r.json();
+          if (!r.ok) { msg.textContent = d.error || 'Erreur'; msg.style.color = '#b91c1c'; return; }
+          show(d.job);
+          const m2 = body.querySelector('#mMsg');
+          if (m2) { m2.textContent = action === 'close' ? "Offre clôturée — elle n'apparaît plus aux candidats." : action === 'confirm' ? 'Offre publiée ✅ Elle est visible par les candidats.' : 'Offre prolongée de 45 jours ✅'; m2.style.color = '#0f9d6b'; }
+        } catch { msg.textContent = 'Problème réseau, réessayez.'; msg.style.color = '#b91c1c'; }
+      };
+      if (job.status === 'pending') {
+        body.innerHTML =
+          '<h2 style="font-size:19px;font-weight:800;color:#0f172a;margin:0 0 4px">Publier votre offre</h2>' +
+          '<p style="color:#64748b;font-size:13px;margin:0 0 16px">' + esc(job.title) + ' · ' + esc(job.company) + '</p>' +
+          '<p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 16px">Votre offre attend votre confirmation. Une fois publiée, elle reste en ligne 45 jours et vous pourrez la prolonger ou la clôturer depuis ce même lien.</p>' +
+          '<button id="mConfirm" style="width:100%;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;border:0;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Publier mon offre →</button>' +
+          '<div id="mMsg" style="font-size:13px;margin-top:12px"></div>';
+        body.querySelector('#mConfirm').addEventListener('click', () => act('confirm'));
+        return;
+      }
       const live = job.status === 'active' && job.live;
       const label = job.status === 'closed' ? 'Clôturée' : (job.live ? 'En ligne' : 'Expirée');
       const color = live ? '#0f9d6b' : '#c8781a';
@@ -826,17 +846,6 @@
           : '<button id="mRenew" style="background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;border:0;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Remettre en ligne (45 j) →</button>') +
         '</div><div id="mMsg" style="font-size:13px;margin-top:12px"></div>' +
         '<div style="text-align:center;margin-top:16px"><a href="/employeurs" style="color:#94a3b8;font-size:13px">Fermer</a></div>';
-      const act = async (action) => {
-        const msg = body.querySelector('#mMsg'); msg.textContent = '…'; msg.style.color = '#64748b';
-        try {
-          const r = await fetch('/api/employer/manage-job', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, action }) });
-          const d = await r.json();
-          if (!r.ok) { msg.textContent = d.error || 'Erreur'; msg.style.color = '#b91c1c'; return; }
-          show(d.job);
-          const m2 = body.querySelector('#mMsg');
-          if (m2) { m2.textContent = action === 'close' ? "Offre clôturée — elle n'apparaît plus aux candidats." : 'Offre prolongée de 45 jours ✅'; m2.style.color = '#0f9d6b'; }
-        } catch { msg.textContent = 'Problème réseau, réessayez.'; msg.style.color = '#b91c1c'; }
-      };
       body.querySelector('#mRenew')?.addEventListener('click', () => act('renew'));
       body.querySelector('#mClose')?.addEventListener('click', () => act('close'));
     }
@@ -850,6 +859,6 @@
     })();
   })();
 </script>
-<script src="/shared.js?v=45b5d4d0"></script>
+<script src="/shared.js?v=c78eda3b"></script>
 </body>
 </html>

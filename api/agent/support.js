@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from '../_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, claimAnonymousAiBudget } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
@@ -85,6 +85,13 @@ export default async function handler(req) {
     );
   }
 
+  if (!user && !(await claimAnonymousAiBudget('support'))) {
+    return new Response(
+      JSON.stringify({ error: 'Assistant très sollicité aujourd\'hui. Écrivez-nous à contact@emploia.eu ou connectez-vous pour continuer.' }),
+      { status: 429, headers: { ...headers, 'Retry-After': '3600' } }
+    );
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'Service temporairement indisponible' }), { status: 500, headers });
@@ -92,7 +99,7 @@ export default async function handler(req) {
 
   // Add user context to the message if available
   const contextNote = user
-    ? `[Utilisateur connecté : plan ${user.plan || 'free'}, ${user.freeGenerations || 0}/5 générations utilisées]`
+    ? `[Utilisateur connecté : plan ${user.plan || 'free'}, ${user.generationsUsed || 0}/5 générations utilisées]`
     : '[Utilisateur non connecté]';
 
   try {

@@ -216,7 +216,7 @@
       <div class="jb-live-dot"></div> Offres en temps réel · France Travail
     </div>
     <div id="demoBadge" class="jb-live-badge" style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.22)">
-      Mode démo — offres représentatives
+      Sources momentanément indisponibles
     </div>
     <h1 class="t-h2" style="margin-bottom:10px">Trouvez votre <span style="color:#a78bfa">prochain poste</span></h1>
     <p class="t-body" style="max-width:480px;margin:0 auto 24px">Stage, alternance, CDI, CDD — toutes les offres françaises. Emploia génère votre CV ATS-optimisé en 30 secondes pour chaque poste.</p>
@@ -333,7 +333,7 @@
     </div>
 
     <div class="jb-demo-notice" id="demoNotice" style="display:none;margin-bottom:10px">
-      Mode démo — offres représentatives. <a href="https://francetravail.io" target="_blank" rel="noopener noreferrer" style="color:inherit;font-weight:700;margin-left:4px">Configurer l'API France Travail →</a>
+      Nos sources d'offres ne répondent pas pour le moment. Réessayez dans quelques minutes, ou <a href="/alerts" style="color:inherit;font-weight:700;margin-left:4px">créez une alerte →</a> pour recevoir les offres dès leur retour.
     </div>
 
     <div class="jb-sort-bar" style="margin-bottom:10px">
@@ -443,7 +443,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=45b5d4d0"></script>
+<script src="/shared.js?v=c78eda3b"></script>
 <script>
   let currentType = 'tous', currentPage = 0;
   const saved = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'); } catch { return []; } })());
@@ -550,7 +550,7 @@
               <div class="jb-card-company">${esc(job.company)}</div>
             </div>
           </div>
-          <span class="jb-match-pill" id="pill-${esc(String(job.id))}" title="Cliquer pour analyser la compatibilité IA" onclick="analyzeScore('${esc(String(job.id))}',this)">✨ Score IA</span>
+          <span class="jb-match-pill" id="pill-${esc(String(job.id))}" title="Cliquer pour analyser la compatibilité IA" data-job-id="${esc(String(job.id))}" onclick="analyzeScore(this.dataset.jobId,this)">✨ Score IA</span>
         </div>
         <div class="jb-badges">
           ${job.type ? `<span class="jb-badge ${typeBadgeClass(job.type)}">${esc(job.type)}</span>` : ''}
@@ -656,9 +656,11 @@
       // offres ne correspond à `q`. On annonce ce que la liste est vraiment.
       const label = abandonne ? 'publiées, tous métiers confondus'
         : q ? `pour "${q}"` : currentType !== 'tous' ? `en ${currentType}` : 'disponibles';
+      // q et loc viennent de l'URL (?q=) : sans esc(), /jobs?q=<img onerror=…>
+      // exécutait du script dans la page.
       document.getElementById('searchStats').innerHTML = abandonne
-        ? `<strong>0</strong> offre pour "${q || loc}" · ${total.toLocaleString('fr-FR')} offres ${label}`
-        : `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${label}`;
+        ? `<strong>0</strong> offre pour "${esc(q || loc)}" · ${total.toLocaleString('fr-FR')} offres ${esc(label)}`
+        : `<strong>${total.toLocaleString('fr-FR')}</strong> offres ${esc(label)}`;
       document.getElementById('resultCount').innerHTML = `<strong style="color:var(--ink)">${total.toLocaleString('fr-FR')}</strong> offres${couvertureContrat(data.couvertureContrat)}`;
       if (!data.jobs?.length) {
         document.getElementById('jobsList').innerHTML = `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">🔍</div><h3>Aucune offre trouvée</h3><p>Essayez d'autres mots-clés ou un autre type de contrat.</p><button onclick="resetFilters()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Voir toutes les offres</button></div>`;

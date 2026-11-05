@@ -52,11 +52,15 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: 'Type de contrat invalide' }), { status: 400, headers: H });
   if (!description || description.length < 80)
     return new Response(JSON.stringify({ error: 'Description trop courte (80 caractères minimum)' }), { status: 400, headers: H });
-  if (!contactEmail && !applyUrl)
-    return new Response(JSON.stringify({ error: 'Email de contact ou URL de candidature requis' }), { status: 400, headers: H });
+  // L'email est désormais obligatoire : c'est par lui que l'offre est
+  // confirmée. Une offre publiée sans preuve de possession d'une adresse
+  // partait en ligne immédiatement, avec n'importe quel lien de candidature —
+  // la porte ouverte aux fausses offres et au phishing sous la bannière Emploia.
+  if (!contactEmail)
+    return new Response(JSON.stringify({ error: 'Email de contact requis — nous y envoyons le lien de confirmation' }), { status: 400, headers: H });
   if (contactEmail && !validateEmail(contactEmail))
     return new Response(JSON.stringify({ error: 'Email de contact invalide' }), { status: 400, headers: H });
-  if (applyUrl && !/^https?:\/\//i.test(applyUrl))
+  if (applyUrl && !/^https:\/\//i.test(applyUrl))
     return new Response(JSON.stringify({ error: 'URL invalide (doit commencer par https://)' }), { status: 400, headers: H });
 
   let salary = null;
@@ -82,7 +86,10 @@ export default async function handler(req) {
     remote,
     postedAt: new Date().toISOString(),
     date: new Date().toISOString(),
-    status: 'active',
+    // En attente jusqu'au clic sur le lien de confirmation envoyé à
+    // contactEmail (action 'confirm' de manage-job). isJobLive n'affiche que
+    // les offres 'active'.
+    status: 'pending',
     source: 'Emploia Direct',
     direct: true,
     country: 'FR',
@@ -134,12 +141,12 @@ export default async function handler(req) {
         body: JSON.stringify({
           from: 'Emploia <noreply@emploia.eu>',
           to: [contactEmail],
-          subject: `Votre offre "${title.replace(/[\r\n]/g, ' ')}" est en ligne sur Emploia ✅`,
-          html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Votre offre est en ligne ✅</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">L'offre <strong>&ldquo;${eTitle}&rdquo;</strong> pour <strong>${eCompany}</strong> est maintenant visible par les candidats sur Emploia.</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Poste :</strong> ${eTitle}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Lieu :</strong> ${eLocation}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Type :</strong> ${eType}</p>${salary ? `<p style="font-size:13px;color:#475569;margin:0"><strong>Salaire :</strong> ${eSalary}</p>` : ''}</div><a href="https://emploia.eu/jobs" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Voir mon offre →</a><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:20px"><p style="font-size:13px;color:#475569;margin:0 0 8px"><strong>Gérer votre offre</strong> — poste pourvu ou à prolonger ? Vous gardez la main :</p><a href="${manageUrl}" style="color:#6366f1;font-weight:600;font-size:13px;word-break:break-all">${htmlEscape(manageUrl)}</a><p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Lien personnel — ne le partagez pas. Sans action, l'offre expire automatiquement après 45 jours.</p></div><p style="margin-top:24px;font-size:13px;color:#94a3b8">Des questions ? Répondez à cet email ou écrivez à <a href="mailto:contact@emploia.eu" style="color:#6366f1">contact@emploia.eu</a></p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${year} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a></p></div></body></html>`,
+          subject: `Confirmez la publication de votre offre "${title.replace(/[\r\n]/g, ' ')}"`,
+          html: `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">Confirmez votre offre</h1><p style="color:#475569;line-height:1.6;margin:0 0 16px">L'offre <strong>&ldquo;${eTitle}&rdquo;</strong> pour <strong>${eCompany}</strong> est prête. Elle sera visible par les candidats dès que vous aurez confirmé sa publication — un clic suffit. Si vous n'êtes pas à l'origine de cette offre, ignorez cet email : elle ne sera jamais publiée.</p><div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:24px"><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Poste :</strong> ${eTitle}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Lieu :</strong> ${eLocation}</p><p style="font-size:13px;color:#475569;margin:0 0 6px"><strong>Type :</strong> ${eType}</p>${salary ? `<p style="font-size:13px;color:#475569;margin:0"><strong>Salaire :</strong> ${eSalary}</p>` : ''}</div><a href="${manageUrl}" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Publier mon offre →</a><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:20px"><p style="font-size:13px;color:#475569;margin:0 0 8px"><strong>Gérer votre offre</strong> — poste pourvu ou à prolonger ? Vous gardez la main :</p><a href="${manageUrl}" style="color:#6366f1;font-weight:600;font-size:13px;word-break:break-all">${htmlEscape(manageUrl)}</a><p style="font-size:11px;color:#94a3b8;margin:8px 0 0">Lien personnel — ne le partagez pas. Sans action, l'offre expire automatiquement après 45 jours.</p></div><p style="margin-top:24px;font-size:13px;color:#94a3b8">Des questions ? Répondez à cet email ou écrivez à <a href="mailto:contact@emploia.eu" style="color:#6366f1">contact@emploia.eu</a></p></div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${year} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a></p></div></body></html>`,
         }),
       }).catch(() => {});
     }
   }
 
-  return new Response(JSON.stringify({ ok: true, id }), { status: 201, headers: H });
+  return new Response(JSON.stringify({ ok: true, id, status: 'pending' }), { status: 201, headers: H });
 }

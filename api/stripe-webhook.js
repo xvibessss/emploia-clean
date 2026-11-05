@@ -1,4 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
+import { trackEvent } from './_lib/track.js';
 import { kvGet, kvSet, kvSetNX, kvIncr, kvSadd, htmlEscape, extendPro } from './_lib/auth.js';
 import { sendEmail } from './_lib/email.js';
 import { enregistrerPaiementOrphelin } from './_lib/orphan.js';
@@ -308,7 +309,7 @@ export default async function handler(req) {
           const lienMotDePasse = cree ? await emettreLienMotDePasse(normalizedEmail) : null;
 
           await Promise.all([
-            fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan: 'campagne', compteCree: cree } }) }).catch(() => {}),
+            trackEvent('plan_upgraded', { plan: 'campagne', compteCree: cree }).catch(() => {}),
             resendKey ? sendEmail(resendKey, {
               from: 'Emploia <noreply@emploia.eu>',
               to: [normalizedEmail],
@@ -350,7 +351,7 @@ export default async function handler(req) {
               kvSet(`stripe:${session.customer}`, normalizedEmail),
               kvSet(`gen:${normalizedEmail}`, 0),
               // Track upgrade (fire and forget)
-              fetch(`${baseUrl}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'plan_upgraded', props: { plan } }) }).catch(() => {}),
+              trackEvent('plan_upgraded', { plan }).catch(() => {}),
               resendKey ? sendEmail(resendKey, {
                 from: 'Emploia <noreply@emploia.eu>',
                 to: [normalizedEmail],
