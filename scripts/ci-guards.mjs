@@ -568,6 +568,9 @@ try {
     [/(?:×|x)\s*plus de réponses positives/i, 'taux de réponse des utilisateurs, jamais mesuré'],
     [/jusqu'au premier oui/i, 'délai d\'embauche des utilisateurs, jamais mesuré'],
     [/d'entretiens en plus/i, 'effet d\'Emploia sur les entretiens, jamais mesuré'],
+    // Retirés du blog le 2026-11-05.
+    [/Rejoignez\s+[\d\s.,]+\+?\s*candidats/i, 'nombre d\'abonnés à la newsletter inventé — rien ne le calcule'],
+    [/Score moyen\s*:\s*\d+\s*\/\s*100/i, 'score moyen des CV générés, jamais mesuré'],
   ];
   let revenues = 0;
   for (const f of visibles) {
