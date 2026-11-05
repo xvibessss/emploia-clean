@@ -23,7 +23,7 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <link rel="dns-prefetch" href="https://plausible.io"/>
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin/>
-<link rel="stylesheet" href="/shared.css?v=c26b9bf9"/>
+<link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -204,17 +204,17 @@
 
 /* Versus section */
 .versus-table{margin-top:40px;border:1px solid var(--hairline);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-1)}
-.versus-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;background:var(--surface-soft);border-bottom:2px solid var(--hairline)}
+.versus-head{display:grid;grid-template-columns:2fr repeat(4,minmax(0,1fr));background:var(--surface-soft);border-bottom:2px solid var(--hairline)}
 .versus-head>div{padding:16px 18px;font-size:13px;font-weight:700;color:var(--slate);text-align:center}
 .versus-head>div:first-child{text-align:left;color:var(--ink)}
 .versus-head .hl{background:var(--primary);color:#fff;border-radius:0}
-.versus-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--hairline-soft)}
+.versus-row{display:grid;grid-template-columns:2fr repeat(4,minmax(0,1fr));border-bottom:1px solid var(--hairline-soft)}
 .versus-row:last-child{border-bottom:0}
 .versus-row>div{padding:13px 18px;font-size:14px;color:var(--charcoal);display:flex;align-items:center;justify-content:center;text-align:center}
 .versus-row>div:first-child{justify-content:flex-start;font-weight:500;color:var(--ink)}
 .versus-yes{color:var(--brand-green);font-size:18px;font-weight:700}
 .versus-no{color:var(--steel);font-size:18px}
-.versus-partial{color:var(--brand-orange);font-size:13px;font-weight:600}
+.versus-partial{color:var(--brand-orange);font-size:13px;font-weight:600;overflow-wrap:anywhere}
 .versus-row:nth-child(odd){background:#FAFAFA}
 .versus-row>div.hl-col{background:rgba(110,72,190,.05)}
 @media (max-width:767px){.versus-table{overflow-x:auto}.versus-head,.versus-row{min-width:560px}}
@@ -250,7 +250,6 @@
 
 /* Nav scrolled state */
 .emp-nav.scrolled{box-shadow:0 1px 16px rgba(0,0,0,.09)}
-.emp-nav.scrolled #navLoginBtn{display:inline-flex!important}
 
 
 /* How it works */
@@ -311,7 +310,6 @@
       </nav>
     </div>
     <div class="emp-nav-right" style="display:flex;align-items:center;gap:10px">
-      <a href="/app" class="emp-btn emp-btn-ghost" style="display:none" id="navLoginBtn">Se connecter</a>
       <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
     </div>
   </div>
@@ -323,7 +321,6 @@
   <a href="/agents" style="color:var(--primary);font-weight:700">Agents IA</a>
   <a href="/blog">Ressources</a>
   <a href="#pricing">Tarifs</a>
-  <a href="/app">Se connecter</a>
 </nav>
 
 <!-- ═════ HERO ═════ -->
@@ -333,7 +330,7 @@
   <div class="emp-dot lg" style="--r:-8deg;background:var(--brand-pink);top:120px;left:8%"></div>
   <div class="emp-dot sm" style="--r:14deg;background:var(--brand-orange);top:60px;left:24%"></div>
   <div class="emp-dot lg" style="--r:6deg;background:var(--brand-yellow);top:90px;right:9%"></div>
-  <div class="emp-dot sm" style="--r:-12deg;background:var(--brand-teal);top:200px;right:22%"></div>
+  <div class="emp-dot sm" style="--r:-12deg;background:var(--brand-teal);top:230px;right:11%"></div>
   <div class="emp-dot sm" style="--r:18deg;background:var(--brand-green);bottom:280px;left:14%"></div>
   <div class="emp-dot lg" style="--r:-4deg;background:var(--brand-purple);bottom:320px;right:6%"></div>
   <div class="emp-dot sm" style="--r:8deg;background:var(--brand-pink);bottom:230px;right:34%"></div>
@@ -715,14 +712,13 @@
       </div>
 
       <div class="bring-card emp-card-brown reveal" data-delay="3">
-        <div class="quote-stars">★★★★★</div>
-        <div class="quote-card">"En trois semaines avec EmploiA, j'ai eu plus d'entretiens qu'en six mois en solo. Le coach IA a vraiment changé ma façon de raconter mon parcours."</div>
+        <div class="quote-stars">Notre règle</div>
+        <div class="quote-card">Un CV par offre, sans rien inventer. EmploiA n'ajoute jamais un employeur, un diplôme ou un chiffre absent de votre profil : ce qui manque est marqué « à compléter », et c'est vous qui décidez.</div>
         <div class="viz">
           <div class="quote-attr">
-            <span class="av"></span>
             <div>
-              <div style="font-weight:600;color:#fff">Camille Durand</div>
-              <div>Product Manager · Embauchée chez Qonto</div>
+              <div style="font-weight:600;color:#fff">Vos candidatures restent les vôtres</div>
+              <div>Relecture avant envoi · rien n'est transmis sans vous</div>
             </div>
           </div>
         </div>
@@ -780,13 +776,13 @@
     <div class="emp-stat-row reveal">
       <div>
         <h3 class="t-h2"><span class="grad-text">Plus d'entretiens.</span><br/>Moins d'onglets.</h3>
-        <p class="t-subtitle mt-4">Les utilisateurs EmploiA passent 4× moins de temps à candidater — et obtiennent 3× plus de réponses positives.</p>
+        <p class="t-subtitle mt-4">Offres, CV adaptés, lettres, relances et préparation d'entretien au même endroit — au lieu de cinq onglets et d'un tableur.</p>
       </div>
       <div class="stat-list">
-        <div class="emp-stat-item"><div class="val" data-count="3.4" data-suffix="×">3.4×</div><div class="bar"><i style="--tw:78%"></i></div><div class="lbl">d'entretiens en plus</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="72" data-prefix="−" data-suffix="%">−72%</div><div class="bar"><i style="--tw:62%;background:var(--brand-orange)"></i></div><div class="lbl">de temps par candidature</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="91" data-suffix="%">91%</div><div class="bar"><i style="--tw:91%;background:var(--brand-green)"></i></div><div class="lbl">score ATS moyen</div></div>
-        <div class="emp-stat-item"><div class="val" data-count="14" data-suffix="j">14j</div><div class="bar"><i style="--tw:38%;background:var(--brand-pink)"></i></div><div class="lbl">jusqu'au premier oui</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="1">1</div><div class="bar"><i style="--tw:100%"></i></div><div class="lbl">espace pour toute votre recherche</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="5">5</div><div class="bar"><i style="--tw:100%;background:var(--brand-orange)"></i></div><div class="lbl">outils IA : CV, lettre, ATS, entretien, relance</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="0" data-suffix=" €">0 €</div><div class="bar"><i style="--tw:100%;background:var(--brand-green)"></i></div><div class="lbl">pour commencer, sans carte bancaire</div></div>
+        <div class="emp-stat-item"><div class="val" data-count="7" data-suffix=" j">7 j</div><div class="bar"><i style="--tw:100%;background:var(--brand-pink)"></i></div><div class="lbl">d'essai Pro gratuit, annulable en 1 clic</div></div>
       </div>
     </div>
   </div>
@@ -1123,7 +1119,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=c78eda3b"></script>
+<script src="/shared.js?v=2efc6d7c"></script>
 <script>
 /* Pricing → Stripe Checkout. Wires the Pro/Campagne cards (data-checkout) to
    /api/stripe-checkout with the right plan key. The plan key is passed through
@@ -1293,12 +1289,6 @@
     if(shouldShow && !shown){ bar.classList.add('visible'); shown = true; }
     else if(!shouldShow && shown){ bar.classList.remove('visible'); shown = false; }
   }, {passive:true});
-})();
-
-/* ── Nav login button desktop ── */
-(function(){
-  var btn = document.getElementById('navLoginBtn');
-  if(btn && window.innerWidth >= 1024) btn.style.display = 'inline-flex';
 })();
 
 /* ── Newsletter submit ── */

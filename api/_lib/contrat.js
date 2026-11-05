@@ -78,8 +78,20 @@ function lireTemps(t) {
 // serait refaire, en plus petit, le défaut qu'on retire.
 const ADZUNA_CONTRAT = { permanent: 'CDI', contract: 'CDD' };
 
+// `contract` ne veut pas dire CDD : c'est tout ce qui n'est pas `permanent` —
+// stage, alternance, mission freelance, intérim. Observé en production le
+// 2026-11-05 : « STAGE - Développeur/euse Full Stack » et quatre missions
+// « - Freelance » publiées en CDD. Sous `contract`, le titre précise donc la
+// nature quand il nomme un stage, une alternance ou une mission freelance ;
+// sinon `contract` vaut CDD comme avant. `permanent` reste prioritaire sur le
+// titre : là, la source dit ce qu'elle dit.
+const CONTRATS_PRECISES_PAR_LE_TITRE = new Set(['Stage', 'Alternance', 'Freelance']);
+
 export function contratAdzuna(j) {
-  return contratPublic(ADZUNA_CONTRAT[normaliserValeur(j?.contract_type)] || detectType(j?.title));
+  const declare = ADZUNA_CONTRAT[normaliserValeur(j?.contract_type)];
+  const parTitre = detectType(j?.title);
+  if (declare === 'CDD' && CONTRATS_PRECISES_PAR_LE_TITRE.has(parTitre)) return contratPublic(parTitre);
+  return contratPublic(declare || parTitre);
 }
 export function tempsAdzuna(j) {
   return lireTemps(normaliserValeur(j?.contract_time));
@@ -314,13 +326,30 @@ export function champMetadata(j, nom) {
 // zéro ». On n'émet alors que la borne qui dit quelque chose, comme une limite
 // haute. C'est plus pauvre et c'est exact ; inventer une borne basse
 // plausible serait la faute que cette mission retire.
+//
+// PLANCHER DE PLAUSIBILITÉ (2026-11-05). Observé en production sur Adzuna :
+// « 2k€/an » pour un poste de technicien (un salaire MENSUEL de 2 000 €) et
+// « 1k€/an » pour une mission à 500 € par jour (un TJM). La source range ces
+// montants dans `salary_min` / `salary_max` sans unité, et ils s'affichaient
+// comme des salaires annuels — un candidat lisait qu'un poste paie mille euros
+// par an. Aucun salaire annuel réel en France n'est sous 6 000 € (même une
+// gratification de stage à temps plein dépasse 7 000 €/an). En dessous, le
+// montant n'est pas annuel : on ne sait pas en quelle unité il est, donc on ne
+// le publie pas — même règle que `salaireSchemaOrg` pour les montants
+// mensuels. Au-dessus de 500 000 €, c'est une saisie fautive, même sanction.
+export const SALAIRE_ANNUEL_MIN = 6000;
+export const SALAIRE_ANNUEL_MAX = 500000;
+
 export function formaterSalaireAnnuel(min, max) {
+  const plausible = (v) => Number.isFinite(v) && v >= SALAIRE_ANNUEL_MIN && v <= SALAIRE_ANNUEL_MAX;
   const brutBas = Number(min) || 0;
   const brutHaut = Number(max) || brutBas;
-  const bas = Math.round(Math.min(brutBas, brutHaut) / 1000);
-  const haut = Math.round(Math.max(brutBas, brutHaut) / 1000);
-  if (haut === 0) return null;                 // rien à dire, 0k–0k inclus
-  if (bas === 0) return `jusqu'à ${haut}k€/an`; // la borne basse ne dit rien
+  const lo = Math.min(brutBas, brutHaut), hi = Math.max(brutBas, brutHaut);
+  if (!plausible(hi)) return null;              // pas un salaire annuel : rien plutôt qu'un faux
+  const haut = Math.round(hi / 1000);
+  // Une borne basse sous le plancher ne dit rien (0, 100…) : seule la haute parle.
+  if (!plausible(lo)) return `jusqu'à ${haut}k€/an`;
+  const bas = Math.round(lo / 1000);
   return bas === haut ? `${bas}k€/an` : `${bas}k–${haut}k€/an`;
 }
 

@@ -561,6 +561,13 @@ try {
     // obtient un score ATS moyen de 40-50/100 » dans un article reste éditorial et n'est pas visé.
     [/score ATS moyen\s*:\s*\d+|score ATS moyen passe de \d+/i, 'score moyen des utilisateurs d\'Emploia, jamais mesuré (la démo du 22/10 donnait 78 %)'],
     [/premier retour en \d+\s*jours en moyenne/i, 'délai moyen de réponse des recruteurs aux utilisateurs, jamais mesuré'],
+    // Retirés de index.html le 2026-11-05 : rescapés des passes précédentes,
+    // découpés par la mise en page (nombre et libellé dans deux <div>).
+    [/Embauch[ée]e chez/i, 'témoignage 5 étoiles signé d\'un nom qui est celui du compte fictif de la démo'],
+    [/\d\s*(?:×|x)\s*moins de temps à candidater/i, 'gain de temps des utilisateurs, jamais mesuré'],
+    [/(?:×|x)\s*plus de réponses positives/i, 'taux de réponse des utilisateurs, jamais mesuré'],
+    [/jusqu'au premier oui/i, 'délai d\'embauche des utilisateurs, jamais mesuré'],
+    [/d'entretiens en plus/i, 'effet d\'Emploia sur les entretiens, jamais mesuré'],
   ];
   let revenues = 0;
   for (const f of visibles) {
@@ -1130,6 +1137,37 @@ try {
 
   if (!bad21) ok("condition de l'alerte réelle intacte, répétition réservée au workflow_dispatch, drapeau passé en paramètre");
 } catch (e) { fail("contrôle de l'alerte de régression SEO impossible : " + e.message); }
+
+// ── 22. socle visuel des pages : ce qui casse une page sans casser un test ──
+// Relevé le 2026-11-05 par un balayage navigateur des 220 pages, et invisible
+// pour tous les autres contrôles : chacun de ces défauts laisse un fichier
+// syntaxiquement valide, que seul un œil sur la page rendue remarque.
+//   - 8 articles sans shared.css : le logo SVG de l'en-tête, sans taille,
+//     remplissait l'écran ;
+//   - 26 articles chargeant shared.js deux fois : la seconde exécution levait
+//     « Identifier 'GOOGLE_ICON' has already been declared » ;
+//   - 35 articles dont le <style> portait des fragments de sélecteur isolés
+//     (« .btn- », « .art- ») qui neutralisaient la règle suivante ;
+//   - 98 pages sur un ancien en-tête (emp-logo) que shared.css ne stylait plus :
+//     pas de navigation mobile, pas de bouton d'inscription.
+console.log('\n[22] socle visuel des pages : shared.css / shared.js / en-tête / CSS tronqué');
+try {
+  const pagesHtml = walk('.').filter(p => p.endsWith('.html') && !p.includes('node_modules') && !p.startsWith('./scripts/') && !p.startsWith('./chrome-extension/'));
+  let bad22 = 0;
+  for (const f of pagesHtml) {
+    const src = readAll(f);
+    const js = (src.match(/<script[^>]+src="\/shared\.js/g) || []).length;
+    const css = (src.match(/<link[^>]+href="\/shared\.css/g) || []).length;
+    if (js > 1) { fail(`${f} : shared.js chargé ${js} fois — la seconde exécution plante sur ses const`); bad22++; }
+    if (js && !css) { fail(`${f} : shared.js sans shared.css — les composants injectés (modale, nav, logo) s'affichent sans style`); bad22++; }
+    if (/class="emp-logo"|class="nav-bar"/.test(src)) { fail(`${f} : ancien en-tête (emp-logo / nav-bar), plus stylé par shared.css — reprendre l'en-tête emp-brand`); bad22++; }
+    for (const bloc of src.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+      const frag = bloc[1].match(/^\s*\.[A-Za-z][\w-]*-\s*$/m);
+      if (frag) { fail(`${f} : fragment de sélecteur « ${frag[0].trim()} » dans <style> — il neutralise la règle qui suit`); bad22++; break; }
+    }
+  }
+  if (!bad22) ok(`${pagesHtml.length} pages : shared.css et shared.js chargés une fois, en-tête à jour, aucun sélecteur tronqué`);
+} catch (e) { fail('contrôle du socle visuel impossible : ' + e.message); }
 
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
