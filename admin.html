@@ -188,6 +188,12 @@
 
 <script>
 const SKEY = 'emploia_admin_secret';
+/* Le secret admin vit dans sessionStorage : propre à cet onglet, effacé à sa
+   fermeture. Il était dans localStorage, lisible par tout script de l'origine,
+   depuis n'importe quelle page et sans limite de durée — une seule faille XSS
+   ailleurs sur le site suffisait à le voler. La ligne suivante purge l'ancienne
+   copie chez qui s'était déjà connecté. */
+try{localStorage.removeItem(SKEY);}catch{}
 const $ = (id) => document.getElementById(id);
 const nf = (n) => (Number(n) || 0).toLocaleString('fr-FR');
 const eur = (n) => (Number(n) || 0).toLocaleString('fr-FR') + ' €';
@@ -195,11 +201,11 @@ const TITLES = { overview:"Vue d'ensemble", revenue:"Revenus & facturation", acq
 let DATA = null;
 
 /* ── Auth ── */
-function login(){ const v=$('secret').value.trim(); if(!v){$('gateErr').textContent='Entre le secret.';return;} try{localStorage.setItem(SKEY,v);}catch{} load(); }
-function logout(){ try{localStorage.removeItem(SKEY);}catch{} DATA=null; $('shell').hidden=true; $('gate').hidden=false; $('secret').value=''; $('gateErr').textContent=''; }
+function login(){ const v=$('secret').value.trim(); if(!v){$('gateErr').textContent='Entre le secret.';return;} try{sessionStorage.setItem(SKEY,v);}catch{} load(); }
+function logout(){ try{sessionStorage.removeItem(SKEY);}catch{} DATA=null; $('shell').hidden=true; $('gate').hidden=false; $('secret').value=''; $('gateErr').textContent=''; }
 
 async function load(){
-  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  let secret=''; try{secret=sessionStorage.getItem(SKEY)||'';}catch{}
   if(!secret){logout();return;}
   try{
     const r=await fetch('/api/admin/stats',{headers:{'x-admin-secret':secret},cache:'no-store'});
@@ -328,7 +334,7 @@ function renderAll(){
 
 /* SEO — Google Search Console (separate endpoint) */
 async function loadAffiliates(){
-  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  let secret=''; try{secret=sessionStorage.getItem(SKEY)||'';}catch{}
   const lead=`<p class="lead">Codes créateurs TikTok. Le code donne <b>10 € de réduction</b> sur le Pack Campagne (59 € → 49 €) et sert de clé d'attribution. La commission est de <b>12 € par vente</b>, versée à la main : après avoir payé un créateur, clique « Marquer payé » pour remettre son solde à zéro.</p>`;
   try{
     const r=await fetch('/api/admin/affiliates',{headers:{'x-admin-secret':secret},cache:'no-store'});
@@ -356,7 +362,7 @@ async function loadAffiliates(){
 
 async function markPaid(code,sales){
   if(!confirm(`Confirmer le versement à ${code} ? Son solde repassera à 0 €.`)) return;
-  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  let secret=''; try{secret=sessionStorage.getItem(SKEY)||'';}catch{}
   try{
     const r=await fetch('/api/admin/affiliates',{method:'POST',headers:{'x-admin-secret':secret,'Content-Type':'application/json'},body:JSON.stringify({code:code,paidSales:sales})});
     if(!r.ok) throw new Error('HTTP '+r.status);
@@ -365,7 +371,7 @@ async function markPaid(code,sales){
 }
 
 async function loadSeo(){
-  let secret=''; try{secret=localStorage.getItem(SKEY)||'';}catch{}
+  let secret=''; try{secret=sessionStorage.getItem(SKEY)||'';}catch{}
   const lead=`<p class="lead">Le SEO est le principal levier d'acquisition d'Emploia (85 pages villes/métiers enrichies). Données Google Search Console (30 derniers jours).</p>`;
   try{
     const r=await fetch('/api/seo-metrics',{headers:{'x-admin-secret':secret},cache:'no-store'});
@@ -392,10 +398,10 @@ async function loadSeo(){
     $('sec-seo').innerHTML=lead+soonCard('Search Console indisponible','Réessaie plus tard, ou vérifie la configuration <code>GSC_*</code> sur Vercel.');
   }
 }
-function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 /* auto-load if secret present */
-(function(){ let s=''; try{s=localStorage.getItem(SKEY)||'';}catch{} if(s) load(); })();
+(function(){ let s=''; try{s=sessionStorage.getItem(SKEY)||'';}catch{} if(s) load(); })();
 </script>
 </body>
 </html>

@@ -2112,7 +2112,12 @@
     loadInterviews();
   }
 
-  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  // Échappe aussi les guillemets : cette fonction est employée dans des
+  // attributs (`href="${esc(j.url)}"`, `title="…"`). Sans cela, une URL d'offre
+  // contenant un `"` sortait de l'attribut et pouvait poser un gestionnaire
+  // d'événement — et, déclarée ici au niveau global, elle remplaçait la version
+  // complète de shared.js pour toute la page.
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
   loadInterviews();
 
