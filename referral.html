@@ -533,7 +533,7 @@
       <a href="/#pricing">Tarifs</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -665,7 +665,7 @@
       </div>
       <div class="ref-link-row">
         <input class="ref-link-input" id="refLink" readonly value="https://emploia.eu/?ref=..."/>
-        <button class="emp-btn emp-btn-primary" onclick="copyLink()">Copier</button>
+        <button class="emp-btn emp-btn-primary" data-on-click="copyLink">Copier</button>
       </div>
 
       <!-- Social sharing -->
@@ -682,7 +682,7 @@
           <svg viewBox="0 0 20 20" fill="none" stroke="var(--charcoal)" stroke-width="1.5"><rect x="3" y="5" width="14" height="10" rx="1.5"/><path d="m3 5 7 6 7-6"/></svg>
           Email
         </a>
-        <button class="ref-share-btn" onclick="copyLink()">
+        <button class="ref-share-btn" data-on-click="copyLink">
           <svg viewBox="0 0 20 20" fill="none" stroke="var(--charcoal)" stroke-width="1.5"><rect x="5" y="7" width="10" height="10" rx="1.5"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2"/></svg>
           Copier
         </button>
@@ -720,42 +720,42 @@
       <h2>Questions fréquentes</h2>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Combien de parrainages puis-je faire ?
         <span class="ref-faq-icon">+</span>
       </div>
       <div class="ref-faq-a">Vous pouvez parrainer autant d'amis que vous le souhaitez. En revanche, le plafond de récompense est fixé à <strong>6 mois gratuits</strong> cumulés. Au-delà, les parrainages supplémentaires ne génèrent plus de mois.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Quand est crédité le mois gratuit ?
         <span class="ref-faq-icon">+</span>
       </div>
       <div class="ref-faq-a">Dès l'inscription de votre filleul, 30 jours d'accès Pro sont ajoutés à votre compte, automatiquement. Ils s'ajoutent à ceux que vous avez déjà : trois filleuls, c'est 90 jours d'affilée. Votre filleul, lui, reçoit 14 jours de Pro à son inscription.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Mon filleul a-t-il besoin de s'abonner ?
         <span class="ref-faq-icon">+</span>
       </div>
       <div class="ref-faq-a">Non, il suffit qu'il crée un compte gratuit sur Emploia via votre lien. Vous gagnez votre mois dès son inscription, indépendamment de son abonnement.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Les mois gratuits expirent-ils ?
         <span class="ref-faq-icon">+</span>
       </div>
       <div class="ref-faq-a">Ils sont cumulables, et ils s'écoulent à partir du jour où ils sont crédités : ce sont des jours d'accès Pro, pas un avoir mis de côté. Si vous avez déjà un abonnement payant, ils ne réduisent pas votre facture ; ils maintiennent votre accès Pro au-delà d'une éventuelle résiliation, tant qu'ils ne sont pas écoulés.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Je suis sur le plan gratuit, puis-je parrainer ?
         <span class="ref-faq-icon">+</span>
       </div>
       <div class="ref-faq-a">Oui ! C'est même là que le parrainage rapporte le plus : chaque filleul vous donne 30 jours d'accès Pro immédiat, sans abonnement ni carte bancaire.</div>
     </div>
     <div class="ref-faq-item">
-      <div class="ref-faq-q" onclick="faqToggle(this.parentElement)">
+      <div class="ref-faq-q" data-on-click="faqToggle_this_parentElement_3e3c">
         Le programme est-il limité dans le temps ?
         <span class="ref-faq-icon">+</span>
       </div>
@@ -824,84 +824,7 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
-<script>
-  // Year
-  document.querySelectorAll('[data-year]').forEach(el => el.textContent = new Date().getFullYear());
-
-  // FAQ accordion
-  function faqToggle(item) {
-    item.classList.toggle('open');
-  }
-
-  // Reward tracker rendering
-  function renderTracker(months) {
-    const slots = document.getElementById('trackerSlots');
-    if (!slots) return;
-    slots.innerHTML = '';
-    for (let i = 1; i <= 6; i++) {
-      const div = document.createElement('div');
-      div.className = 'ref-tracker-slot' + (i <= months ? ' earned' : '');
-      div.innerHTML = `<span class="icon">🎁</span><span>${i} mois</span>`;
-      slots.appendChild(div);
-    }
-    const bar = document.getElementById('trackerBar');
-    if (bar) bar.style.width = Math.min(months / 6 * 100, 100) + '%';
-  }
-  renderTracker(0); // initial empty state
-
-  // Load referral data
-  async function loadReferral() {
-    try {
-      const r = await fetch('/api/auth/me', { credentials: 'include' });
-      if (!r.ok) return;
-      const d = await r.json();
-      if (!d.user) return;
-
-      document.getElementById('refNotLogged').style.display = 'none';
-      document.getElementById('refLoggedIn').style.display = 'block';
-
-      const refR = await fetch('/api/referral', { credentials: 'include' });
-      if (!refR.ok) return;
-      const ref = await refR.json();
-
-      const link = ref.link || `https://emploia.eu/?ref=${ref.code}`;
-      document.getElementById('refLink').value = link;
-
-      const signups = ref.signups || 0;
-      const months = ref.monthsEarned || 0;
-      document.getElementById('refSignups').textContent = signups;
-      document.getElementById('refMonths').textContent = months;
-
-      // Update hero counter
-      document.getElementById('heroSignups').textContent = signups;
-      document.getElementById('heroMonths').textContent = months;
-      if (signups > 0) document.getElementById('heroCounter').style.display = 'inline-flex';
-
-      // Update tracker
-      renderTracker(months);
-
-      const msg = encodeURIComponent(`Essaie Emploia — le copilote IA pour décrocher des entretiens 🚀 : ${link}`);
-      document.getElementById('shareWA').href = `https://wa.me/?text=${msg}`;
-      document.getElementById('shareLI').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`;
-      document.getElementById('shareEmail').href = `mailto:?subject=Je%20te%20recommande%20Emploia&body=${msg}`;
-    } catch (e) {}
-  }
-
-  function copyLink() {
-    const val = document.getElementById('refLink').value;
-    navigator.clipboard.writeText(val)
-      .then(() => empToast('Lien copié !', 'success'))
-      .catch(() => empToast('Copie impossible — utilisez Ctrl+C', 'error'));
-  }
-
-  // Check URL ref param (when landing via a referral link)
-  const urlRef = new URLSearchParams(window.location.search).get('ref');
-  if (urlRef && /^[A-Z0-9]{8}$/i.test(urlRef)) {
-    sessionStorage.setItem('emploia_ref', urlRef.toUpperCase());
-  }
-
-  loadReferral();
-</script>
+<script src="/shared.js?v=3e6e75fe"></script>
+<script src="/js/pages/referral.js?v=79ee0836"></script>
 </body>
 </html>

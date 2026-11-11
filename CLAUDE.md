@@ -173,6 +173,16 @@ opening a PR are free; promoting is his call.
 - **IA anonyme** : plafond global quotidien (`ANON_AI_DAILY_CAP`, défaut 3000) sur `/api/chat` et `/api/agent/support` sans compte.
 - Sonde : `npm run test:security` (`scripts/security/hardening.test.mjs`), lancée en CI.
 
+## Sécurité — plus aucun JavaScript en ligne (2026-11-10)
+
+La CSP (`vercel.json`) n'a plus `'unsafe-inline'` dans `script-src`. **Un `<script>` sans `src` ou un attribut `onclick=` ne s'exécute plus** — en silence, visible seulement dans la console du navigateur.
+
+- **Scripts de page** : dans `js/pages/<page>.js`, référencés par `<script src="/js/pages/….js?v=<empreinte>">`. Après toute modification d'un fichier de `js/` ou de `shared.js` : `npm run assets:version` (le service worker sert les `.js` « cache d'abord » ; sans nouvelle empreinte, la correction n'atteint pas les visiteurs déjà venus).
+- **Gestionnaires** : le balisage porte `data-on-click="nom"` (ou `-submit`, `-input`, `-keydown`…) et le script de la page définit `EMP_H["nom"] = function (event) { … }` (`this` = l'élément, `return false` = annuler). Le moteur est en tête de `shared.js` ; `js/gestionnaires.js` en est la copie pour les pages sans `shared.js` (`/admin`, `/onboarding`).
+- **Donnée dans un gestionnaire** : jamais interpolée dans du code. Elle voyage dans un attribut `data-*` échappé avec `esc()` et se lit par `this.getAttribute(…)`.
+- **Tests** : une sonde qui lit une page pour y trouver du JavaScript passe par `scripts/lib/page.mjs` (`lirePage`, `pageAvecScripts`). Garde CI [23] : aucun script ni gestionnaire en ligne, chaque `data-on-*` a sa fonction, les deux copies du moteur sont identiques.
+- Les blocs `<script type="application/ld+json">` restent en ligne : ce sont des données, la CSP ne les concerne pas. `style-src` garde `'unsafe-inline'`.
+
 ## Interface — passe du 2026-11-05 (balayage navigateur des 220 pages)
 
 - **Salaires Adzuna** : `formaterSalaireAnnuel` refuse tout montant hors [6 000 € ; 500 000 €] — un mensuel (« 2k€/an ») ou un TJM (« 1k€/an ») n'est plus affiché comme annuel. `contract` Adzuna n'est plus toujours CDD : le titre précise Stage / Alternance / Freelance.

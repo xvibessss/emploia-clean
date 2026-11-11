@@ -18,6 +18,7 @@
 // logique resterait verte en divergeant du handler — c'est exactement le
 // défaut qu'on vient de retirer ailleurs.
 import fs from 'node:fs';
+import { pageAvecScripts } from '../lib/page.mjs';
 import vm from 'node:vm';
 import {
   CONTRATS, FILTRE_VERS_CONTRAT, contratPublic, detectType,
@@ -29,7 +30,7 @@ import {
 const src = fs.readFileSync(new URL('../../api/jobs.js', import.meta.url), 'utf8');
 const libSrc = fs.readFileSync(new URL('../../api/_lib/contrat.js', import.meta.url), 'utf8');
 const alertSrc = fs.readFileSync(new URL('../../api/cron/send-alerts.js', import.meta.url), 'utf8');
-const frontSrc = fs.readFileSync(new URL('../../jobs.html', import.meta.url), 'utf8');
+const frontSrc = pageAvecScripts(fs.readFileSync(new URL('../../jobs.html', import.meta.url), 'utf8'));
 // Le front, commentaires retirés. La feuille de style cite les libellés
 // interdits pour dire qu'ils le sont : les tester sur le fichier entier ferait
 // échouer la sonde sur sa propre documentation.

@@ -166,7 +166,7 @@ tr:hover td{background:rgba(0,0,0,.015)}
       <a href="/blog" style="color:var(--primary);font-weight:600">Blog</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -561,13 +561,7 @@ tr:hover td{background:rgba(0,0,0,.015)}
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
-<script>
-document.addEventListener('scroll', () => {
-  const h = document.documentElement;
-  const el = document.getElementById('read-progress');
-  if (el) el.style.width = Math.min((h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100, 100) + '%';
-});
-</script>
+<script src="/shared.js?v=3e6e75fe"></script>
+<script src="/js/pages/blog/salaires-tech-2026.js?v=3ab826bc"></script>
 </body>
 </html>

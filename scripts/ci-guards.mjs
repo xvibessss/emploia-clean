@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { analyserDeclencheurs, filtresDeBranches, aDeclencheurPullRequest } from './ci/declencheurs.mjs';
+import { lirePage } from './lib/page.mjs';
 
 let fails = 0;
 const fail = m => { console.error('  ✗ ' + m); fails++; };
@@ -766,7 +767,7 @@ try {
   // couleur n'est pas celui du CDI. `esc(null)` rend '' : une pastille
   // inconditionnelle donnait une puce bleue vide, et le bleu est la couleur du
   // CDI — le défaut avait une seconde incarnation, visuelle.
-  const front = readAll('jobs.html');
+  const front = lirePage('jobs.html');
   // Commentaires retirés une fois pour toutes : CSS et JS citent les libellés
   // interdits pour dire qu'ils le sont, et un garde qui se déclenche sur sa
   // propre documentation finit par être désarmé.
@@ -1178,6 +1179,76 @@ try {
   }
   if (!bad22) ok(`${pagesHtml.length} pages : shared.css et shared.js chargés une fois, en-tête à jour, aucun sélecteur tronqué`);
 } catch (e) { fail('contrôle du socle visuel impossible : ' + e.message); }
+
+// ── 23. aucun JavaScript en ligne : la CSP ne l'autorise plus ───────────────
+// La politique de sécurité (vercel.json) a perdu 'unsafe-inline' dans
+// script-src. C'est ce qui rend inoffensive une donnée mal échappée : un
+// `<script>` ou un `onclick=` injecté n'est plus exécuté. La contrepartie est
+// qu'un script ou un gestionnaire en ligne ajouté par mégarde ne s'exécute
+// plus non plus — en silence, sans erreur côté serveur, visible seulement
+// dans la console du navigateur. Ce garde le voit avant le navigateur :
+//   - aucun <script> exécutable sans src (les blocs JSON-LD sont des données,
+//     la CSP ne les concerne pas) ;
+//   - aucun attribut on* ni lien `javascript:`, dans le HTML comme dans le
+//     balisage que le JavaScript injecte (shared.js, js/) ;
+//   - chaque `src="/js/…"` désigne un fichier présent ;
+//   - chaque nom posé dans un data-on-* a sa fonction dans un script que la
+//     page charge — sinon le bouton ne fait rien ;
+//   - le moteur (js/gestionnaires.js) est identique à sa copie dans shared.js.
+console.log("\n[23] CSP sans 'unsafe-inline' : aucun script ni gestionnaire en ligne");
+try {
+  const pages23 = walk('.').filter(p => p.endsWith('.html') && !p.includes('node_modules') && !p.startsWith('scripts/') && !p.startsWith('chrome-extension/'));
+  const jsFiles23 = ['shared.js', ...(fs.existsSync('js') ? walk('js').filter(p => p.endsWith('.js')) : [])];
+  const ON_ATTR = /\son[a-z]+\s*=\s*\\?["']/i;
+  const defsOf = t => new Set([...t.matchAll(/EMP_H\[["']([^"']+)["']\]\s*=|EMP_H\.([A-Za-z_$][\w$]*)\s*=/g)].map(m => m[1] || m[2]));
+  const usesOf = t => new Set([...t.matchAll(/data-on-[a-z]+="([^"$]+)"/g)].map(m => m[1]));
+  let bad23 = 0;
+
+  const csp = (JSON.parse(readAll('vercel.json')).headers || []).flatMap(h => h.headers).find(h => h.key === 'Content-Security-Policy');
+  const scriptSrc = csp ? (csp.value.match(/script-src[^;]*/) || [''])[0] : '';
+  if (!scriptSrc) { fail("vercel.json : pas de directive script-src dans la CSP"); bad23++; }
+  else if (/'unsafe-inline'|'unsafe-eval'/.test(scriptSrc)) { fail(`vercel.json : script-src autorise de nouveau le code en ligne (${scriptSrc})`); bad23++; }
+
+  const moteur = readAll('js/gestionnaires.js');
+  const partage = readAll('shared.js');
+  if (!moteur) { fail('js/gestionnaires.js absent'); bad23++; }
+  else if (!partage.includes(moteur)) { fail('js/gestionnaires.js et sa copie en tête de shared.js ont divergé — recopier le fichier dans shared.js'); bad23++; }
+
+  for (const f of jsFiles23) {
+    // Le moteur cite « onclick » dans son commentaire d'en-tête : on ne juge que le code.
+    const code = readAll(f).replace(/\/\*[\s\S]*?\*\//g, '');
+    const m = code.match(ON_ATTR);
+    if (m) { fail(`${f} : attribut on* dans du balisage injecté (« ${m[0].trim()} ») — utiliser data-on-<événement>="nom" et EMP_H`); bad23++; }
+  }
+
+  const defsPartage = defsOf(partage);
+  for (const f of pages23) {
+    const src = readAll(f);
+    for (const bloc of src.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)) {
+      if (/application\/(ld\+json|json)/i.test(bloc[1]) || !bloc[2].trim()) continue;
+      fail(`${f} : <script> en ligne — la CSP ne l'exécutera pas. Le déplacer dans js/pages/ puis « npm run assets:version »`); bad23++; break;
+    }
+    const sansScripts = src.replace(/<script[\s\S]*?<\/script>/gi, '');
+    const attr = sansScripts.match(ON_ATTR);
+    if (attr) { fail(`${f} : attribut on* (« ${attr[0].trim()} ») — la CSP ne l'exécutera pas. Utiliser data-on-<événement>="nom" et EMP_H`); bad23++; }
+    if (/href\s*=\s*["']\s*javascript:/i.test(sansScripts)) { fail(`${f} : lien « javascript: » — bloqué par la CSP`); bad23++; }
+
+    const locaux = [...src.matchAll(/<script[^>]*\bsrc="\/(js\/[^"?]+)/g)].map(m => m[1]);
+    let dispo = new Set(/src="\/shared\.js/.test(src) ? defsPartage : []);
+    let balisage = sansScripts;
+    for (const j of locaux) {
+      if (!exists(j)) { fail(`${f} : ${j} référencé mais absent`); bad23++; continue; }
+      const t = readAll(j).replace(/\/\*[\s\S]*?\*\//g, '');
+      for (const d of defsOf(t)) dispo.add(d);
+      balisage += t;
+    }
+    const aMoteur = /src="\/shared\.js/.test(src) || locaux.includes('js/gestionnaires.js');
+    const manquants = [...usesOf(balisage)].filter(n => !dispo.has(n));
+    if (manquants.length) { fail(`${f} : gestionnaire(s) déclaré(s) sans fonction EMP_H — ${manquants.slice(0, 4).join(', ')}`); bad23++; }
+    if (usesOf(balisage).size && !aMoteur) { fail(`${f} : des data-on-* mais ni shared.js ni js/gestionnaires.js — rien ne les relie`); bad23++; }
+  }
+  if (!bad23) ok(`${pages23.length} pages et ${jsFiles23.length} scripts : aucun code en ligne, tous les gestionnaires déclarés ont leur fonction`);
+} catch (e) { fail('contrôle CSP / code en ligne impossible : ' + e.message); }
 
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');

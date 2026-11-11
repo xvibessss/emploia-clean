@@ -152,7 +152,7 @@
       <a href="/#pricing">Tarifs</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -325,7 +325,7 @@
     <span>Partager cet article :</span>
     <a class="share-btn share-li" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Femploia.eu%2Fblog%2Flettre-motivation-2026" target="_blank" rel="noopener">in LinkedIn</a>
     <a class="share-btn share-tw" href="https://twitter.com/intent/tweet?text=R%C3%A9diger+une+lettre+de+motivation+percutante+%E2%9C%89%EF%B8%8F&url=https%3A%2F%2Femploia.eu%2Fblog%2Flettre-motivation-2026&via=emploia_fr" target="_blank" rel="noopener">𝕏 Twitter</a>
-    <button class="share-btn share-cp" onclick="navigator.clipboard.writeText('https://emploia.eu/blog/lettre-motivation-2026');this.textContent='✓ Copié !';setTimeout(()=>this.textContent='🔗 Copier',2000)">🔗 Copier</button>
+    <button class="share-btn share-cp" data-on-click="navigator_clipboard_writeText_b15b">🔗 Copier</button>
   </div>
 
   <div class="art-cta">
@@ -337,7 +337,7 @@
   <div class="newsletter-widget">
     <div class="nw-title">📬 Offres &amp; conseils chaque semaine</div>
     <p class="nw-sub">Chaque semaine, une sélection d'offres et nos nouveaux guides dans votre boîte. Désinscription en un clic.</p>
-    <form class="nw-form" onsubmit="submitNW(event,this)">
+    <form class="nw-form" data-on-submit="submitNW_event_this_da76">
       <input class="nw-input" type="email" placeholder="votre@email.fr" required/>
       <button class="nw-btn" type="submit">S'abonner →</button>
     </form>
@@ -365,10 +365,7 @@
     </div>
   </div>
 </div>
-<script>
-document.addEventListener('scroll',()=>{const h=document.documentElement;const el=document.getElementById('read-progress');if(el)el.style.width=Math.min((h.scrollTop/(h.scrollHeight-h.clientHeight))*100,100)+'%';});
-async function submitNW(e,f){e.preventDefault();const btn=f.querySelector('.nw-btn');btn.disabled=true;btn.textContent='...';try{const r=await fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.querySelector('.nw-input').value,source:'blog'})});if(r.ok){f.style.display='none';f.nextElementSibling.style.display='block';}}catch{}btn.disabled=false;btn.textContent="S'abonner →";}
-</script>
+<script src="/js/pages/blog/lettre-motivation-2026.js?v=637068d9"></script>
 
 <footer class="emp-footer">
   <div class="container">
@@ -409,6 +406,6 @@ async function submitNW(e,f){e.preventDefault();const btn=f.querySelector('.nw-b
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>

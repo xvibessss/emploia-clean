@@ -171,7 +171,7 @@ strong{color:var(--t1);font-weight:700}
       <a href="/#pricing">Tarifs</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -205,11 +205,11 @@ strong{color:var(--t1);font-weight:700}
       <div class="calc-title">🧮 Estimation rapide</div>
       <div class="calc-row">
         <div class="calc-label">Salaire brut annuel (€)</div>
-        <input type="number" id="brutAnnuel" class="calc-input" placeholder="35000" oninput="calcNet()"/>
+        <input type="number" id="brutAnnuel" class="calc-input" placeholder="35000" data-on-input="calcNet"/>
       </div>
       <div class="calc-row">
         <div class="calc-label">Statut</div>
-        <select id="statut" class="calc-input" onchange="calcNet()">
+        <select id="statut" class="calc-input" data-on-change="calcNet">
           <option value="0.78">Non-cadre</option>
           <option value="0.76">Cadre</option>
         </select>
@@ -320,15 +320,15 @@ strong{color:var(--t1);font-weight:700}
       <h2>Questions fréquentes</h2>
 
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Comment calculer son net à partir du brut ? <span>+</span></div>
+        <div class="faq-q" data-on-click="this_parentElement_classList_t_7d37">Comment calculer son net à partir du brut ? <span>+</span></div>
         <div class="faq-a">Pour un non-cadre : net ≈ brut × 0,78. Pour un cadre : net ≈ brut × 0,76. Exemple : 40 000€ brut annuel = environ 2 600€ net/mois (non-cadre) ou 2 533€ (cadre). Ces taux sont des estimations — le montant exact dépend de votre mutuelle, avantages en nature et convention collective.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Quelle est la différence entre brut et net ? <span>+</span></div>
+        <div class="faq-q" data-on-click="this_parentElement_classList_t_7d37">Quelle est la différence entre brut et net ? <span>+</span></div>
         <div class="faq-a">Le brut est votre salaire avant déduction des cotisations sociales salariales (maladie, retraite, CSG, CRDS). Le net est ce que vous percevez réellement. En France, les cotisations salariales représentent environ 20-25% du brut.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Faut-il négocier en brut ou en net ? <span>+</span></div>
+        <div class="faq-q" data-on-click="this_parentElement_classList_t_7d37">Faut-il négocier en brut ou en net ? <span>+</span></div>
         <div class="faq-a">Toujours en brut annuel en France — c'est la référence universelle. Si vous visez 2 500€ net/mois, demandez environ 38 500€ brut annuel (non-cadre). Présenter votre demande en brut annuel permet d'éviter les confusions et reste dans le référentiel de l'employeur.</div>
       </div>
     </div>
@@ -356,19 +356,7 @@ strong{color:var(--t1);font-weight:700}
   </article>
 </div>
 
-<script>
-function calcNet() {
-  const brut = parseFloat(document.getElementById('brutAnnuel').value);
-  const coeff = parseFloat(document.getElementById('statut').value);
-  const res = document.getElementById('calcResult');
-  if (!brut || isNaN(brut)) { res.style.display = 'none'; return; }
-  const netAnnuel = Math.round(brut * coeff);
-  const netMensuel = Math.round(netAnnuel / 12);
-  document.getElementById('netMensuel').textContent = netMensuel.toLocaleString('fr-FR') + ' €';
-  document.getElementById('netAnnuel').textContent = netAnnuel.toLocaleString('fr-FR') + ' €';
-  res.style.display = 'flex';
-}
-</script>
+<script src="/js/pages/blog/salaire-brut-net.js?v=5c50335e"></script>
 
 <footer class="emp-footer">
   <div class="container">
@@ -409,6 +397,6 @@ function calcNet() {
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>

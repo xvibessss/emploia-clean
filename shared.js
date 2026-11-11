@@ -2,6 +2,83 @@
    EMPLOIA — Notion-Style · Shared JS
 ═══════════════════════════════════════════════════════════════════ */
 
+/* ── Gestionnaires déclarés ──────────────────────────────────────────────────
+   Le HTML ne porte plus d'attribut on* (onclick, onsubmit…) : la politique de
+   sécurité du site (CSP) interdit le JavaScript écrit dans le balisage, parce
+   que c'est par là qu'une donnée mal échappée devient du code exécuté.
+
+   À la place, un élément déclare un NOM :
+
+       <button data-on-click="ouvrirPreferences">…</button>
+
+   et le JavaScript de la page associe ce nom à une fonction :
+
+       EMP_H.ouvrirPreferences = function (event) { … };
+
+   Dans la fonction, `this` est l'élément et `event` l'événement ; `return
+   false` annule l'action par défaut — exactement comme dans un attribut on*.
+   Une valeur propre à l'élément (un identifiant d'offre, par exemple) voyage
+   dans un attribut data-* échappé avec esc(), lu par this.getAttribute(…) :
+   elle reste une donnée et ne peut plus être interprétée comme du code.
+
+   Le balisage injecté après coup (innerHTML) est relié de la même façon, par
+   l'observateur ci-dessous. Un nom absent du registre ne fait rien, sinon un
+   avertissement dans la console.
+
+   Ce bloc existe à l'identique en tête de shared.js (pour toutes les pages) et
+   dans js/gestionnaires.js (pour les rares pages sans shared.js). Le garde CI
+   [23] vérifie que les deux copies ne divergent pas. */
+window.EMP_H = window.EMP_H || {};
+(function () {
+  if (window.__empGestionnaires) return;
+  window.__empGestionnaires = true;
+  var TYPES = ['click', 'dblclick', 'change', 'input', 'submit', 'keydown', 'keyup', 'focus', 'blur',
+    'mouseover', 'mouseout', 'mouseenter', 'mouseleave', 'dragstart', 'dragenter', 'dragover', 'dragleave',
+    'dragend', 'drop', 'load', 'error'];
+  var SELECTEUR = TYPES.map(function (t) { return '[data-on-' + t + ']'; }).join(',');
+  var relies = new WeakSet();
+
+  function relier(el) {
+    if (relies.has(el)) return;
+    relies.add(el);
+    TYPES.forEach(function (type) {
+      var nom = el.getAttribute('data-on-' + type);
+      if (!nom) return;
+      el.addEventListener(type, function (event) {
+        var fn = window.EMP_H[nom];
+        if (typeof fn !== 'function') {
+          console.warn('[emploia] gestionnaire inconnu : ' + nom);
+          return;
+        }
+        if (fn.call(el, event) === false) event.preventDefault();
+      });
+      // Une image du HTML d'origine peut avoir échoué AVANT que ce script ne
+      // tourne : un attribut onerror l'aurait vu, un écouteur posé après coup
+      // non. On rejoue donc l'échec déjà constaté.
+      if (type === 'error' && el.tagName === 'IMG' && el.complete && el.naturalWidth === 0 && el.getAttribute('src')) {
+        var fn = window.EMP_H[nom];
+        if (typeof fn === 'function') fn.call(el, new Event('error'));
+      }
+    });
+  }
+
+  function parcourir(racine) {
+    if (!racine || racine.nodeType !== 1) return;
+    if (racine.matches(SELECTEUR)) relier(racine);
+    var liste = racine.querySelectorAll(SELECTEUR);
+    for (var i = 0; i < liste.length; i++) relier(liste[i]);
+  }
+
+  new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var ajoutes = mutations[i].addedNodes;
+      for (var j = 0; j < ajoutes.length; j++) parcourir(ajoutes[j]);
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
+  parcourir(document.documentElement);
+})();
+
 /* ── Global polish: scroll progress + nav scroll-aware + reveals ── */
 (function(){
   // Inject scroll progress bar if not already present
@@ -226,38 +303,38 @@ const GOOGLE_ICON = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill=
   modal.className = 'emp-auth-overlay';
   modal.innerHTML = `
     <div class="emp-auth-box">
-      <button class="emp-auth-close" onclick="empCloseAuth()" aria-label="Fermer">✕</button>
+      <button class="emp-auth-close" data-on-click="empCloseAuth" aria-label="Fermer">✕</button>
       <div id="empAuthMain">
         <div class="emp-auth-logo">E</div>
         <h2 class="emp-auth-title">Bienvenue sur Emploia</h2>
         <p class="emp-auth-subtitle">Votre copilote IA pour décrocher des entretiens</p>
-        <button class="emp-social-btn" onclick="empGoogleLogin()">${GOOGLE_ICON} Continuer avec Google</button>
+        <button class="emp-social-btn" data-on-click="empGoogleLogin">${GOOGLE_ICON} Continuer avec Google</button>
         <div class="emp-auth-divider">ou continuer avec un email</div>
         <div class="emp-auth-tabs">
-          <button class="emp-auth-tab active" data-tab="login" onclick="empSwitchAuthTab('login')">Se connecter</button>
-          <button class="emp-auth-tab" data-tab="register" onclick="empSwitchAuthTab('register')">S'inscrire</button>
+          <button class="emp-auth-tab active" data-tab="login" data-on-click="empSwitchAuthTab_login_b8f6">Se connecter</button>
+          <button class="emp-auth-tab" data-tab="register" data-on-click="empSwitchAuthTab_register_bca5">S'inscrire</button>
         </div>
-        <form id="empLoginForm" onsubmit="empSubmitLogin(event)">
+        <form id="empLoginForm" data-on-submit="empSubmitLogin_event_7de2">
           <div class="emp-auth-field"><label>Email</label><input type="email" id="empLoginEmail" placeholder="vous@email.fr" autocomplete="email" required/></div>
-          <div class="emp-auth-field"><label>Mot de passe <span class="emp-auth-forgot" onclick="empShowForgot()">Mot de passe oublié ?</span></label><input type="password" id="empLoginPassword" placeholder="••••••••" autocomplete="current-password" required/></div>
+          <div class="emp-auth-field"><label>Mot de passe <span class="emp-auth-forgot" data-on-click="empShowForgot">Mot de passe oublié ?</span></label><input type="password" id="empLoginPassword" placeholder="••••••••" autocomplete="current-password" required/></div>
           <div id="empLoginError" class="emp-auth-error" style="display:none"></div>
           <button type="submit" class="emp-auth-submit" id="empLoginBtn">Se connecter</button>
         </form>
-        <form id="empRegisterForm" style="display:none" onsubmit="empSubmitRegister(event)">
+        <form id="empRegisterForm" style="display:none" data-on-submit="empSubmitRegister_event_3d5f">
           <div class="emp-auth-field"><label>Prénom et nom</label><input type="text" id="empRegisterName" placeholder="Marie Dupont" autocomplete="name" required/></div>
           <div class="emp-auth-field"><label>Email</label><input type="email" id="empRegisterEmail" placeholder="vous@email.fr" autocomplete="email" required/></div>
-          <div class="emp-auth-field"><label>Mot de passe</label><input type="password" id="empRegisterPassword" placeholder="8 car. min, 1 majuscule, 1 chiffre" autocomplete="new-password" required oninput="empPwdStrength(this.value)"/><div class="emp-pwd-strength"><div class="emp-pwd-bar" id="empPwdBar"></div></div></div>
+          <div class="emp-auth-field"><label>Mot de passe</label><input type="password" id="empRegisterPassword" placeholder="8 car. min, 1 majuscule, 1 chiffre" autocomplete="new-password" required data-on-input="empPwdStrength_this_value_6daa"/><div class="emp-pwd-strength"><div class="emp-pwd-bar" id="empPwdBar"></div></div></div>
           <div id="empRegisterError" class="emp-auth-error" style="display:none"></div>
           <button type="submit" class="emp-auth-submit" id="empRegisterBtn">Créer mon compte gratuit</button>
         </form>
         <p class="emp-auth-legal">En continuant, vous acceptez nos <a href="/legal">CGU</a> et notre <a href="/legal">politique de confidentialité</a></p>
       </div>
       <div id="empAuthForgot" style="display:none">
-        <button class="emp-auth-back" onclick="empShowMain()">← Retour</button>
+        <button class="emp-auth-back" data-on-click="empShowMain">← Retour</button>
         <div class="emp-auth-logo">🔑</div>
         <h2 class="emp-auth-title">Mot de passe oublié ?</h2>
         <p class="emp-auth-subtitle">Entrez votre email, on vous envoie un lien de réinitialisation.</p>
-        <form id="empForgotForm" onsubmit="empSubmitForgot(event)">
+        <form id="empForgotForm" data-on-submit="empSubmitForgot_event_5280">
           <div class="emp-auth-field"><label>Email</label><input type="email" id="empForgotEmail" placeholder="vous@email.fr" autocomplete="email" required/></div>
           <div id="empForgotError" class="emp-auth-error" style="display:none"></div>
           <button type="submit" class="emp-auth-submit" id="empForgotBtn">Envoyer le lien</button>
@@ -267,7 +344,7 @@ const GOOGLE_ICON = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill=
         <div class="emp-auth-sent-icon">✉️</div>
         <h2 class="emp-auth-title">Email envoyé !</h2>
         <p class="emp-auth-subtitle">Vérifiez votre boîte mail et cliquez sur le lien.<br/><span style="font-size:12px;color:var(--steel)">Pensez à vérifier vos spams.</span></p>
-        <button class="emp-auth-submit" style="margin-top:8px" onclick="empShowMain()">Retour à la connexion</button>
+        <button class="emp-auth-submit" style="margin-top:8px" data-on-click="empShowMain">Retour à la connexion</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -279,7 +356,7 @@ const GOOGLE_ICON = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill=
     const authDiv = document.createElement('div');
     authDiv.className = 'emp-nav-auth';
     authDiv.id = 'empNavAuth';
-    authDiv.innerHTML = `<button class="emp-login-btn" onclick="empShowAuth('login')">Se connecter</button><a href="/app" class="emp-btn emp-btn-primary emp-btn-sm">Commencer gratuit</a>`;
+    authDiv.innerHTML = `<button class="emp-login-btn" data-on-click="empShowAuth_login_c158">Se connecter</button><a href="/app" class="emp-btn emp-btn-primary emp-btn-sm">Commencer gratuit</a>`;
     navRight.prepend(authDiv);
   }
 
@@ -388,7 +465,7 @@ window.empUpdateNav = function(user) {
   const authDiv = document.getElementById('empNavAuth');
   if (!authDiv) return;
   if (!user) {
-    authDiv.innerHTML = `<button class="emp-login-btn" onclick="empShowAuth('login')">Se connecter</button><a href="/app" class="emp-btn emp-btn-primary emp-btn-sm">Commencer gratuit</a>`;
+    authDiv.innerHTML = `<button class="emp-login-btn" data-on-click="empShowAuth_login_c158">Se connecter</button><a href="/app" class="emp-btn emp-btn-primary emp-btn-sm">Commencer gratuit</a>`;
     return;
   }
   const displayName = user.name || user.email?.split('@')[0] || 'Compte';
@@ -397,7 +474,7 @@ window.empUpdateNav = function(user) {
   const planLabel = user.plan === 'pro' ? '⭐ Pro' : user.plan === 'intensif' ? '🚀 Intensif' : 'Gratuit';
   authDiv.innerHTML = `
     <div class="emp-user-menu" id="empUserMenu">
-      <button class="emp-user-btn" onclick="empToggleUserMenu()">
+      <button class="emp-user-btn" data-on-click="empToggleUserMenu">
         <div class="emp-user-avatar">${avatarContent}</div>
         <span class="emp-user-name">${esc(displayName.split(' ')[0])}</span>
         <span class="emp-user-chevron">▾</span>
@@ -408,9 +485,9 @@ window.empUpdateNav = function(user) {
         <div class="emp-user-sep"></div>
         <div class="emp-user-plan">Plan : <strong>${planLabel}</strong></div>
         <div class="emp-user-sep"></div>
-        ${!user.provider || user.provider === 'email' ? `<button onclick="empShowChangePwd()">🔑 Changer le mot de passe</button>` : ''}
+        ${!user.provider || user.provider === 'email' ? `<button data-on-click="empShowChangePwd">🔑 Changer le mot de passe</button>` : ''}
         <div class="emp-user-sep"></div>
-        <button class="emp-user-logout" onclick="empLogout()">Déconnexion</button>
+        <button class="emp-user-logout" data-on-click="empLogout">Déconnexion</button>
       </div>
     </div>`;
   document.addEventListener('click', e => {
@@ -486,20 +563,20 @@ window.empShowUpgrade = function() {
     const feat = ['CV &amp; lettres illimités', 'Coach d\'entretien IA', 'Suivi candidatures Kanban', 'Orion, ton copilote IA', 'Modèles premium']
       .map(f => `<li style="display:flex;align-items:center;gap:9px;padding:5px 0;font-size:13.5px;color:var(--ink,#0f172a)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>${f}</li>`).join('');
     m.innerHTML = `<div class="emp-upgrade-box" style="max-width:420px;text-align:left">
-      <button class="emp-auth-close" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" aria-label="Fermer">✕</button>
+      <button class="emp-auth-close" data-on-click="document_getElementById_empUpg_1323" aria-label="Fermer">✕</button>
       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,.12);color:#6366f1;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;margin-bottom:14px">⚡ Limite gratuite atteinte</div>
       <h2 style="font-size:21px;font-weight:800;margin:0 0 6px;color:var(--ink,#0f172a);letter-spacing:-.4px">Débloquez tout Emploia</h2>
       <p style="color:var(--slate,#64748b);font-size:13.5px;line-height:1.6;margin:0 0 16px">Continuez sur votre lancée avec des générations illimitées et le coaching IA.</p>
       <div id="empUpPlanToggle" style="display:inline-flex;background:var(--cloud,#f1f5f9);border-radius:100px;padding:3px;margin-bottom:14px;font-size:12px;font-weight:700">
-        <button data-plan="campagne" onclick="empUpgradeSetPlan('campagne')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:var(--primary,#6366f1);color:#fff">Pack Campagne</button>
-        <button data-plan="pro" onclick="empUpgradeSetPlan('pro')" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:transparent;color:var(--slate,#64748b)">Pro mensuel</button>
+        <button data-plan="campagne" data-on-click="empUpgradeSetPlan_campagne_42c4" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:var(--primary,#6366f1);color:#fff">Pack Campagne</button>
+        <button data-plan="pro" data-on-click="empUpgradeSetPlan_pro_4350" style="border:0;border-radius:100px;padding:6px 14px;cursor:pointer;background:transparent;color:var(--slate,#64748b)">Pro mensuel</button>
       </div>
       <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px"><span style="font-size:38px;font-weight:900;color:var(--ink,#0f172a);letter-spacing:-1.5px"><span id="empUpPrice">59</span>€</span><span id="empUpUnit" style="color:var(--slate,#64748b);font-size:14px">les 3 mois</span></div>
       <div id="empUpPer" style="color:var(--steel,#94a3b8);font-size:12px;margin-bottom:16px">paiement unique · moins de 20€/mois, rien à résilier</div>
       <ul style="list-style:none;padding:0;margin:0 0 18px">${feat}</ul>
-      <button id="empUpCta" onclick="empUpgradeCheckout(this)" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Prendre le Pack Campagne →</button>
+      <button id="empUpCta" data-on-click="empUpgradeCheckout_this_db8f" class="emp-btn emp-btn-primary w-full" style="justify-content:center;margin-bottom:9px;font-weight:700">Prendre le Pack Campagne →</button>
       <div id="empUpFine" style="text-align:center;font-size:11.5px;color:var(--steel,#94a3b8);margin-bottom:12px">Sans essai · accès immédiat · non reconductible</div>
-      <div style="text-align:center"><a href="/#pricing" onclick="document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''" style="color:var(--slate,#64748b);font-size:13px;text-decoration:underline">Comparer toutes les offres</a></div>
+      <div style="text-align:center"><a href="/#pricing" data-on-click="document_getElementById_empUpg_1323" style="color:var(--slate,#64748b);font-size:13px;text-decoration:underline">Comparer toutes les offres</a></div>
     </div>`;
     document.body.appendChild(m);
     m.addEventListener('click', e => { if (e.target === m) { m.classList.remove('open'); document.body.style.overflow = ''; } });
@@ -515,7 +592,7 @@ window.empShowUpgrade = function() {
   const modal = document.createElement('div');
   modal.id = 'empChangePwdModal';
   modal.className = 'emp-auth-overlay';
-  modal.innerHTML = `<div class="emp-auth-box"><button class="emp-auth-close" onclick="document.getElementById('empChangePwdModal').classList.remove('open');document.body.style.overflow=''" aria-label="Fermer">✕</button><div class="emp-auth-logo">🔑</div><h2 class="emp-auth-title">Changer le mot de passe</h2><p class="emp-auth-subtitle">Entrez votre mot de passe actuel puis choisissez un nouveau.</p><form id="empChangePwdForm" onsubmit="empSubmitChangePwd(event)"><div class="emp-auth-field"><label>Mot de passe actuel</label><input type="password" id="empCurPwd" placeholder="••••••••" autocomplete="current-password" required/></div><div class="emp-auth-field"><label>Nouveau mot de passe</label><input type="password" id="empNewPwd" placeholder="8 car. min, 1 majuscule, 1 chiffre" autocomplete="new-password" required oninput="empPwdStrength(this.value)"/><div class="emp-pwd-strength"><div class="emp-pwd-bar" id="empPwdBar2"></div></div></div><div class="emp-auth-field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="empConfirmPwd" placeholder="••••••••" autocomplete="new-password" required/></div><div id="empChangePwdError" class="emp-auth-error" style="display:none"></div><div id="empChangePwdSuccess" class="emp-auth-success" style="display:none">Mot de passe modifié avec succès ✓</div><button type="submit" class="emp-auth-submit" id="empChangePwdBtn">Modifier le mot de passe</button></form></div>`;
+  modal.innerHTML = `<div class="emp-auth-box"><button class="emp-auth-close" data-on-click="document_getElementById_empCha_b842" aria-label="Fermer">✕</button><div class="emp-auth-logo">🔑</div><h2 class="emp-auth-title">Changer le mot de passe</h2><p class="emp-auth-subtitle">Entrez votre mot de passe actuel puis choisissez un nouveau.</p><form id="empChangePwdForm" data-on-submit="empSubmitChangePwd_event_651c"><div class="emp-auth-field"><label>Mot de passe actuel</label><input type="password" id="empCurPwd" placeholder="••••••••" autocomplete="current-password" required/></div><div class="emp-auth-field"><label>Nouveau mot de passe</label><input type="password" id="empNewPwd" placeholder="8 car. min, 1 majuscule, 1 chiffre" autocomplete="new-password" required data-on-input="empPwdStrength_this_value_6daa"/><div class="emp-pwd-strength"><div class="emp-pwd-bar" id="empPwdBar2"></div></div></div><div class="emp-auth-field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="empConfirmPwd" placeholder="••••••••" autocomplete="new-password" required/></div><div id="empChangePwdError" class="emp-auth-error" style="display:none"></div><div id="empChangePwdSuccess" class="emp-auth-success" style="display:none">Mot de passe modifié avec succès ✓</div><button type="submit" class="emp-auth-submit" id="empChangePwdBtn">Modifier le mot de passe</button></form></div>`;
   document.addEventListener('DOMContentLoaded', () => document.body.appendChild(modal));
   modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.remove('open'); document.body.style.overflow = ''; } });
 })();
@@ -862,4 +939,98 @@ window.empConfirmIfIncomplete = function(text) {
   const n = window.empPlaceholders(typeof text === 'string' ? text : '').length;
   if (!n) return true;
   return confirm(`Il reste ${n} champ${n > 1 ? 's' : ''} « [à compléter] » non rempli${n > 1 ? 's' : ''}. Exporter quand même ?`);
+};
+
+/* ── Gestionnaires d'événements partagés ───────────────────────────────────
+   Anciens attributs on* communs à plusieurs pages, ou posés par le balisage
+   que ce fichier injecte. Voir le bloc « Gestionnaires déclarés » en tête. */
+EMP_H["document_getElementById_empCha_b842"] = function (event) {
+  document.getElementById('empChangePwdModal').classList.remove('open');document.body.style.overflow=''
+};
+EMP_H["document_getElementById_empUpg_1323"] = function (event) {
+  document.getElementById('empUpgradeModal').classList.remove('open');document.body.style.overflow=''
+};
+EMP_H["empCloseAuth"] = function (event) {
+  empCloseAuth()
+};
+EMP_H["empGoogleLogin"] = function (event) {
+  empGoogleLogin()
+};
+EMP_H["empLogout"] = function (event) {
+  empLogout()
+};
+EMP_H["empPwdStrength_this_value_6daa"] = function (event) {
+  empPwdStrength(this.value)
+};
+EMP_H["empShowAuth_login_c158"] = function (event) {
+  empShowAuth('login')
+};
+EMP_H["empShowChangePwd"] = function (event) {
+  empShowChangePwd()
+};
+EMP_H["empShowForgot"] = function (event) {
+  empShowForgot()
+};
+EMP_H["empShowMain"] = function (event) {
+  empShowMain()
+};
+EMP_H["empSubmitChangePwd_event_651c"] = function (event) {
+  empSubmitChangePwd(event)
+};
+EMP_H["empSubmitForgot_event_5280"] = function (event) {
+  empSubmitForgot(event)
+};
+EMP_H["empSubmitLogin_event_7de2"] = function (event) {
+  empSubmitLogin(event)
+};
+EMP_H["empSubmitRegister_event_3d5f"] = function (event) {
+  empSubmitRegister(event)
+};
+EMP_H["empSwitchAuthTab_login_b8f6"] = function (event) {
+  empSwitchAuthTab('login')
+};
+EMP_H["empSwitchAuthTab_register_bca5"] = function (event) {
+  empSwitchAuthTab('register')
+};
+EMP_H["empToggleNav"] = function (event) {
+  empToggleNav()
+};
+EMP_H["empToggleUserMenu"] = function (event) {
+  empToggleUserMenu()
+};
+EMP_H["empUpgradeCheckout_this_db8f"] = function (event) {
+  empUpgradeCheckout(this)
+};
+EMP_H["empUpgradeSetPlan_campagne_42c4"] = function (event) {
+  empUpgradeSetPlan('campagne')
+};
+EMP_H["empUpgradeSetPlan_pro_4350"] = function (event) {
+  empUpgradeSetPlan('pro')
+};
+EMP_H["if_event_key_Enter_refineSearc_c6ea"] = function (event) {
+  if(event.key==='Enter')refineSearch()
+};
+EMP_H["navigator_clipboard_writeText_33ca"] = function (event) {
+  navigator.clipboard.writeText(location.href).then(()=>this.textContent='Lien copié ✓')
+};
+EMP_H["refineSearch"] = function (event) {
+  refineSearch()
+};
+EMP_H["submitNW_event_this_da76"] = function (event) {
+  submitNW(event,this)
+};
+EMP_H["subscribeNewsletter_event_1d28"] = function (event) {
+  subscribeNewsletter(event)
+};
+EMP_H["this_parentElement_classList_t_7d37"] = function (event) {
+  this.parentElement.classList.toggle('open')
+};
+EMP_H["this_parentElement_textContent_56d8"] = function (event) {
+  this.parentElement.textContent='🏢'
+};
+EMP_H["this_style_borderColor_var_hai_1335"] = function (event) {
+  this.style.borderColor='var(--hairline)'
+};
+EMP_H["this_style_borderColor_var_pri_f596"] = function (event) {
+  this.style.borderColor='var(--primary)'
 };

@@ -155,7 +155,7 @@
       <a href="/blog" style="color:var(--primary);font-weight:600">Blog</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -384,14 +384,7 @@
 
   
 
-  <script>
-    const rp = document.getElementById('rp');
-    window.addEventListener('scroll', () => {
-      const h = document.documentElement;
-      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-      rp.style.width = pct + '%';
-    }, { passive: true });
-  </script>
+  <script src="/js/pages/blog/simulation-entretien-embauche.js?v=51d09bbd"></script>
 
 <footer class="emp-footer">
   <div class="container">
@@ -432,6 +425,6 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>

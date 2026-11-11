@@ -108,7 +108,7 @@
       <a href="/dashboard">Dashboard</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -124,8 +124,8 @@
     <h1>Offres <span style="background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent">BTP / Construction</span> en France</h1>
     <p>Offres d'emploi BTP — conducteur de travaux, chef de chantier, ingénieur génie civil, architecte. CDI, CDD, alternance dans la construction.</p>
     <div class="seo-search-row">
-      <input class="seo-search-input" id="queryInput" placeholder="Affiner..." onkeydown="if(event.key==='Enter')refineSearch()"/>
-      <button class="btn btn-primary" onclick="refineSearch()">Rechercher</button>
+      <input class="seo-search-input" id="queryInput" placeholder="Affiner..." data-on-keydown="if_event_key_Enter_refineSearc_c6ea"/>
+      <button class="btn btn-primary" data-on-click="refineSearch">Rechercher</button>
     </div>
   </div>
   <div class="skills-cloud"><span class="job-tag">AutoCAD</span><span class="job-tag">Revit</span><span class="job-tag">BIM</span><span class="job-tag">MS Project</span><span class="job-tag">CCTP</span><span class="job-tag">DPGF</span><span class="job-tag">PGC</span><span class="job-tag">Génie civil</span></div>
@@ -156,33 +156,5 @@
   <a href="/interview" class="emp-bottom-nav-item"><span class="bn-icon">🎤</span>Entretien</a>
   <a href="/dashboard" class="emp-bottom-nav-item"><span class="bn-icon">📊</span>Dashboard</a>
 </nav>
-<script src="/shared.js?v=2efc6d7c"></script>
-<script>
-  const DEFAULT_QUERY="BTP conducteur travaux";
-  function esc(s){return(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-  function renderJob(j){
-    const card=document.createElement('div');card.className='job-card reveal';
-    const t={full_time:'CDI',part_time:'Temps partiel',contract:'CDD',internship:'Stage',apprenticeship:'Alternance',temporary:'Intérim',freelance:'Freelance'};
-    const type=t[j.job_type]||j.type||'';
-    const enc=encodeURIComponent((j.title||'')+(j.company_name||j.company?' chez '+(j.company_name||j.company):''));
-    const logo=j.company_logo?`<img src="${esc(j.company_logo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🏢'">`:'🏢';
-    card.innerHTML=`<div class="job-card-top"><div class="job-logo">${logo}</div><div><div class="job-title">${esc(j.title||'Poste')}</div><div class="job-company">${esc(j.company_name||j.company||'')}</div></div></div>
-    <div class="job-tags">${type?`<span class="job-tag type">${esc(type)}</span>`:''}${j.remote?'<span class="job-tag">🌐 Remote</span>':''}</div>
-    <div class="job-card-footer"><a href="/app?offre=${enc}" class="btn btn-primary">✨ Générer CV</a>${j.url&&/^https?:\/\//i.test(j.url)?`<a href="${esc(j.url)}" target="_blank" rel="noopener" class="btn btn-ghost">Voir →</a>`:''}</div>`;
-    return card;
-  }
-  function refineSearch(){window.location.href='/recherche?q='+encodeURIComponent(document.getElementById('queryInput').value.trim()||DEFAULT_QUERY);}
-  async function loadJobs(){
-    const g=document.getElementById('jobGrid');
-    try{
-      const r=await fetch('/api/jobs?q='+encodeURIComponent(DEFAULT_QUERY)+'&limit=18');
-      const d=await r.json();const jobs=d.jobs||d.results||[];
-      g.innerHTML='';
-      if(!jobs.length){g.innerHTML='<div class="loading-state">Aucune offre — <a href="/jobs" style="color:var(--blb);margin-left:6px">voir toutes les offres</a></div>';document.getElementById('jobCount').textContent='Aucune offre';return;}
-      jobs.forEach(j=>g.appendChild(renderJob(j)));
-      document.getElementById('jobCount').textContent=d.filtre==='abandonne'?'Aucune offre ne correspond · '+(d.total||jobs.length).toLocaleString('fr-FR')+' dernières offres publiées':(d.total||jobs.length).toLocaleString('fr-FR')+' offres trouvées';
-      document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
-    }catch{g.innerHTML='<div class="loading-state"><a href="/jobs" style="color:var(--blb)">Voir toutes les offres</a></div>';}
-  }
-  loadJobs();
-</script></body></html>
+<script src="/shared.js?v=3e6e75fe"></script>
+<script src="/js/pages/metier/btp.js?v=2078d3b2"></script></body></html>

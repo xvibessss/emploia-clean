@@ -310,7 +310,7 @@
       </nav>
     </div>
     <div class="emp-nav-right" style="display:flex;align-items:center;gap:10px">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </header>
@@ -1030,7 +1030,7 @@
   <div class="msg"><strong>5 générations offertes</strong> — sans carte bancaire.</div>
   <div class="acts">
     <a href="/app" class="emp-btn emp-btn-primary" style="padding:9px 20px;font-size:14px">Essayer gratuitement</a>
-    <button class="close-bar" onclick="document.getElementById('stickyBar').remove()" aria-label="Fermer">×</button>
+    <button class="close-bar" data-on-click="document_getElementById_sticky_d38e" aria-label="Fermer">×</button>
   </div>
 </div>
 
@@ -1111,7 +1111,7 @@
     <div class="newsletter-inner">
       <h5>Conseils emploi · 1 fois par semaine</h5>
       <p>Stratégies CV, préparation entretien, tendances marché — directs en boîte mail.</p>
-      <form class="newsletter-form" id="newsletterForm" onsubmit="empNewsletterSubmit(event)">
+      <form class="newsletter-form" id="newsletterForm" data-on-submit="empNewsletterSubmit_event_48e8">
         <input type="email" placeholder="votre@email.fr" required autocomplete="email" aria-label="Adresse email"/>
         <button type="submit">S'inscrire</button>
       </form>
@@ -1119,187 +1119,10 @@
   </div>
 </div>
 
-<script src="/shared.js?v=2efc6d7c"></script>
-<script>
-/* Pricing → Stripe Checkout. Wires the Pro/Campagne cards (data-checkout) to
-   /api/stripe-checkout with the right plan key. The plan key is passed through
-   verbatim; the server decides subscription vs one-off payment and amounts are
-   whatever the STRIPE_PRICE_* env vars point to.
-   A creator code captured from ?code= rides along on the Pack Campagne only —
-   the server drops it on any other plan, and drops one it cannot resolve.
-   Falls back to /app (the href) if JS/checkout is unavailable. */
-(function () {
-  function toast(m) { (window.empToast ? window.empToast(m, 'error') : alert(m)); }
-  async function startCheckout(plan, btn) {
-    const code = plan === 'campagne' && window.empCreatorCode ? window.empCreatorCode() : '';
-    // Consentement exprès à l'exécution immédiate : sans lui, pas de commande.
-    if (window.empConsentImmediate && !await window.empConsentImmediate(plan === 'campagne' ? 'Pack Campagne' : 'Pro')) return;
-    const label = btn.textContent;
-    if (window.trackEvent) window.trackEvent('checkout_started', { plan });
-    btn.style.pointerEvents = 'none'; btn.setAttribute('aria-busy', 'true'); btn.textContent = 'Redirection…';
-    try {
-      const res = await fetch('/api/stripe-checkout', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(code ? { plan, code, consent: true } : { plan, consent: true }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.url) { window.location.href = data.url; return; }
-      toast(data.error || 'Le paiement est momentanément indisponible. Réessayez.');
-    } catch (e) {
-      toast('Le paiement est momentanément indisponible. Réessayez.');
-    }
-    btn.style.pointerEvents = ''; btn.removeAttribute('aria-busy'); btn.textContent = label;
-  }
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('[data-checkout]');
-    if (!btn) return;
-    e.preventDefault();
-    const plan = btn.getAttribute('data-checkout'); // 'pro' | 'campagne'
-    // Prefer an authenticated checkout so the purchase binds to the account.
-    if (!window.empUser && typeof window.empShowAuth === 'function') { window.empShowAuth('signup'); return; }
-    startCheckout(plan, btn);
-  });
-})();
-</script>
-<script>
-/* ── Creator code → visible discount on the Pack Campagne ──
-   A TikTok viewer arrives on /?code=LEA10. The discount is applied for real by
-   Stripe at checkout; this only makes it visible on the card, because a code
-   the visitor cannot see on the page reads as a code that did not work.
-   Purely cosmetic: it never decides the amount charged, and it stays silent
-   when no code was captured. The server is still free to reject the code, in
-   which case the buyer sees 59 € on Stripe's page — hence "sous réserve". */
-(function () {
-  var code = window.empCreatorCode ? window.empCreatorCode() : '';
-  if (!code) return;
-  var price = document.getElementById('packPrice');
-  var per = document.getElementById('packPer');
-  if (!price || !per) return;
-  price.innerHTML = '<span style="text-decoration:line-through;opacity:.45;font-size:.6em;margin-right:8px">59€</span>49€<small> les 3 mois</small>';
-  per.innerHTML = 'Code <strong>' + code.replace(/[^A-Z0-9]/g, '') + '</strong> appliqué · −10€ · paiement unique';
-})();
-</script>
+<script src="/shared.js?v=3e6e75fe"></script>
+<script src="/js/pages/index.js?v=076d184e"></script>
+<script src="/js/pages/index-2.js?v=6a651b1f"></script>
 
-<script>
-/* ── Scroll progress bar ── */
-(function(){
-  var bar = document.getElementById('emp-scroll-prog');
-  if(!bar) return;
-  window.addEventListener('scroll', function(){
-    var h = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
-  }, {passive:true});
-})();
-
-/* ── Nav scroll-aware ── */
-(function(){
-  var nav = document.querySelector('.emp-nav');
-  if(!nav) return;
-  window.addEventListener('scroll', function(){
-    nav.classList.toggle('scrolled', window.scrollY > 80);
-  }, {passive:true});
-})();
-
-/* ── Scroll reveal ── */
-(function(){
-  var els = document.querySelectorAll('.reveal');
-  if(!els.length) return;
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
-    });
-  },{threshold:0.08,rootMargin:'0px 0px -32px 0px'});
-  els.forEach(function(el){ io.observe(el); });
-})();
-
-/* ── Count-up + stat bar animate ── */
-(function(){
-  var stats = document.querySelectorAll('.emp-stat-item');
-  if(!stats.length) return;
-  var done = false;
-  var io = new IntersectionObserver(function(entries){
-    if(done || !entries.some(function(e){ return e.isIntersecting; })) return;
-    done = true;
-    io.disconnect();
-    stats.forEach(function(item, idx){
-      var el = item.querySelector('.val[data-count]');
-      var bar = item.querySelector('.bar i');
-      setTimeout(function(){
-        if(bar) bar.classList.add('animated');
-        if(!el) return;
-        var target = parseFloat(el.dataset.count);
-        var prefix = el.dataset.prefix || '';
-        var suffix = el.dataset.suffix || '';
-        var duration = 1100, start = performance.now();
-        var isFloat = String(target).includes('.');
-        requestAnimationFrame(function tick(now){
-          var p = Math.min((now-start)/duration, 1);
-          var eased = 1 - Math.pow(1-p, 3);
-          el.textContent = prefix + (isFloat ? (target*eased).toFixed(1) : Math.round(target*eased)) + suffix;
-          if(p < 1) requestAnimationFrame(tick);
-        });
-      }, idx * 120);
-    });
-  },{threshold:0.4});
-  stats.forEach(function(el){ io.observe(el); });
-})();
-
-/* ── Typewriter hero ── */
-(function(){
-  var el = document.getElementById('twWord');
-  if(!el) return;
-  var words = ['Product Managers','Développeurs','Data Scientists','Designers','Marketeurs','Commerciaux','Reconversions'];
-  var i = 0, ci = 0, deleting = false;
-  function tick(){
-    var word = words[i];
-    if(!deleting){
-      ci++;
-      el.textContent = word.slice(0, ci);
-      if(ci === word.length){ deleting = true; setTimeout(tick, 1800); return; }
-      setTimeout(tick, 65);
-    } else {
-      ci--;
-      el.textContent = word.slice(0, ci);
-      if(ci === 0){ deleting = false; i = (i+1) % words.length; setTimeout(tick, 300); return; }
-      setTimeout(tick, 35);
-    }
-  }
-  setTimeout(tick, 1200);
-})();
-
-/* ── Hero kanban cards entrance ── */
-(function(){
-  var cards = document.querySelectorAll('.kcard');
-  cards.forEach(function(c, i){
-    setTimeout(function(){ c.classList.add('in'); }, 400 + i * 80);
-  });
-})();
-
-/* ── Sticky CTA bar ── */
-(function(){
-  var bar = document.getElementById('stickyBar');
-  var footer = document.querySelector('.emp-footer');
-  if(!bar) return;
-  var shown = false;
-  window.addEventListener('scroll', function(){
-    var scrolled = window.scrollY > window.innerHeight * 0.9;
-    var nearFooter = footer && (footer.getBoundingClientRect().top < window.innerHeight + 80);
-    var shouldShow = scrolled && !nearFooter;
-    if(shouldShow && !shown){ bar.classList.add('visible'); shown = true; }
-    else if(!shouldShow && shown){ bar.classList.remove('visible'); shown = false; }
-  }, {passive:true});
-})();
-
-/* ── Newsletter submit ── */
-function empNewsletterSubmit(e){
-  e.preventDefault();
-  var form = document.getElementById('newsletterForm');
-  var email = form.querySelector('input').value;
-  fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})})
-    .catch(function(){});
-  form.innerHTML = '<p style="color:var(--brand-green);font-weight:600;margin:0">✓ Merci ! Vous recevrez votre premier conseil cette semaine.</p>';
-}
-</script>
+<script src="/js/pages/index-3.js?v=5265c06d"></script>
 </body>
 </html>

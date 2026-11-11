@@ -188,7 +188,7 @@
       <a href="/dashboard">Dashboard</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -496,7 +496,7 @@
       <span>Partager :</span>
       <a class="share-btn linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.eu/blog/email-candidature-parfait" target="_blank" rel="noopener">LinkedIn</a>
       <a class="share-btn twitter" href="https://twitter.com/intent/tweet?url=https://emploia.eu/blog/email-candidature-parfait&text=L%27email+de+candidature+parfait+en+2026" target="_blank" rel="noopener">X / Twitter</a>
-      <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);this.textContent='Lien copié !';setTimeout(()=>this.textContent='Copier le lien',2000)">Copier le lien</button>
+      <button class="share-btn" data-on-click="navigator_clipboard_writeText_6781">Copier le lien</button>
     </div>
 
     <div class="art-cta">
@@ -508,7 +508,7 @@
     <div class="newsletter-widget">
       <h3>Conseils carrière chaque semaine</h3>
       <p>Templates d'email, scripts de négociation, alertes emploi personnalisées — dans votre boîte mail.</p>
-      <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <form class="newsletter-form" data-on-submit="handleNewsletter_event_35f7">
         <input type="email" placeholder="votre@email.fr" required/>
         <button type="submit">Je m'inscris</button>
       </form>
@@ -539,23 +539,7 @@
   
 </div>
 
-<script>
-  const rp = document.getElementById('readProgress');
-  window.addEventListener('scroll', () => {
-    const h = document.body.scrollHeight - window.innerHeight;
-    rp.style.width = (h > 0 ? window.scrollY / h * 100 : 0) + '%';
-  });
-  function handleNewsletter(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.textContent = 'Inscription en cours...';
-    fetch('/api/newsletter', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({email: e.target.querySelector('input').value})
-    }).then(() => { btn.textContent = 'Inscrit !'; }).catch(() => { btn.textContent = 'Erreur, réessayez'; });
-  }
-</script>
+<script src="/js/pages/blog/email-candidature-parfait.js?v=1813c425"></script>
 
 <footer class="emp-footer">
   <div class="container">
@@ -596,6 +580,6 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>
