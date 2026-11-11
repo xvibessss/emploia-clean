@@ -125,7 +125,7 @@
       <a href="/dashboard">Dashboard</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -297,13 +297,13 @@
     <span>Partager :</span>
     <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://emploia.eu/blog/teletravail-negocier-2026" target="_blank" rel="noopener">LinkedIn</a>
     <a class="share-btn" href="https://twitter.com/intent/tweet?text=Négocier+le+télétravail+en+2026+%3A+droits+et+méthodes&url=https://emploia.eu/blog/teletravail-negocier-2026" target="_blank" rel="noopener">Twitter / X</a>
-    <button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>this.textContent='Lien copié ✓')">Copier le lien</button>
+    <button class="share-btn" data-on-click="navigator_clipboard_writeText_33ca">Copier le lien</button>
   </div>
 
   <div class="newsletter-widget">
     <h4>Conseils emploi et droits du travail</h4>
     <p>Chaque semaine, les meilleures ressources pour votre recherche d'emploi et vos négociations.</p>
-    <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+    <form class="newsletter-form" data-on-submit="subscribeNewsletter_event_1d28">
       <input type="email" id="nlEmail" placeholder="votre@email.fr" required/>
       <button type="submit">S'abonner</button>
     </form>
@@ -339,20 +339,7 @@
 </div>
 
 
-<script>
-  window.addEventListener('scroll', () => {
-    const d = document.documentElement;
-    const pct = (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100;
-    document.getElementById('readProgress').style.width = pct + '%';
-  });
-  function subscribeNewsletter(e) {
-    e.preventDefault();
-    const email = document.getElementById('nlEmail').value;
-    fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
-      .then(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; })
-      .catch(() => { e.target.innerHTML = '<p style="color:#10b981;font-weight:700">✓ Vous êtes inscrit !</p>'; });
-  }
-</script>
+<script src="/js/pages/blog/teletravail-negocier-2026.js?v=f8658fa2"></script>
 
 <footer class="emp-footer">
   <div class="container">
@@ -393,6 +380,6 @@
   </div>
 </footer>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>

@@ -225,7 +225,7 @@
       <a href="/employeurs" style="color:var(--primary);font-weight:600">Recruteurs</a>
     </div>
     <div class="emp-nav-right">
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </header>
@@ -628,49 +628,49 @@
       </div>
       <div class="faq reveal">
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Combien de temps mon offre est-elle visible ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Les offres gratuites restent en ligne 30 jours. Passé ce délai, elles sont automatiquement archivées. Vous pouvez republier la même offre à tout moment.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Faut-il créer un compte pour publier une offre ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Non, aucun compte recruteur n'est requis pendant la bêta. Il vous suffit de remplir le formulaire. Si vous fournissez un email de contact, vous recevrez une confirmation automatique.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Comment les candidats me contactent-ils ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Directement par l'email de contact RH que vous renseignez, ou via l'URL de candidature (votre ATS, Typeform, etc.). Pas d'intermédiaire — les candidatures arrivent directement dans votre boîte.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Puis-je modifier ou supprimer mon offre ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Pour toute modification ou suppression d'offre pendant la bêta, écrivez à <strong>contact@emploia.eu</strong> avec l'ID de votre offre (mentionné dans l'email de confirmation). Nous traitons les demandes sous 24h.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Qu'est-ce que le badge "Offre directe" ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Les offres publiées directement par des employeurs sur Emploia reçoivent un badge "⭐ Offre directe" et sont affichées en priorité dans les résultats de recherche, avant les offres agrégées depuis d'autres jobboards.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Y aura-t-il des offres payantes à l'avenir ?</span>
             <span class="faq-chevron">▾</span>
           </div>
           <div class="faq-a"><div class="faq-a-inner">Oui, nous prévoyons une offre "Recruteur Pro" à 99€/offre avec mise en avant prioritaire, accès aux CVs et tableau de bord dédié. La publication de base restera disponible gratuitement. Écrivez à <a href="mailto:contact@emploia.eu" style="color:var(--primary)">contact@emploia.eu</a> pour être notifié.</div></div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q" data-on-click="toggleFaq_this_d030">
             <span>Vous acceptez les offres de grandes entreprises / groupes ?</span>
             <span class="faq-chevron">▾</span>
           </div>
@@ -743,122 +743,7 @@
   </div>
 </footer>
 
-<script>
-  function toggleFaq(btn) {
-    const item = btn.closest('.faq-item');
-    const isOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
-    if (!isOpen) item.classList.add('open');
-  }
-
-  document.getElementById('jobForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    const errBox = document.getElementById('formError');
-    errBox.style.display = 'none';
-
-    const body = {
-      title:        document.getElementById('title').value.trim(),
-      company:      document.getElementById('company').value.trim(),
-      location:     document.getElementById('location').value.trim(),
-      type:         document.getElementById('type').value,
-      description:  document.getElementById('description').value.trim(),
-      contactEmail: document.getElementById('contactEmail').value.trim(),
-      applyUrl:     document.getElementById('applyUrl').value.trim(),
-      salaryMin:    parseInt(document.getElementById('salaryMin').value) || 0,
-      salaryMax:    parseInt(document.getElementById('salaryMax').value) || 0,
-      remote:       document.getElementById('remote').checked,
-    };
-
-    btn.disabled = true;
-    btn.textContent = 'Publication en cours…';
-
-    try {
-      const res = await fetch('/api/employer/post-job', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        errBox.textContent = data.error || 'Une erreur est survenue.';
-        errBox.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Publier mon offre gratuitement →';
-        return;
-      }
-      document.getElementById('jobForm').style.display = 'none';
-      document.getElementById('formSuccess').style.display = 'block';
-      window.scrollTo({ top: document.getElementById('poster-offre').offsetTop - 20, behavior: 'smooth' });
-    } catch {
-      errBox.textContent = 'Erreur réseau. Vérifiez votre connexion et réessayez.';
-      errBox.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Publier mon offre gratuitement →';
-    }
-  });
-
-  // ── Self-service management: /employeurs?manage=<token> ──
-  (function () {
-    const token = new URLSearchParams(location.search).get('manage');
-    if (!token) return;
-    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    const fmtDate = s => { try { return new Date(s).toLocaleDateString('fr-FR'); } catch { return ''; } };
-    const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    ov.innerHTML = '<div style="background:#fff;border-radius:20px;max-width:460px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3)"><div id="manageBody"><p style="color:#64748b">Chargement de votre offre…</p></div></div>';
-    document.body.appendChild(ov);
-    const body = ov.querySelector('#manageBody');
-    const card = (title, msg) => '<h2 style="font-size:19px;font-weight:800;color:#0f172a;margin:0 0 8px">' + esc(title) + '</h2><p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 18px">' + esc(msg) + '</p><a href="/employeurs" style="color:#6366f1;font-weight:600;font-size:14px">← Retour</a>';
-    function show(job) {
-      const act = async (action) => {
-        const msg = body.querySelector('#mMsg'); msg.textContent = '…'; msg.style.color = '#64748b';
-        try {
-          const r = await fetch('/api/employer/manage-job', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, action }) });
-          const d = await r.json();
-          if (!r.ok) { msg.textContent = d.error || 'Erreur'; msg.style.color = '#b91c1c'; return; }
-          show(d.job);
-          const m2 = body.querySelector('#mMsg');
-          if (m2) { m2.textContent = action === 'close' ? "Offre clôturée — elle n'apparaît plus aux candidats." : action === 'confirm' ? 'Offre publiée ✅ Elle est visible par les candidats.' : 'Offre prolongée de 45 jours ✅'; m2.style.color = '#0f9d6b'; }
-        } catch { msg.textContent = 'Problème réseau, réessayez.'; msg.style.color = '#b91c1c'; }
-      };
-      if (job.status === 'pending') {
-        body.innerHTML =
-          '<h2 style="font-size:19px;font-weight:800;color:#0f172a;margin:0 0 4px">Publier votre offre</h2>' +
-          '<p style="color:#64748b;font-size:13px;margin:0 0 16px">' + esc(job.title) + ' · ' + esc(job.company) + '</p>' +
-          '<p style="color:#475569;font-size:14px;line-height:1.6;margin:0 0 16px">Votre offre attend votre confirmation. Une fois publiée, elle reste en ligne 45 jours et vous pourrez la prolonger ou la clôturer depuis ce même lien.</p>' +
-          '<button id="mConfirm" style="width:100%;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;border:0;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Publier mon offre →</button>' +
-          '<div id="mMsg" style="font-size:13px;margin-top:12px"></div>';
-        body.querySelector('#mConfirm').addEventListener('click', () => act('confirm'));
-        return;
-      }
-      const live = job.status === 'active' && job.live;
-      const label = job.status === 'closed' ? 'Clôturée' : (job.live ? 'En ligne' : 'Expirée');
-      const color = live ? '#0f9d6b' : '#c8781a';
-      body.innerHTML =
-        '<h2 style="font-size:19px;font-weight:800;color:#0f172a;margin:0 0 4px">Gérer votre offre</h2>' +
-        '<p style="color:#64748b;font-size:13px;margin:0 0 16px">' + esc(job.title) + ' · ' + esc(job.company) + '</p>' +
-        '<div style="margin-bottom:16px"><span style="font-size:12px;font-weight:700;color:' + color + '">● ' + label + '</span>' + (live ? '<span style="font-size:12px;color:#94a3b8"> · expire le ' + fmtDate(job.expiresAt) + '</span>' : '') + '</div>' +
-        '<div style="display:flex;flex-direction:column;gap:10px">' +
-        (live
-          ? '<button id="mRenew" style="background:#eef2ff;color:#4141d6;border:0;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Prolonger de 45 jours</button><button id="mClose" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Clôturer (poste pourvu)</button>'
-          : '<button id="mRenew" style="background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;border:0;border-radius:11px;padding:13px;font-weight:700;font-size:14px;cursor:pointer">Remettre en ligne (45 j) →</button>') +
-        '</div><div id="mMsg" style="font-size:13px;margin-top:12px"></div>' +
-        '<div style="text-align:center;margin-top:16px"><a href="/employeurs" style="color:#94a3b8;font-size:13px">Fermer</a></div>';
-      body.querySelector('#mRenew')?.addEventListener('click', () => act('renew'));
-      body.querySelector('#mClose')?.addEventListener('click', () => act('close'));
-    }
-    (async function load() {
-      try {
-        const r = await fetch('/api/employer/manage-job?token=' + encodeURIComponent(token));
-        const d = await r.json();
-        if (!r.ok || !d.job) { body.innerHTML = card('Offre introuvable', d.error || "Ce lien de gestion n'est plus valide."); return; }
-        show(d.job);
-      } catch { body.innerHTML = card('Erreur', 'Problème réseau, réessayez.'); }
-    })();
-  })();
-</script>
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/js/pages/employeurs.js?v=983bd557"></script>
+<script src="/shared.js?v=3e6e75fe"></script>
 </body>
 </html>

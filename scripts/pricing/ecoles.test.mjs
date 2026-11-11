@@ -12,8 +12,9 @@
 // occasions de se contredire devant un DPO.
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { pageAvecScripts } from '../lib/page.mjs';
 
-const html = fs.readFileSync(new URL('../../ecoles.html', import.meta.url), 'utf8');
+const html = pageAvecScripts(fs.readFileSync(new URL('../../ecoles.html', import.meta.url), 'utf8'));
 
 let passed = 0, failed = 0;
 function check(label, condition, detail) {

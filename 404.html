@@ -218,7 +218,7 @@
     </div>
     <div class="emp-nav-right">
       <a href="/app" class="emp-btn emp-btn-primary emp-btn-sm" style="display:none" id="nav404cta">Commencer</a>
-      <button class="emp-hamburger" id="empHamburger" onclick="empToggleNav()" aria-label="Menu"><span></span></button>
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
     </div>
   </div>
 </nav>
@@ -260,7 +260,7 @@
       <div class="error-search-label">Cherchez parmi nos offres d'emploi</div>
       <div class="error-search-row">
         <input type="text" class="emp-input" id="errSearch" placeholder="Développeur, Marketing, RH..." style="flex:1" aria-label="Recherche d'offres d'emploi"/>
-        <button class="emp-btn emp-btn-primary" onclick="errSearch()">
+        <button class="emp-btn emp-btn-primary" data-on-click="errSearch">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M11 11 L14 14"/></svg>
           Chercher
         </button>
@@ -305,38 +305,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=2efc6d7c"></script>
-<script>
-  // Show nav CTA for non-logged users
-  document.getElementById('nav404cta').style.display = '';
-
-  // Search redirect
-  function errSearch() {
-    const q = document.getElementById('errSearch').value.trim();
-    if (q) window.location.href = '/jobs?q=' + encodeURIComponent(q);
-  }
-  document.getElementById('errSearch').addEventListener('keydown', e => {
-    if (e.key === 'Enter') errSearch();
-  });
-
-  // Floating particles
-  const container = document.getElementById('particles');
-  const colors = ['rgba(110,72,190,.35)', 'rgba(154,119,216,.3)', 'rgba(197,174,236,.4)'];
-  for (let i = 0; i < 14; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = 2 + Math.random() * 4;
-    p.style.cssText = `
-      left:${Math.random()*100}%;
-      width:${size}px;
-      height:${size}px;
-      opacity:${0.15 + Math.random() * 0.35};
-      animation-duration:${7 + Math.random() * 9}s;
-      animation-delay:${-Math.random() * 9}s;
-      background:${colors[Math.floor(Math.random() * colors.length)]};
-    `;
-    container.appendChild(p);
-  }
-</script>
+<script src="/shared.js?v=3e6e75fe"></script>
+<script src="/js/pages/404.js?v=cacabe82"></script>
 </body>
 </html>

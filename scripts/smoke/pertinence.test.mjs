@@ -28,10 +28,11 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 import * as recherche from '../../api/_lib/recherche.js';
+import { pageAvecScripts } from '../lib/page.mjs';
 
 const racine = new URL('../../', import.meta.url);
 const src = fs.readFileSync(new URL('api/jobs.js', racine), 'utf8');
-const jobsHtml = fs.readFileSync(new URL('jobs.html', racine), 'utf8');
+const jobsHtml = pageAvecScripts(fs.readFileSync(new URL('jobs.html', racine), 'utf8'));
 
 let passed = 0, failed = 0;
 function check(label, condition, detail) {
@@ -177,7 +178,7 @@ const pages = pagesHtml(dossier);
 const muettes = [];
 let avecCompteur = 0;
 for (const f of pages) {
-  for (const ligne of fs.readFileSync(f, 'utf8').split('\n')) {
+  for (const ligne of pageAvecScripts(fs.readFileSync(f, 'utf8')).split('\n')) {
     if (!/getElementById\('jobCount'\)\.textContent\s*=/.test(ligne)) continue;
     // Une affectation à '' ou à « Aucune offre » n'affirme rien : elle n'a pas
     // besoin de consulter le drapeau.
@@ -196,7 +197,7 @@ check('AUCUN compteur n’affirme sans consulter `filtre`',
 // exigence, et leur libellé de ville est conservé hors repli.
 const ville = pages.find(f => /emploi\/rouen\.html$/.test(f));
 if (ville) {
-  const s = fs.readFileSync(ville, 'utf8');
+  const s = pageAvecScripts(fs.readFileSync(ville, 'utf8'));
   check('une page de ville garde son libellé hors repli',
     /offres à Rouen/.test(s) && /filtre === 'abandonne'/.test(s));
 }

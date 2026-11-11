@@ -68,12 +68,32 @@ const htmlFiles = (dir = '.', out = []) => {
 const referencePattern = ({ file, attr }) =>
   new RegExp(`${attr}="\\/?${file.replace('.', '\\.')}(\\?v=[0-9a-f]+)?"`, 'g');
 
+// Les scripts de page (`/js/…`). Depuis le retrait des scripts en ligne (CSP
+// sans 'unsafe-inline'), le JavaScript de chaque page vit dans un fichier à
+// part, et le service worker sert les .js « cache d'abord » : sans empreinte
+// dans l'URL, une correction de script n'atteindrait jamais un visiteur déjà
+// venu. Contrairement aux deux feuilles partagées, la liste n'est pas fixe —
+// on estampille donc tout `src="/js/….js"` rencontré, avec l'empreinte du
+// fichier qu'il désigne. Un fichier absent est laissé tel quel : le garde [23]
+// de ci-guards le signale, ce n'est pas le rôle de ce script.
+const PAGE_SCRIPT = /src="\/(js\/[^"?]+\.js)(\?v=[0-9a-f]+)?"/g;
+const pageScriptHashes = new Map();
+const pageScriptHash = (file) => {
+  if (!pageScriptHashes.has(file)) {
+    pageScriptHashes.set(file, fs.existsSync(file) ? hashOf(file) : null);
+  }
+  return pageScriptHashes.get(file);
+};
+
 export const stampHtml = (source, hashes) =>
   ASSETS.reduce(
     (text, asset) =>
       text.replace(referencePattern(asset), `${asset.attr}="/${asset.file}?v=${hashes[asset.file]}"`),
     source,
-  );
+  ).replace(PAGE_SCRIPT, (whole, file) => {
+    const h = pageScriptHash(file);
+    return h ? `src="/${file}?v=${h}"` : whole;
+  });
 
 // Le service worker garde sa propre copie des feuilles, sous une troisième
 // couche de cache. Il reçoit donc les mêmes empreintes : son nom de cache en

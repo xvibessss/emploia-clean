@@ -1,0 +1,346 @@
+const ARTICLES = [
+  { id:'ats-guide', cat:'cv', emoji:'📄', tag:'cv', title:'Comment optimiser son CV pour passer les filtres ATS en 2026', excerpt:'78% des CVs sont rejetés avant même d\'être lus par un humain. Guide complet : format, mots-clés, structure — tout pour passer les filtres ATS des grandes entreprises françaises.', read:'12 min', date:'20 avr. 2026' },
+  { id:'star-method', cat:'entretien', emoji:'🎤', tag:'entretien', title:'La méthode STAR : structurer vos réponses en entretien', excerpt:'Situation, Tâche, Action, Résultat — la technique utilisée par tous les candidats retenus pour répondre aux questions comportementales.', read:'8 min', date:'18 avr. 2026' },
+  { id:'salary-2026', cat:'salaire', emoji:'💰', tag:'salaire', title:'Grille des salaires en France 2026 par métier et région', excerpt:'Les rémunérations réelles — CDI, alternance, stage — par secteur et ville. Données issues des offres France Travail.', read:'10 min', date:'15 avr. 2026' },
+  { id:'cover-letter', cat:'cv', emoji:'✉️', tag:'cv', title:'Rédiger une lettre de motivation percutante en 2026', excerpt:'Les recruteurs lisent en moyenne 47 secondes. Voici comment structurer votre lettre pour qu\'elle survive à ce test.', read:'7 min', date:'12 avr. 2026' },
+  { id:'alternance-guide', cat:'recherche', emoji:'🔄', tag:'recherche', title:'Trouver une alternance : guide complet 2026', excerpt:'Calendrier, plateformes, CFA, contact direct — tout ce qu\'il faut savoir pour décrocher une alternance en France.', read:'12 min', date:'10 avr. 2026' },
+  { id:'linkedin-optimization', cat:'cv', emoji:'💼', tag:'cv', title:'Optimiser son profil LinkedIn pour être recruté', excerpt:'Le titre, le résumé, les expériences — les 7 sections critiques à optimiser pour apparaître dans les recherches des recruteurs.', read:'9 min', date:'8 avr. 2026' },
+  { id:'cv-sans-experience', cat:'cv', emoji:'🌱', tag:'cv', title:'Faire un CV sans expérience : méthode complète (2026)', excerpt:'Projets personnels, formations, bénévolat, compétences — comment valoriser tout ce qui compte pour convaincre un recruteur sans expérience pro.', read:'9 min', date:'7 avr. 2026' },
+  { id:'questions-entretien-rh', cat:'entretien', emoji:'🤝', tag:'entretien', title:'Les 30 questions d\'entretien RH les plus posées — Avec réponses', excerpt:'"Parlez-moi de vous", "Vos défauts ?", "Pourquoi nous ?" — les meilleures réponses type pour les 30 questions RH les plus fréquentes en France.', read:'15 min', date:'5 avr. 2026' },
+  { id:'relancer-candidature', cat:'recherche', emoji:'📧', tag:'recherche', title:'Relancer une candidature après un entretien : email + timing', excerpt:'Comment relancer un recruteur sans paraître insistant. Timing exact, formulation, 4 exemples d\'emails de relance qui fonctionnent.', read:'6 min', date:'3 avr. 2026' },
+  { id:'negocier-salaire', cat:'salaire', emoji:'💬', tag:'salaire', title:'Négocier son salaire en entretien : guide complet + scripts', excerpt:'Quand parler salaire, combien demander, comment répondre à "Quelles sont vos prétentions ?". 3 scripts de négociation + tableau des fourchettes par métier.', read:'10 min', date:'25 avr. 2026' },
+  { id:'candidature-spontanee', cat:'recherche', emoji:'📨', tag:'recherche', title:'Candidature spontanée : exemple complet + guide 2026', excerpt:'80% des offres ne sont jamais publiées. Comment trouver le bon contact, rédiger le bon email et décrocher un entretien sans offre publiée.', read:'8 min', date:'28 avr. 2026' },
+  { id:'reconversion-professionnelle', cat:'recherche', emoji:'🔄', tag:'recherche', title:'Reconversion professionnelle en 2026 : guide complet + financement', excerpt:'CPF, Pro-A, 6 secteurs qui recrutent — tout pour changer de métier en 2026, avec les formations financées et les démarches étape par étape.', read:'12 min', date:'2 mai 2026' },
+  { id:'cv-par-competences-2026', cat:'cv', emoji:'📄', tag:'cv', title:'CV par compétences vs CV chronologique : lequel choisir en 2026 ?', excerpt:'Chronologique ou fonctionnel ? Quel format de CV choisir selon votre profil et le poste visé. Avec conseils ATS et exemples.', read:'5 min', date:'4 mai 2026' },
+  { id:'negocier-contrat-travail-2026', cat:'salaire', emoji:'📝', tag:'salaire', title:'Négocier son contrat de travail : salaire, avantages et clauses à surveiller', excerpt:'Salaire, télétravail, non-concurrence, période d\'essai — tout ce que vous devez vérifier et négocier avant de signer.', read:'9 min', date:'6 mai 2026' },
+  { id:'portfolio-developpeur-2026', cat:'cv', emoji:'💻', tag:'cv', title:'Créer un portfolio développeur qui impressionne les recruteurs en 2026', excerpt:'Projets à inclure, GitHub, démo live, portfolio site — ce que les CTO regardent vraiment dans un portfolio dev.', read:'6 min', date:'8 mai 2026' },
+  { id:'entretien-en-anglais', cat:'entretien', emoji:'🌐', tag:'entretien', title:'Réussir un entretien en anglais : phrases clés et pièges à éviter', excerpt:'Vocabulaire RH, présentation de parcours, questions difficiles — le guide complet pour un entretien en anglais réussi.', read:'8 min', date:'10 mai 2026' },
+  { id:'travailler-en-startup-2026', cat:'recherche', emoji:'🚀', tag:'recherche', title:'Travailler en startup en 2026 : avantages, inconvénients et comment postuler', excerpt:'Salaires, equity, culture startup, BSPCE — tout ce qu\'il faut savoir avant de rejoindre une startup et comment candidater efficacement.', read:'7 min', date:'12 mai 2026' },
+  { id:'teletravail-negocier-2026', cat:'recherche', emoji:'🏠', tag:'recherche', title:'Télétravail en 2026 : comment le négocier et quels sont vos droits', excerpt:'Accord d\'entreprise, indemnités, matériel, jours minimum. Comment négocier le remote lors d\'un entretien ou en CDI.', read:'7 min', date:'14 mai 2026' },
+  { id:'secteurs-qui-recrutent-2026', cat:'recherche', emoji:'📊', tag:'recherche', title:'Les 10 secteurs qui recrutent le plus en France en 2026', excerpt:'Santé, tech, cybersécurité, logistique, BTP — les secteurs en forte croissance avec les métiers les plus recherchés et les fourchettes de salaire.', read:'10 min', date:'16 mai 2026' },
+  { id:'ia-et-emploi-2026', cat:'recherche', emoji:'🤖', tag:'recherche', title:'IA et emploi en 2026 : quels métiers résisteront à l\'intelligence artificielle ?', excerpt:'Quels métiers seront transformés par l\'IA ? Lesquels vont prospérer ? Guide pour adapter votre carrière à l\'ère de l\'IA générative.', read:'9 min', date:'18 mai 2026' },
+  { id:'preparer-entretien-technique', cat:'entretien', emoji:'💻', tag:'entretien', title:'Comment préparer un entretien technique (dev, data, DevOps) en 2026', excerpt:'Algorithmes, system design, live coding, pair programming — méthode complète et ressources pour passer les entretiens techniques en France.', read:'11 min', date:'20 mai 2026' },
+  { id:'email-candidature-parfait', cat:'recherche', emoji:'📧', tag:'recherche', title:'L\'email de candidature parfait en 2026 : objet, structure et exemples', excerpt:'Comment rédiger un email de candidature percutant. Objet, 4 paragraphes, 3 exemples complets — les erreurs qui font supprimer votre email.', read:'7 min', date:'22 mai 2026' },
+  { id:'reseaux-sociaux-recherche-emploi', cat:'cv', emoji:'🌐', tag:'cv', title:'Réseaux sociaux et recherche d\'emploi en 2026 : LinkedIn, Twitter/X, GitHub', excerpt:'Comment utiliser LinkedIn, Twitter/X et GitHub pour attirer les recruteurs. Profil, contenu, réseau — stratégie complète plateforme par plateforme.', read:'8 min', date:'24 mai 2026' },
+  { id:'cv-gratuit-en-ligne-2026', cat:'cv', emoji:'🎯', tag:'cv', title:'CV gratuit en ligne 2026 : créez un CV ATS en 5 minutes', excerpt:'Comparatif des 5 meilleurs outils pour créer un CV gratuit en ligne. Emploia vs Canva vs Google Docs — lequel passe vraiment les filtres ATS ?', read:'9 min', date:'18 mai 2026' },
+  { id:'simulation-entretien-embauche', cat:'entretien', emoji:'🎤', tag:'entretien', title:'Simulation d\'entretien d\'embauche en ligne (IA) 2026 : s\'entraîner gratuitement', excerpt:'Comment utiliser un simulateur d\'entretien IA pour décrocher plus d\'offres. Plan 48h, 20 questions clés, méthode STAR, feedback instantané.', read:'10 min', date:'18 mai 2026' },
+  { id:'generateur-lettre-motivation-gratuit', cat:'cv', emoji:'✍️', tag:'cv', title:'Générateur de lettre de motivation gratuit en ligne 2026', excerpt:'Comment générer une lettre de motivation personnalisée gratuitement. Structure exacte, exemples avant/après, erreurs à éviter — prête en 30 secondes.', read:'8 min', date:'18 mai 2026' },
+  { id:'score-ats-cv-optimisation', cat:'cv', emoji:'📊', tag:'cv', title:'Score ATS : analyser et optimiser son CV pour passer les filtres en 2026', excerpt:'Comment fonctionne le scoring ATS, quels facteurs comptent (mots-clés 40%, format 25%), et comment passer de 38 à 91/100 en 5 étapes concrètes.', read:'11 min', date:'18 mai 2026' },
+  { id:'lettre-motivation-stage', cat:'cv', emoji:'✉️', tag:'cv', title:'Lettre de motivation stage 2026 — Exemples complets par secteur', excerpt:'Structure en 4 blocs, 2 exemples complets (tech + marketing), phrases éliminatoires à bannir. La méthode pour décrocher un entretien même sans expérience pro.', read:'10 min', date:'19 mai 2026' },
+  { id:'entretien-telephonique', cat:'entretien', emoji:'📞', tag:'entretien', title:'Entretien téléphonique 2026 : réussir le premier filtre RH', excerpt:'60% des candidats éliminés en 15-20 minutes. Questions types avec les bonnes réponses, check-list pré-appel et email de remerciement qui fait la différence.', read:'9 min', date:'19 mai 2026' },
+  { id:'cv-en-anglais', cat:'cv', emoji:'🌐', tag:'cv', title:'CV en anglais 2026 — Modèle complet + différences avec le CV français', excerpt:'CV vs Resume, ce qu\'il ne faut surtout pas traduire mot à mot, vocabulaire RH anglais, verbes d\'action, exemple complet. Tout pour postuler à l\'international.', read:'11 min', date:'19 mai 2026' },
+  { id:'trouver-emploi-rapidement', cat:'recherche', emoji:'🎯', tag:'recherche', title:'Comment trouver un emploi rapidement en 2026 — 7 stratégies', excerpt:'Plan d\'action semaine par semaine, 7 stratégies classées par impact, plateformes à cibler selon votre profil. La méthode qui permet de trouver en 2-8 semaines.', read:'12 min', date:'19 mai 2026' },
+  { id:'comment-se-presenter-entretien', cat:'entretien', emoji:'🎤', tag:'entretien', title:'Comment se présenter en entretien — Pitch 90 secondes (2026)', excerpt:'Structure en 4 temps, 3 exemples complets (expérimenté, débutant, reconversion), erreurs qui coulent un pitch. La question la plus prévisible et la plus mal préparée.', read:'9 min', date:'20 mai 2026' },
+  { id:'lettre-motivation-alternance', cat:'cv', emoji:'✉️', tag:'cv', title:'Lettre de motivation alternance 2026 — Exemples complets + Guide', excerpt:'Ce qui différencie la lettre d\'alternance de la lettre de stage, 2 exemples complets (dev web + marketing), erreurs éliminatoires. 7 alternants sur 10 embauchés à l\'issue.', read:'10 min', date:'20 mai 2026' },
+  { id:'defauts-entretien', cat:'entretien', emoji:'🎭', tag:'entretien', title:'Défauts en entretien 2026 — Les meilleures réponses avec exemples', excerpt:'Structure DAP, 8 défauts bien formulés par profil, 5 pièges éliminatoires. "Quels sont vos défauts ?" est une des questions les plus redoutées — et la plus simple à préparer.', read:'8 min', date:'20 mai 2026' },
+  { id:'accroche-cv', cat:'cv', emoji:'💡', tag:'cv', title:'Accroche CV 2026 — Exemples complets + Comment rédiger son profil', excerpt:'Formule en 3 lignes, 6 exemples avant/après par profil (dev, PM, commercial, reconversion, junior), check-list et erreurs à éviter. Section la plus lue — et la plus mal rédigée.', read:'8 min', date:'20 mai 2026' },
+  { id:'salaire-brut-net', cat:'salaire', emoji:'💰', tag:'salaire', title:'Salaire brut net 2026 : simulateur + tableau de conversion', excerpt:'Convertir brut en net en France : taux exacts, simulateur interactif, tableau SMIC→100k€, différences cadre/non-cadre, formule de négociation. Tout ce que votre employeur ne vous dit pas.', read:'9 min', date:'20 mai 2026' },
+  { id:'competences-cv', cat:'cv', emoji:'🛠️', tag:'cv', title:'Compétences CV 2026 : hard skills, soft skills et mots-clés ATS par secteur', excerpt:'Quelles compétences mettre sur son CV pour passer les ATS : grilles par secteur (tech, data, marketing, finance, commercial, PM), niveaux de maîtrise, 5 erreurs à éviter.', read:'10 min', date:'20 mai 2026' },
+  { id:'cv-etudiant', cat:'cv', emoji:'📚', tag:'cv', title:'CV étudiant 2026 : modèle complet + guide pas à pas', excerpt:'Structure d\'un CV étudiant efficace, modèle complet annoté, comment valoriser associations/jobs d\'été/projets académiques — pour stages, alternances et premier emploi sans expérience.', read:'10 min', date:'21 mai 2026' },
+  { id:'bilan-de-competences', cat:'recherche', emoji:'🔍', tag:'recherche', title:'Bilan de compétences 2026 : guide complet, financement CPF et démarches', excerpt:'Comment financer un bilan de compétences avec le CPF, choisir le bon organisme Qualiopi, ce que les 3 phases produisent et comment utiliser le document de synthèse pour changer de voie.', read:'11 min', date:'21 mai 2026' },
+  { id:'periode-essai-droits', cat:'salaire', emoji:'⚖️', tag:'salaire', title:'Période d\'essai 2026 : durée légale, droits et rupture — Guide complet', excerpt:'Durée par contrat (CDI 2-4 mois, CDD), droits pendant la période d\'essai, délais de prévenance à la rupture, chômage après PE rompue par l\'employeur, recours en cas d\'abus.', read:'9 min', date:'21 mai 2026' },
+  { id:'comment-faire-un-cv', cat:'cv', emoji:'📄', tag:'cv', title:'Comment faire un CV en 2026 : guide complet pas à pas', excerpt:'7 étapes pour créer un CV qui passe les ATS et convainc les recruteurs : structure, formule des bullet points, mise en forme, optimisation ATS, adaptation à chaque offre.', read:'13 min', date:'21 mai 2026' },
+  { id:'questions-a-poser-en-entretien', cat:'entretien', emoji:'❓', tag:'entretien', title:'Questions à poser en entretien 2026 : les 25 meilleures + celles à éviter', excerpt:'25 questions classées par catégorie (poste, équipe, entreprise, progression, suite du processus). Celles qui impressionnent le recruteur ET celles qui plombent une candidature.', read:'8 min', date:'21 mai 2026' },
+  { id:'rupture-conventionnelle', cat:'salaire', emoji:'🤝', tag:'salaire', title:'Rupture conventionnelle 2026 : guide complet, indemnités et procédure', excerpt:'Conditions, procédure en 5 étapes (rétractation 15j + homologation DREETS 15j), calcul des indemnités légales, délai carence chômage, fiscalité. Le guide le plus complet.', read:'11 min', date:'22 mai 2026' },
+  { id:'lettre-motivation-reconversion', cat:'cv', emoji:'🔄', tag:'cv', title:'Lettre de motivation reconversion 2026 — 3 exemples complets annotés', excerpt:'Structure en 4 blocs, 3 exemples annotés (comptable→dev, commercial→RH, enseignant→marketing), les erreurs qui font rejeter et ce qui convainc un recruteur malgré un profil atypique.', read:'10 min', date:'22 mai 2026' },
+  { id:'cv-commercial', cat:'cv', emoji:'💼', tag:'cv', title:'CV commercial 2026 : modèle complet + conseils pour décrocher des entretiens', excerpt:'Comment un CV commercial se distingue : KPIs obligatoires, modèle annoté B2B, compétences (CRM, méthodes de vente), différences B2B/B2C et profils terrain/sédentaire/manager.', read:'10 min', date:'22 mai 2026' },
+  { id:'lettre-demission', cat:'salaire', emoji:'📝', tag:'salaire', title:'Lettre de démission 2026 : 3 modèles gratuits + guide droits et préavis', excerpt:'Modèles prêts à envoyer (CDI avec préavis, dispense de préavis, période d\'essai), délais légaux par catégorie, droit au chômage après démission et alternative rupture conventionnelle.', read:'8 min', date:'22 mai 2026' },
+  { id:'preparer-entretien-embauche', cat:'entretien', emoji:'🧠', tag:'entretien', title:'Préparer un entretien d\'embauche 2026 : méthode complète en 48h', excerpt:'Plan heure par heure sur 48h : recherches entreprise/recruteur, préparation STAR, questions pièges, checklist complète, posture et suivi post-entretien. Tout pour arriver confiant.', read:'11 min', date:'22 mai 2026' },
+  { id:'cv-developpeur', cat:'cv', emoji:'💻', tag:'cv', title:'CV développeur 2026 : guide complet + modèle annoté senior Full-Stack', excerpt:'Ce que les tech leads regardent en 30 secondes, tableau séniorité Junior→Tech Lead, modèle annoté React/Node/TypeScript, formules bullet points avec impact mesurable, ATS pour devs.', read:'10 min', date:'23 mai 2026' },
+  { id:'trouver-emploi-apres-50-ans', cat:'recherche', emoji:'🎯', tag:'recherche', title:'Trouver un emploi après 50 ans : stratégies anti-âgisme et plan 90 jours', excerpt:'Reconversion, CV senior, réseau, secteurs qui recrutent les +50 ans, dispositifs CPF et ARE. Plan d\'action concret semaine par semaine pour retrouver un emploi après 50 ans.', read:'11 min', date:'23 mai 2026' },
+  { id:'modele-cv-word', cat:'cv', emoji:'📄', tag:'cv', title:'Modèle CV Word 2026 : personnaliser sans se planter', excerpt:'Les 5 erreurs des modèles CV Word gratuits (tableaux, zones de texte, barres compétences), quand Word est acceptable vs quand il coule votre candidature, structure ATS-compatible étape par étape.', read:'9 min', date:'23 mai 2026' },
+  { id:'portage-salarial', cat:'salaire', emoji:'💼', tag:'salaire', title:'Portage salarial 2026 : comment ça marche, avantages et pièges', excerpt:'Fonctionnement en 3 acteurs, calcul du salaire net (règle des 50%), comparaison freelance vs portage vs SASU, meilleures sociétés de portage et pièges à éviter (faux portage, cumul ARE).', read:'10 min', date:'23 mai 2026' },
+  { id:'contrat-de-professionnalisation', cat:'recherche', emoji:'📚', tag:'recherche', title:'Contrat de professionnalisation 2026 : conditions, salaire et différences avec l\'apprentissage', excerpt:'Qui peut en bénéficier (tous âges), grille de salaires par profil, différences clés avec l\'apprentissage (âge, rythme, financement), comment trouver un contrat pro et le formaliser avec l\'OPCO.', read:'9 min', date:'24 mai 2026' },
+  { id:'cv-manager', cat:'cv', emoji:'👔', tag:'cv', title:'CV Manager 2026 : guide complet + modèle annoté pour cadres et directeurs', excerpt:'Ce que les DRH regardent en 30 secondes dans un CV manager, formules bullet points avec impact chiffré, tableau des niveaux (Team Lead→DG), accroche executive summary, mots-clés ATS.', read:'10 min', date:'24 mai 2026' },
+  { id:'13eme-mois', cat:'salaire', emoji:'💰', tag:'salaire', title:'13e mois 2026 : obligatoire ou non, comment le négocier et le calculer', excerpt:'Le 13e mois n\'est pas obligatoire par la loi — mais le devient dans 3 cas. Calcul au prorata temporis, conventions collectives qui le prévoient, stratégie de négociation et droits en cas de départ.', read:'8 min', date:'24 mai 2026' },
+  { id:'prime-activite', cat:'salaire', emoji:'🏦', tag:'salaire', title:'Prime d\'activité 2026 : conditions, montant, simulation et comment faire la demande', excerpt:'Qui est éligible (salariés, auto-entrepreneurs, étudiants), montant par situation familiale, formule de calcul CAF, étapes de la demande en ligne et erreurs à éviter (déclaration trimestrielle).', read:'9 min', date:'24 mai 2026' },
+  { id:'augmentation-salaire', cat:'salaire', emoji:'📈', tag:'salaire', title:'Demander une augmentation de salaire en 2026 : méthode, timing et scripts', excerpt:'Quand le faire, combien demander, scripts de négociation testés, erreurs à éviter et plan B si refus. La méthode complète pour obtenir une augmentation en CDI.', read:'11 min', date:'25 mai 2026' },
+  { id:'devenir-freelance-2026', cat:'recherche', emoji:'🧑‍💻', tag:'recherche', title:'Comment devenir freelance en 2026 : le guide complet pour se lancer', excerpt:'Quel statut choisir, comment calculer son TJM, trouver ses premiers clients, faire la transition salarié→freelance. Le guide complet pour se lancer en France.', read:'12 min', date:'27 mai 2026' },
+  { id:'cv-ingenieur-2026', cat:'cv', emoji:'⚙️', tag:'cv', title:'CV ingénieur 2026 : exemple, modèle ATS et conseils par secteur', excerpt:'Structure type, mots-clés ATS par secteur (IT, BTP, industrie), modèle annoté et erreurs à éviter pour un CV ingénieur qui passe les filtres.', read:'10 min', date:'27 mai 2026' },
+  { id:'repondre-recruteur-linkedin', cat:'recherche', emoji:'💬', tag:'recherche', title:'Comment répondre à un recruteur sur LinkedIn en 2026 (exemples)', excerpt:'5 modèles de réponses prêts à copier : intéressé, pas disponible, poste inadapté. Comment transformer un message LinkedIn en opportunité concrète.', read:'7 min', date:'27 mai 2026' },
+  { id:'meilleurs-sites-emploi-france-2026', cat:'recherche', emoji:'🔍', tag:'recherche', title:'Meilleurs sites d\'emploi en France 2026 : comparatif complet', excerpt:'Indeed, LinkedIn, APEC, France Travail, Welcome to the Jungle… Quel site choisir selon votre profil ? Comparatif complet des 10 meilleures plateformes.', read:'9 min', date:'27 mai 2026' },
+  { id:'cv-data-scientist-2026', cat:'cv', emoji:'📊', tag:'cv', title:'CV Data Scientist 2026 : exemple ATS et mots-clés par spécialité', excerpt:'Comment rédiger un CV Data Scientist optimisé ATS : structure, mots-clés par spécialité (ML, NLP, Data Eng.), exemple annoté et erreurs fréquentes.', read:'10 min', date:'27 mai 2026' },
+  { id:'lettre-motivation-bts', cat:'lettre', emoji:'📝', tag:'lettre', title:'Lettre de motivation BTS 2026 : exemples complets par filière', excerpt:'Exemples de lettres de motivation BTS prêts à personnaliser : MCO, SIO, Comptabilité, Commerce. Alternance ou formation initiale, les bons modèles.', read:'8 min', date:'27 mai 2026' },
+  { id:'cv-product-manager-2026', cat:'cv', emoji:'💼', tag:'cv', title:'CV Product Manager 2026 : modèle, compétences et exemples', excerpt:'Structure idéale, compétences différenciantes par type de PM (Technique, Growth, B2B), formulations avant/après avec KPIs et erreurs fréquentes à éviter.', read:'10 min', date:'3 juin 2026' },
+  { id:'cv-chef-de-projet-2026', cat:'cv', emoji:'📋', tag:'cv', title:'CV Chef de Projet 2026 : guide complet + exemples', excerpt:'Sections indispensables, certifications PMP/Prince2/PSM, formulations avec budget/équipe/délai et tableau comparatif CDP IT / Marketing / BTP / DSI.', read:'9 min', date:'3 juin 2026' },
+  { id:'cv-marketing-digital-2026', cat:'cv', emoji:'📱', tag:'cv', title:'CV Marketing Digital 2026 : modèle, compétences et exemples', excerpt:'SEO, SEA, Social, Growth — les 4 profils marketing digital, les outils à mentionner, les KPIs qui convainquent et les certifications qui comptent.', read:'9 min', date:'3 juin 2026' },
+  { id:'questions-entretien-stage', cat:'entretien', emoji:'🎓', tag:'entretien', title:'Questions d\'entretien de stage : les 25 plus posées avec réponses (2026)', excerpt:'Les 25 questions les plus posées en entretien de stage — avec réponses types, exemples, guide de préparation en 3 étapes et erreurs qui font recaler.', read:'12 min', date:'3 juin 2026' },
+  { id:'salaires-tech-2026', cat:'salaire', emoji:'💻', tag:'salaire', title:'Salaires dans la tech en France 2026 : le guide complet par métier', excerpt:'Développeur, Data Scientist, DevOps, Product Manager — les salaires réels dans la tech française en 2026, par niveau, par ville et par type d\'entreprise.', read:'11 min', date:'3 juin 2026' },
+  { id:'cv-infirmier-2026', cat:'cv', emoji:'🏥', tag:'cv', title:'CV infirmier / infirmière 2026 : modèle, compétences et erreurs à éviter', excerpt:'Modèle de CV infirmier(e) optimisé pour hôpitaux, cliniques et EHPAD. Numéro RPPS, certifications (AFGSU, DU), logiciels de soins et formulations bullet points qui font la différence.', read:'10 min', date:'6 juin 2026' },
+  { id:'cv-comptable-2026', cat:'cv', emoji:'📊', tag:'cv', title:'CV comptable 2026 : modèle, compétences et conseils pour décrocher un poste', excerpt:'Logiciels (SAP, Sage, QuickBooks), certifications (DCG, DSCG), tableau junior→DAF et formulations avec volume financier géré. Tout ce qu\'un recruteur comptabilité cherche en 20 secondes.', read:'11 min', date:'6 juin 2026' },
+  { id:'lettre-motivation-apprentissage', cat:'lettre', emoji:'🎓', tag:'lettre', title:'Lettre de motivation contrat d\'apprentissage 2026 : modèle annoté et conseils', excerpt:'Modèle de lettre annoté paragraphe par paragraphe, exemples par secteur (finance, commerce, dev), erreurs qui font rejeter la candidature et conseils pour se démarquer parmi 200 apprentis.', read:'9 min', date:'6 juin 2026' },
+];
+
+const tagColors = { cv:'tag-cv', entretien:'tag-entretien', recherche:'tag-recherche', salaire:'tag-salaire', lettre:'tag-lettre' };
+const tagLabels = { cv:'CV & ATS', entretien:'Entretien', recherche:'Marché emploi', salaire:'Salaire', lettre:'Lettre de motivation' };
+
+const slugMap = { 'ats-guide':'cv-ats-2026', 'star-method':'methode-star-entretien', 'salary-2026':'salaires-france-2026', 'cover-letter':'lettre-motivation-2026', 'alternance-guide':'trouver-alternance-2026', 'linkedin-optimization':'optimiser-profil-linkedin', 'cv-sans-experience':'cv-sans-experience', 'questions-entretien-rh':'questions-entretien-rh', 'relancer-candidature':'relancer-candidature', 'negocier-salaire':'negocier-salaire-entretien', 'candidature-spontanee':'candidature-spontanee-exemple', 'reconversion-professionnelle':'reconversion-professionnelle-2026', 'cv-par-competences-2026':'cv-par-competences-2026', 'negocier-contrat-travail-2026':'negocier-contrat-travail-2026', 'portfolio-developpeur-2026':'portfolio-developpeur-2026', 'entretien-en-anglais':'entretien-en-anglais', 'travailler-en-startup-2026':'travailler-en-startup-2026', 'teletravail-negocier-2026':'teletravail-negocier-2026', 'secteurs-qui-recrutent-2026':'secteurs-qui-recrutent-2026', 'ia-et-emploi-2026':'ia-et-emploi-2026', 'preparer-entretien-technique':'preparer-entretien-technique', 'email-candidature-parfait':'email-candidature-parfait', 'reseaux-sociaux-recherche-emploi':'reseaux-sociaux-recherche-emploi', 'cv-gratuit-en-ligne-2026':'cv-gratuit-en-ligne-2026', 'simulation-entretien-embauche':'simulation-entretien-embauche', 'generateur-lettre-motivation-gratuit':'generateur-lettre-motivation-gratuit', 'score-ats-cv-optimisation':'score-ats-cv-optimisation', 'lettre-motivation-stage':'lettre-motivation-stage', 'entretien-telephonique':'entretien-telephonique', 'cv-en-anglais':'cv-en-anglais', 'trouver-emploi-rapidement':'trouver-emploi-rapidement', 'comment-se-presenter-entretien':'comment-se-presenter-entretien', 'lettre-motivation-alternance':'lettre-motivation-alternance', 'defauts-entretien':'defauts-entretien', 'accroche-cv':'accroche-cv', 'salaire-brut-net':'salaire-brut-net', 'competences-cv':'competences-cv', 'cv-etudiant':'cv-etudiant', 'bilan-de-competences':'bilan-de-competences', 'periode-essai-droits':'periode-essai-droits', 'comment-faire-un-cv':'comment-faire-un-cv', 'questions-a-poser-en-entretien':'questions-a-poser-en-entretien', 'rupture-conventionnelle':'rupture-conventionnelle', 'lettre-motivation-reconversion':'lettre-motivation-reconversion', 'cv-commercial':'cv-commercial', 'lettre-demission':'lettre-demission', 'preparer-entretien-embauche':'preparer-entretien-embauche', 'cv-developpeur':'cv-developpeur', 'trouver-emploi-apres-50-ans':'trouver-emploi-apres-50-ans', 'modele-cv-word':'modele-cv-word', 'portage-salarial':'portage-salarial', 'contrat-de-professionnalisation':'contrat-de-professionnalisation', 'cv-manager':'cv-manager', '13eme-mois':'13eme-mois', 'prime-activite':'prime-activite', 'augmentation-salaire':'augmentation-salaire', 'devenir-freelance-2026':'devenir-freelance-2026', 'cv-ingenieur-2026':'cv-ingenieur-2026', 'repondre-recruteur-linkedin':'repondre-recruteur-linkedin', 'meilleurs-sites-emploi-france-2026':'meilleurs-sites-emploi-france-2026', 'cv-data-scientist-2026':'cv-data-scientist-2026', 'lettre-motivation-bts':'lettre-motivation-bts', 'cv-product-manager-2026':'cv-product-manager-2026', 'cv-chef-de-projet-2026':'cv-chef-de-projet-2026', 'cv-marketing-digital-2026':'cv-marketing-digital-2026', 'questions-entretien-stage':'questions-entretien-stage', 'salaires-tech-2026':'salaires-tech-2026', 'cv-infirmier-2026':'cv-infirmier-2026', 'cv-comptable-2026':'cv-comptable-2026', 'lettre-motivation-apprentissage':'lettre-motivation-apprentissage' };
+
+// Accent bg tints per category for card images
+const catBg = { cv:'linear-gradient(135deg,#EAE0F7,#D4C4F0)', entretien:'linear-gradient(135deg,#D7E8F4,#B8D4EE)', recherche:'linear-gradient(135deg,#DDEFE0,#BEDFBE)', salaire:'linear-gradient(135deg,#FBEFC9,#F5D980)' };
+
+let currentCat = 'tous';
+
+// Newsletter insert every N cards
+const NL_INSERT_AFTER = 9;
+
+function buildNewsletterBanner() {
+  return `<div class="newsletter-banner reveal" data-delay="1" style="grid-column:1/-1">
+    <div class="nl-inner">
+      <div class="nl-text">
+        <div class="nl-eyebrow">Newsletter</div>
+        <div class="nl-title">Conseils emploi chaque semaine</div>
+        <div class="nl-sub">Nos guides, les offres qui recrutent en France et les tendances marché — directement dans votre boite mail.</div>
+      </div>
+      <div>
+        <form class="nl-form" data-on-submit="handleNlSubmit_event_9900">
+          <input class="nl-input" type="email" placeholder="votre@email.fr" required autocomplete="email"/>
+          <button class="nl-btn" type="submit">S'abonner</button>
+        </form>
+        <div class="nl-note">Pas de spam. Désabonnement en un clic.</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function handleNlSubmit(e) {
+  e.preventDefault();
+  const email = e.target.querySelector('input[type=email]').value;
+  if (window.empShowToast) empShowToast('Merci ! Vous recevrez nos prochains conseils.', 'success');
+  else alert('Merci pour votre inscription !');
+  e.target.reset();
+}
+
+function renderArticles() {
+  const filtered = currentCat === 'tous' ? ARTICLES : ARTICLES.filter(a => a.cat === currentCat);
+  const grid = document.getElementById('articlesGrid');
+
+  let html = '';
+  filtered.forEach((a, i) => {
+    // Insert newsletter banner after NL_INSERT_AFTER articles (only on "tous" tab)
+    if (i === NL_INSERT_AFTER && currentCat === 'tous') {
+      html += buildNewsletterBanner();
+    }
+    const delay = ((i % 3) + 1);
+    html += `<a class="article-card reveal" data-delay="${delay}" href="/blog/${slugMap[a.id] || '#article-' + a.id}" data-cat="${a.cat}">
+      <div class="ac-img" style="background:${catBg[a.tag] || 'var(--surface)'}">${a.emoji}</div>
+      <div class="ac-body">
+        <div class="ac-top">
+          <span class="ac-tag ${tagColors[a.tag] || ''}">${esc(tagLabels[a.tag] || 'Conseils')}</span>
+          <span class="ac-read-time">${a.read}</span>
+        </div>
+        <div class="ac-title">${a.title}</div>
+        <div class="ac-excerpt">${a.excerpt}</div>
+        <div class="ac-footer">
+          <span class="ac-date">${a.date}</span>
+          <span class="ac-arrow">Lire →</span>
+        </div>
+      </div>
+    </a>`;
+  });
+
+  grid.innerHTML = html;
+
+  // Re-trigger reveal on newly injected cards
+  if (window.empInitReveal) window.empInitReveal();
+  else {
+    // Fallback: observe new .reveal elements
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.08 });
+    grid.querySelectorAll('.reveal').forEach(el => { observer.observe(el); });
+  }
+}
+
+function filterCat(btn) {
+  document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = btn.dataset.cat;
+  renderArticles();
+}
+
+function filterByCategory(cat) {
+  const btn = document.querySelector(`.cat-pill[data-cat="${cat}"]`);
+  if (btn) filterCat(btn);
+  const grid = document.getElementById('articlesGrid');
+  if (grid) window.scrollTo({ top: grid.offsetTop - 130, behavior: 'smooth' });
+}
+
+renderArticles();
+
+/* ── ARTICLE MODAL ── */
+const ARTICLE_CONTENT = {
+  'ats-guide': {
+    tag: 'Guide complet · CV & ATS',
+    title: 'Comment optimiser son CV pour passer les filtres ATS en France',
+    meta: '15 min · Mis à jour avril 2026 · Guide CV & ATS',
+    body: `
+      <p><strong>78% des CVs sont rejetés avant même d'être lus par un humain.</strong> En France, les grandes entreprises utilisent des logiciels ATS (Applicant Tracking System) pour filtrer automatiquement les candidatures. Voici comment passer ces filtres.</p>
+      <h2>🤖 Comment fonctionne un ATS ?</h2>
+      <p>Un ATS analyse votre CV automatiquement et attribue un score basé sur la correspondance avec l'offre. Les logiciels les plus utilisés en France sont <strong>SAP SuccessFactors, Talentsoft, Workday et Greenhouse</strong>.</p>
+      <div class="highlight">💡 Un CV ATS-optimisé doit avoir un score supérieur à 70/100 pour être lu par un recruteur humain.</div>
+      <h2>✅ Les règles d'or du CV ATS</h2>
+      <h3>1. Format : simple et structuré</h3>
+      <ul>
+        <li>Utilisez un fichier <strong>.docx ou .pdf texte</strong> (jamais scanné, jamais une image)</li>
+        <li>Police classique : Calibri, Arial, Times New Roman — taille 10-12pt</li>
+        <li>Pas de tableaux complexes, pas de colonnes multiples, pas d'en-têtes/pieds de page</li>
+        <li>Pas de logos, pas d'icônes, pas de graphiques</li>
+      </ul>
+      <h3>2. Mots-clés : copiez l'offre</h3>
+      <ul>
+        <li>Intégrez <strong>exactement</strong> les mêmes termes que l'offre (ex: "gestion de projet" et non "management de projet")</li>
+        <li>Incluez les outils mentionnés : Excel, Salesforce, JIRA, etc.</li>
+        <li>Répétez les mots-clés importants 2-3 fois naturellement</li>
+      </ul>
+      <h3>3. Structure : les sections obligatoires</h3>
+      <ul>
+        <li><strong>Titre de poste</strong> : reprend exactement l'intitulé de l'offre</li>
+        <li><strong>Résumé professionnel</strong> : 3-4 phrases avec les mots-clés principaux</li>
+        <li><strong>Expériences</strong> : ordre chronologique inverse, avec dates précises</li>
+        <li><strong>Compétences</strong> : section dédiée avec tous les outils/technologies</li>
+        <li><strong>Formation</strong> : diplôme, école, année — format standardisé</li>
+      </ul>
+      <h2>🔍 Les ATS en France : différences clés</h2>
+      <p><strong>Talentsoft</strong> (très utilisé CAC40) : privilégie les expériences détaillées avec mots-clés métier. <strong>SuccessFactors</strong> (banque, assurance) : analyse les diplômes et certifications. <strong>Workday</strong> : score basé sur l'adéquation poste/profil.</p>
+      <h2>📊 Checklist avant d'envoyer</h2>
+      <ul>
+        <li>☐ Nom du fichier : "Prenom-Nom-Poste.pdf"</li>
+        <li>☐ Titre = intitulé exact de l'offre</li>
+        <li>☐ Au moins 5 mots-clés de l'offre présents</li>
+        <li>☐ Dates au format MM/AAAA</li>
+        <li>☐ Coordonnées complètes (email, téléphone, ville)</li>
+        <li>☐ Pas de photo (discriminatoire et pénalisée par certains ATS)</li>
+      </ul>
+    `
+  },
+  'star-method': {
+    tag: 'Guide entretien',
+    title: 'La méthode STAR : structurez vos réponses en entretien',
+    meta: '8 min · Mis à jour avril 2026 · Entretiens',
+    body: `
+      <p>La méthode STAR est la technique la plus efficace pour répondre aux questions comportementales en entretien. Voici comment la maîtriser.</p>
+      <h2>⭐ STAR : Situation, Tâche, Action, Résultat</h2>
+      <div class="highlight"><strong>S</strong>ituation : Quel était le contexte ? (2-3 phrases max)<br><strong>T</strong>âche : Quel était votre rôle et vos responsabilités ?<br><strong>A</strong>ction : Qu'avez-vous fait concrètement ? (le cœur de la réponse)<br><strong>R</strong>ésultat : Quel a été l'impact, idéalement chiffré ?</div>
+      <h2>📝 Exemple concret</h2>
+      <p><strong>Question :</strong> "Parlez-moi d'une situation où vous avez dû gérer un conflit dans votre équipe."</p>
+      <p><strong>Réponse STAR :</strong><br>
+      <strong>S:</strong> "Dans mon précédent poste chez X, deux développeurs avaient des désaccords fréquents sur l'architecture technique du projet."<br>
+      <strong>T:</strong> "En tant que chef de projet, il était de ma responsabilité d'assurer la cohésion de l'équipe."<br>
+      <strong>A:</strong> "J'ai organisé une réunion avec les deux personnes, j'ai créé un tableau de décision objectif et nous avons choisi l'architecture par consensus."<br>
+      <strong>R:</strong> "Le projet a été livré en avance de 2 semaines, et l'ambiance d'équipe s'est nettement améliorée."</p>
+      <h2>🎯 Questions typiques en France</h2>
+      <ul>
+        <li>"Donnez-moi un exemple d'un objectif difficile que vous avez atteint"</li>
+        <li>"Comment gérez-vous les priorités quand tout est urgent ?"</li>
+        <li>"Parlez-moi d'un échec et ce que vous en avez appris"</li>
+        <li>"Décrivez une situation où vous avez dû convaincre quelqu'un"</li>
+      </ul>
+    `
+  },
+  'salary-2026': {
+    tag: 'Grilles salariales 2026',
+    title: 'Grille des salaires en France 2026 par métier et région',
+    meta: '10 min · Mis à jour avril 2026 · Salaires',
+    body: `
+      <p>Voici les données salariales réelles issues des offres France Travail et APEC pour 2026.</p>
+      <h2>💻 Tech & Digital</h2>
+      <ul>
+        <li>Développeur junior (0-3 ans) : <strong>35 000 – 45 000 €/an</strong></li>
+        <li>Développeur confirmé (3-7 ans) : <strong>45 000 – 60 000 €/an</strong></li>
+        <li>Développeur senior (7+ ans) : <strong>60 000 – 80 000 €/an</strong></li>
+        <li>Data Scientist : <strong>45 000 – 65 000 €/an</strong></li>
+        <li>Product Manager : <strong>50 000 – 75 000 €/an</strong></li>
+        <li>DevOps/Cloud Engineer : <strong>52 000 – 72 000 €/an</strong></li>
+      </ul>
+      <h2>📊 Marketing & Communication</h2>
+      <ul>
+        <li>Chargé de marketing junior : <strong>28 000 – 35 000 €/an</strong></li>
+        <li>Responsable marketing : <strong>42 000 – 58 000 €/an</strong></li>
+        <li>Directeur marketing : <strong>70 000 – 100 000 €/an</strong></li>
+      </ul>
+      <h2>🏦 Finance & Banque</h2>
+      <ul>
+        <li>Analyste financier junior : <strong>38 000 – 50 000 €/an</strong></li>
+        <li>Contrôleur de gestion : <strong>42 000 – 60 000 €/an</strong></li>
+        <li>Directeur financier : <strong>80 000 – 130 000 €/an</strong></li>
+      </ul>
+      <div class="highlight">📍 <strong>Paris vs Province :</strong> les salaires parisiens sont en moyenne 15-25% plus élevés. Lyon et Bordeaux suivent à ~10% d'écart.</div>
+    `
+  },
+  'cover-letter': {
+    tag: 'Guide lettre de motivation',
+    title: 'Rédiger une lettre de motivation percutante en 2026',
+    meta: '7 min · Mis à jour avril 2026 · CV & ATS',
+    body: `
+      <p>Les recruteurs passent en moyenne <strong>47 secondes</strong> sur une lettre de motivation. Voici comment structurer la vôtre pour survivre à ce test.</p>
+      <h2>🚫 Ce qu'il ne faut JAMAIS écrire</h2>
+      <ul>
+        <li>"Je me permets de vous contacter suite à votre annonce..."</li>
+        <li>"Mon parcours m'a permis de développer des compétences..."</li>
+        <li>"Je suis motivé et dynamique..."</li>
+        <li>"Dans l'attente de votre réponse, veuillez agréer..."</li>
+      </ul>
+      <h2>✅ La structure qui convertit</h2>
+      <h3>Paragraphe 1 — L'accroche (2-3 phrases)</h3>
+      <p>Montrez que vous connaissez l'entreprise. Mentionnez un fait précis : leur dernière levée de fonds, un produit, leur mission. Ça différencie immédiatement.</p>
+      <h3>Paragraphe 2 — Votre valeur ajoutée (80-100 mots)</h3>
+      <p>2-3 réalisations concrètes, quantifiées, directement liées aux besoins du poste. Pas votre CV en prose — des résultats.</p>
+      <h3>Paragraphe 3 — L'appel à l'action (40-60 mots)</h3>
+      <p>Exprimez votre motivation pour CE poste spécifiquement et proposez un entretien de manière proactive.</p>
+      <div class="highlight">💡 300 mots maximum. Les recruteurs français n'aiment pas les lettres longues.</div>
+    `
+  },
+  'alternance-guide': {
+    tag: 'Guide alternance 2026',
+    title: 'Trouver une alternance : guide complet 2026',
+    meta: '12 min · Mis à jour avril 2026 · Recherche',
+    body: `
+      <p>L'alternance est le meilleur tremplin pour l'emploi en France : <strong>7 alternants sur 10 sont embauchés par leur entreprise</strong> à l'issue du contrat.</p>
+      <h2>📅 Calendrier 2026</h2>
+      <ul>
+        <li><strong>Janvier – Mars :</strong> Début des candidatures pour les alternances de septembre</li>
+        <li><strong>Avril – Juin :</strong> Peak des offres et entretiens</li>
+        <li><strong>Juillet :</strong> Dernières places — urgence</li>
+        <li><strong>Août – Septembre :</strong> Signatures et démarrage</li>
+      </ul>
+      <h2>🌐 Les meilleures plateformes</h2>
+      <ul>
+        <li><strong>Emploia /jobs</strong> → filtrez par "Alternance"</li>
+        <li><strong>Indeed.fr</strong> → recherche "alternance [métier]"</li>
+        <li><strong>Welcome to the Jungle</strong> → offres de qualité, scale-ups</li>
+        <li><strong>LinkedIn</strong> → en ajoutant "alternance" dans les mots-clés</li>
+        <li><strong>L'Etudiant.fr</strong> → spécialisé alternance</li>
+      </ul>
+      <h2>💡 La stratégie des candidatures spontanées</h2>
+      <p>40% des alternances se trouvent par candidature spontanée. Identifiez 20 entreprises cibles, trouvez le RH sur LinkedIn, envoyez un message personnalisé + votre CV.</p>
+      <div class="highlight">✉️ Message LinkedIn type : "Bonjour [Prénom], je recherche une alternance en [domaine] pour [période]. Votre travail sur [projet spécifique] m'a particulièrement inspiré. Seriez-vous disponible pour un échange de 15 minutes ?"</div>
+    `
+  },
+};
+
+function openArticle(id) {
+  const article = ARTICLE_CONTENT[id];
+  if (!article) return;
+  document.getElementById('amTag').textContent = article.tag;
+  document.getElementById('amTitle').textContent = article.title;
+  document.getElementById('amMeta').textContent = article.meta;
+  document.getElementById('amBody').innerHTML = article.body;
+  document.getElementById('articleModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  window.history.pushState({}, '', '#article-' + id);
+}
+
+function closeArticle() {
+  document.getElementById('articleModal').classList.remove('open');
+  document.body.style.overflow = '';
+  window.history.pushState({}, '', window.location.pathname);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
+
+// Open article from URL hash on load
+if (window.location.hash.startsWith('#article-')) {
+  const id = window.location.hash.slice(9);
+  setTimeout(() => openArticle(id), 100);
+}
