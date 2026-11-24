@@ -22,6 +22,7 @@ import {
 } from '../../api/_lib/lever.js';
 import { FOURNISSEURS, TTL_SECONDES, MAX_OFFRES, collecterFournisseur } from '../../api/_lib/ats.js';
 import { causeDepuisBalise, construireBalise } from '../../api/_lib/ats-balise.js';
+import { lecteurPartage } from './_lecteur-partage.mjs';
 import { BOARDS, RELEVE } from '../../api/_lib/lever-boards.js';
 import { CONTRATS, contratLever, tempsLever, contratDepuisTexte } from '../../api/_lib/contrat.js';
 
@@ -352,12 +353,17 @@ function extraire(src, nom) {
   return null;
 }
 const blocFetch = extraire(jobsSrc, 'fetchLever');
+// Le collecteur délègue sa lecture à `servirReservoir` et à `_lib/recherche.js`,
+// exécutés tels qu'écrits — voir `_lecteur-partage.mjs`.
+const lecteur = lecteurPartage(jobsSrc);
+check('le lecteur partagé des réservoirs est exécutable tel qu’écrit', lecteur.present);
 check('le collecteur du handler est extractible pour être exécuté', Boolean(blocFetch));
 
 async function appeler(contenuKV, { q = '', type = '', location = '', page = 0, balise = null } = {}) {
   const j = [];
   const bac = {
     console,
+    ...lecteur.globaux,
     kvGet: async () => contenuKV,
     muet: (jj, source, raison, cause) => { jj?.push({ source, raison, cause: cause || 'inconnue' }); return []; },
     FILTRE_VERS_CONTRAT: { stage: 'Stage', alternance: 'Alternance', cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance' },
@@ -368,7 +374,7 @@ async function appeler(contenuKV, { q = '', type = '', location = '', page = 0, 
     resultat: null, journal: j,
   };
   vm.createContext(bac);
-  vm.runInContext(`${blocFetch}; resultat = fetchLever(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal, lireBalise);`, bac);
+  vm.runInContext(`${lecteur.source}\n${blocFetch}; resultat = fetchLever(${JSON.stringify(q)}, ${JSON.stringify(type)}, ${JSON.stringify(location)}, ${page}, journal, lireBalise);`, bac);
   return { offres: await bac.resultat, journal: j };
 }
 

@@ -101,7 +101,7 @@ ok('plan', `free · ${used} génération(s) déjà utilisée(s)`);
 // ── Phase B : épuiser, si demandé ───────────────────────────────────────────
 // Placée avant la phase A : on ne peut tester le refus qu'une fois la limite
 // atteinte. Sur un compte déjà épuisé, rien n'est dépensé.
-const PAYLOAD = { company: 'Sonde EmploiA', jobTitle: 'Test', tone: 'professional' };
+const PAYLOAD = { company: 'Sonde Emploia', jobTitle: 'Test', tone: 'professional' };
 if (used < FREE_LIMIT) {
   if (!CONSOMME) {
     console.log(`\n[B] Épuisement — ignoré`);

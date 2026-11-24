@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { kvGet, kvSet, kvSmembers, htmlEscape } from '../_lib/auth.js';
+import { kvGet, kvSet, kvSmembers, htmlEscape, unsubscribeUrl, bearerMatches } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
@@ -56,7 +56,7 @@ async function generateEmail(user, profile, daysOld, generationsUsed, apiKey) {
 
 export default async function handler(req) {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  if (!bearerMatches(req, cronSecret)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -119,7 +119,7 @@ export default async function handler(req) {
     <a href="${BASE_URL}/#pricing" style="display:inline-block;background:linear-gradient(135deg,#6E48BE,#4f46e5);color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;margin-top:8px">Passer Pro — 24€/mois →</a>
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px">
-    Emploia · <a href="${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a>
+    Emploia · <a href="${unsubscribeUrl(email)}" style="color:#94a3b8">Se désabonner</a>
   </p>
 </div>
 </body></html>`,

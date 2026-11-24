@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { getCurrentUser, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX, htmlEscape } from "../_lib/auth.js";
+import { getCurrentUser, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX, htmlEscape, unsubscribeUrl } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -58,6 +58,9 @@ export default async function handler(req) {
     const sendDrip = async (key, subject, html) => {
       const fullUser = await kvGet(`user:${user.email}`);
       if (fullUser?.[key]) return;
+      // Le lien « Se désabonner » de ces emails pose `optout:` : il doit aussi
+      // les arrêter, pas seulement ceux des crons.
+      if (await kvGet(`optout:${user.email}`)) return;
       // Atomic lock (NX = set only if not exists, TTL=120s) prevents double-send
       // from concurrent /me requests hitting the same user at the same time
       const locked = await kvSetNX(`driplock:${user.email}:${key}`, 1, 120);
@@ -73,7 +76,7 @@ export default async function handler(req) {
         await kvSet(`user:${user.email}`, { ...fullUser, [key]: true });
       } catch { /* fire-and-forget */ }
     };
-    const baseHtml = (title, body) => `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">${title}</h1>${body}</div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`;
+    const baseHtml = (title, body) => `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif"><div style="max-width:520px;margin:40px auto;padding:0 20px"><div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden"><div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:28px 32px"><div style="background:rgba(255,255,255,.2);display:inline-block;border-radius:10px;padding:6px 14px;font-size:18px;font-weight:900;color:#fff">Emploia</div></div><div style="padding:32px"><h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 12px">${title}</h1>${body}</div></div><p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="${unsubscribeUrl(user.email)}" style="color:#94a3b8">Se désabonner</a></p></div></body></html>`;
     // Each drip is checked independently (not else-if) so a user inactive
     // for several days still receives all relevant drips on their next visit.
     // sendDrip() is idempotent via KV flags — no double-send risk.
@@ -215,7 +218,7 @@ export default async function handler(req) {
   </a>
 </div>
 <a href="https://emploia.eu/app" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;font-weight:800;font-size:15px;padding:14px 28px;border-radius:11px;text-decoration:none">Reprendre ma recherche →</a>
-<p style="margin-top:20px;font-size:12px;color:#94a3b8">Pour ne plus recevoir ces emails : <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(user.email)}" style="color:#94a3b8">Se désabonner</a></p>`
+<p style="margin-top:20px;font-size:12px;color:#94a3b8">Pour ne plus recevoir ces emails : <a href="${unsubscribeUrl(user.email)}" style="color:#94a3b8">Se désabonner</a></p>`
       )).catch(() => {});
     }
   }

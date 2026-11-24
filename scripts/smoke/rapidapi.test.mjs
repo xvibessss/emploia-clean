@@ -329,8 +329,10 @@ check('le TTL de la clé couvre trois exécutions quotidiennes manquées',
   TTL_SECONDES >= 72 * 3600, `${TTL_SECONDES / 3600} h`);
 
 const cronSrc = fs.readFileSync(new URL('../../api/cron/collect-rapidapi.js', import.meta.url), 'utf8');
+// Comparaison à temps constant via bearerMatches (api/_lib/auth.js) : un `!==`
+// laissait mesurer, caractère par caractère, la part juste du secret.
 check('le cron refuse un appel sans CRON_SECRET',
-  /req\.headers\.get\('authorization'\) !== `Bearer \$\{cronSecret\}`/.test(cronSrc) &&
+  /if \(!bearerMatches\(req, cronSecret\)\)/.test(cronSrc) &&
   /status: 401/.test(cronSrc));
 // ── 11. LA CLÉ EST ÉCRITE MÊME QUAND LA COLLECTE NE RAMÈNE RIEN ─────────────
 // Il y avait ici l'assertion EXACTEMENT INVERSE : « une collecte totalement

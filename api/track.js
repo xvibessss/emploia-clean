@@ -1,28 +1,12 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvIncr, kvZadd, kvZcard, kvZremrangebyrank, kvExpire } from './_lib/auth.js';
+import { checkRateLimit } from './_lib/auth.js';
+import { trackEvent, CLIENT_EVENTS } from './_lib/track.js';
 
-const VALID_EVENTS = [
-  'cv_generated',
-  'user_registered',
-  'plan_upgraded',
-  'interview_started',
-  'ats_checked',
-  'letter_generated',
-  'paywall_viewed',
-  'checkout_started',
-  'referral_code_created',
-  'referral_signup',
-];
-
-const MAX_TIMELINE_SIZE = 10000;
+// Endpoint public : seuls les événements nés dans le navigateur. Les autres
+// (inscription, génération, paiement) sont comptés par le serveur lui-même via
+// _lib/track.js — voir la note en tête de ce fichier pour la raison.
 const MAX_BODY_SIZE = 1024;
-// Daily per-event buckets self-expire so the keyspace stays bounded.
-const DAILY_BUCKET_TTL = 120 * 86400; // ~120 days
-
-function dayKey(ts) {
-  return new Date(ts).toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
-}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -35,6 +19,10 @@ export default async function handler(req, res) {
   const contentLength = parseInt(req.headers['content-length'] || '0', 10);
   if (contentLength > MAX_BODY_SIZE) return res.status(413).json({ error: 'Payload too large' });
 
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'track', 60, 3600);
+  if (!rl.allowed) return res.status(429).json({ error: 'Too many requests' });
+
   let body;
   try {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -44,21 +32,12 @@ export default async function handler(req, res) {
 
   const { event, props } = body || {};
   if (!event || typeof event !== 'string') return res.status(400).json({ error: 'Missing or invalid event' });
-  if (!VALID_EVENTS.includes(event)) return res.status(400).json({ error: 'Unknown event' });
+  // Un événement inconnu (cv_vault_view…) est ignoré sans erreur : le client
+  // l'envoie aussi à Plausible, et un 400 ne servirait qu'à remplir la console.
+  if (!CLIENT_EVENTS.includes(event)) return res.status(202).json({ ok: true, ignored: true });
 
   try {
-    await kvIncr(`track:${event}`);
-    const now = Date.now();
-    // Per-day bucket for time-series / trend charts (self-expiring).
-    const bucketKey = `track:${event}:${dayKey(now)}`;
-    const { result: bucketCount } = await kvIncr(bucketKey);
-    if (Number(bucketCount) === 1) await kvExpire(bucketKey, DAILY_BUCKET_TTL);
-    const member = JSON.stringify({ event, props: props || {}, ts: now });
-    await kvZadd('track:events', now, member);
-    const size = await kvZcard('track:events');
-    if (size > MAX_TIMELINE_SIZE) {
-      await kvZremrangebyrank('track:events', 0, size - MAX_TIMELINE_SIZE - 1);
-    }
+    await trackEvent(event, props);
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[track] KV error:', err);

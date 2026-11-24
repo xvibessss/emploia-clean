@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════════════
-   EmploiA — rasterisation des icônes d'application
+   Emploia — rasterisation des icônes d'application
 
    Pourquoi ce script existe. `apple-touch-icon` désignait `favicon.svg`.
    iOS n'accepte pas le SVG pour cette balise : Safari exige du PNG. Un
-   candidat qui ajoute EmploiA à son écran d'accueil — le geste naturel
+   candidat qui ajoute Emploia à son écran d'accueil — le geste naturel
    pour un outil qu'on rouvre chaque jour pendant une recherche — n'y
    trouvait donc pas le logo, mais une vignette générée par le système.
 

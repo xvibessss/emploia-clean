@@ -1,5 +1,7 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { kvGet, kvSet, kvSadd, signToken, setCookieHeader, htmlEscape } from '../../_lib/auth.js';
+import { kvGet, kvSet, kvSadd, signToken, setCookieHeader, htmlEscape, safeEqual, checkRateLimit } from '../../_lib/auth.js';
+import { creditReferral, createReferralCode } from '../../_lib/referral.js';
+import { trackEvent } from '../../_lib/track.js';
 
 export default async function handler(req) {
   const url = new URL(req.url);
@@ -15,7 +17,13 @@ export default async function handler(req) {
   const cookies = req.headers.get('cookie') || '';
   const cookieState = cookies.match(/emp_oauth_state=([^;]+)/)?.[1];
 
-  if (!code || !state || state !== cookieState) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'google-callback', 20, 600);
+  if (!rl.allowed) {
+    return new Response(null, { status: 302, headers: { Location: '/?error=trop_de_tentatives' } });
+  }
+
+  if (!code || !state || !safeEqual(state, cookieState || '')) {
     return new Response(null, { status: 302, headers: { Location: '/?error=oauth_invalid' } });
   }
 
@@ -83,6 +91,12 @@ export default async function handler(req) {
       await kvSet(`user:${email}`, user);
       await kvSet(`userid:${id}`, email);
       kvSadd('all_users', email).catch(() => {});
+      trackEvent('user_registered').catch(() => {});
+      await createReferralCode(user).catch(() => null);
+      const refCookie = cookies.match(/(?:^|;\s*)emp_oauth_ref=([A-Z0-9]{8})(?:;|$)/)?.[1];
+      if (refCookie) {
+        await creditReferral(refCookie, user).catch((e) => console.error('[google] parrainage non crédité', e?.message));
+      }
 
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {
@@ -115,6 +129,7 @@ export default async function handler(req) {
     const headers = new Headers({ Location: isNewUser ? '/onboarding' : '/dashboard' });
     headers.append('Set-Cookie', setCookieHeader(token));
     headers.append('Set-Cookie', 'emp_oauth_state=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure');
+    headers.append('Set-Cookie', 'emp_oauth_ref=; HttpOnly; Path=/api/auth/google; Max-Age=0; SameSite=Lax; Secure');
     return new Response(null, { status: 302, headers });
 
   } catch (err) {

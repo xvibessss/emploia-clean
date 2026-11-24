@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
+import * as recherche from '../../api/_lib/recherche.js';
 
 const racine = new URL('../../', import.meta.url);
 const src = fs.readFileSync(new URL('api/jobs.js', racine), 'utf8');
@@ -54,16 +55,20 @@ function extraire(source, nom) {
 // une copie de leur logique resterait verte en divergeant du handler.
 console.log('\n── Les trois états du filtre ──');
 
-const blocs = ['normaliser', 'motsDeRecherche', 'estPertinente', 'filtrerPertinence']
-  .map(n => extraire(src, n));
-check('les quatre fonctions du filtre sont extractibles', blocs.every(Boolean));
+// `normaliser`, `motsDeRecherche` et la garde des enseignes homonymes vivent
+// dans `_lib/recherche.js`, partagés avec le lecteur des réservoirs : ils sont
+// importés tels quels. Les deux filtres de l'agrégat sont lus dans le handler.
+const blocs = ['estPertinente', 'filtrerPertinence'].map(n => extraire(src, n));
+check('les deux fonctions du filtre sont extractibles', blocs.every(Boolean));
+check('le handler importe la lecture de requête du module partagé',
+  /from '\.\/_lib\/recherche\.js'/.test(src));
 
-const motsVides = /const MOTS_VIDES = new Set\([^)]*\);/s.exec(src)?.[0];
-check('MOTS_VIDES est lisible', Boolean(motsVides));
+check('MOTS_VIDES est exporté', recherche.MOTS_VIDES instanceof Set && recherche.MOTS_VIDES.has('emploi'));
+check('ENSEIGNES_HOMONYMES est exporté', recherche.ENSEIGNES_HOMONYMES instanceof Set && recherche.ENSEIGNES_HOMONYMES.has('boulanger'));
 
-const bac = { console };
+const bac = { console, ...recherche };
 vm.createContext(bac);
-vm.runInContext(`${motsVides}\n${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
+vm.runInContext(`${blocs.join('\n')}\nthis.filtrerPertinence = filtrerPertinence; this.motsDeRecherche = motsDeRecherche; this.estPertinente = estPertinente;`, bac);
 const { filtrerPertinence, motsDeRecherche } = bac;
 
 const offre = (p = {}) => ({ title: 'Développeur Backend', company: 'Acme', location: 'Paris', description: 'Node.js', ...p });
@@ -95,6 +100,20 @@ check('la correspondance est une sous-chaîne — « boulangerie » retient « b
 check('les mots de moins de quatre lettres sont ignorés',
   !motsDeRecherche('cdi', '').length);
 
+// L'enseigne Boulanger (électroménager, catalogue SmartRecruiters) ne doit
+// pas passer pour une offre de boulanger sur la foi de son seul nom.
+const enseigne = offre({ title: 'Vendeur électroménager H/F', company: 'Boulanger', location: 'Lille', description: '' });
+const homonyme = filtrerPertinence([enseigne, offre({ title: 'Commis boulanger' })], 'boulanger', '');
+check('une enseigne homonyme d’un métier ne correspond pas par son seul nom',
+  homonyme.filtre === 'actif' && homonyme.jobs.length === 1 && homonyme.jobs[0].title === 'Commis boulanger',
+  `${homonyme.filtrees} écartée(s)`);
+check('ses offres restent trouvables par leur titre',
+  filtrerPertinence([enseigne, offre()], 'vendeur', '').jobs.length === 1);
+check('la neutralisation porte sur le nom ENTIER — « Boulangerie Paul » reste un indice',
+  filtrerPertinence([offre({ title: 'Vendeur', company: 'Boulangerie Paul' }), offre()], 'boulanger', '').jobs.length === 1);
+check('une entreprise ordinaire reste un indice — « Accor » trouve Accor',
+  filtrerPertinence([offre({ title: 'Réceptionniste', company: 'Accor' }), offre()], 'accor', '').jobs.length === 1);
+
 // ── 2. LE HANDLER LE DIT ENCORE AUX JOURNAUX ────────────────────────────────
 // La correction AJOUTE une visibilité, elle n'en retire pas.
 console.log('\n── Le handler journalise toujours le repli ──');
@@ -120,7 +139,7 @@ check('l’avis est rendu AU-DESSUS de la liste',
 // « 0 offre pour "" » serait une phrase cassée. Les deux vides ne peuvent pas
 // abandonner — ce qui est vérifié juste en dessous sur le vrai filtre.
 check('la cible nommée est la requête OU le lieu',
-  /const cible = q \|\| loc \|\| '';/.test(jobsHtml) && /\$\{q \|\| loc\}/.test(jobsHtml));
+  /const cible = q \|\| loc \|\| '';/.test(jobsHtml) && /\$\{esc\(q \|\| loc\)\}/.test(jobsHtml));
 const surLieuSeul = filtrerPertinence([offre({ location: 'Paris' })], '', 'Carcassonne');
 check('le repli se déclenche bien sur le lieu seul',
   surLieuSeul.filtre === 'abandonne');
@@ -136,7 +155,7 @@ check('le compteur consulte le drapeau avant d’affirmer',
 check('sous repli, la page annonce zéro offre POUR la requête',
   /<strong>0<\/strong> offre pour/.test(jobsHtml));
 check('hors repli, le compteur est inchangé',
-  /<strong>\$\{total\.toLocaleString\('fr-FR'\)\}<\/strong> offres \$\{label\}/.test(jobsHtml));
+  /<strong>\$\{total\.toLocaleString\('fr-FR'\)\}<\/strong> offres \$\{esc\(label\)\}/.test(jobsHtml));
 
 // ── 4. AUCUNE PAGE N'AFFIRME PLUS UN COMPTEUR EN AVEUGLE ────────────────────
 // L'invariant porte sur les 85 pages, pas sur un échantillon : c'est la seule

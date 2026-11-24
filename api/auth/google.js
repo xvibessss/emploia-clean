@@ -28,5 +28,11 @@ export default async function handler(req) {
 
   const headers = new Headers({ Location: `https://accounts.google.com/o/oauth2/v2/auth?${params}` });
   headers.append('Set-Cookie', `emp_oauth_state=${state}; HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`);
+  // Un parrainage capté (?ref=) traverse l'aller-retour Google dans un cookie
+  // à part : le callback ne le crédite que si le compte est créé à ce moment-là.
+  const ref = (new URL(req.url).searchParams.get('ref') || '').trim().toUpperCase();
+  if (/^[A-Z0-9]{8}$/.test(ref)) {
+    headers.append('Set-Cookie', `emp_oauth_ref=${ref}; HttpOnly; Path=/api/auth/google; Max-Age=600; SameSite=Lax; Secure`);
+  }
   return new Response(null, { status: 302, headers });
 }

@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { kvGet, kvSmembers, checkRateLimit } from './_lib/auth.js';
+import { kvGet, kvSmembers, checkRateLimit, adminSecretMatches } from './_lib/auth.js';
 
 // Admin-only stats endpoint — requires ADMIN_SECRET header.
 // Never exposed to regular users; returns aggregate metrics.
@@ -17,8 +17,7 @@ export default async function handler(req) {
     });
   }
 
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret || req.headers.get('x-admin-secret') !== secret) {
+  if (!adminSecretMatches(req)) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
   }
 

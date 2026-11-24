@@ -1,21 +1,21 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { getCurrentUser, kvGet, kvSet, getAllowedOrigin, checkRateLimit, validateEmail, extendPro } from './_lib/auth.js';
+import { getCurrentUser, kvGet, getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
+import { createReferralCode } from './_lib/referral.js';
+import { trackEvent } from './_lib/track.js';
 
-// Referral system:
-// KV keys:
-//   ref:{code}        → { userId, email, signups: [email,...], monthsEarned: 0, createdAt }
-//   refcode:{userId}  → code  (lookup by user)
-
-function genCode(userId) {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const seed = userId.slice(-8);
-  let code = '';
-  for (let i = 0; i < 8; i++) {
-    const idx = (seed.charCodeAt(i % seed.length) + i * 7) % chars.length;
-    code += chars[idx];
-  }
-  return code;
-}
+// GET /api/referral — code de parrainage de l'utilisateur connecté (créé au
+// besoin) et ses compteurs.
+//
+// Il n'y a plus de POST. Le crédit d'un parrainage n'arrive qu'au moment où un
+// compte est créé, côté serveur (`_lib/referral.js`, appelé par register.js et
+// par le callback Google) : un endpoint public qui crédite sur la foi d'une
+// adresse e-mail permettait de s'offrir des mois de Pro sans parrainer
+// personne.
+//
+// KV :
+//   ref:{code}        → { userId, email, signups: [email,...], monthsEarned, createdAt }
+//   refcode:{userId}  → code
+//   referred:{email}  → code qui a parrainé ce compte (verrou « une fois »)
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -24,111 +24,36 @@ export default async function handler(req) {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Credentials': 'true',
     'Vary': 'Origin',
+    'Cache-Control': 'no-store',
   };
 
   if (req.method === 'OPTIONS') return new Response(null, {
     status: 204,
-    headers: { ...H, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
+    headers: { ...H, 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
   });
+  if (req.method !== 'GET') {
+    return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: { ...H, Allow: 'GET, OPTIONS' } });
+  }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rl = await checkRateLimit(`ip:${ip}`, 'referral', 30, 3600);
   if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: { ...H, 'Retry-After': '3600' } });
 
-  // GET /api/referral — get or create referral code for logged-in user
-  if (req.method === 'GET') {
-    const user = await getCurrentUser(req);
-    if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
+  const user = await getCurrentUser(req);
+  if (!user) return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: H });
 
-    let code = await kvGet(`refcode:${user.id}`);
-    if (!code) {
-      code = genCode(user.id);
-      const refData = { userId: user.id, email: user.email, signups: [], monthsEarned: 0, createdAt: new Date().toISOString() };
-      await kvSet(`ref:${code}`, refData);
-      await kvSet(`refcode:${user.id}`, code);
-      // Track (fire and forget)
-      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
-      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_code_created' }) }).catch(() => {});
-    }
-
-    const refData = await kvGet(`ref:${code}`) || {};
-    return new Response(JSON.stringify({
-      code,
-      link: `https://emploia.eu/?ref=${code}`,
-      signups: (refData.signups || []).length,
-      monthsEarned: refData.monthsEarned || 0,
-    }), { status: 200, headers: H });
+  let code = await kvGet(`refcode:${user.id}`);
+  if (!code) {
+    code = await createReferralCode(user);
+    if (!code) return new Response(JSON.stringify({ error: 'Service momentanément indisponible' }), { status: 503, headers: H });
+    trackEvent('referral_code_created').catch(() => {});
   }
 
-  // POST /api/referral — track a referral signup (called during register if ?ref= in URL)
-  if (req.method === 'POST') {
-    const bodyText = await req.text();
-    if (bodyText.length > 500) return new Response(JSON.stringify({ error: 'Requête trop longue' }), { status: 413, headers: H });
-    let body;
-    try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
-
-    const { code, newUserEmail } = body;
-    if (!code || !newUserEmail) return new Response(JSON.stringify({ error: 'code et newUserEmail requis' }), { status: 400, headers: H });
-
-    // Validate code format
-    if (!/^[A-Z0-9]{8}$/.test(code)) return new Response(JSON.stringify({ error: 'Code invalide' }), { status: 400, headers: H });
-
-    // Validate email to prevent garbage data in signups list
-    if (!validateEmail(String(newUserEmail).toLowerCase().trim())) {
-      return new Response(JSON.stringify({ error: 'Email invalide' }), { status: 400, headers: H });
-    }
-    const normalizedNewEmail = String(newUserEmail).toLowerCase().trim();
-
-    const [refData, newUser] = await Promise.all([
-      kvGet(`ref:${code}`),
-      kvGet(`user:${normalizedNewEmail}`),
-    ]);
-    if (!refData) return new Response(JSON.stringify({ error: 'Code introuvable' }), { status: 404, headers: H });
-    // Don't reveal whether the email exists in the system
-    if (!newUser) return new Response(JSON.stringify({ ok: false }), { status: 200, headers: H });
-
-    // Don't let the owner refer themselves
-    if (refData.email === normalizedNewEmail) return new Response(JSON.stringify({ ok: false, reason: 'self' }), { status: 200, headers: H });
-
-    // Don't double-count
-    if ((refData.signups || []).includes(normalizedNewEmail)) {
-      return new Response(JSON.stringify({ ok: false, reason: 'already_counted' }), { status: 200, headers: H });
-    }
-
-    const signups = [...(refData.signups || []), normalizedNewEmail];
-    const monthsEarned = Math.min(6, signups.length); // max 6 months
-    await kvSet(`ref:${code}`, { ...refData, signups, monthsEarned });
-    // Track a genuinely new referred signup (fire and forget)
-    {
-      const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
-      fetch(`${base}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'referral_signup' }) }).catch(() => {});
-    }
-
-    // Reward = internally-granted free Pro time (proUntil), honored by getCurrentUser.
-    // No Stripe subscription is created; it simply auto-expires.
-    // extendPro lives in _lib/auth.js — shared with the Pack Campagne grant.
-
-    // Referrer: +30 days per new signup, capped at 6 rewarded signups (≈6 months).
-    const referrerUser = await kvGet(`user:${refData.email}`);
-    if (referrerUser) {
-      const patch = { ...referrerUser, referralMonths: monthsEarned, referralSignups: signups.length };
-      if (signups.length <= 6) patch.proUntil = extendPro(referrerUser.proUntil, 30);
-      await kvSet(`user:${refData.email}`, patch);
-    }
-
-    // Referee: +14 days of Pro as a welcome bonus (makes the invite worth accepting).
-    let refereeDays = 0;
-    if (!newUser.referredBy) {
-      refereeDays = 14;
-      await kvSet(`user:${normalizedNewEmail}`, {
-        ...newUser,
-        referredBy: code,
-        proUntil: extendPro(newUser.proUntil, refereeDays),
-      });
-    }
-
-    return new Response(JSON.stringify({ ok: true, signups: signups.length, monthsEarned, refereeDays }), { status: 200, headers: H });
-  }
-
-  return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), { status: 405, headers: H });
+  const refData = await kvGet(`ref:${code}`) || {};
+  return new Response(JSON.stringify({
+    code,
+    link: `https://emploia.eu/?ref=${code}`,
+    signups: (refData.signups || []).length,
+    monthsEarned: refData.monthsEarned || 0,
+  }), { status: 200, headers: H });
 }
