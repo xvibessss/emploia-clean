@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { kvGet, kvSet, kvSmembers, getGenerationsUsed } from '../_lib/auth.js';
+import { kvGet, kvSet, kvSmembers, getGenerationsUsed, unsubscribeUrl, bearerMatches } from '../_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
@@ -9,7 +9,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 
 export default async function handler(req) {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers.get('authorization') !== `Bearer ${cronSecret}`) {
+  if (!bearerMatches(req, cronSecret)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -114,7 +114,7 @@ export default async function handler(req) {
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">
     © ${new Date().getFullYear()} Emploia ·
     <a href="${BASE_URL}" style="color:#94a3b8">emploia.eu</a> ·
-    <a href="${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a>
+    <a href="${unsubscribeUrl(email)}" style="color:#94a3b8">Se désabonner</a>
   </p>
 </div>
 </body></html>`,

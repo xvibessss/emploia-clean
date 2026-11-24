@@ -101,6 +101,14 @@ jobs:
         run: node scripts/smoke/lever.test.mjs
       - name: Collecteur Teamtailor (un salaire mensuel n'est jamais publié en k€/an)
         run: node scripts/smoke/teamtailor.test.mjs
+      - name: Collecteur SmartRecruiters (l'id « permanent » n'est jamais lu comme un CDI)
+        run: node scripts/smoke/smartrecruiters.test.mjs
+      - name: Collecteur Ashby (isRemote n'est pas du distanciel, l'equity n'est pas un salaire)
+        run: node scripts/smoke/ashby.test.mjs
+      - name: Découverte des boards (le contenu décide, un réseau muet n'est pas une absence)
+        run: node scripts/smoke/decouverte.test.mjs
+      - name: Recherche dans les réservoirs (mot à mot, sans accent, la ville par le lieu)
+        run: node scripts/smoke/recherche.test.mjs
       - name: Réservoir RapidAPI (budget sous le plafond mesuré, absence jamais masquée)
         run: node scripts/smoke/rapidapi.test.mjs
       - name: Collecteur France Travail (jeton lu de expires_in, 4 causes distinctes)
@@ -117,6 +125,8 @@ jobs:
         run: node scripts/smoke/assertions.test.mjs
       - name: Achat anonyme (le webhook n'abandonne jamais un paiement en silence)
         run: node scripts/billing/achat-anonyme.test.mjs
+      - name: Sécurité — désinscription signée, parrainage, CORS, secrets, funnel
+        run: node scripts/security/hardening.test.mjs
       - name: Alerte de régression SEO (création, dédoublonnage, répétition sans écriture)
         run: node scripts/seo/alerte-regression.test.mjs
       - name: Billing probes (checkout mode + webhook grant/rejeu + commissions)

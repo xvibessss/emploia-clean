@@ -316,7 +316,11 @@ window.empSwitchAuthTab = function(tab) {
   document.getElementById('empLoginError').style.display = 'none';
   document.getElementById('empRegisterError').style.display = 'none';
 };
-window.empGoogleLogin = function() { window.location.href = '/api/auth/google'; };
+window.empGoogleLogin = function() {
+  let ref = '';
+  try { ref = sessionStorage.getItem('emploia_ref') || ''; } catch (e) {}
+  window.location.href = '/api/auth/google' + (/^[A-Z0-9]{8}$/.test(ref) ? '?ref=' + ref : '');
+};
 window.empPwdStrength = function(pwd) {
   const bar = document.getElementById('empPwdBar');
   if (!bar) return;
@@ -579,7 +583,10 @@ async function empAuthInit() {
 
 // ── SUPPORT WIDGET FLOTTANT ─────────────────────────────────────────
 (function empSupportWidget() {
-  if (window.location.pathname === '/chat') return;
+  // Pages qui ont déjà leur propre assistant : un second bouton de chat se
+  // posait exactement sur le leur (/jobs : copilote Orion) ou sur le bouton
+  // d'envoi du simulateur (/interview).
+  if (['/chat', '/jobs', '/interview'].includes(window.location.pathname.replace(/\.html$/, ''))) return;
 
   const CSS = `
 #emp-sw-btn{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--primary,#6E48BE);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(110,72,190,.35);display:flex;align-items:center;justify-content:center;z-index:9000;transition:transform .2s,box-shadow .2s}

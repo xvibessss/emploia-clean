@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ═══════════════════════════════════════════════════════════════════
-   EmploiA — empreinte de contenu sur shared.css et shared.js
+   Emploia — empreinte de contenu sur shared.css et shared.js
 
    Pourquoi ce script existe. Les deux feuilles partagées étaient servies
    sans version dans leur URL, avec `max-age=604800, stale-while-revalidate=

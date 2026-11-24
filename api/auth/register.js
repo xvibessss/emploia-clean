@@ -1,7 +1,9 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
+import { trackEvent } from '../_lib/track.js';
+import { createReferralCode, creditReferral } from '../_lib/referral.js';
 import {
   kvGet, kvSet, kvSadd, signToken, setCookieHeader, checkRateLimit,
-  hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape
+  hashPassword, generateSalt, getAllowedOrigin, validateEmail, sanitizeString, htmlEscape, unsubscribeUrl,
 } from "../_lib/auth.js";
 
 const FORBIDDEN_DISPOSABLE = ['mailinator', 'guerrillamail', 'tempmail', 'throwam', 'yopmail', '10minutemail'];
@@ -87,28 +89,16 @@ export default async function handler(req) {
   await kvSet(`user:${email}`, user);
   await kvSet(`userid:${id}`, email);
   kvSadd('all_users', email).catch(() => {});
-  // Track registration (fire and forget)
-  const trackBase = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
-  fetch(`${trackBase}/api/track`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'user_registered' }) }).catch(() => {});
+  trackEvent('user_registered').catch(() => {});
 
-  // Generate a cryptographically random referral code (not derived from userId)
-  const refCharsMap = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const refBytes = new Uint8Array(8);
-  crypto.getRandomValues(refBytes);
-  const ownRefCode = Array.from(refBytes).map(b => refCharsMap[b % refCharsMap.length]).join('');
-  kvSet(`ref:${ownRefCode}`, { userId: id, email, signups: [], monthsEarned: 0, createdAt: new Date().toISOString() }).catch(() => {});
-  kvSet(`refcode:${id}`, ownRefCode).catch(() => {});
+  // Code de parrainage propre au nouveau compte (aléatoire, réservé en NX).
+  const ownRefCode = await createReferralCode({ id, email }).catch(() => null);
 
-  // Track referral signup if a ref code was provided
+  // Parrainage reçu : crédité ici, directement, avec le compte qui vient
+  // d'être écrit — plus par un appel HTTP à un endpoint public.
   const refCode = typeof body.ref === 'string' ? body.ref.trim().toUpperCase() : null;
-  if (refCode && /^[A-Z0-9]{8}$/.test(refCode)) {
-    const base = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
-    fetch(`${base}/api/referral`, {
-      method: 'POST',
-      signal: AbortSignal.timeout(5000),
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: refCode, newUserEmail: email }),
-    }).catch(() => {});
+  if (refCode) {
+    await creditReferral(refCode, user).catch((e) => console.error('[register] parrainage non crédité', e?.message));
   }
 
   const resendKey = process.env.RESEND_API_KEY;
@@ -156,15 +146,15 @@ export default async function handler(req) {
           </div>
         </div>
       </div>
-      <div style="margin-top:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
+      ${welcomeRefCode ? `<div style="margin-top:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
         <p style="color:#0f172a;font-size:13px;font-weight:700;margin:0 0 8px">🎁 Votre code de parrainage</p>
-        <p style="color:#475569;font-size:12px;margin:0 0 12px;line-height:1.5">Partagez Emploia et gagnez <strong>1 mois Pro offert</strong> par ami inscrit (max 3 mois).</p>
+        <p style="color:#475569;font-size:12px;margin:0 0 12px;line-height:1.5">Partagez Emploia : chaque ami inscrit vous donne <strong>30 jours de Pro</strong> (jusqu'à 6 filleuls récompensés), et 14 jours à lui.</p>
         <div style="background:#fff;border:1.5px dashed #6366f1;border-radius:10px;padding:10px 16px;text-align:center;font-size:18px;font-weight:900;color:#6366f1;letter-spacing:3px">${welcomeRefCode}</div>
         <a href="${refLink}" style="display:block;margin-top:10px;text-align:center;font-size:12px;color:#6366f1;text-decoration:none">Ou partagez ce lien →</a>
-      </div>
+      </div>` : ''}
     </div>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="https://emploia.eu/api/newsletter?unsubscribe=${encodeURIComponent(email)}" style="color:#94a3b8">Se désabonner</a></p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:20px">© ${new Date().getFullYear()} Emploia · <a href="https://emploia.eu" style="color:#94a3b8">emploia.eu</a> · <a href="${unsubscribeUrl(email)}" style="color:#94a3b8">Se désabonner</a></p>
 </div>
 </body></html>`,
       }),

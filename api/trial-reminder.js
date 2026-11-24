@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvGet, kvSet, kvSmembers, getGenerationsUsed, htmlEscape } from './_lib/auth.js';
+import { kvGet, kvSet, kvSmembers, getGenerationsUsed, htmlEscape, unsubscribeUrl, bearerMatches } from './_lib/auth.js';
 import { sendEmail as sendResendEmail } from './_lib/email.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
@@ -11,7 +11,7 @@ const BATCH_SIZE = 100;
 // ── Email helpers ──────────────────────────────────────────────────────────────
 
 function unsubscribeLink(email) {
-  return `${BASE_URL}/api/newsletter?unsubscribe=${encodeURIComponent(email)}`;
+  return unsubscribeUrl(email);
 }
 
 function emailWrapper({ firstName, subject, headerGradient = 'linear-gradient(135deg,#6366f1,#3b82f6)', body, email }) {
@@ -233,7 +233,7 @@ function buildJ30Email({ firstName, userId, email }) {
 export default async function handler(req, res) {
   // Auth check
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || req.headers['authorization'] !== `Bearer ${cronSecret}`) {
+  if (!bearerMatches(req, cronSecret)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

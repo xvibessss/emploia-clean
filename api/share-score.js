@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvGet, kvSet } from './_lib/auth.js';
+import { kvGet, kvSet, checkRateLimit } from './_lib/auth.js';
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || 'https://emploia.eu';
 const THIRTY_DAYS = 30 * 86400;
@@ -23,20 +23,28 @@ export default async function handler(req, res) {
       }
     }
 
-    const { score, jobTitle, userId } = body || {};
-    if (typeof score !== 'number' || score < 0 || score > 100) {
+    const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const rl = await checkRateLimit(`ip:${ip}`, 'share-score', 10, 3600);
+    if (!rl.allowed) return res.status(429).json({ error: 'Trop de partages. Réessayez dans 1 heure.' });
+
+    const { score, jobTitle } = body || {};
+    if (typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > 100) {
       return res.status(400).json({ error: 'Le score doit être un nombre entre 0 et 100' });
     }
 
-    const token = crypto.randomUUID().slice(0, 8);
-    await kvSet(`share:${token}`, { score, jobTitle: jobTitle || '', userId: userId || '', createdAt: Date.now() }, THIRTY_DAYS);
+    // 12 caractères hexadécimaux (48 bits) au lieu de 8 : une page publique
+    // indexable ne doit pas pouvoir être énumérée en balayant l'espace des jetons.
+    // userId n'est plus stocké — rien ne le relisait, et la page est publique.
+    const token = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+    const title = typeof jobTitle === 'string' ? jobTitle.replace(/[\r\n<>]/g, ' ').trim().slice(0, 120) : '';
+    await kvSet(`share:${token}`, { score: Math.round(score), jobTitle: title, createdAt: Date.now() }, THIRTY_DAYS);
     return res.status(201).json({ token, url: `${BASE_URL}/score/${token}` });
   }
 
   if (req.method === 'GET') {
     const { token } = req.query;
     if (!token || typeof token !== 'string') return res.status(400).json({ error: 'Paramètre token manquant' });
-    if (!/^[0-9a-f]{8}$/.test(token)) return res.status(400).json({ error: 'Token invalide' });
+    if (!/^(?:[0-9a-f]{8}|[0-9a-f]{12})$/.test(token)) return res.status(400).json({ error: 'Token invalide' });
 
     const data = await kvGet(`share:${token}`);
     if (!data) return res.status(404).json({ error: 'Score introuvable ou expiré' });

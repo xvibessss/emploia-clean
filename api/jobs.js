@@ -9,6 +9,9 @@ import { collecterFranceTravail } from './_lib/france-travail.js';
 // pouvoir diverger.
 import { CLE_BALISE as CLE_BALISE_ATS, causeDepuisBalise } from './_lib/ats-balise.js';
 import { isJobLive, toPublicJob } from './_lib/employer.js';
+// Lire une requête — ses mots, ses accents, les enseignes homonymes — est
+// partagé entre le filtre de l'agrégat et le lecteur des réservoirs.
+import { normaliser, motsDeRecherche, indiceEntreprise, rangerParRequete, lieuCorrespond } from './_lib/recherche.js';
 // Toute transformation d'une donnée amont en type de contrat vit dans
 // `_lib/contrat.js`, pour que l'agrégateur et les alertes email lisent la même
 // notion de la même façon. La règle y est écrite une fois : ce qu'on
@@ -35,7 +38,6 @@ const H = {
   'Content-Type': 'application/json',
 };
 
-function daysAgo(n) { return new Date(Date.now() - n * 86400000).toISOString(); }
 
 // ── FILTRE DE CONTRAT ─────────────────────────────────
 // Il n'en existait aucun. `?type=cdd` était propagé en amont par trois
@@ -145,12 +147,12 @@ function muet(journal, source, raison, cause) {
 // entrée de cache écrite par un déploiement antérieur — ou altérée — ne peut
 // donc pas introduire une clé inconnue dans la réponse publique.
 //
-// La liste d'appels DOIT porter exactement ces neuf noms, et
+// La liste d'appels DOIT porter exactement ces noms, dans cet ordre, et
 // `scripts/smoke/contribution.test.mjs` le vérifie : deux listes qu'on espère
 // synchronisées finissent par diverger, et c'est ce fichier qui a déjà
 // documenté ce que coûte la divergence — `?type=cdd` était propagé par trois
 // collecteurs sur huit et ignoré par les cinq autres.
-const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
+const COLLECTEURS = ['Emploia', 'Greenhouse', 'Lever', 'Teamtailor', 'SmartRecruiters', 'Ashby', 'France Travail', 'French Job Market', 'JSearch', 'Adzuna', 'Remotive', 'Arbeitnow'];
 
 // Ce que `offresParCollecteur` compte, et pourquoi ce n'est pas `sources`.
 //
@@ -522,21 +524,11 @@ function servirReservoir(offres, q, type, location, page) {
     // preuve que `_lib/contrat.js` interdit.
     jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
   }
-  if (q) {
-    const ql = q.toLowerCase();
-    jobs = jobs.filter(j =>
-      (j.title || '').toLowerCase().includes(ql) ||
-      (j.company || '').toLowerCase().includes(ql) ||
-      (j.description || '').toLowerCase().includes(ql)
-    );
-  }
-  if (location) {
-    const ll = location.toLowerCase();
-    jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-  }
-  return jobs
-    .slice()
-    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  if (location) jobs = jobs.filter(j => lieuCorrespond(j, location));
+  // La requête est lue MOT À MOT, sans accent, et les offres sont rangées par
+  // pertinence avant d'être paginées — voir `rangerParRequete`. La chercher
+  // d'un bloc, comme avant, privait 34 des 37 pages /metier de toute offre ATS.
+  return rangerParRequete(jobs, q, location)
     .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
 }
 
@@ -632,36 +624,13 @@ async function fetchLever(q, type, location, page, journal, lireBalise) {
         causeDepuisBalise(await lireBalise(), 'Lever'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // Une offre au contrat inconnu est écartée sous filtre, comme partout
-      // ailleurs : 45,3 % des offres Lever sortent avec `type: null`, et les
-      // servir en réponse à « CDI » serait l'affirmation sans preuve que
-      // `_lib/contrat.js` interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    // Paginé comme les sources réseau le sont, et pour la même raison : rendre
-    // les 358 offres d'un coup noierait les autres collecteurs dans un agrégat
-    // où elles passeraient toutes devant — `prioritize` classe la France au
-    // premier rang. Dix par page les rend accessibles sans déséquilibrer la
-    // liste.
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // Une offre au contrat inconnu est écartée sous filtre, comme partout
+    // ailleurs : 45,3 % des offres Lever sortent avec `type: null`, et les
+    // servir en réponse à « CDI » serait l'affirmation sans preuve que
+    // `_lib/contrat.js` interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Lever', e.message || String(e)); }
 }
 
@@ -696,34 +665,89 @@ async function fetchTeamtailor(q, type, location, page, journal, lireBalise) {
         causeDepuisBalise(await lireBalise(), 'Teamtailor'));
     }
 
-    let jobs = offres;
-    if (type && type !== 'tous' && FILTRE_VERS_CONTRAT[type]) {
-      // Une offre au contrat inconnu est écartée sous filtre, comme partout
-      // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
-      // des offres Teamtailor sortent avec `type: null`, parce que le champ
-      // `employmentType` que le standard schema.org définit est servi ZÉRO
-      // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
-      // sans preuve que `_lib/contrat.js` interdit.
-      jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
-    }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    const PAR_PAGE = 10;
-    return jobs
-      .slice()
-      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-      .slice(page * PAR_PAGE, page * PAR_PAGE + PAR_PAGE);
+    // Une offre au contrat inconnu est écartée sous filtre, comme partout
+    // ailleurs — et ici c'est le cas le plus fréquent des trois ATS : 75,9 %
+    // des offres Teamtailor sortent avec `type: null`, parce que le champ
+    // `employmentType` que le standard schema.org définit est servi ZÉRO
+    // fois sur 602. Les servir en réponse à « CDI » serait l'affirmation
+    // sans preuve que `_lib/contrat.js` interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
   } catch (e) { return muet(journal, 'Teamtailor', e.message || String(e)); }
+}
+
+// ── SMARTRECRUITERS (crawl direct des ATS, via Upstash KV) ─
+// Le quatrième collecteur qui ne sorte pas sur le réseau, et le premier qui
+// apporte des MÉTIERS de terrain : réceptionniste, chef de partie, chef de
+// rang, barman (Accor, Groupe Barrière), vendeur, conseiller de vente,
+// magasinier (Kiabi, Conforama, Boulanger, Primark). Chiffres complets dans
+// `PROTO-smartrecruiters-ats-2026-11-04.md`.
+//
+// Deux différences avec les trois autres ATS, toutes deux mesurées :
+//   · la description est VIDE — la liste n'en porte pas, et la chercher
+//     coûterait un appel par offre. Le terme de recherche ne lit donc que le
+//     titre et l'entreprise ;
+//   · le contrat vient du TITRE SEUL — l'id `permanent` de la source couvre
+//     124 CDD (voir `contratSmartRecruiters`). 69 % des offres sortent donc
+//     `type: null`, et sont écartées sous filtre de contrat, comme partout.
+//
+// Placé après les trois autres ATS et avant les republicateurs, pour que
+// `deduplicate()` garde l'URL de l'ATS plutôt que celle d'un agrégateur.
+async function fetchSmartRecruiters(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('smartrecruiters_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'SmartRecruiters', 'réservoir smartrecruiters_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'SmartRecruiters'));
+    }
+
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
+  } catch (e) { return muet(journal, 'SmartRecruiters', e.message || String(e)); }
+}
+
+// ── ASHBY (crawl direct des ATS, via Upstash KV) ──────
+// Le cinquième collecteur qui ne sorte pas sur le réseau, et celui qui ferme
+// une liste ouverte depuis trois relevés. Greenhouse, Lever et Teamtailor
+// avaient laissé huit scale-ups françaises introuvables ; Ashby en porte
+// QUATRE — Pennylane 153 offres FR, Alan 69, Back Market 29, Ledger 13. Mais
+// « introuvable » voulait dire « absente des ATS crawlés », pas « absente
+// d'emploia » : Alan, Back Market et Ledger étaient déjà servies par les
+// sources tierces. Seule Pennylane ne l'était pas — 153 offres, et non 264.
+// Chiffres complets, et cette correction, dans `PROTO-ashby-ats-2026-10-27.md`
+// (§5). Alan reste mal couverte (5 offres servies sur 69) : « déjà présente »
+// n'est pas « bien servie ».
+//
+// C'est aussi le seul des cinq à publier un salaire en nombre — 76 offres
+// françaises en portent un — et seulement après trois filtres : le drapeau de
+// consentement de l'employeur, le type « Salary » (et non l'equity, le bonus
+// ou la commission), et l'intervalle annuel en euros.
+//
+// Placé APRÈS les autres ATS mais AVANT les sources tierces : l'ordre entre
+// ATS est sans conséquence, ce qui compte est qu'ils passent tous avant les
+// republicateurs pour que `deduplicate()` garde l'URL de l'employeur.
+// Même garde et même balise que les autres ATS.
+async function fetchAshby(q, type, location, page, journal, lireBalise) {
+  try {
+    const collecte = await kvGet('ashby_jobs');
+    const offres = Array.isArray(collecte?.offres) ? collecte.offres : null;
+    if (!offres || !offres.length) {
+      return muet(journal, 'Ashby', 'réservoir ashby_jobs sans offre servable',
+        causeDepuisBalise(await lireBalise(), 'Ashby'));
+    }
+
+    // 78,5 % des offres Ashby sortent avec `type: null`, et c'est correct :
+    // son `employmentType` vaut « FullTime » sur la grande majorité, ce qui
+    // est une DURÉE de travail et non un contrat. Les servir en réponse à
+    // « CDI » serait l'affirmation sans preuve que `_lib/contrat.js`
+    // interdit.
+    // Filtre de contrat, lieu, requête et pagination : le lecteur partagé,
+    // pour que les réservoirs ne divergent plus (voir `servirReservoir`).
+    return servirReservoir(offres, q, type, location, page);
+  } catch (e) { return muet(journal, 'Ashby', e.message || String(e)); }
 }
 
 // ── EMPLOYER DIRECT JOBS (Upstash KV) ────────────────
@@ -736,19 +760,9 @@ async function fetchEmployerJobs(q, type, location, journal) {
     if (type && type !== 'tous') {
       if (FILTRE_VERS_CONTRAT[type]) jobs = jobs.filter(j => j.type === FILTRE_VERS_CONTRAT[type]);
     }
-    if (q) {
-      const ql = q.toLowerCase();
-      jobs = jobs.filter(j =>
-        j.title.toLowerCase().includes(ql) ||
-        j.company.toLowerCase().includes(ql) ||
-        (j.description || '').toLowerCase().includes(ql)
-      );
-    }
-    if (location) {
-      const ll = location.toLowerCase();
-      jobs = jobs.filter(j => !j.location || j.location.toLowerCase().includes(ll) || j.remote);
-    }
-    return jobs.slice(0, 5).map(toPublicJob);
+    if (location) jobs = jobs.filter(j => lieuCorrespond(j, location));
+    // Même lecture de la requête que les réservoirs : mot à mot, sans accent.
+    return rangerParRequete(jobs, q, location).slice(0, 5).map(toPublicJob);
   } catch (e) { return muet(journal, 'Emploia', e.message || String(e)); }
 }
 
@@ -804,29 +818,16 @@ function prioritize(jobs) {
 // mentionnant réellement la ville — et écarte presque exactement 11 offres par
 // page, vérifiées une à une sur Amiens comme étant 6 Remotive + 5 Arbeitnow.
 // Le bloc fixe, à l'unité, sans une seule offre légitime perdue.
-function normaliser(s) {
-  return (s || '')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // « santé » → « sante »
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-// Mots trop courts ou trop communs pour porter du sens : les garder ferait
-// correspondre n'importe quoi (« de », « et », « job »).
-const MOTS_VIDES = new Set(['pour', 'avec', 'dans', 'chez', 'les', 'des', 'une', 'job', 'jobs', 'emploi', 'poste', 'offre', 'cdi', 'cdd']);
-
-function motsDeRecherche(q, location) {
-  return [...new Set([...normaliser(q).split(' '), ...normaliser(location).split(' ')])]
-    .filter(m => m.length >= 4 && !MOTS_VIDES.has(m));
-}
+// `normaliser`, `motsDeRecherche` et la garde des enseignes homonymes
+// (`indiceEntreprise`) vivent dans `_lib/recherche.js` : le lecteur des
+// réservoirs lit la requête de la même façon que ce filtre.
 
 // Une offre est retenue si l'un de ses champs porte l'un des mots de la
 // requête. On regarde le titre, l'entreprise, le lieu ET la description : une
 // offre d'aide-soignant peut ne pas porter « EHPAD » dans son titre.
 function estPertinente(job, mots) {
   if (!mots.length) return true;                     // pas de requête → tout passe
-  const foin = normaliser(`${job.title} ${job.company} ${job.location} ${job.description}`);
+  const foin = normaliser(`${job.title} ${indiceEntreprise(job.company)} ${job.location} ${job.description}`);
   return mots.some(m => foin.includes(m));
 }
 
@@ -844,30 +845,17 @@ function filtrerPertinence(jobs, q, location) {
   return { jobs: gardees, filtrees: jobs.length - gardees.length, filtre: 'actif' };
 }
 
-// ── MOCK FALLBACK ─────────────────────────────────────
-const MOCK = [
-  { id:'m1', title:'Développeur Full Stack React/Node.js', company:'BNP Paribas', location:'Paris 75009', type:'CDI', salary:'45–55k€/an', description:'Stack React, Node.js, PostgreSQL.', url:'/app', date:daysAgo(1), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m2', title:'Growth Marketing Manager', company:'Doctolib', location:'Paris 75009', type:'CDI', salary:'40–50k€/an', description:'Pilotez la croissance B2B.', url:'/app', date:daysAgo(2), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m3', title:'Stage Marketing Digital — 6 mois', company:"L'Oréal", location:'Paris 75008', type:'Stage', salary:'1 200€/mois', description:'Stage 6 mois en Growth.', url:'/app', date:daysAgo(1), remote:false, source:'Emploia', logo:null, country:'FR' },
-  { id:'m4', title:'Alternance Business Developer', company:'Capgemini', location:'Paris 75017', type:'Alternance', salary:'1 500€/mois', description:'Alternance 12 mois BD.', url:'/app', date:daysAgo(3), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m5', title:'Data Analyst — CDD 12 mois', company:'Société Générale', location:'Paris La Défense', type:'CDD', salary:'38–42k€/an', description:'SQL, Python, Tableau.', url:'/app', date:daysAgo(2), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m6', title:'UX Designer', company:'Pennylane', location:'Paris 75009', type:'CDI', salary:'42–52k€/an', description:'Figma, user research.', url:'/app', date:daysAgo(0), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m7', title:'DevOps Engineer', company:'OVHcloud', location:'Roubaix 59100', type:'CDI', salary:'48–58k€/an', description:'Kubernetes, Terraform, AWS.', url:'/app', date:daysAgo(1), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m8', title:'Alternance Cybersécurité — 2 ans', company:'Thales', location:'Vélizy 78', type:'Alternance', salary:'1 700€/mois', description:'SOC, pentest, conformité.', url:'/app', date:daysAgo(0), remote:false, source:'Emploia', logo:null, country:'FR' },
-  { id:'m9', title:'Product Manager Apps Mobiles', company:'Meilleurtaux', location:'Paris 75002', type:'CDI', salary:'50–65k€/an', description:'Roadmap produit, 2M+ DL.', url:'/app', date:daysAgo(4), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m10', title:'Stage Data Python — 6 mois', company:'Criteo', location:'Paris 75009', type:'Stage', salary:'1 350€/mois', description:'Python, pandas, SQL.', url:'/app', date:daysAgo(1), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m11', title:'Ingénieur Backend Node.js', company:'Qonto', location:'Paris 75002', type:'CDI', salary:'45–58k€/an', description:'API REST, microservices.', url:'/app', date:daysAgo(0), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m12', title:'Alternance RH & Recrutement', company:'Decathlon', location:'Lille 59000', type:'Alternance', salary:'1 300€/mois', description:'Recrutement, onboarding.', url:'/app', date:daysAgo(5), remote:false, source:'Emploia', logo:null, country:'FR' },
-  { id:'m13', title:'Commercial B2B SaaS', company:'Salesforce', location:'Paris 75008', type:'CDI', salary:'45–70k€/an + var.', description:'Account Executive marché FR.', url:'/app', date:daysAgo(2), remote:true, source:'Emploia', logo:null, country:'FR' },
-  { id:'m14', title:'Stage Communication & Brand', company:'LVMH', location:'Paris 75008', type:'Stage', salary:'1 100€/mois', description:'Stage 6 mois direction com.', url:'/app', date:daysAgo(1), remote:false, source:'Emploia', logo:null, country:'FR' },
-  { id:'m15', title:'Data Engineer', company:'Criteo', location:'Paris 75009', type:'CDI', salary:'50–65k€/an', description:'Spark, Kafka, Airflow.', url:'/app', date:daysAgo(3), remote:true, source:'Emploia', logo:null, country:'FR' },
-];
-
+// ── REPLI QUAND TOUTES LES SOURCES ÉCHOUENT ───────────
+// Il servait quinze offres codées en dur au nom d'employeurs réels (BNP
+// Paribas, Doctolib, L'Oréal, Thales…), datées « il y a 1 jour » et affichées
+// sur les 86 pages /emploi et /metier sans aucune mention. Des offres qui
+// n'existent pas, attribuées à des entreprises qui ne les ont pas publiées :
+// une pratique commerciale trompeuse, pas un filet de sécurité. Le repli dit
+// désormais la vérité — aucune offre, et `demo: true` pour que les pages et les
+// sondes (scripts/smoke/surface.mjs, sources.mjs) sachent que les sources sont
+// tombées.
 function getMock(q, type, page) {
-  let items = [...MOCK];
-  if (q) { const ql=q.toLowerCase(); items=items.filter(j=>j.title.toLowerCase().includes(ql)||j.company.toLowerCase().includes(ql)); }
-  if (type && type!=='tous') { if(FILTRE_VERS_CONTRAT[type]) items=items.filter(j=>j.type===FILTRE_VERS_CONTRAT[type]); }
-  return { jobs:items.slice(page*12,page*12+12), total:items.length, page, demo:true, sources:['Emploia'] };
+  return { jobs: [], total: 0, page, demo: true, indisponible: true, sources: [] };
 }
 
 // ── MAIN HANDLER (Edge Runtime) ───────────────────────
@@ -965,6 +953,8 @@ export default async function handler(req) {
     ['Greenhouse',        () => fetchGreenhouse(q, type, location, page, journal, lireBaliseAts)],
     ['Lever',             () => fetchLever(q, type, location, page, journal, lireBaliseAts)],
     ['Teamtailor',        () => fetchTeamtailor(q, type, location, page, journal, lireBaliseAts)],
+    ['SmartRecruiters',   () => fetchSmartRecruiters(q, type, location, page, journal, lireBaliseAts)],
+    ['Ashby',             () => fetchAshby(q, type, location, page, journal, lireBaliseAts)],
     ['France Travail',    () => fetchFranceTravail(q, type, location, page, journal)],
     ['French Job Market', () => fetchFrenchMarket(q, type, location, page, journal, reservoirRapidapi)],
     ['JSearch',           () => fetchJSearch(q, type, location, page, journal, reservoirRapidapi)],

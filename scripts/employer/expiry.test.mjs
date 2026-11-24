@@ -19,6 +19,11 @@ test('active but past expiry → not live', () => {
   assert.equal(isJobLive(job, now), false);
 });
 
+test('pending (not yet confirmed by email) → never live', () => {
+  const job = { status: 'pending', postedAt: iso(now) };
+  assert.equal(isJobLive(job, now), false);
+});
+
 test('closed → never live even if fresh', () => {
   const job = { status: 'closed', postedAt: iso(now) };
   assert.equal(isJobLive(job, now), false);

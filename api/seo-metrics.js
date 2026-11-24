@@ -1,4 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
+import { checkRateLimit, adminSecretMatches } from './_lib/auth.js';
 
 // Google Search Console — real SEO metrics for the admin console.
 // Auth: a Google service account granted access to the property in GSC.
@@ -65,8 +66,10 @@ export default async function handler(req) {
   const H = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: H });
 
-  const adminSecret = process.env.ADMIN_SECRET;
-  if (!adminSecret || req.headers.get('x-admin-secret') !== adminSecret) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'admin', 30, 3600);
+  if (!rl.allowed) return new Response(JSON.stringify({ error: 'Trop de requêtes' }), { status: 429, headers: H });
+  if (!adminSecretMatches(req)) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: H });
   }
 

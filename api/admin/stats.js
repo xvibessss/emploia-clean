@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-import { kvGet, kvSmembers, kvMget, kvZcard, kvScard } from '../_lib/auth.js';
+import { kvGet, kvSmembers, kvMget, kvZcard, kvScard, checkRateLimit, adminSecretMatches } from '../_lib/auth.js';
 
 const PRO_PRICE = 24;
 // Intensif is retired from sale (2026-09-30) but existing subscribers keep
@@ -17,14 +17,15 @@ const CAMPAGNE_MONTHLY = CAMPAGNE_PRICE / 3; // 19.67 €/month
 const DAY = 86400000;
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret || req.headers['x-admin-secret'] !== secret) {
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const rl = await checkRateLimit(`ip:${ip}`, 'admin', 30, 3600);
+  if (!rl.allowed) return res.status(429).json({ error: 'Trop de requêtes' });
+  if (!adminSecretMatches(req)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 

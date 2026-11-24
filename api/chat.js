@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser } from './_lib/auth.js';
+import { checkRateLimit, sanitizeString, getAllowedOrigin, getCurrentUser, claimAnonymousAiBudget } from './_lib/auth.js';
 
 const SYSTEM = `Tu es Orion, le copilote IA d'Emploia — le seul assistant de candidature 100% spécialisé sur le marché français.
 
@@ -60,6 +60,11 @@ export default async function handler(req) {
   // Optional auth — Pro/Intensif users get Sonnet, free/anonymous get Haiku
   const chatUser = await getCurrentUser(req).catch(() => null);
   const isPremium = chatUser?.plan && chatUser.plan !== 'free';
+  if (!chatUser && !(await claimAnonymousAiBudget('chat'))) {
+    return new Response(JSON.stringify({ error: 'Orion est très sollicité aujourd\'hui. Créez un compte gratuit pour continuer la conversation.' }), {
+      status: 429, headers: { ...H_JSON, 'Retry-After': '3600' }
+    });
+  }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return new Response(JSON.stringify({ error: 'Service temporairement indisponible' }), { status: 500, headers: H_JSON });
