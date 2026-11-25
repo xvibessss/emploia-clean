@@ -132,6 +132,39 @@ export const FOURNISSEURS = [
   },
 ];
 
+// Quand un catalogue dépasse la borne, QUI perd ses offres compte autant que
+// combien. Un `slice(0, borne)` coupait la FIN de la liste, donc les derniers
+// boards du relevé disparaissaient en entier : mesuré le 2026-11-25 sur Ashby,
+// 665 offres françaises pour 600 places, et 17 entreprises sur 31 (Notion,
+// Mollie, Sorare, Finary…) passaient à zéro pendant que Pennylane gardait ses
+// 182 offres. On prend donc les offres à tour de rôle, une par entreprise et
+// par tour, dans l'ordre où la source les rend : la coupe tombe sur la queue
+// des plus gros employeurs, et chaque entreprise collectée reste visible.
+// Sous la borne, la liste est rendue telle quelle, ordre compris.
+export function repartirSousBorne(offres, borne) {
+  if (offres.length <= borne) return offres;
+  const parEntreprise = new Map();
+  for (const o of offres) {
+    const cle = o.company || '';
+    if (!parEntreprise.has(cle)) parEntreprise.set(cle, []);
+    parEntreprise.get(cle).push(o);
+  }
+  const files = [...parEntreprise.values()];
+  const retenues = [];
+  for (let tour = 0; retenues.length < borne; tour++) {
+    let avance = false;
+    for (const file of files) {
+      if (tour < file.length) {
+        retenues.push(file[tour]);
+        avance = true;
+        if (retenues.length === borne) break;
+      }
+    }
+    if (!avance) break;
+  }
+  return retenues;
+}
+
 // Une collecte, les trois gardes, un relevé prêt à écrire. Rendu séparément de
 // l'écriture KV pour que la sonde puisse l'exécuter hors ligne.
 //
@@ -159,9 +192,11 @@ export async function collecterFournisseur(fournisseur, options = {}) {
   // La borne est celle du fournisseur s'il en déclare une — calée sur le
   // POIDS de ses offres, voir SmartRecruiters ci-dessus — sinon la commune.
   const borne = fournisseur.maxOffres ?? MAX_OFFRES;
-  const retenues = francaises.slice(0, borne);
+  const retenues = repartirSousBorne(francaises, borne);
   if (francaises.length > borne) {
-    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${borne} — ${francaises.length - borne} écartée(s). Le catalogue a dépassé ce qu'une seule clé KV peut porter : découper par clé.`);
+    const avant = new Set(francaises.map(o => o.company)).size;
+    const apres = new Set(retenues.map(o => o.company)).size;
+    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${borne} — ${francaises.length - borne} écartée(s), prises sur les plus gros employeurs (${apres}/${avant} entreprises gardées). Le catalogue a dépassé ce qu'une seule clé KV peut porter : découper par clé.`);
   }
 
   return {
