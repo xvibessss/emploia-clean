@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { kvGet, kvSet, checkRateLimit, getAllowedOrigin } from '../_lib/auth.js';
+import { kvGet, kvSet, checkRateLimit, getAllowedOrigin, safeEqual } from '../_lib/auth.js';
 import { isJobLive, expiresAt, toPublicJob } from '../_lib/employer.js';
 
 // Self-service management of an employer offer via its capability token.
@@ -11,7 +11,9 @@ import { isJobLive, expiresAt, toPublicJob } from '../_lib/employer.js';
 const VALID_ACTIONS = ['confirm', 'close', 'renew'];
 
 function findByToken(jobs, token) {
-  const idx = jobs.findIndex(j => j.manageToken && j.manageToken === token);
+  // Comparaison en temps constant, comme les autres secrets du projet : `===`
+  // s'arrête au premier caractère différent.
+  const idx = jobs.findIndex(j => safeEqual(j.manageToken, token));
   return { idx, job: idx >= 0 ? jobs[idx] : null };
 }
 
