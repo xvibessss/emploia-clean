@@ -132,7 +132,9 @@ check('jobs.html porte une fonction d’avis sur le repli', Boolean(avis));
 check('l’avis est piloté par le drapeau, pas deviné',
   /data\?\.filtre !== 'abandonne'/.test(avis || ''));
 check('l’avis est rendu AU-DESSUS de la liste',
-  /avisPertinence\(data, q, loc\) \+ filteredJobs\.map\(renderJob\)/.test(jobsHtml));
+  // Depuis le 2026-11-25 la liste est rendue par appliquerTriEtFiltres(), qui
+  // trie et filtre la page reçue sans refaire la requête.
+  /avisPertinence\(data, currentQ, currentLoc\) \+ jobs\.map\(renderJob\)/.test(jobsHtml));
 
 // `motsDeRecherche` tire ses mots de la requête ET du lieu : une page de ville
 // sans offre déclenche donc le repli sans qu'aucun `q` n'ait été saisi, et
