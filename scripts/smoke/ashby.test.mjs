@@ -21,7 +21,7 @@ import {
   texteDeContenu, estDistanciel, lieuAffiche, lieuxDeLOffre, offrePubliee,
   offreExploitable,
 } from '../../api/_lib/ashby.js';
-import { FOURNISSEURS, TTL_SECONDES, MAX_OFFRES, collecterFournisseur } from '../../api/_lib/ats.js';
+import { FOURNISSEURS, TTL_SECONDES, MAX_OFFRES, collecterFournisseur, repartirSousBorne } from '../../api/_lib/ats.js';
 import { causeDepuisBalise } from '../../api/_lib/ats-balise.js';
 import { lecteurPartage } from './_lecteur-partage.mjs';
 import { BOARDS, RELEVE } from '../../api/_lib/ashby-boards.js';
@@ -288,6 +288,20 @@ check('une collecte sans offre française ne demande pas d’écriture',
 const pleine = await collecterFournisseur(faux, { fetchImpl: async () => reponse({ jobs: [job()] }) });
 check('une collecte française demande l’écriture', pleine.ecrire === true);
 check('seules les offres françaises sont retenues', pleine.valeur.offres.every(x => x.country === 'FR'));
+// La borne coupe la queue des gros employeurs, jamais une entreprise entière.
+{
+  const gros = Array.from({ length: 182 }, (_, i) => ({ id: `p${i}`, company: 'Pennylane' }));
+  const petits = Array.from({ length: 20 }, (_, i) => ({ id: `s${i}`, company: `Petite${i}` }));
+  const catalogue = [...gros, ...petits];
+  const garde = repartirSousBorne(catalogue, 100);
+  const entreprises = new Set(garde.map(o => o.company));
+  check('au-delà de la borne, aucune entreprise ne disparaît',
+    garde.length === 100 && entreprises.size === 21, `${garde.length} offres, ${entreprises.size}/21 entreprises`);
+  check('au-delà de la borne, la coupe tombe sur le plus gros employeur',
+    garde.filter(o => o.company === 'Pennylane').length === 80);
+  check('sous la borne, la liste est rendue telle quelle',
+    repartirSousBorne(catalogue, 500) === catalogue);
+}
 check('la borne de taille et le TTL sont communs à tous les fournisseurs',
   MAX_OFFRES > 0 && TTL_SECONDES > 24 * 3600, `${MAX_OFFRES} offres, TTL ${TTL_SECONDES / 3600} h`);
 
