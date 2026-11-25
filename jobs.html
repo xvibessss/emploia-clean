@@ -252,35 +252,17 @@
 
   <!-- SIDEBAR -->
   <aside class="jb-sidebar" id="filtersSidebar">
-    <div class="jb-filter-panel">
-      <div class="jb-fp-title">Expérience</div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp0" onchange="doSearch()"/><label for="exp0">Débutant (0-1 an)</label><span class="jb-fo-count">124</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp1" onchange="doSearch()"/><label for="exp1">Junior (1-3 ans)</label><span class="jb-fo-count">289</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp2" onchange="doSearch()"/><label for="exp2">Confirmé (3-5 ans)</label><span class="jb-fo-count">412</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp3" onchange="doSearch()"/><label for="exp3">Senior (5+ ans)</label><span class="jb-fo-count">187</span></div>
-    </div>
+    <!-- Expérience, Secteur, Hybride et Présentiel ont été retirés le 2026-11-25 :
+         aucune source ne publie ces champs, donc les cocher relançait la même
+         recherche, et leurs compteurs (124, 289, 412…) étaient écrits en dur.
+         Un filtre revient le jour où la donnée existe. -->
     <div class="jb-filter-panel">
       <div class="jb-fp-title">Télétravail</div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem1" onchange="doSearch()"/><label for="rem1">Full remote</label><span class="jb-fo-count">156</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem2" onchange="doSearch()"/><label for="rem2">Hybride</label><span class="jb-fo-count">334</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem3" onchange="doSearch()"/><label for="rem3">Présentiel</label><span class="jb-fo-count">522</span></div>
-    </div>
-    <div class="jb-filter-panel">
-      <div class="jb-fp-title">Secteur</div>
-      <select class="jb-filter-select" id="filterSecteur" onchange="doSearch()">
-        <option value="">Tous les secteurs</option>
-        <option>Tech & IT</option>
-        <option>Marketing & Com</option>
-        <option>Finance & Banque</option>
-        <option>Commerce & Vente</option>
-        <option>RH & Recrutement</option>
-        <option>Santé</option>
-        <option>Éducation</option>
-      </select>
+      <div class="jb-filter-option"><input type="checkbox" id="rem1" onchange="doSearch()"/><label for="rem1">Full remote</label></div>
     </div>
     <div class="jb-filter-panel">
       <div class="jb-fp-title">Salaire annuel</div>
-      <select class="jb-filter-select" id="filterSalaire" onchange="doSearch()">
+      <select class="jb-filter-select" id="filterSalaire" onchange="appliquerTriEtFiltres()">
         <option value="">Tous les salaires</option>
         <option value="0-30">&lt; 30 000€</option>
         <option value="30-40">30 000 – 40 000€</option>
@@ -339,7 +321,8 @@
     <div class="jb-sort-bar" style="margin-bottom:10px">
       <div style="font-size:13px;color:var(--stone)" id="resultCount">Chargement...</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <select class="jb-sort-select" id="sortBy" onchange="doSearch()">
+        <select class="jb-sort-select" id="sortBy" onchange="appliquerTriEtFiltres()">
+          <option value="pertinence">Pertinence</option>
           <option value="recent">Plus récentes</option>
           <option value="match">Meilleur match</option>
           <option value="salary">Salaire</option>
@@ -443,11 +426,14 @@
   </div>
 </div>
 
-<script src="/shared.js?v=2efc6d7c"></script>
+<script src="/shared.js?v=450c183d"></script>
 <script>
   let currentType = 'tous', currentPage = 0;
   const saved = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_saved_jobs') || '[]'); } catch { return []; } })());
   let allJobs = [];
+  // La dernière page reçue de /api/jobs : le tri et le filtre salaire s'y
+  // appliquent sans refaire la requête.
+  let dernierePage = null, dernierTotal = 0, currentQ = '', currentLoc = '';
   const tracked = new Set((() => { try { return JSON.parse(localStorage.getItem('emploia_tracked_jobs') || '[]'); } catch { return []; } })());
   let applyQueueIds = new Set((() => { try { return (JSON.parse(localStorage.getItem('emploia_apply_queue') || '[]')).map(q => String(q.id)); } catch { return []; } })());
 
@@ -510,6 +496,23 @@
     pillEl.title = [data.verdict, data.pros?.length ? '✅ ' + data.pros.join(' · ') : '', data.cons?.length ? '⚠️ ' + data.cons.join(' · ') : '', data.tip ? '💡 ' + data.tip : ''].filter(Boolean).join('\n');
   }
 
+  // Estimation LOCALE par recouvrement de mots-clés entre le profil et l'offre.
+  // Elle s'affichait « ✨ 33 % », comme le score de l'IA, et prenait sa place
+  // dans le cache : un clic ne lançait plus jamais la vraie analyse. Elle est
+  // désormais signalée comme une estimation (« ≈ 33 % mots-clés »), n'entre
+  // pas dans le cache, et le clic lance toujours /api/match-score.
+  const estimations = {};
+  function estimationMotsCles(job, profile) {
+    const jobText = ((job.title || '') + ' ' + (job.description || '')).toLowerCase();
+    const words = jobText.match(/\b[a-záàéèêëîïôùûüç]{4,}\b/gi) || [];
+    const freq = {}; words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+    const top = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,25).map(e => e[0]);
+    const matched = top.filter(k => profile.includes(k));
+    return { score: Math.round(30 + (matched.length / Math.max(top.length, 1)) * 65), pros: matched.slice(0, 3) };
+  }
+  function scoreConnu(job) {
+    return scoreCache[job.id]?.score ?? estimations[job.id]?.score ?? null;
+  }
   function autoScoreAllJobs(jobs) {
     const profile = (localStorage.getItem('emploia_profile_text') || '').toLowerCase();
     if (!profile || profile.length < 20) return;
@@ -517,15 +520,10 @@
       const pillEl = document.getElementById(`pill-${job.id}`);
       if (!pillEl) return;
       if (scoreCache[job.id]) { showScore(pillEl, scoreCache[job.id]); return; }
-      const jobText = ((job.title || '') + ' ' + (job.description || '')).toLowerCase();
-      const words = jobText.match(/\b[a-záàéèêëîïôùûüç]{4,}\b/gi) || [];
-      const freq = {}; words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
-      const top = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,25).map(e => e[0]);
-      const matched = top.filter(k => profile.includes(k));
-      const score = Math.round(30 + (matched.length / Math.max(top.length, 1)) * 65);
-      const verdict = score >= 75 ? 'Bon match' : score >= 50 ? 'Match partiel' : 'Compétences à développer';
-      const data = { score, verdict, pros: matched.slice(0, 3), cons: [], tip: '' };
-      persistScore(job.id, data); showScore(pillEl, data);
+      const e = estimations[job.id] || (estimations[job.id] = estimationMotsCles(job, profile));
+      pillEl.textContent = `≈ ${e.score} % mots-clés`;
+      pillEl.title = 'Estimation par mots-clés communs avec votre profil — cliquer pour l\'analyse IA'
+        + (e.pros.length ? '\n✅ ' + e.pros.join(' · ') : '');
     });
   }
 
@@ -535,9 +533,13 @@
   function typeBadgeClass(type) { return {'CDI':'jb-type-blue','CDD':'jb-type-purple','Stage':'jb-type-green','Alternance':'jb-type-yellow','Freelance':'jb-type-teal'}[type]||'jb-badge-gray'; }
 
   function renderJob(job) {
-    const daysSince = Math.floor((Date.now() - new Date(job.date)) / 86400000);
-    const dateStr = daysSince === 0 ? "Aujourd'hui" : daysSince === 1 ? "Hier" : `Il y a ${daysSince}j`;
-    const isNew = daysSince < 3;
+    // Adzuna horodate parfois quelques minutes DANS LE FUTUR (« Il y a -1j »
+    // s'affichait le 2026-11-25) : on borne à 0. Une date absente ou illisible
+    // n'affiche rien plutôt que « Il y a 20 000j ».
+    const t = job.date ? new Date(job.date).getTime() : NaN;
+    const daysSince = Number.isFinite(t) ? Math.max(0, Math.floor((Date.now() - t) / 86400000)) : null;
+    const dateStr = daysSince === null ? '' : daysSince === 0 ? "Aujourd'hui" : daysSince === 1 ? "Hier" : `Il y a ${daysSince}j`;
+    const isNew = daysSince !== null && daysSince < 3;
     const isSaved = saved.has(job.id);
     const isTracked = tracked.has(job.id);
     return `
@@ -666,16 +668,58 @@
         document.getElementById('jobsList').innerHTML = `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">🔍</div><h3>Aucune offre trouvée</h3><p>Essayez d'autres mots-clés ou un autre type de contrat.</p><button onclick="resetFilters()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Voir toutes les offres</button></div>`;
         document.getElementById('pagination').innerHTML = ''; return;
       }
-      const salaryFilter = document.getElementById('filterSalaire')?.value || '';
-      let filteredJobs = data.jobs;
-      if (salaryFilter) { const [minS, maxS] = salaryFilter.split('-'); const minK = minS ? parseInt(minS)*1000 : 0; const maxK = maxS ? parseInt(maxS)*1000 : Infinity; filteredJobs = data.jobs.filter(j => { const s = j.salary_min || j.salary_max; if (!s) return true; return s >= minK && s <= maxK; }); }
-      allJobs = filteredJobs;
-      document.getElementById('jobsList').innerHTML = avisPertinence(data, q, loc) + filteredJobs.map(renderJob).join('');
-      renderPagination(filteredJobs.length, salaryFilter ? filteredJobs.length : total);
-      requestAnimationFrame(() => autoScoreAllJobs(filteredJobs));
+      dernierePage = data;
+      dernierTotal = total;
+      currentQ = q; currentLoc = loc;
+      appliquerTriEtFiltres();
     } catch(e) {
       document.getElementById('jobsList').innerHTML = `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">⚠️</div><h3>Erreur de chargement</h3><p>Impossible de charger les offres. Vérifiez votre connexion.</p><button onclick="loadJobs()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Réessayer</button></div>`;
     }
+  }
+
+  // Le filtre salaire lisait `salary_min`/`salary_max`, des champs qu'aucune
+  // source ne renvoie : il laissait tout passer. Le champ réel est `salary`,
+  // une fourchette affichable (« 40k–45k€/an », « Annuel de 35000 à 40000
+  // Euros »). On n'en lit que l'annuel ; un salaire non publié n'est pas
+  // « dans la fourchette », donc il sort du filtre au lieu d'y rester.
+  function fourchetteAnnuelle(salary) {
+    const txt = String(salary || '');
+    // Le filtre est gradué en euros : une fourchette en dollars ou en livres
+    // (Remotive publie « $35,3k- $52k ») n'y est pas comparable.
+    if (!txt || /mois|mensuel|heure|horaire|hour|jour|day|\$|usd|£|gbp/i.test(txt)) return null;
+    const nombres = [...txt.replace(/\s/g, '').matchAll(/(\d+(?:[.,]\d+)?)(k)?/gi)]
+      .map(m => parseFloat(m[1].replace(',', '.')) * (m[2] ? 1000 : 1))
+      .filter(n => n >= 6000 && n <= 500000);
+    if (!nombres.length) return null;
+    return [Math.min(...nombres), Math.max(...nombres)];
+  }
+
+  function appliquerTriEtFiltres() {
+    const data = dernierePage;
+    if (!data?.jobs?.length) return;
+    let jobs = data.jobs.slice();
+    const salaryFilter = document.getElementById('filterSalaire')?.value || '';
+    if (salaryFilter) {
+      const [minS, maxS] = salaryFilter.replace('+', '-').split('-');
+      const bas = minS ? parseInt(minS, 10) * 1000 : 0;
+      const haut = maxS ? parseInt(maxS, 10) * 1000 : Infinity;
+      jobs = jobs.filter(j => { const f = fourchetteAnnuelle(j.salary); return f && f[1] >= bas && f[0] <= haut; });
+    }
+    const tri = document.getElementById('sortBy')?.value || 'pertinence';
+    const quand = j => { const t = j.date ? new Date(j.date).getTime() : NaN; return Number.isFinite(t) ? t : 0; };
+    if (tri === 'recent') jobs.sort((a, b) => quand(b) - quand(a));
+    else if (tri === 'salary') jobs.sort((a, b) => ((fourchetteAnnuelle(b.salary) || [0, 0])[1]) - ((fourchetteAnnuelle(a.salary) || [0, 0])[1]));
+    else if (tri === 'match') jobs.sort((a, b) => (scoreConnu(b) ?? -1) - (scoreConnu(a) ?? -1));
+    allJobs = jobs;
+    const list = document.getElementById('jobsList');
+    if (!jobs.length) {
+      list.innerHTML = avisPertinence(data, currentQ, currentLoc) + `<div class="jb-empty"><div style="font-size:44px;margin-bottom:14px">💶</div><h3>Aucun salaire publié dans cette fourchette</h3><p>Sur cette page, ${data.jobs.length} offre(s), dont ${data.jobs.filter(j => fourchetteAnnuelle(j.salary)).length} avec un salaire annuel publié. La plupart des employeurs n'en publient pas.</p><button onclick="document.getElementById('filterSalaire').value='';appliquerTriEtFiltres()" class="emp-btn emp-btn-primary" style="font-size:12px;padding:8px 18px">Retirer le filtre salaire</button></div>`;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+    list.innerHTML = avisPertinence(data, currentQ, currentLoc) + jobs.map(renderJob).join('');
+    renderPagination(jobs.length, salaryFilter ? jobs.length : dernierTotal);
+    requestAnimationFrame(() => autoScoreAllJobs(jobs));
   }
 
   function renderPagination(count, total) {
@@ -708,7 +752,7 @@
 
   function resetFilters() {
     document.querySelectorAll('.jb-sidebar input[type="checkbox"]').forEach(i => i.checked = false);
-    document.getElementById('filterSalaire').value = ''; document.getElementById('filterSecteur').value = '';
+    document.getElementById('filterSalaire').value = '';
     document.getElementById('searchInput').value = ''; document.getElementById('locationInput').value = '';
     currentType = 'tous'; document.querySelectorAll('.jb-type-chip').forEach(b => b.classList.remove('active'));
     document.querySelector('.jb-type-chip[data-type="tous"]').classList.add('active'); loadJobs();

@@ -679,10 +679,25 @@ async function empAuthInit() {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sub.click(); }
     });
 
-    function addMsg(text, who) {
+    // Le texte arrive de deux mains qu'on ne contrôle pas : la question tapée
+    // et la réponse du modèle. Les deux passaient tels quels dans innerHTML, et
+    // le markdown du modèle (« # Plan Pro », « **Tarif** ») s'affichait brut.
+    // On échappe d'abord, puis on rend un markdown minimal ; seuls nos propres
+    // messages de repli portent un lien, ajouté à part par `lienContact`.
+    function formaterReponse(texte) {
+      return esc(String(texte || ''))
+        .split('\n')
+        .map(l => l
+          .replace(/^\s{0,3}#{1,6}\s+(.+)$/, '<strong>$1</strong>')
+          .replace(/^\s*[-*]\s+/, '• ')
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'))
+        .join('<br>');
+    }
+    const lienContact = ' <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>';
+    function addMsg(text, who, lien = '') {
       const d = document.createElement('div');
       d.className = `emp-sw-msg ${who}`;
-      d.innerHTML = text.replace(/\n/g, '<br>');
+      d.innerHTML = formaterReponse(text) + lien;
       msgs.appendChild(d);
       msgs.scrollTop = msgs.scrollHeight;
     }
@@ -713,13 +728,14 @@ async function empAuthInit() {
         const data = await res.json();
         dots.remove();
         if (res.status === 429) {
-          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à', 'bot', lienContact);
         } else {
-          addMsg(data.answer || 'Je n\'ai pas pu répondre. Contactez <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+          if (data.answer) addMsg(data.answer, 'bot');
+          else addMsg('Je n\'ai pas pu répondre. Contactez', 'bot', lienContact);
         }
       } catch {
         dots.remove();
-        addMsg('Service indisponible. Écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+        addMsg('Service indisponible. Écrivez à', 'bot', lienContact);
       } finally {
         busy = false;
         sub.disabled = false;
