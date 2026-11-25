@@ -684,7 +684,9 @@
   // « dans la fourchette », donc il sort du filtre au lieu d'y rester.
   function fourchetteAnnuelle(salary) {
     const txt = String(salary || '');
-    if (!txt || /mois|mensuel|heure|horaire|jour/i.test(txt)) return null;
+    // Le filtre est gradué en euros : une fourchette en dollars ou en livres
+    // (Remotive publie « $35,3k- $52k ») n'y est pas comparable.
+    if (!txt || /mois|mensuel|heure|horaire|hour|jour|day|\$|usd|£|gbp/i.test(txt)) return null;
     const nombres = [...txt.replace(/\s/g, '').matchAll(/(\d+(?:[.,]\d+)?)(k)?/gi)]
       .map(m => parseFloat(m[1].replace(',', '.')) * (m[2] ? 1000 : 1))
       .filter(n => n >= 6000 && n <= 500000);
