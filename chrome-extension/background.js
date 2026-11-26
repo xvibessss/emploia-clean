@@ -1,58 +1,27 @@
-// Service worker — message hub between popup and content scripts
+// Emploia — service worker
+//
+// L'offre est passée au générateur dans le FRAGMENT de l'URL (#offre=…) : le
+// navigateur ne l'envoie jamais au serveur, elle n'apparaît donc dans aucun
+// journal, et elle échappe aux limites de longueur des URL côté hébergeur.
+// /app la lit, la colle dans le champ, puis efface le fragment.
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'GET_PROFILE') {
-    chrome.storage.local.get(['emploia_profile', 'emploia_token', 'emploia_api_base'], async (data) => {
-      if (data.emploia_profile) {
-        sendResponse({ ok: true, profile: data.emploia_profile });
-        return;
-      }
-      // Try to fetch from server if token exists
-      if (data.emploia_token) {
-        try {
-          const base = data.emploia_api_base || 'https://emploia.eu';
-          const res = await fetch(`${base}/api/profile`, {
-            headers: { 'Cookie': `__Host-emploia-token=${data.emploia_token}` },
-            credentials: 'include',
-          });
-          if (res.ok) {
-            const profile = await res.json();
-            chrome.storage.local.set({ emploia_profile: profile });
-            sendResponse({ ok: true, profile });
-            return;
-          }
-        } catch {}
-      }
-      sendResponse({ ok: false, error: 'no_profile' });
+const GENERATEUR = 'https://emploia.eu/app?source=extension';
+
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (msg.type === 'OPEN_GENERATOR' && typeof msg.offre === 'string' && msg.offre.trim()) {
+    chrome.tabs.create({
+      url: `${GENERATEUR}#offre=${encodeURIComponent(msg.offre.slice(0, 8000))}`,
+      index: sender.tab ? sender.tab.index + 1 : undefined,
     });
-    return true; // async
   }
 
-  if (msg.type === 'SAVE_PROFILE') {
-    chrome.storage.local.set({ emploia_profile: msg.profile }, () => {
-      sendResponse({ ok: true });
-    });
-    return true;
-  }
-
-  if (msg.type === 'CLEAR_PROFILE') {
-    chrome.storage.local.remove(['emploia_profile', 'emploia_token'], () => {
-      sendResponse({ ok: true });
-    });
-    return true;
-  }
-
-  if (msg.type === 'AUTOFILL_DONE') {
-    // Notify popup that autofill was successful
-    chrome.action.setBadgeText({ text: '✓', tabId: sender.tab?.id });
-    chrome.action.setBadgeBackgroundColor({ color: '#22c55e', tabId: sender.tab?.id });
-    setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: sender.tab?.id }), 3000);
+  if (msg.type === 'AUTOFILL_DONE' && sender.tab?.id) {
+    chrome.action.setBadgeText({ text: '✓', tabId: sender.tab.id });
+    chrome.action.setBadgeBackgroundColor({ color: '#22c55e', tabId: sender.tab.id });
+    setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: sender.tab.id }), 3000);
   }
 });
 
-// Clear badge on tab navigation
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status === 'loading') {
-    chrome.action.setBadgeText({ text: '', tabId });
-  }
+  if (changeInfo.status === 'loading') chrome.action.setBadgeText({ text: '', tabId });
 });

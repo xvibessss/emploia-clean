@@ -6,7 +6,7 @@
     '/legal': 'mentions',
   };
 
-  const SECTIONS = ['mentions', 'privacy', 'cgu', 'cgv', 'cookies'];
+  const SECTIONS = ['mentions', 'privacy', 'cgu', 'cgv', 'cookies', 'extension'];
 
   function showSection(id) {
     document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));

@@ -3,3 +3,6 @@
 # pas des secrets réels ; l'entrée évite de réécrire l'historique de la PR.
 9e095ec163f443c6607204d283d9df1f5aa644f9:scripts/security/hardening.test.mjs:generic-api-key:116
 9e095ec163f443c6607204d283d9df1f5aa644f9:scripts/security/hardening.test.mjs:generic-api-key:117
+# Faux secret de test du commit 6bf30ab (scripts/smoke/alertes.test.mjs),
+# remplacé depuis par une valeur tirée au hasard à l'exécution.
+6bf30abf6bc7c3094ca873f3aa84e7f3bd03aea0:scripts/smoke/alertes.test.mjs:generic-api-key:12

@@ -419,16 +419,52 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     } catch(e) {}
   }
 
-  // Pre-fill from ?offre= URL param
+  // Pre-fill from ?offre= URL param, or from #offre= — le fragment est ce que
+  // l'extension Chrome utilise : il n'est jamais envoyé au serveur, donc le
+  // texte de l'offre ne finit dans aucun journal et échappe aux limites de
+  // longueur des URL. Il est effacé dès qu'il est lu.
   const urlP = new URLSearchParams(window.location.search);
-  const offreParam = urlP.get('offre');
+  const hashP = new URLSearchParams(window.location.hash.slice(1));
+  const offreParam = urlP.get('offre') || hashP.get('offre');
   if (offreParam && !prefill) {
     const jobInput = document.getElementById('jobInput');
     if (jobInput && !jobInput.value.trim()) {
-      jobInput.value = offreParam; // déjà décodé par URLSearchParams — un second decodeURIComponent levait URIError sur un « % » littéral
+      jobInput.value = offreParam.slice(0, 8000); // déjà décodé par URLSearchParams — un second decodeURIComponent levait URIError sur un « % » littéral
       updateLen();
+      if (urlP.get('source') === 'extension') empToast('Offre récupérée depuis l’extension ✨', 'success');
       history.replaceState(null, '', '/app');
     }
+  }
+
+  // Lien « Générer mon CV pour cette offre » d'une alerte email :
+  // /app?source=alerte&offre_id=…&auto=1. L'email ne peut pas porter le texte
+  // de l'offre, il porte son identifiant ; la fiche est lue sur /api/offre.
+  // La génération ne part toute seule que si l'abonné est connecté et que son
+  // parcours est déjà là : c'est ce qu'il a demandé en cliquant, et rien
+  // d'autre. Sinon, l'offre est collée et on lui montre le champ à remplir.
+  const offreId = urlP.get('offre_id');
+  if (offreId && /^[A-Za-z0-9_.:-]{1,100}$/.test(offreId)) {
+    (async () => {
+      const auto = urlP.get('auto') === '1';
+      history.replaceState(null, '', '/app');
+      let fiche = null;
+      try { const r = await fetch(`/api/offre?id=${encodeURIComponent(offreId)}`); if (r.ok) fiche = await r.json(); } catch {}
+      const jobInput = document.getElementById('jobInput');
+      if (!fiche || !fiche.texte) { empToast('Cette offre a expiré — collez-la à la main.', 'info'); return; }
+      if (!jobInput.value.trim()) { jobInput.value = fiche.texte.slice(0, 8000); updateLen(); }
+      const utilisateur = window.empUser || await new Promise(res => {
+        window.addEventListener('empUserLoaded', e => res(e.detail || null), { once: true });
+        setTimeout(() => res(window.empUser || null), 4000);
+      });
+      const profil = document.getElementById('profileInput');
+      if (auto && utilisateur && profil.value.trim().length >= 80) {
+        empToast('Offre récupérée — génération de votre CV ✨', 'success');
+        generate();
+      } else {
+        empToast('Offre récupérée ✨ Ajoutez votre parcours, puis cliquez sur Générer.', 'success');
+        profil.focus();
+      }
+    })();
   }
 
   // ── KEYBOARD SHORTCUT: Cmd/Ctrl+Enter to generate ──────────────────
