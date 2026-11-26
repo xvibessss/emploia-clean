@@ -9,7 +9,8 @@ process.env.KV_REST_API_TOKEN = 'test';
 process.env.CRON_SECRET = 'cron-test';
 process.env.RESEND_API_KEY = 're_test';
 process.env.NEXT_PUBLIC_URL = 'https://emploia.eu';
-process.env.JWT_SECRET = 'jwt-test-secret-de-32-caracteres-au-moins';
+// Tiré au hasard à chaque exécution : aucun secret, même factice, dans le dépôt.
+process.env.JWT_SECRET = (await import('node:crypto')).randomBytes(24).toString('hex');
 
 const store = new Map();
 const emails = [];
