@@ -252,35 +252,17 @@
 
   <!-- SIDEBAR -->
   <aside class="jb-sidebar" id="filtersSidebar">
-    <div class="jb-filter-panel">
-      <div class="jb-fp-title">Expérience</div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp0" data-on-change="doSearch"/><label for="exp0">Débutant (0-1 an)</label><span class="jb-fo-count">124</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp1" data-on-change="doSearch"/><label for="exp1">Junior (1-3 ans)</label><span class="jb-fo-count">289</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp2" data-on-change="doSearch"/><label for="exp2">Confirmé (3-5 ans)</label><span class="jb-fo-count">412</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="exp3" data-on-change="doSearch"/><label for="exp3">Senior (5+ ans)</label><span class="jb-fo-count">187</span></div>
-    </div>
+    <!-- Expérience, Secteur, Hybride et Présentiel ont été retirés le 2026-11-25 :
+         aucune source ne publie ces champs, donc les cocher relançait la même
+         recherche, et leurs compteurs (124, 289, 412…) étaient écrits en dur.
+         Un filtre revient le jour où la donnée existe. -->
     <div class="jb-filter-panel">
       <div class="jb-fp-title">Télétravail</div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem1" data-on-change="doSearch"/><label for="rem1">Full remote</label><span class="jb-fo-count">156</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem2" data-on-change="doSearch"/><label for="rem2">Hybride</label><span class="jb-fo-count">334</span></div>
-      <div class="jb-filter-option"><input type="checkbox" id="rem3" data-on-change="doSearch"/><label for="rem3">Présentiel</label><span class="jb-fo-count">522</span></div>
-    </div>
-    <div class="jb-filter-panel">
-      <div class="jb-fp-title">Secteur</div>
-      <select class="jb-filter-select" id="filterSecteur" data-on-change="doSearch">
-        <option value="">Tous les secteurs</option>
-        <option>Tech & IT</option>
-        <option>Marketing & Com</option>
-        <option>Finance & Banque</option>
-        <option>Commerce & Vente</option>
-        <option>RH & Recrutement</option>
-        <option>Santé</option>
-        <option>Éducation</option>
-      </select>
+      <div class="jb-filter-option"><input type="checkbox" id="rem1" data-on-change="doSearch"/><label for="rem1">Full remote</label></div>
     </div>
     <div class="jb-filter-panel">
       <div class="jb-fp-title">Salaire annuel</div>
-      <select class="jb-filter-select" id="filterSalaire" data-on-change="doSearch">
+      <select class="jb-filter-select" id="filterSalaire" data-on-change="appliquerTriEtFiltres">
         <option value="">Tous les salaires</option>
         <option value="0-30">&lt; 30 000€</option>
         <option value="30-40">30 000 – 40 000€</option>
@@ -339,7 +321,8 @@
     <div class="jb-sort-bar" style="margin-bottom:10px">
       <div style="font-size:13px;color:var(--stone)" id="resultCount">Chargement...</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <select class="jb-sort-select" id="sortBy" data-on-change="doSearch">
+        <select class="jb-sort-select" id="sortBy" data-on-change="appliquerTriEtFiltres">
+          <option value="pertinence">Pertinence</option>
           <option value="recent">Plus récentes</option>
           <option value="match">Meilleur match</option>
           <option value="salary">Salaire</option>
@@ -443,7 +426,7 @@
   </div>
 </div>
 
-<script src="/shared.js?v=3e6e75fe"></script>
-<script src="/js/pages/jobs.js?v=52cddb8e"></script>
+<script src="/shared.js?v=6ee03a17"></script>
+<script src="/js/pages/jobs.js?v=ec94069a"></script>
 </body>
 </html>

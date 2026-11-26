@@ -756,10 +756,25 @@ async function empAuthInit() {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sub.click(); }
     });
 
-    function addMsg(text, who) {
+    // Le texte arrive de deux mains qu'on ne contrôle pas : la question tapée
+    // et la réponse du modèle. Les deux passaient tels quels dans innerHTML, et
+    // le markdown du modèle (« # Plan Pro », « **Tarif** ») s'affichait brut.
+    // On échappe d'abord, puis on rend un markdown minimal ; seuls nos propres
+    // messages de repli portent un lien, ajouté à part par `lienContact`.
+    function formaterReponse(texte) {
+      return esc(String(texte || ''))
+        .split('\n')
+        .map(l => l
+          .replace(/^\s{0,3}#{1,6}\s+(.+)$/, '<strong>$1</strong>')
+          .replace(/^\s*[-*]\s+/, '• ')
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'))
+        .join('<br>');
+    }
+    const lienContact = ' <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>';
+    function addMsg(text, who, lien = '') {
       const d = document.createElement('div');
       d.className = `emp-sw-msg ${who}`;
-      d.innerHTML = text.replace(/\n/g, '<br>');
+      d.innerHTML = formaterReponse(text) + lien;
       msgs.appendChild(d);
       msgs.scrollTop = msgs.scrollHeight;
     }
@@ -790,13 +805,14 @@ async function empAuthInit() {
         const data = await res.json();
         dots.remove();
         if (res.status === 429) {
-          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+          addMsg('Trop de questions envoyées. Réessayez dans une heure ou écrivez à', 'bot', lienContact);
         } else {
-          addMsg(data.answer || 'Je n\'ai pas pu répondre. Contactez <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+          if (data.answer) addMsg(data.answer, 'bot');
+          else addMsg('Je n\'ai pas pu répondre. Contactez', 'bot', lienContact);
         }
       } catch {
         dots.remove();
-        addMsg('Service indisponible. Écrivez à <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>', 'bot');
+        addMsg('Service indisponible. Écrivez à', 'bot', lienContact);
       } finally {
         busy = false;
         sub.disabled = false;
@@ -859,16 +875,29 @@ window.empConsentImmediate = function(planLabel) {
     const m = document.createElement('div');
     m.id = 'empConsentModal';
     m.className = 'emp-auth-overlay open';
+    // Le texte précédent effrayait au moment de payer (« la loi nous demande »,
+    // « la commande ne sera pas passée »), et « dès le paiement validé » était
+    // faux pour le Pro, dont l'essai de 7 jours ne débite rien à la commande.
+    // Les deux déclarations exigées par L221-28 restent entières et lisibles :
+    // demande expresse d'accès immédiat, reconnaissance de la perte du droit.
+    // Seul le ton change, et la ligne rassurante ne dit que du vrai : l'essai
+    // et la résiliation (portail Stripe, /dashboard) pour le Pro, le paiement
+    // unique sans reconduction pour le Pack Campagne.
+    const estPro = planLabel === 'Pro';
+    const rassurance = estPro
+      ? '7 jours d’essai gratuit, puis 24 €/mois. Résiliable à tout moment depuis votre espace.'
+      // Sans montant : un code créateur peut le ramener de 59 € à 49 €.
+      : 'Paiement unique pour 3 mois, sans abonnement : rien ne sera reconduit.';
     m.innerHTML = `<div class="emp-auth-box" style="max-width:460px;text-align:left">
-      <h2 style="font-size:19px;font-weight:800;margin:0 0 10px;color:var(--ink,#0f172a);letter-spacing:-.3px">Avant de payer</h2>
-      <p style="font-size:13.5px;line-height:1.6;color:var(--slate,#64748b);margin:0 0 14px">Votre accès à <strong>${planLabel}</strong> s'ouvre dès le paiement validé. La loi nous demande de recueillir votre accord explicite sur ce point.</p>
+      <h2 style="font-size:19px;font-weight:800;margin:0 0 10px;color:var(--ink,#0f172a);letter-spacing:-.3px">Accès immédiat à ${planLabel}</h2>
+      <p style="font-size:13.5px;line-height:1.6;color:var(--slate,#64748b);margin:0 0 14px">Votre accès s’ouvre dès la validation de votre commande. ${rassurance}</p>
       <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--surface,#f7f6f3);border:1px solid var(--hairline,#e7e4de);border-radius:8px;padding:13px">
         <input type="checkbox" id="empConsentBox" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--primary,#6366f1)"/>
-        <span style="font-size:13px;line-height:1.55;color:var(--charcoal,#37352f)">Je demande expressément l'exécution immédiate du service et je reconnais qu'une fois mon accès ouvert, je <strong>perds mon droit de rétractation</strong> de 14 jours.</span>
+        <span style="font-size:13px;line-height:1.55;color:var(--charcoal,#37352f)">Je souhaite accéder tout de suite à ${planLabel}, et je comprends que mon accès étant ouvert immédiatement, je ne pourrai plus exercer le droit de rétractation de 14 jours.</span>
       </label>
-      <p style="font-size:11.5px;color:var(--steel,#837f77);margin:11px 0 16px;line-height:1.5">Si vous préférez conserver ce droit, ne cochez pas : la commande ne sera pas passée. Détail dans nos <a href="/legal#cgv" target="_blank" rel="noopener" style="color:var(--primary,#6366f1);text-decoration:underline">conditions générales de vente</a>.</p>
+      <p style="font-size:11.5px;color:var(--steel,#837f77);margin:11px 0 16px;line-height:1.5">Paiement sécurisé par Stripe. Détails dans nos <a href="/legal#cgv" target="_blank" rel="noopener" style="color:var(--primary,#6366f1);text-decoration:underline">conditions générales de vente</a>.</p>
       <div style="display:flex;gap:9px">
-        <button type="button" id="empConsentCancel" class="emp-btn emp-btn-secondary" style="flex:1;justify-content:center">Annuler</button>
+        <button type="button" id="empConsentCancel" class="emp-btn emp-btn-secondary" style="flex:1;justify-content:center">Retour</button>
         <button type="button" id="empConsentGo" class="emp-btn emp-btn-primary" style="flex:2;justify-content:center" disabled>Continuer vers le paiement</button>
       </div>
     </div>`;
