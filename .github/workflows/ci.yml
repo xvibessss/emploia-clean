@@ -129,6 +129,8 @@ jobs:
         run: node scripts/security/hardening.test.mjs
       - name: Alerte de régression SEO (création, dédoublonnage, répétition sans écriture)
         run: node scripts/seo/alerte-regression.test.mjs
+      - name: Alertes emploi (moteur /jobs, offres nouvelles seulement, bouton « Générer mon CV »)
+        run: node scripts/smoke/alertes.test.mjs
       - name: Billing probes (checkout mode + webhook grant/rejeu + commissions)
         run: |
           node scripts/billing/probe-checkout.mjs
