@@ -854,9 +854,15 @@ try {
   // comparaient `job_types` à `full_time` / `temporary` / `apprenticeship`,
   // valeurs qui n'existent pas chez Arbeitnow : toute alerte typée filtrait à
   // zéro.
+  // Depuis le 2026-11-26, elles passent par le moteur de /jobs lui-même
+  // (_lib/alertes.js importe ../jobs.js) : même filtre de contrat, même
+  // pertinence, même cache. L'une ou l'autre voie est acceptée ; une lecture
+  // propre au cron, non.
   const alertes = sansCommentaires(readAll('api/cron/send-alerts.js'));
-  if (alertes && !/_lib\/contrat\.js/.test(alertes)) {
-    fail('api/cron/send-alerts.js ne partage pas _lib/contrat.js — deux lectures divergentes du même champ');
+  const libAlertes = sansCommentaires(readAll('api/_lib/alertes.js'));
+  const delegue = /_lib\/alertes\.js/.test(alertes) && /from '\.\.\/jobs\.js'/.test(libAlertes);
+  if (alertes && !/_lib\/contrat\.js/.test(alertes) && !delegue) {
+    fail('api/cron/send-alerts.js ne partage ni _lib/contrat.js ni le moteur de /jobs — deux lectures divergentes du même champ');
     bad14++;
   }
 

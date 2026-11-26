@@ -29,6 +29,10 @@ import {
 const src = fs.readFileSync(new URL('../../api/jobs.js', import.meta.url), 'utf8');
 const libSrc = fs.readFileSync(new URL('../../api/_lib/contrat.js', import.meta.url), 'utf8');
 const alertSrc = fs.readFileSync(new URL('../../api/cron/send-alerts.js', import.meta.url), 'utf8');
+// Depuis la refonte des alertes, le cron ne filtre plus lui-même : il passe par
+// `_lib/alertes.js`, qui interroge le moteur de /jobs (lequel lit le contrat
+// avec `_lib/contrat.js`). La garde suit cette chaîne au lieu d'un import direct.
+const alertLibSrc = fs.readFileSync(new URL('../../api/_lib/alertes.js', import.meta.url), 'utf8');
 const frontSrc = fs.readFileSync(new URL('../../jobs.html', import.meta.url), 'utf8');
 // Le front, commentaires retirés. La feuille de style cite les libellés
 // interdits pour dire qu'ils le sont : les tester sur le fichier entier ferait
@@ -395,10 +399,15 @@ check('son repli est neutre', /\}\[type\]\|\|'jb-badge-gray'/.test(frontSrc));
 
 // ── Les alertes email lisent la même notion ─────────────────────────────────
 console.log('\n[I] Les alertes email lisent le contrat, elles ne le supposent plus');
-check('send-alerts partage le module de lecture',
-  /from '\.\.\/_lib\/contrat\.js'/.test(alertSrc));
-check('l’ancienne table TYPE_MAP est retirée', !/TYPE_MAP/.test(alertSrc));
-check('une alerte « all » ne filtre pas', /type !== 'all'/.test(alertSrc));
+check('send-alerts passe par le module des alertes',
+  /from '\.\.\/_lib\/alertes\.js'/.test(alertSrc));
+check('le module des alertes délègue au moteur de /jobs',
+  /from '\.\.\/jobs\.js'/.test(alertLibSrc));
+check('le moteur de /jobs partage le module de lecture du contrat',
+  /from '\.\/_lib\/contrat\.js'/.test(src));
+check('l’ancienne table TYPE_MAP est retirée',
+  !/TYPE_MAP/.test(alertSrc) && !/TYPE_MAP/.test(alertLibSrc));
+check('une alerte « all » ne filtre pas', /type !== 'all'/.test(alertLibSrc));
 // La décision, vérifiée sur le comportement : un contrat inconnu n'est pas
 // envoyé à un abonné « CDI ».
 const offres = [

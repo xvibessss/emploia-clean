@@ -129,6 +129,8 @@ jobs:
         run: node scripts/security/hardening.test.mjs
       - name: Alerte de régression SEO (création, dédoublonnage, répétition sans écriture)
         run: node scripts/seo/alerte-regression.test.mjs
+      - name: Alertes emploi (moteur /jobs, offres nouvelles seulement, bouton « Générer mon CV »)
+        run: node scripts/smoke/alertes.test.mjs
       - name: Extension Chrome (lecture des offres, remplissage sans écraser ni confondre)
         run: |
           npm install --no-save --no-package-lock jsdom@24
