@@ -730,7 +730,7 @@
     document.getElementById('pagination').innerHTML = `<button class="jb-page-btn" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>←</button>${pages.map(p => `<button class="jb-page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p+1}</button>`).join('')}<button class="jb-page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages-1?'disabled':''}>→</button>`;
   }
   function goPage(p) { currentPage = p; loadJobs(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  function genCV(jobId) { const _j = allJobs.find(j => String(j.id) === String(jobId)); sessionStorage.setItem('emp_prefill', JSON.stringify({ title: _j?.title || '', company: _j?.company || '', desc: (_j?.description || '').slice(0, 200) })); empToast('Redirection vers le générateur...', 'success'); setTimeout(() => window.location.href = '/app', 800); }
+  function genCV(jobId) { const _j = allJobs.find(j => String(j.id) === String(jobId)); sessionStorage.setItem('emp_prefill', JSON.stringify({ title: _j?.title || '', company: _j?.company || '', desc: (_j?.description || '').slice(0, 8000) })); empToast('Redirection vers le générateur...', 'success'); setTimeout(() => window.location.href = '/app', 800); }
 
   async function toggleSave(id, btn) {
     if (saved.has(id)) { saved.delete(id); btn.textContent = '☆'; btn.classList.remove('saved'); localStorage.setItem('emploia_saved_jobs', JSON.stringify([...saved])); empToast('Offre retirée des favoris', 'info'); fetch('/api/saved-jobs?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'include' }).catch(() => {}); }

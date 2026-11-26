@@ -764,14 +764,19 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     } catch(e) {}
   }
 
-  // Pre-fill from ?offre= URL param
+  // Pre-fill from ?offre= URL param, or from #offre= — le fragment est ce que
+  // l'extension Chrome utilise : il n'est jamais envoyé au serveur, donc le
+  // texte de l'offre ne finit dans aucun journal et échappe aux limites de
+  // longueur des URL. Il est effacé dès qu'il est lu.
   const urlP = new URLSearchParams(window.location.search);
-  const offreParam = urlP.get('offre');
+  const hashP = new URLSearchParams(window.location.hash.slice(1));
+  const offreParam = urlP.get('offre') || hashP.get('offre');
   if (offreParam && !prefill) {
     const jobInput = document.getElementById('jobInput');
     if (jobInput && !jobInput.value.trim()) {
-      jobInput.value = offreParam; // déjà décodé par URLSearchParams — un second decodeURIComponent levait URIError sur un « % » littéral
+      jobInput.value = offreParam.slice(0, 8000); // déjà décodé par URLSearchParams — un second decodeURIComponent levait URIError sur un « % » littéral
       updateLen();
+      if (urlP.get('source') === 'extension') empToast('Offre récupérée depuis l’extension ✨', 'success');
       history.replaceState(null, '', '/app');
     }
   }

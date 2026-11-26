@@ -153,6 +153,7 @@
     <a class="legal-tab" data-section="cgu" href="/legal/cgu">CGU</a>
     <a class="legal-tab" data-section="cgv" href="/legal#cgv">CGV</a>
     <a class="legal-tab" data-section="cookies" href="/legal/cookies">Cookies</a>
+    <a class="legal-tab" data-section="extension" href="/legal#extension">Extension Chrome</a>
   </div>
 
   <!-- MENTIONS LÉGALES -->
@@ -263,6 +264,41 @@
 
     <h2>8. DPO & Réclamations</h2>
     <p>Contact : <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>. Vous pouvez également saisir la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</p>
+  </section>
+
+  <!-- EXTENSION CHROME — page citée par la fiche du Chrome Web Store -->
+  <section class="legal-section" id="extension">
+    <h1>Extension Chrome Emploia — confidentialité</h1>
+    <p class="legal-date">Dernière mise à jour : 26 novembre 2026</p>
+    <p>L'extension « Emploia — Adapte ton CV à chaque offre » fait deux choses : ouvrir dans le générateur d'Emploia l'offre d'emploi affichée à l'écran, et remplir les champs d'identité d'un formulaire de candidature. Cette page décrit exactement ce qu'elle lit, ce qu'elle garde et ce qu'elle envoie.</p>
+
+    <h2>1. Ce que l'extension lit</h2>
+    <p>Uniquement sur les sites d'emploi listés dans sa fiche (LinkedIn, Indeed, Welcome to the Jungle, JobTeaser, HelloWork, Monster, APEC, Meteojob, Cadremploi, France Travail), elle lit sur la page ouverte le titre, l'entreprise, le lieu et la description de l'offre, pour savoir s'il faut afficher le bouton « Adapter mon CV ». Elle ne lit ni votre historique, ni vos autres onglets, ni vos messages, ni le contenu des sites qui ne sont pas des sites d'emploi.</p>
+
+    <h2>2. Ce que l'extension garde</h2>
+    <p>Si vous enregistrez un profil dans l'extension (prénom, nom, email, téléphone, ville, profil LinkedIn, poste actuel), il est stocké <strong>uniquement sur votre ordinateur</strong>, dans l'espace de stockage local de Chrome. Il n'est envoyé à aucun serveur, pas même à Emploia. Le bouton « Effacer » de l'extension le supprime ; désinstaller l'extension le supprime aussi.</p>
+
+    <h2>3. Ce que l'extension envoie</h2>
+    <p>Rien, tant que vous ne cliquez pas. Quand vous cliquez sur « Adapter mon CV », le texte de l'offre (8 000 caractères au plus) est ouvert dans un nouvel onglet sur emploia.eu, dans la partie de l'adresse qui suit le signe <code>#</code>. Par conception, cette partie n'est jamais transmise au serveur : la page du générateur la lit dans votre navigateur, la colle dans le champ « offre », puis l'efface de l'adresse. Ce que vous en faites ensuite (générer un CV, une lettre) relève de la <a href="#privacy">politique de confidentialité</a> du site.</p>
+    <p>Quand vous cliquez sur « Remplir avec Emploia », les valeurs de votre profil sont écrites dans les champs du formulaire ouvert, et nulle part ailleurs. L'extension ne remplit jamais un champ déjà rempli et n'envoie jamais le formulaire : c'est vous qui le relisez et l'envoyez.</p>
+
+    <h2>4. Ce que l'extension ne fait pas</h2>
+    <ul>
+      <li>Aucun suivi publicitaire, aucune statistique d'usage, aucun cookie.</li>
+      <li>Aucune vente, location ou cession de données.</li>
+      <li>Aucune utilisation des données pour évaluer une solvabilité ou à des fins de crédit.</li>
+      <li>Aucun code chargé à distance : tout le code est dans le paquet publié.</li>
+    </ul>
+
+    <h2>5. Autorisations demandées</h2>
+    <ul>
+      <li><strong>storage</strong> : garder votre profil sur votre ordinateur.</li>
+      <li><strong>activeTab</strong> : permettre à la fenêtre de l'extension de demander à l'onglet ouvert s'il affiche une offre ou un formulaire.</li>
+      <li><strong>Accès aux sites d'emploi listés</strong> : y afficher le bouton et y lire l'offre. Aucun autre site.</li>
+    </ul>
+
+    <h2>6. Contact</h2>
+    <p>Hugo Chapelle, éditeur d'Emploia — <a href="mailto:contact@emploia.eu">contact@emploia.eu</a>.</p>
   </section>
 
   <!-- CGU -->
@@ -470,7 +506,7 @@
     '/legal': 'mentions',
   };
 
-  const SECTIONS = ['mentions', 'privacy', 'cgu', 'cgv', 'cookies'];
+  const SECTIONS = ['mentions', 'privacy', 'cgu', 'cgv', 'cookies', 'extension'];
 
   function showSection(id) {
     document.querySelectorAll('.legal-section').forEach(s => s.classList.remove('active'));
