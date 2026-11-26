@@ -48,7 +48,7 @@ function emailHtml(prenom, today, sections, email) {
         </div>
         ${jobs.map(jobCard).join('')}
       </div>`).join('');
-  return `<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f8fafc;font-family:Inter,system-ui,sans-serif">
 <div style="max-width:580px;margin:40px auto;padding:0 20px">
   <div style="background:#fff;border-radius:20px;border:1px solid #e2e8f0;overflow:hidden">
     <div style="background:#6E48BE;padding:24px 32px">
