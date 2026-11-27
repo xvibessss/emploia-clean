@@ -56,11 +56,19 @@ import { BOARDS as BOARDS_ASHBY, RELEVE as RELEVE_ASHBY } from './ashby-boards.j
 export const TTL_SECONDES = TTL_OFFRES_SECONDES;
 
 // MESURÉ chez Greenhouse : 668 octets par offre, soit 218 Ko pour 334 offres.
-// La borne existe parce que ce chiffre est fonction du catalogue : à 200 boards
-// la même valeur pèserait ~1,5 Mo et dépasserait la taille d'un enregistrement
-// Upstash. 600 offres ≈ 400 Ko, donc une marge de 2,5× sous la limite — et le
-// jour où un catalogue la dépasse, la troncature est JOURNALISÉE plutôt que
+// La borne existe parce que ce chiffre est fonction du catalogue — et le jour
+// où un catalogue la dépasse, la troncature est JOURNALISÉE plutôt que
 // découverte par une écriture qui échoue en silence.
+//
+// CE QUE LA BORNE PROTÈGE A CHANGÉ (revu le 2026-11-27). Elle avait été calée
+// sous la taille de requête d'Upstash, alors de 1 Mo. Upstash l'a portée à
+// 10 Mo par requête et 100 Mo par enregistrement, plan gratuit compris : à
+// 400 Ko, la clé n'en approchait plus. La contrainte réelle est ailleurs :
+// CHAQUE recherche non cachée de /jobs lit les cinq clés ATS. Mesuré le
+// 2026-11-27 : 1 209 Ko par recherche (Greenhouse 143, Lever 194, Teamtailor
+// 134, SmartRecruiters 320, Ashby 418). C'est ce poids — latence de lecture et
+// bande passante mensuelle (10 Go sur le plan gratuit) — qu'une borne doit
+// tenir, et non plus une limite de taille qu'aucune clé n'atteint.
 export const MAX_OFFRES = 600;
 
 export const FOURNISSEURS = [
@@ -129,6 +137,16 @@ export const FOURNISSEURS = [
     // texte). Le cron passe de ~48 s à ~54 s, loin sous les 300 s réservées
     // dans vercel.json.
     concurrence: 6,
+    // Relevée de 600 à 900, et c'est MESURÉ. Ashby a dépassé la borne commune
+    // le 2026-11-25 (665 offres FR) et la dépasse chaque nuit depuis : 682 le
+    // 2026-11-27, soit 82 offres vraies écartées. Une offre STOCKÉE pèse
+    // 716 octets — la description est déjà tronquée à 300 caractères par
+    // `texteDeContenu` — donc 900 offres ≈ 630 Ko, quinze fois sous les 10 Mo
+    // qu'Upstash accepte par requête. Le coût est sur la lecture : +70 Ko par
+    // recherche non cachée aujourd'hui (1,21 → 1,28 Mo), au plus +210 Ko si le
+    // catalogue atteint la borne. 900 laisse ~30 % de croissance avant que la
+    // troncature équitable de `repartirSousBorne` ne reprenne la main.
+    maxOffres: 900,
   },
 ];
 
@@ -196,7 +214,7 @@ export async function collecterFournisseur(fournisseur, options = {}) {
   if (francaises.length > borne) {
     const avant = new Set(francaises.map(o => o.company)).size;
     const apres = new Set(retenues.map(o => o.company)).size;
-    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${borne} — ${francaises.length - borne} écartée(s), prises sur les plus gros employeurs (${apres}/${avant} entreprises gardées). Le catalogue a dépassé ce qu'une seule clé KV peut porter : découper par clé.`);
+    console.error(`collect-ats/${fournisseur.nom}: ${francaises.length} offres FR pour une borne à ${borne} — ${francaises.length - borne} écartée(s), prises sur les plus gros employeurs (${apres}/${avant} entreprises gardées). Relever \`maxOffres\` de ce fournisseur sur son poids mesuré par offre (voir ats.js), ou découper par clé si la lecture devient trop lourde.`);
   }
 
   return {

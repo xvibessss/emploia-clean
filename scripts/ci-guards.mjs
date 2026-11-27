@@ -1186,7 +1186,31 @@ try {
   if (!bad22) ok(`${pagesHtml.length} pages : shared.css et shared.js chargés une fois, en-tête à jour, aucun sélecteur tronqué`);
 } catch (e) { fail('contrôle du socle visuel impossible : ' + e.message); }
 
-// ── 23. aucun JavaScript en ligne : la CSP ne l'autorise plus ───────────────
+console.log('\n[23] workflows : aucun commentaire dans un bloc `args:`');
+// L'action lychee colle les lignes de `args: |` en une seule commande : un
+// « # » y commentait tout ce qui suivait, fichiers à vérifier compris, et le
+// Link Check échouait sans avoir lu un lien (constaté le 2026-11-27). YAML ne
+// signale rien : à l'intérieur d'un bloc `|`, le « # » est du texte.
+try {
+  const wfs = fs.readdirSync('.github/workflows').filter(f => /\.ya?ml$/.test(f));
+  let bad24 = 0;
+  for (const f of wfs) {
+    const lignes = readAll(`.github/workflows/${f}`).split('\n');
+    for (let i = 0; i < lignes.length; i++) {
+      const m = lignes[i].match(/^(\s*)args:\s*[|>][-+]?\s*$/);
+      if (!m) continue;
+      const base = m[1].length;
+      for (let j = i + 1; j < lignes.length; j++) {
+        const l = lignes[j];
+        if (l.trim() === '') continue;
+        if (l.match(/^\s*/)[0].length <= base) break;
+        if (l.trim().startsWith('#')) { fail(`${f}:${j + 1} : commentaire dans le bloc args — il coupe la commande, le sortir au-dessus de « args: »`); bad24++; }
+      }
+    }
+  }
+  if (!bad24) ok(`${wfs.length} workflows : aucun bloc args ne contient de commentaire`);
+} catch (e) { fail('contrôle des blocs args impossible : ' + e.message); }
+// ── 24. aucun JavaScript en ligne : la CSP ne l'autorise plus ───────────────
 // La politique de sécurité (vercel.json) a perdu 'unsafe-inline' dans
 // script-src. C'est ce qui rend inoffensive une donnée mal échappée : un
 // `<script>` ou un `onclick=` injecté n'est plus exécuté. La contrepartie est
@@ -1201,7 +1225,7 @@ try {
 //   - chaque nom posé dans un data-on-* a sa fonction dans un script que la
 //     page charge — sinon le bouton ne fait rien ;
 //   - le moteur (js/gestionnaires.js) est identique à sa copie dans shared.js.
-console.log("\n[23] CSP sans 'unsafe-inline' : aucun script ni gestionnaire en ligne");
+console.log("\n[24] CSP sans 'unsafe-inline' : aucun script ni gestionnaire en ligne");
 try {
   const pages23 = walk('.').filter(p => p.endsWith('.html') && !p.includes('node_modules') && !p.startsWith('scripts/') && !p.startsWith('chrome-extension/'));
   const jsFiles23 = ['shared.js', ...(fs.existsSync('js') ? walk('js').filter(p => p.endsWith('.js')) : [])];
