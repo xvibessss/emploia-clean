@@ -1185,5 +1185,30 @@ try {
   if (!bad22) ok(`${pagesHtml.length} pages : shared.css et shared.js chargés une fois, en-tête à jour, aucun sélecteur tronqué`);
 } catch (e) { fail('contrôle du socle visuel impossible : ' + e.message); }
 
+console.log('\n[23] workflows : aucun commentaire dans un bloc `args:`');
+// L'action lychee colle les lignes de `args: |` en une seule commande : un
+// « # » y commentait tout ce qui suivait, fichiers à vérifier compris, et le
+// Link Check échouait sans avoir lu un lien (constaté le 2026-11-27). YAML ne
+// signale rien : à l'intérieur d'un bloc `|`, le « # » est du texte.
+try {
+  const wfs = fs.readdirSync('.github/workflows').filter(f => /\.ya?ml$/.test(f));
+  let bad24 = 0;
+  for (const f of wfs) {
+    const lignes = readAll(`.github/workflows/${f}`).split('\n');
+    for (let i = 0; i < lignes.length; i++) {
+      const m = lignes[i].match(/^(\s*)args:\s*[|>][-+]?\s*$/);
+      if (!m) continue;
+      const base = m[1].length;
+      for (let j = i + 1; j < lignes.length; j++) {
+        const l = lignes[j];
+        if (l.trim() === '') continue;
+        if (l.match(/^\s*/)[0].length <= base) break;
+        if (l.trim().startsWith('#')) { fail(`${f}:${j + 1} : commentaire dans le bloc args — il coupe la commande, le sortir au-dessus de « args: »`); bad24++; }
+      }
+    }
+  }
+  if (!bad24) ok(`${wfs.length} workflows : aucun bloc args ne contient de commentaire`);
+} catch (e) { fail('contrôle des blocs args impossible : ' + e.message); }
+
 if (fails) { console.error(`CI GUARDS: ${fails} problème(s) ✗`); process.exit(1); }
 console.log('CI GUARDS: tout vert ✓');
