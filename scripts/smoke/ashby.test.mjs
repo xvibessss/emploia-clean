@@ -402,5 +402,24 @@ const dureeAts = (vercel.functions || {})['api/cron/collect-ats.js']?.maxDuratio
 check('la durée réservée couvre trois ATS avec de la marge',
   Number(dureeAts) >= 120, `maxDuration ${dureeAts} s`);
 
+console.log('\n── La borne de stockage, calée sur le poids ─────────');
+// Mesuré le 2026-11-27 : 682 offres FR, 716 octets par offre stockée.
+const ashby = FOURNISSEURS.find(f => f.nom === 'Ashby');
+const borneAshby = ashby?.maxOffres ?? MAX_OFFRES;
+check('la borne Ashby couvre le catalogue mesuré (682 offres FR)', borneAshby >= 682, `borne ${borneAshby}`);
+check('à la borne, la clé reste sous 1 Mo (716 o/offre, Upstash accepte 10 Mo)',
+  borneAshby * 716 <= 1024 * 1024, `${Math.round(borneAshby * 716 / 1024)} Ko`);
+{
+  // Le comportement, pas seulement la constante : 700 offres FR de 31
+  // entreprises sont toutes stockées, là où l'ancienne borne en coupait 100.
+  const fausses = Array.from({ length: 700 }, (_, i) => offreKV({ id: `ab_x_${i}`, company: `Ent${i % 31}`, country: 'FR' }));
+  const c = await collecterFournisseur({ ...ashby, collecter: async () => fausses });
+  check('700 offres FR : aucune écartée', c.valeur.offres.length === 700, `${c.valeur.offres.length}`);
+  const trop = Array.from({ length: borneAshby + 50 }, (_, i) => offreKV({ id: `ab_y_${i}`, company: `Ent${i % 31}`, country: 'FR' }));
+  const c2 = await collecterFournisseur({ ...ashby, collecter: async () => trop });
+  check('au-delà de la borne, la coupe tombe pile à la borne et garde chaque entreprise',
+    c2.valeur.offres.length === borneAshby && new Set(c2.valeur.offres.map(o => o.company)).size === 31);
+}
+
 if (failed) { console.error(`\n❌ sonde Ashby : ${failed} échec(s)\n`); process.exit(1); }
 console.log(`\n✅ sonde Ashby : ${passed} vérifications OK\n`);
