@@ -26,6 +26,15 @@ jobs:
           # pages portent des liens absolus vers emploia.eu, donc une
           # exclusion écrite sur l'hôte Vercel ne les couvre plus. C'est ce
           # qui rendait les exclusions ci-dessous partiellement inopérantes.
+          #
+          # LinkedIn répond 403 à tout robot sur ses boutons « partager » : les
+          # 24 erreurs du 2026-11-22 étaient toutes ce lien-là, sur 24 articles
+          # du blog, et un vrai lien cassé s'y serait perdu.
+          #
+          # AUCUN COMMENTAIRE DANS `args`. L'action colle ces lignes en une
+          # seule commande : un « # » y met en commentaire tout ce qui suit,
+          # fichiers à vérifier compris, et lychee s'arrête sur « required
+          # arguments were not provided: <inputs> » (constaté le 2026-11-27).
           args: |
             --base-url https://emploia.eu
             --exclude "^https://emploia\.eu/(app|dashboard|profil|chat|cv-vault|alerts|apply-queue)"
@@ -34,9 +43,6 @@ jobs:
             --exclude "^https://plausible\.io"
             --exclude "^https://js\.stripe\.com"
             --exclude "^https://instagram\.com"
-            # LinkedIn répond 403 à tout robot sur ses boutons « partager » :
-            # les 24 erreurs du 2026-11-22 étaient toutes ce lien-là, sur 24
-            # articles du blog, et un vrai lien cassé s'y serait perdu.
             --exclude "^https://www\.linkedin\.com/sharing/"
             --timeout 20
             --retry-wait-time 5
