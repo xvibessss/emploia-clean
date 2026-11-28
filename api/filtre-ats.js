@@ -3,6 +3,7 @@ import { kvGet, kvSet, getAllowedOrigin, checkRateLimit } from './_lib/auth.js';
 import { competencesDe, nomDe } from './_lib/competences.js';
 import { analyser, MIN_OFFRES } from './_lib/filtre-ats.js';
 import jobsHandler from './jobs.js';
+import { trackEvent } from './_lib/track.js';
 
 // Simulateur de filtre ATS (page /filtre-ats). Public : pas de compte requis.
 // Le CV envoyé n'est ni stocké ni journalisé — seules les compétences qu'il
@@ -77,6 +78,7 @@ export default async function handler(req) {
     return json({ insuffisant: true, nbOffres: offres.length, metier, ville, cv, noms: Object.fromEntries(cv.map((id) => [id, nomDe(id)])) });
   }
   const r = analyser(offres, cv);
+  trackEvent('ats_filter_simulated', { offres: r.nbOffres }).catch(() => {});
   const ids = new Set([...cv, ...r.offres.flatMap((o) => o.e), ...r.manquantes.map((m) => m.id)]);
   return json({ metier, ville, cv, ...r, noms: Object.fromEntries([...ids].map((id) => [id, nomDe(id)])) });
 }

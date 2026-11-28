@@ -26,6 +26,7 @@
     "test:alertes": "node scripts/smoke/alertes.test.mjs",
     "test:prets": "node scripts/smoke/prets.test.mjs",
     "test:filtre-ats": "node scripts/smoke/filtre-ats.test.mjs",
+    "test:adaptation": "node scripts/smoke/adaptation.test.mjs",
     "test:extension": "node scripts/extension/content.test.mjs",
     "test:decouverte": "node scripts/smoke/decouverte.test.mjs",
     "test:recherche": "node scripts/smoke/recherche.test.mjs",
