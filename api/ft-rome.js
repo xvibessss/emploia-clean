@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge', regions: ['cdg1'] };
+export const config = { runtime: 'edge', regions: ['fra1'] };
 // ROMEO v2 (France Travail) — rattache un intitulé libre (« chargé de com
 // digitale », une ligne d'expérience d'un CV) à une appellation du ROME 4.0.
 //

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge', regions: ['cdg1'] };
+export const config = { runtime: 'edge', regions: ['iad1'] };
 // La Bonne Boite v2 (France Travail) — entreprises à fort potentiel d'embauche
 // dans les 6 prochains mois, pour les candidatures spontanées.
 //
