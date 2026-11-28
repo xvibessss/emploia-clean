@@ -42,9 +42,11 @@ function redis(cmd) {
   }
 }
 const sortants = [];
+let appelsKv = 0;
 globalThis.fetch = async (url, init = {}) => {
   const u = String(url);
   if (u.startsWith('https://kv.test')) {
+    appelsKv++;
     return new Response(JSON.stringify({ result: redis(JSON.parse(init.body)) }));
   }
   sortants.push(u);
@@ -181,6 +183,31 @@ await test('aucune offre fabriquée au nom d’un employeur réel', () => {
   for (const nom of ['BNP Paribas', 'Doctolib', "L'Oréal", 'Thales', 'Capgemini', 'LVMH']) {
     assert.ok(!jobsSrc.includes(`company:'${nom}'`) && !jobsSrc.includes(`company:"${nom}"`), nom);
   }
+});
+const me = (await import('../../api/auth/me.js')).default;
+await test('/me : un visiteur sans cookie de session ne coûte aucune commande Upstash', async () => {
+  for (const cookie of [undefined, 'autre=1', `x__Host-emploia-token=abc`]) {
+    const avant = appelsKv;
+    const r = await me(req('https://emploia.eu/api/auth/me', { headers: cookie ? { cookie, 'x-forwarded-for': '203.0.113.9' } : { 'x-forwarded-for': '203.0.113.9' } }));
+    assert.equal(r.status, 401, String(cookie));
+    assert.deepEqual(await r.json(), { error: 'Non authentifié' });
+    assert.equal(appelsKv - avant, 0, `commandes KV pour cookie=${cookie}`);
+  }
+});
+await test('/me : avec le cookie, la limite de débit et la session jouent toujours', async () => {
+  kvPut('userid:u_me', 'me@example.com');
+  kvPut('user:me@example.com', { id: 'u_me', email: 'me@example.com', plan: 'free' });
+  const cookie = `__Host-emploia-token=${await auth.signToken('u_me')}`;
+  const avant = appelsKv;
+  const ok = await me(req('https://emploia.eu/api/auth/me', { headers: { cookie, 'x-forwarded-for': '203.0.113.10' } }));
+  assert.equal(ok.status, 200);
+  assert.equal((await ok.json()).user.email, 'me@example.com');
+  assert.ok(appelsKv - avant > 0, 'la limite de débit doit lire Upstash');
+  const faux = await me(req('https://emploia.eu/api/auth/me', { headers: { cookie: '__Host-emploia-token=pas.un.jeton', 'x-forwarded-for': '203.0.113.10' } }));
+  assert.equal(faux.status, 401);
+  let dernier;
+  for (let i = 0; i < 61; i++) dernier = await me(req('https://emploia.eu/api/auth/me', { headers: { cookie, 'x-forwarded-for': '203.0.113.11' } }));
+  assert.equal(dernier.status, 429);
 });
 const manage = (await import('../../api/employer/manage-job.js')).default;
 await test('offre employeur : en attente tant que l’email n’a pas confirmé', async () => {
