@@ -1276,6 +1276,20 @@ try {
     const manquants = [...usesOf(balisage)].filter(n => !dispo.has(n));
     if (manquants.length) { fail(`${f} : gestionnaire(s) déclaré(s) sans fonction EMP_H — ${manquants.slice(0, 4).join(', ')}`); bad23++; }
     if (usesOf(balisage).size && !aMoteur) { fail(`${f} : des data-on-* mais ni shared.js ni js/gestionnaires.js — rien ne les relie`); bad23++; }
+
+    // L'ORDRE compte : un script chargé avant le moteur qui écrit dans EMP_H
+    // plante sur « EMP_H is not defined », et TOUT le script meurt avec lui
+    // (17 pages, /employeurs et 16 articles, constaté le 2026-11-28 au banc
+    // « session ouverte »). Il doit créer le registre lui-même.
+    const ordre = [...src.matchAll(/<script[^>]*\bsrc="\/([^"?]+)/g)].map(m => m[1]);
+    const iMoteur = ordre.findIndex(x => x === 'shared.js' || x === 'js/gestionnaires.js');
+    for (const j of ordre.slice(0, iMoteur < 0 ? ordre.length : iMoteur)) {
+      if (!j.startsWith('js/') || !exists(j)) continue;
+      const t = readAll(j);
+      if (/(^|[^.\w])EMP_H\[/m.test(t) && !/window\.EMP_H\s*=\s*window\.EMP_H\s*\|\|\s*\{\}/.test(t)) {
+        fail(`${f} : ${j} écrit dans EMP_H mais est chargé avant le moteur — commencer le fichier par « window.EMP_H = window.EMP_H || {}; »`); bad23++;
+      }
+    }
   }
   if (!bad23) ok(`${pages23.length} pages et ${jsFiles23.length} scripts : aucun code en ligne, tous les gestionnaires déclarés ont leur fonction`);
 } catch (e) { fail('contrôle CSP / code en ligne impossible : ' + e.message); }

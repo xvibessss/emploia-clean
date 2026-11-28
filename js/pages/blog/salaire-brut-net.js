@@ -1,3 +1,4 @@
+window.EMP_H = window.EMP_H || {}; // ce script est chargé avant le moteur (shared.js)
 function calcNet() {
   const brut = parseFloat(document.getElementById('brutAnnuel').value);
   const coeff = parseFloat(document.getElementById('statut').value);

@@ -1,3 +1,4 @@
+window.EMP_H = window.EMP_H || {}; // ce script est chargé avant le moteur (shared.js)
   const rp = document.getElementById('readProgress');
   window.addEventListener('scroll', () => {
     const h = document.body.scrollHeight - window.innerHeight;

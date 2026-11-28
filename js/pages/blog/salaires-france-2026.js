@@ -1,3 +1,4 @@
+window.EMP_H = window.EMP_H || {}; // ce script est chargé avant le moteur (shared.js)
 document.addEventListener('scroll',()=>{const h=document.documentElement;const el=document.getElementById('read-progress');if(el)el.style.width=Math.min((h.scrollTop/(h.scrollHeight-h.clientHeight))*100,100)+'%';});
 async function submitNW(e,f){e.preventDefault();const btn=f.querySelector('.nw-btn');btn.disabled=true;btn.textContent='...';try{const r=await fetch('/api/newsletter',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:f.querySelector('.nw-input').value,source:'blog'})});if(r.ok){f.style.display='none';f.nextElementSibling.style.display='block';}}catch{}btn.disabled=false;btn.textContent="S'abonner →";}
 

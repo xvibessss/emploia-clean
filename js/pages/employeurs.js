@@ -1,3 +1,4 @@
+window.EMP_H = window.EMP_H || {}; // ce script est chargé avant le moteur (shared.js)
   function toggleFaq(btn) {
     const item = btn.closest('.faq-item');
     const isOpen = item.classList.contains('open');

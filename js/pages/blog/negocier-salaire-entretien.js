@@ -1,3 +1,4 @@
+window.EMP_H = window.EMP_H || {}; // ce script est chargé avant le moteur (shared.js)
 document.addEventListener('scroll', () => {
   const h = document.documentElement;
   const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
