@@ -26,8 +26,13 @@
 // `api.pole-emploi.io` résout encore mais ne répond plus (délai dépassé en
 // 12 s), ce qui est la raison de ne pas y revenir.
 
+// MIS À JOUR LE 2026-11-28. La documentation « 4.1. Client Credentials » donne
+// désormais `authentification-partenaire.francetravail.io` comme point d'accès,
+// et francetravail.io affiche un bandeau « Incident génération access token
+// royaume partenaire » invitant à quitter `entreprise.francetravail.fr` pour ce
+// nouvel hôte. Chemin, realm, corps et `expires_in: 1499` sont inchangés.
 export const TOKEN_URL =
-  'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire';
+  'https://authentification-partenaire.francetravail.io/connexion/oauth2/access_token?realm=%2Fpartenaire';
 export const RECHERCHE_URL =
   'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
 
@@ -36,6 +41,26 @@ export const RECHERCHE_URL =
 export const SCOPE = 'api_offresdemploiv2 o2dsoffre';
 
 export const CLE_JETON = 'ft_token';
+
+// UN JETON PAR API, PAS UN JETON POUR TOUTES. Le serveur d'autorisation refuse
+// la demande ENTIÈRE dès qu'un seul scope n'est pas accordé (`invalid_scope`).
+// Or l'API Offres d'emploi a quitté le libre-service le 2026-10 (« plus exposée
+// sur francetravail.io le temps d'une analyse », data.gouv.fr) : demander ses
+// scopes avec ceux de La Bonne Boite ferait tomber La Bonne Boite avec elle.
+// Scopes relevés le 2026-11-28 dans les OpenAPI officielles de chaque API.
+export const SCOPES = {
+  offres: SCOPE,
+  labonneboite: 'api_labonneboitev2 search office',
+  romeo: 'api_romeov2',
+  romeMetiers: 'api_rome-metiersv1 nomenclatureRome',
+};
+export const CLES_JETON = {
+  offres: CLE_JETON,
+  labonneboite: 'ft_token:labonneboite',
+  romeo: 'ft_token:romeo',
+  romeMetiers: 'ft_token:rome-metiers',
+};
+export const API_BASE = 'https://api.francetravail.io/partenaire';
 
 // LE POINT QUI AURAIT CASSÉ EN PRODUCTION. Le code d'origine mettait le jeton
 // en cache 3300 s, sur un commentaire affirmant « FT tokens are valid for
@@ -130,11 +155,13 @@ export async function obtenirJeton({
   kvGet, kvSet,
   ignorerCache = false,
   timeout = TIMEOUT_JETON_MS,
+  scope = SCOPE,
+  cleCache = CLE_JETON,
 } = {}) {
   if (!clientId || !clientSecret) return { cause: 'cle_absente' };
 
   if (!ignorerCache && kvGet) {
-    const enCache = await kvGet(CLE_JETON).catch(() => null);
+    const enCache = await kvGet(cleCache).catch(() => null);
     if (typeof enCache === 'string' && enCache) return { jeton: enCache, depuisCache: true };
   }
 
@@ -147,7 +174,7 @@ export async function obtenirJeton({
         grant_type: 'client_credentials',
         client_id: clientId,
         client_secret: clientSecret,
-        scope: SCOPE,
+        scope,
       }).toString(),
     }, timeout);
   } catch (e) {
@@ -170,7 +197,7 @@ export async function obtenirJeton({
   if (typeof jeton !== 'string' || !jeton) return { cause: 'forme_inattendue' };
 
   const ttl = ttlDepuisExpiration(corps?.expires_in);
-  if (kvSet) kvSet(CLE_JETON, jeton, ttl).catch(() => {});
+  if (kvSet) kvSet(cleCache, jeton, ttl).catch(() => {});
   return { jeton, ttl };
 }
 
@@ -308,4 +335,46 @@ export async function collecterFranceTravail({
   // Les deux tentatives ont rendu 401 : le refus ne vient pas d'un jeton
   // périmé en cache, il est réel.
   return { offres: [], cause: 'http_401', raison: 'HTTP 401 après renouvellement du jeton' };
+}
+
+// ── APPEL GÉNÉRIQUE AUX AUTRES API (La Bonne Boite, ROMEO, ROME) ────────────
+// Même contrat que la collecte d'offres : `{ donnees }` ou `{ cause }`, jamais
+// d'exception, un seul rejeu sur 401 avec un jeton neuf.
+export async function appelerApiFT(api, chemin, {
+  clientId, clientSecret,
+  fetchImpl = fetch,
+  kvGet, kvSet,
+  init = {},
+  timeout = TIMEOUT_RECHERCHE_MS,
+} = {}) {
+  const scope = SCOPES[api];
+  if (!scope) return { cause: 'api_inconnue' };
+
+  for (const tentative of [0, 1]) {
+    const { jeton, cause } = await obtenirJeton({
+      clientId, clientSecret, fetchImpl, kvGet, kvSet,
+      ignorerCache: tentative === 1, scope, cleCache: CLES_JETON[api],
+    });
+    if (!jeton) return { cause };
+
+    let res;
+    try {
+      res = await avecTimeout(fetchImpl, `${API_BASE}${chemin}`, {
+        ...init,
+        headers: { Accept: 'application/json', ...(init.headers || {}), Authorization: `Bearer ${jeton}` },
+      }, timeout);
+    } catch (e) {
+      return { cause: e?.name === 'AbortError' ? 'timeout' : 'erreur_reseau' };
+    }
+
+    if (res.status === 401 && tentative === 0) continue;
+    if (res.status === 204) return { donnees: null };
+    if (!res.ok) return { cause: `http_${res.status}` };
+    try {
+      return { donnees: await res.json() };
+    } catch {
+      return { cause: 'reponse_illisible' };
+    }
+  }
+  return { cause: 'http_401' };
 }

@@ -160,8 +160,10 @@ check('les sites HTTP du handler déclarent leur code explicitement',
   sitesHandler === 3, `${sitesHandler}/3`);
 check('le collecteur RapidAPI déclare le sien de la même façon',
   sitesCollecteur === 1, `${sitesCollecteur}/1`);
-check('le collecteur France Travail déclare le sien de la même façon',
-  sitesFT === 1, `${sitesFT}/1`);
+// 1 → 2 le 2026-11-28 : `appelerApiFT` (La Bonne Boite, ROMEO) a son propre
+// site HTTP, écrit de la même façon que celui de la collecte d'offres.
+check('le collecteur France Travail déclare les siens de la même façon',
+  sitesFT === 2, `${sitesFT}/2`);
 check('aucun site ne construit sa cause depuis un message d’exception',
   !/cause: *e\.message/.test(src) && !/cause: *e\.message/.test(libSrc) &&
   !/cause: *e\.message/.test(ftSrc));

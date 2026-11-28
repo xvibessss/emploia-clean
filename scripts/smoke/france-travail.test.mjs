@@ -22,6 +22,7 @@ import {
   MARGE_JETON_SECONDES, TTL_JETON_PLANCHER, TTL_JETON_DEFAUT,
   FILTRE_VERS_TYPE_CONTRAT, FILTRES_NON_SERVIS, MAX_OFFRES, OFFRES_PAR_PAGE,
   ttlDepuisExpiration, parametresDeRecherche, obtenirJeton, collecterFranceTravail,
+  SCOPES, CLES_JETON, API_BASE, appelerApiFT,
 } from '../../api/_lib/france-travail.js';
 import { contratFranceTravail, CONTRATS } from '../../api/_lib/contrat.js';
 
@@ -147,8 +148,11 @@ console.log('\n── [2] La requête de jeton est conforme à la documentation 
 // 2026-10-21) : un retour en arrière ne se verrait donc PAS comme un 404 mais
 // comme un `timeout`, c'est-à-dire comme une panne réseau passagère. C'est
 // précisément le genre de régression qu'un test doit refuser, pas diagnostiquer.
-check('TOKEN_URL est le serveur d’autorisation francetravail.fr, realm encodé',
-  TOKEN_URL === 'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire',
+// Hôte changé le 2026-11-28 : la doc « 4.1. Client Credentials » nomme
+// désormais authentification-partenaire.francetravail.io, et le site signale un
+// incident de génération de jeton sur entreprise.francetravail.fr.
+check('TOKEN_URL est le serveur d’autorisation partenaire francetravail.io, realm encodé',
+  TOKEN_URL === 'https://authentification-partenaire.francetravail.io/connexion/oauth2/access_token?realm=%2Fpartenaire',
   TOKEN_URL);
 check('RECHERCHE_URL est l’API francetravail.io v2',
   RECHERCHE_URL === 'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search',
@@ -164,8 +168,8 @@ check('le scope déclaré est celui de l’exemple officiel',
   const corps = new URLSearchParams(appel.options.body);
   check('le realm est encodé dans l’URL du serveur d’autorisation',
     appel.url.includes('realm=%2Fpartenaire'));
-  check('l’hôte est entreprise.francetravail.fr (et non pole-emploi.fr)',
-    appel.url.startsWith('https://entreprise.francetravail.fr/connexion/oauth2/access_token'));
+  check('l’hôte est authentification-partenaire.francetravail.io',
+    appel.url.startsWith('https://authentification-partenaire.francetravail.io/connexion/oauth2/access_token'));
   check('la méthode est POST', appel.options.method === 'POST');
   check('le corps est urlencodé',
     appel.options.headers['Content-Type'] === 'application/x-www-form-urlencoded');
@@ -500,6 +504,68 @@ console.log('\n── [8] L’offre normalisée ──');
   check('sans typeContrat ni indice d’intitulé → type null', o.type === null);
   check('sans lieu → « France », pas une ville choisie au hasard',
     o.location === 'France');
+}
+
+
+// ── UN JETON PAR API : La Bonne Boite ne tombe pas avec Offres d'emploi ─────
+{
+  const net = reseau({ jeton: JETON_OK(1499, 'JETON-LBB'), recherche: reponse({ hits: 1, items: [{ siret: '1' }] }) });
+  const kv = kvDePapier();
+  const r = await appelerApiFT('labonneboite', '/labonneboite/v2/recherche?job=dev&city=Lyon', {
+    clientId: 'ID', clientSecret: 'SECRET', fetchImpl: net.fetchImpl, ...kv,
+  });
+  const corps = new URLSearchParams(net.jetons()[0].options.body);
+  check('La Bonne Boite demande SES scopes, sans ceux des offres',
+    corps.get('scope') === 'api_labonneboitev2 search office' && !corps.get('scope').includes('offresdemploi'));
+  check('son jeton a sa propre clé de cache', kv.ecritures[0]?.k === CLES_JETON.labonneboite && CLES_JETON.labonneboite !== CLE_JETON);
+  check('l’appel vise la base partenaire', net.recherches()[0].url === API_BASE + '/labonneboite/v2/recherche?job=dev&city=Lyon');
+  check('le Bearer est posé', net.recherches()[0].options.headers.Authorization === 'Bearer JETON-LBB');
+  check('les données reviennent', r.donnees?.hits === 1);
+}
+{
+  const net = reseau({ jeton: JETON_OK(), recherche: reponse([]) });
+  await appelerApiFT('romeo', '/romeo/v2/predictionMetiers', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kvDePapier(),
+    init: { method: 'POST', body: '{}' } });
+  check('ROMEO demande api_romeov2', new URLSearchParams(net.jetons()[0].options.body).get('scope') === SCOPES.romeo && SCOPES.romeo === 'api_romeov2');
+  check('la méthode POST est transmise', net.recherches()[0].options.method === 'POST');
+}
+{
+  const net = reseau({ jeton: reponse({ error: 'invalid_scope' }, { status: 400 }) });
+  const r = await appelerApiFT('labonneboite', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kvDePapier() });
+  check('scope refusé → droits_insuffisants, nommé', r.cause === 'droits_insuffisants');
+}
+{
+  const kv = kvDePapier({ [CLES_JETON.labonneboite]: 'PERIME' });
+  const net = reseau({ jeton: JETON_OK(1499, 'NEUF'), recherche: [reponse({}, { status: 401 }), reponse({ items: [] })] });
+  const r = await appelerApiFT('labonneboite', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kv });
+  check('401 → un jeton neuf, un seul rejeu', !r.cause && net.jetons().length === 1 && net.recherches().length === 2);
+}
+{
+  const r = await appelerApiFT('inconnue', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: async () => { throw new Error('ne doit pas sortir'); } });
+  check('API inconnue → refus sans appel réseau', r.cause === 'api_inconnue');
+  const r2 = await appelerApiFT('romeo', '/x', { fetchImpl: async () => { throw new Error('ne doit pas sortir'); } });
+  check('identifiants absents → cle_absente', r2.cause === 'cle_absente');
+}
+
+
+// ── Handlers : validation et normalisation, sans réseau ─────────────────────
+{
+  const { construireRecherche, normaliserEntreprise } = await import('../../api/ft-entreprises.js');
+  check('sans métier → refus', !!construireRecherche(new URLSearchParams('city=Lyon')).erreur);
+  check('sans lieu → refus', !!construireRecherche(new URLSearchParams('job=dev')).erreur);
+  const { params } = construireRecherche(new URLSearchParams('job=dev&city=Lyon&page_size=999&pirate=1'));
+  check('page_size plafonné à 50 et paramètres inconnus écartés', params.get('page_size') === '50' && !params.has('pirate'));
+  const e = normaliserEntreprise({ siret: '123', company_name: 'ACME', city: 'Lyon', headcount_min: 10, headcount_max: 19, is_high_potential: true });
+  check('entreprise normalisée sans rien inventer', e.nom === 'ACME' && e.effectif === '10–19' && e.fortPotentiel && e.secteur === null);
+}
+{
+  const { construirePrediction, normaliserPredictions, MAX_INTITULES } = await import('../../api/ft-rome.js');
+  const { payload } = construirePrediction({ intitules: Array.from({ length: 30 }, (_, i) => 'poste ' + i), contexte: 'agence' });
+  check('ROMEO : 20 intitulés au plus par appel', payload.appellations.length === MAX_INTITULES);
+  check('ROMEO : nomAppelant emploia', payload.options.nomAppelant === 'emploia');
+  check('ROMEO : intitulé vide refusé', !!construirePrediction({ intitules: ['  '] }).erreur);
+  const r = normaliserPredictions([{ intitule: 'boucher', metiersRome: [{ libelleAppellation: 'Boucher / Bouchère', codeRome: 'D1101', libelleRome: 'Boucherie', codeAppellation: '11564', scorePrediction: 0.75 }] }]);
+  check('ROMEO : prédiction normalisée', r[0].metiers[0].codeRome === 'D1101' && r[0].metiers[0].score === 0.75);
 }
 
 if (failed) { console.error(`\n❌ sonde France Travail : ${failed} échec(s)\n`); process.exit(1); }
