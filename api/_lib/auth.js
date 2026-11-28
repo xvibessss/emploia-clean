@@ -219,6 +219,14 @@ function getToken(req) {
   return match ? match[1] : null;
 }
 
+// Vrai si la requête porte le cookie de session — sans le vérifier. Sert de
+// garde peu coûteuse : sans ce cookie, `getCurrentUser` rendra forcément null,
+// donc tout travail en amont (limite de débit, lecture KV) serait dépensé pour
+// rien. Ne prouve PAS une session : ne jamais s'en servir pour autoriser.
+export function hasSessionCookie(req) {
+  return getToken(req) !== null;
+}
+
 export async function getCurrentUser(req) {
   const token = getToken(req);
   if (!token) return null;
