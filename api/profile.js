@@ -37,7 +37,13 @@ export default async function handler(req) {
     try { body = JSON.parse(bodyText); } catch { return new Response(JSON.stringify({ error: 'JSON invalide' }), { status: 400, headers: H }); }
 
     const str = (v, max) => typeof v === 'string' ? v.slice(0, max) : undefined;
-    const profile = {};
+    // FUSION, pas remplacement. Trois pages écrivent ici, chacune ses champs :
+    // /app envoie { profileText } deux secondes après chaque frappe,
+    // /cv-builder l'identité et les coordonnées, /profil le reste. Repartir
+    // d'un objet vide effaçait, à chaque enregistrement, tout ce que les deux
+    // autres avaient écrit — expériences, formation, LinkedIn. Un champ omis
+    // est donc conservé ; pour vider un champ, l'envoyer vide ('' ou []).
+    const profile = { ...((await kvGet(`profile:${user.email}`)) || {}) };
 
     // Scalar string fields
     const scalarFields = { firstName: 100, lastName: 100, title: 200, location: 200, phone: 30, summary: 3000, profileText: 5000 };
