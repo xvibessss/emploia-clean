@@ -22,7 +22,7 @@ import {
   MARGE_JETON_SECONDES, TTL_JETON_PLANCHER, TTL_JETON_DEFAUT,
   FILTRE_VERS_TYPE_CONTRAT, FILTRES_NON_SERVIS, MAX_OFFRES, OFFRES_PAR_PAGE,
   ttlDepuisExpiration, parametresDeRecherche, obtenirJeton, collecterFranceTravail,
-  SCOPES, CLES_JETON, API_BASE, appelerApiFT,
+  SCOPES, CLES_JETON, API_BASE, appelerApiFT, TOKEN_URL_SECOURS,
 } from '../../api/_lib/france-travail.js';
 import { contratFranceTravail, CONTRATS } from '../../api/_lib/contrat.js';
 
@@ -47,7 +47,7 @@ const reponse = (corps, { status = 200, ok } = {}) => ({
 // appel de cette étape, ce qui permet de jouer « 401 puis 200 ».
 function reseau(plan) {
   const appels = [];
-  const etapeDe = (url) => (String(url).startsWith(TOKEN_URL) ? 'jeton' : 'recherche');
+  const etapeDe = (url) => (String(url).includes('/connexion/oauth2/access_token') ? 'jeton' : 'recherche');
   const fetchImpl = async (url, options) => {
     appels.push({ url: String(url), options });
     const cle = etapeDe(url);
@@ -566,6 +566,26 @@ console.log('\n── [8] L’offre normalisée ──');
   check('ROMEO : intitulé vide refusé', !!construirePrediction({ intitules: ['  '] }).erreur);
   const r = normaliserPredictions([{ intitule: 'boucher', metiersRome: [{ libelleAppellation: 'Boucher / Bouchère', codeRome: 'D1101', libelleRome: 'Boucherie', codeAppellation: '11564', scorePrediction: 0.75 }] }]);
   check('ROMEO : prédiction normalisée', r[0].metiers[0].codeRome === 'D1101' && r[0].metiers[0].score === 0.75);
+}
+
+
+// ── Hôte de secours : seulement si le premier ne répond pas en OAuth ────────
+{
+  const net = reseau({ jeton: [reponse(undefined, { status: 409 }), JETON_OK(1499, 'VIA-SECOURS')], recherche: reponse({ items: [] }) });
+  const r = await appelerApiFT('labonneboite', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kvDePapier() });
+  check('409 non JSON → l’hôte de secours est essayé et sert le jeton',
+    !r.cause && net.jetons()[1]?.url === TOKEN_URL_SECOURS && net.recherches()[0].options.headers.Authorization === 'Bearer VIA-SECOURS');
+}
+{
+  const net = reseau({ jeton: [reponse({ error: 'invalid_client' }, { status: 400 })] });
+  const r = await appelerApiFT('labonneboite', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kvDePapier() });
+  check('refus OAuth en bonne forme → pas de second hôte', r.cause === 'identifiants_refuses' && net.jetons().length === 1);
+}
+{
+  const net = reseau({ jeton: [reponse(undefined, { status: 409 }), reponse(undefined, { status: 503 })] });
+  const r = await appelerApiFT('labonneboite', '/x', { clientId: 'ID', clientSecret: 'S', fetchImpl: net.fetchImpl, ...kvDePapier() });
+  check('les deux hôtes en panne → jeton_refuse et diagnostic des deux',
+    r.cause === 'jeton_refuse' && /409/.test(r.diagnostic) && /503/.test(r.diagnostic));
 }
 
 if (failed) { console.error(`\n❌ sonde France Travail : ${failed} échec(s)\n`); process.exit(1); }
