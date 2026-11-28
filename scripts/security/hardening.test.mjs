@@ -209,6 +209,29 @@ await test('/me : avec le cookie, la limite de débit et la session jouent toujo
   for (let i = 0; i < 61; i++) dernier = await me(req('https://emploia.eu/api/auth/me', { headers: { cookie, 'x-forwarded-for': '203.0.113.11' } }));
   assert.equal(dernier.status, 429);
 });
+const profilApi = (await import('../../api/profile.js')).default;
+await test('/api/profile : un enregistrement partiel ne perd pas ce que les autres pages ont écrit', async () => {
+  kvPut('userid:u_prof', 'prof@example.com');
+  kvPut('user:prof@example.com', { id: 'u_prof', email: 'prof@example.com', plan: 'free' });
+  const cookie = `__Host-emploia-token=${await auth.signToken('u_prof')}`;
+  const put = (corps) => profilApi(req('https://emploia.eu/api/profile', { method: 'PUT', headers: { cookie, 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.20' }, body: JSON.stringify(corps) }));
+  // /profil, puis /app (autosave du parcours), puis /cv-builder.
+  assert.equal((await put({ title: 'Comptable', linkedin: 'https://linkedin.com/in/c', experience: [{ title: 'Comptable', company: 'Fiducial', date: '2021-2024', desc: 'Bilans' }] })).status, 200);
+  assert.equal((await put({ profileText: 'Camille, comptable 3 ans' })).status, 200);
+  assert.equal((await put({ firstName: 'Camille', phone: '0600000000' })).status, 200);
+  const r = await profilApi(req('https://emploia.eu/api/profile', { headers: { cookie, 'x-forwarded-for': '203.0.113.20' } }));
+  const p = await r.json();
+  assert.equal(p.experience?.[0]?.company, 'Fiducial', 'expériences effacées');
+  assert.equal(p.linkedin, 'https://linkedin.com/in/c', 'LinkedIn effacé');
+  assert.equal(p.profileText, 'Camille, comptable 3 ans', 'parcours effacé');
+  assert.equal(p.firstName, 'Camille');
+  // Vider reste possible, et une URL dangereuse reste refusée.
+  await put({ linkedin: '', experience: [] });
+  await put({ portfolio: 'javascript:alert(1)' });
+  const p2 = await (await profilApi(req('https://emploia.eu/api/profile', { headers: { cookie, 'x-forwarded-for': '203.0.113.20' } }))).json();
+  assert.equal(p2.linkedin, ''); assert.deepEqual(p2.experience, []); assert.ok(!p2.portfolio);
+  assert.equal(p2.profileText, 'Camille, comptable 3 ans');
+});
 const manage = (await import('../../api/employer/manage-job.js')).default;
 await test('offre employeur : en attente tant que l’email n’a pas confirmé', async () => {
   kvPut('employer_jobs', [{ id: 'emp_1', manageToken: 'a'.repeat(32), status: 'pending', title: 'Dev', company: 'ACME', postedAt: new Date().toISOString() }]);
