@@ -131,6 +131,8 @@ jobs:
         run: node scripts/seo/alerte-regression.test.mjs
       - name: Alertes emploi (moteur /jobs, offres nouvelles seulement, bouton « Générer mon CV »)
         run: node scripts/smoke/alertes.test.mjs
+      - name: Découvrir — prêts à postuler (section à préciser, mots ajoutés, comptes isolés)
+        run: node scripts/smoke/prets.test.mjs
       - name: Extension Chrome (lecture des offres, remplissage sans écraser ni confondre)
         run: |
           npm install --no-save --no-package-lock jsdom@24
