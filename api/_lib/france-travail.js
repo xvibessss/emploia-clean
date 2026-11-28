@@ -188,7 +188,13 @@ export async function obtenirJeton({
   let corps = null;
   try { corps = await res.json(); } catch { corps = null; }
 
-  if (!res.ok) return { cause: causeDErreurOAuth(corps) };
+  // `diagnostic` : le statut HTTP et le CODE OAuth (`invalid_client`…), jamais
+  // la description ni le corps. Il ne part que dans les journaux, pour qu'un
+  // `jeton_refuse` générique dise enfin ce que le serveur a répondu.
+  if (!res.ok) {
+    const code = typeof corps?.error === 'string' ? corps.error.slice(0, 40) : (corps === null ? 'corps_non_json' : 'sans_code');
+    return { cause: causeDErreurOAuth(corps), diagnostic: `HTTP ${res.status} ${code}` };
+  }
 
   const jeton = corps?.access_token;
   // 200 sans `access_token` : le serveur a répondu, mais pas ce qu'on attend.
@@ -276,12 +282,12 @@ export async function collecterFranceTravail({
   // clé, en rendant `http_401` à chaque requête. La boucle se répare d'elle-
   // même en demandant un jeton neuf, cache ignoré.
   for (const tentative of [0, 1]) {
-    const { jeton, cause: causeJeton } = await obtenirJeton({
+    const { jeton, cause: causeJeton, diagnostic } = await obtenirJeton({
       clientId, clientSecret, fetchImpl, kvGet, kvSet,
       ignorerCache: tentative === 1,
     });
     if (!jeton) {
-      return { offres: [], cause: causeJeton, raison: `jeton indisponible (${causeJeton})` };
+      return { offres: [], cause: causeJeton, raison: `jeton indisponible (${causeJeton}${diagnostic ? ' — ' + diagnostic : ''})` };
     }
 
     let res;
@@ -351,11 +357,11 @@ export async function appelerApiFT(api, chemin, {
   if (!scope) return { cause: 'api_inconnue' };
 
   for (const tentative of [0, 1]) {
-    const { jeton, cause } = await obtenirJeton({
+    const { jeton, cause, diagnostic } = await obtenirJeton({
       clientId, clientSecret, fetchImpl, kvGet, kvSet,
       ignorerCache: tentative === 1, scope, cleCache: CLES_JETON[api],
     });
-    if (!jeton) return { cause };
+    if (!jeton) return { cause, diagnostic };
 
     let res;
     try {

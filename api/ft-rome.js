@@ -64,7 +64,7 @@ export default async function handler(req) {
   const { payload, erreur } = construirePrediction(body);
   if (erreur) return new Response(JSON.stringify({ error: erreur }), { status: 400, headers: H });
 
-  const { donnees, cause } = await appelerApiFT('romeo', '/romeo/v2/predictionMetiers', {
+  const { donnees, cause, diagnostic } = await appelerApiFT('romeo', '/romeo/v2/predictionMetiers', {
     clientId: process.env.FRANCE_TRAVAIL_CLIENT_ID,
     clientSecret: process.env.FRANCE_TRAVAIL_CLIENT_SECRET,
     kvGet, kvSet,
@@ -72,7 +72,7 @@ export default async function handler(req) {
   });
 
   if (cause) {
-    console.warn(`[ft-rome] ROMEO indisponible : ${cause}`);
+    console.warn(`[ft-rome] ROMEO indisponible : ${cause}${diagnostic ? ' — ' + diagnostic : ''}`);
     return new Response(JSON.stringify({ error: 'Source indisponible', cause, resultats: [] }), { status: 502, headers: H });
   }
   return new Response(JSON.stringify({ resultats: normaliserPredictions(donnees), source: 'ROMEO – France Travail' }), { status: 200, headers: H });
