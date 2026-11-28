@@ -133,6 +133,8 @@ jobs:
         run: node scripts/smoke/alertes.test.mjs
       - name: Découvrir — prêts à postuler (section à préciser, mots ajoutés, comptes isolés)
         run: node scripts/smoke/prets.test.mjs
+      - name: Simulateur de filtre ATS (lexique, faux positifs, calcul, vraies offres du moteur /jobs)
+        run: node scripts/smoke/filtre-ats.test.mjs
       - name: Extension Chrome (lecture des offres, remplissage sans écraser ni confondre)
         run: |
           npm install --no-save --no-package-lock jsdom@24

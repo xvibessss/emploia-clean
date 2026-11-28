@@ -29,6 +29,7 @@
 import {
   contratTeamtailor, tempsTeamtailor, salaireSchemaOrg, normaliserValeur,
 } from './contrat.js';
+import { competencesDe } from './competences.js';
 
 export const TEAMTAILOR_HOTE = 'teamtailor.com';
 
@@ -174,6 +175,9 @@ export function normaliserOffre(item, entree) {
     // trop bas.
     salary: salaireSchemaOrg(item?._jobposting?.baseSalary),
     description: texteDeContenu(item),
+    // Compétences lues dans la description COMPLÈTE : la description stockée
+    // est tronquée à 300 caractères, et c'est là que se trouvent les exigences.
+    competences: competencesDe(`${item?.title ?? item?.attributes?.title ?? ''} ${texteDeContenu(item, 40000)}`, 12, entree.company),
     // Souvent le propre domaine de l'employeur, pas celui de l'ATS.
     url: String(item?.url ?? ''),
     // `date_published` est déjà une chaîne ISO, servie sur 100 % des offres.

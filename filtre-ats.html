@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+  <title>Simulateur de filtre ATS gratuit — ton CV passe-t-il les robots ? | Emploia</title>
+  <meta name="description" content="Colle ton CV et vois, sur de vraies offres de ton métier, combien un filtre par mots-clés t'élimine — et quelles compétences te feraient revenir. Gratuit, sans compte."/>
+  <link rel="canonical" href="https://emploia.eu/filtre-ats"/>
+  <meta property="og:title" content="Ton CV passe-t-il le filtre ATS ? Teste sur de vraies offres"/>
+  <meta property="og:description" content="Chaque point est une vraie offre de ton métier : bleu, ton CV passe ; rouge, il est filtré. Gratuit, sans compte."/>
+  <meta property="og:url" content="https://emploia.eu/filtre-ats"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="https://emploia.eu/og-image.png"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt" content="Emploia — le copilote IA qui candidate à votre place"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6E48BE"/>
+  <link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Simulateur de filtre ATS","url":"https://emploia.eu/filtre-ats","applicationCategory":"BusinessApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"publisher":{"@type":"Organization","name":"Emploia","url":"https://emploia.eu"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Qu'est-ce qu'un filtre ATS ?","acceptedAnswer":{"@type":"Answer","text":"Un ATS (logiciel de suivi des candidatures) permet au recruteur de trier les CV reçus, notamment en ne gardant que ceux qui contiennent certains mots-clés : une compétence, un logiciel, une langue. Un CV qui ne les cite pas peut être écarté avant d'être lu."}},
+    {"@type":"Question","name":"Comment le simulateur calcule-t-il le résultat ?","acceptedAnswer":{"@type":"Answer","text":"Chaque point est une vraie offre du métier publiée sur Emploia. Pour chaque offre, on retient ses trois compétences les plus demandées sur l'ensemble des offres analysées. Ton CV passe l'offre s'il cite ces trois compétences."}},
+    {"@type":"Question","name":"Mon CV est-il enregistré ?","acceptedAnswer":{"@type":"Answer","text":"Non. Le texte sert uniquement à repérer les compétences qu'il cite ; il n'est ni stocké ni conservé dans les journaux."}}
+  ]}</script>
+  <style>
+    .fa-page { max-width: 860px; margin: 0 auto; padding: 28px 18px 120px; }
+    .fa-hero h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -.6px; line-height: 1.15; margin: 0 0 10px; }
+    .fa-hero h1 span { color: var(--primary); }
+    .fa-hero p { color: var(--slate); font-size: 16px; line-height: 1.55; margin: 0 0 22px; max-width: 640px; }
+    .fa-box { background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 22px; }
+    .fa-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+    .fa-field { display: block; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .fa-field input, .fa-field textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; border: 1px solid rgba(0,0,0,.12); border-radius: 10px; padding: 11px 12px; font: inherit; font-size: 14px; font-weight: 400; background: var(--canvas); }
+    .fa-field textarea { min-height: 170px; resize: vertical; }
+    .fa-aide { font-size: 12px; color: var(--slate); margin: -4px 0 14px; }
+    .fa-go { width: 100%; padding: 14px; font-size: 16px; }
+    .fa-resultat { margin-top: 26px; }
+    .fa-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .fa-chiffre { border-radius: 16px; padding: 16px 18px; }
+    .fa-chiffre b { display: block; font-size: 34px; font-weight: 800; letter-spacing: -1px; }
+    .fa-chiffre span { font-size: 13px; font-weight: 600; }
+    .fa-bleu { background: rgba(37,99,235,.08); color: #1D4ED8; }
+    .fa-rouge { background: rgba(220,38,38,.07); color: #B91C1C; }
+    .fa-phrase { font-size: 15px; line-height: 1.55; margin: 0 0 14px; }
+    .fa-grille { display: flex; flex-wrap: wrap; gap: 6px; padding: 16px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px; }
+    .fa-pt { width: 16px; height: 16px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; transition: background .35s ease, transform .35s ease; }
+    .fa-pt.ok { background: #2563EB; }
+    .fa-pt.ko { background: #EF4444; opacity: .85; }
+    .fa-pt.revient { animation: faRevient .6s ease; }
+    @keyframes faRevient { 0% { transform: scale(1.8); } 100% { transform: scale(1); } }
+    .fa-legende { display: flex; gap: 16px; font-size: 12px; color: var(--slate); margin: 8px 2px 0; flex-wrap: wrap; }
+    .fa-legende i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+    .fa-detail { min-height: 20px; font-size: 13px; color: var(--ink); margin: 10px 2px 0; }
+    .fa-section { margin-top: 22px; }
+    .fa-section h2 { font-size: 18px; margin: 0 0 6px; }
+    .fa-section > p { font-size: 13px; color: var(--slate); margin: 0 0 12px; line-height: 1.5; }
+    .fa-puces { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fa-puce { border: 1px solid var(--hairline); background: var(--surface); border-radius: 999px; padding: 8px 13px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink); }
+    .fa-puce small { color: var(--slate); font-weight: 500; margin-left: 4px; }
+    .fa-puce[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .fa-puce[aria-pressed="true"] small { color: rgba(255,255,255,.8); }
+    .fa-puce.forte { cursor: default; background: rgba(37,99,235,.07); border-color: rgba(37,99,235,.15); color: #1D4ED8; }
+    .fa-avertissement { font-size: 12px; color: #92400E; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 9px 12px; margin-top: 12px; }
+    .fa-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .fa-methode { font-size: 13px; color: var(--slate); line-height: 1.6; background: var(--canvas); border: 1px dashed rgba(0,0,0,.12); border-radius: 12px; padding: 14px 16px; margin-top: 22px; }
+    .fa-faq { margin-top: 34px; }
+    .fa-faq details { background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; }
+    .fa-faq summary { font-weight: 700; cursor: pointer; font-size: 14px; }
+    .fa-faq p { font-size: 14px; color: #334155; line-height: 1.6; margin: 10px 0 2px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 560px) { .fa-row { grid-template-columns: 1fr; gap: 0; } .fa-chiffre b { font-size: 28px; } .fa-pt { width: 13px; height: 13px; } }
+  </style>
+</head>
+<body>
+<div id="emp-scroll-prog"></div>
+<div id="empToasts"></div>
+
+<nav class="emp-nav">
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/jobs">Offres</a>
+      <a href="/decouvrir">Découvrir</a>
+      <a href="/filtre-ats" style="color:var(--primary);font-weight:600">Filtre ATS</a>
+      <a href="/app">Générer</a>
+      <a href="/#pricing">Tarifs</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/decouvrir">Découvrir une offre à la fois</a>
+  <a href="/filtre-ats">Simulateur de filtre ATS</a>
+  <a href="/app">Générer un CV</a>
+</div>
+
+<main class="fa-page">
+  <section class="fa-hero">
+    <h1>Ton CV passe-t-il <span>le filtre ATS</span> ?</h1>
+    <p>Colle ton CV. On le passe au filtre des vraies offres de ton métier publiées sur Emploia : chaque point est une offre — <strong style="color:#1D4ED8">bleu</strong>, ton CV passe ; <strong style="color:#B91C1C">rouge</strong>, il est filtré avant d'être lu.</p>
+  </section>
+
+  <section class="fa-box" id="faFormulaire">
+    <div class="fa-row">
+      <label class="fa-field">Métier visé <input id="faMetier" placeholder="Chef de projet marketing" autocomplete="off"/></label>
+      <label class="fa-field">Ville (facultatif) <input id="faVille" placeholder="Paris" autocomplete="off"/></label>
+    </div>
+    <label class="fa-field">Ton CV <textarea id="faCv" placeholder="Colle ici le texte de ton CV : expériences, compétences, outils, langues…"></textarea></label>
+    <p class="fa-aide">Gratuit, sans compte. Ton CV n'est pas enregistré : on n'en lit que les compétences.</p>
+    <button class="btn btn-primary fa-go" id="faGo" data-on-click="faLancer">Passer mon CV au filtre</button>
+  </section>
+
+  <section class="fa-resultat" id="faResultat" hidden aria-live="polite">
+    <div class="fa-chiffres">
+      <div class="fa-chiffre fa-bleu"><b id="faEnLice">0</b><span>offres où ton CV passe</span></div>
+      <div class="fa-chiffre fa-rouge"><b id="faFiltrees">0</b><span>offres qui te filtrent</span></div>
+    </div>
+    <p class="fa-phrase" id="faPhrase"></p>
+    <div class="fa-grille" id="faGrille" role="list"></div>
+    <div class="fa-legende"><span><i style="background:#2563EB"></i>Ton CV passe</span><span><i style="background:#EF4444"></i>Filtré</span><span>Touche un point pour voir l'offre</span></div>
+    <div class="fa-detail" id="faDetail"></div>
+
+    <div class="fa-section" id="faSectionManque">
+      <h2>Ce qui te fait filtrer</h2>
+      <p>Les compétences les plus exigées que ton CV ne cite pas. Le chiffre indique combien d'offres reviendraient si tu l'avais. Coche celles que tu maîtrises <strong>vraiment</strong> pour voir l'effet.</p>
+      <div class="fa-puces" id="faManquantes"></div>
+      <div class="fa-avertissement">N'ajoute à ton CV que ce que tu sais faire : le recruteur le vérifiera en entretien. Une compétence que tu as mais que ton CV ne nomme pas, c'est souvent juste une question de mots.</div>
+    </div>
+
+    <div class="fa-section" id="faSectionForte">
+      <h2>Ce que ton CV a déjà</h2>
+      <p>Compétences demandées par ces offres et que ton CV cite. Entre parenthèses, le nombre d'offres qui les demandent.</p>
+      <div class="fa-puces" id="faFortes"></div>
+    </div>
+
+    <div class="fa-cta">
+      <a class="btn btn-primary" href="/decouvrir">✨ Adapter mon CV à chaque offre</a>
+      <button class="btn" data-on-click="faPartager">Partager mon résultat</button>
+      <button class="btn" data-on-click="faRecommencer">Refaire un test</button>
+    </div>
+
+    <div class="fa-methode" id="faMethode"></div>
+  </section>
+
+  <section class="fa-faq">
+    <h2 style="font-size:20px">Questions fréquentes</h2>
+    <details><summary>Qu'est-ce qu'un filtre ATS ?</summary><p>Un ATS (logiciel de suivi des candidatures) aide le recruteur à trier les CV reçus. Il peut ne garder que ceux qui contiennent certains mots-clés : une compétence, un logiciel, une langue. Un CV qui ne les cite pas peut être écarté avant d'être lu par une personne.</p></details>
+    <details><summary>Comment le résultat est-il calculé ?</summary><p>Chaque point est une vraie offre du métier publiée sur Emploia. Pour chaque offre, on retient ses trois compétences les plus demandées sur l'ensemble des offres analysées — celles qu'un recruteur met le plus souvent en filtre. Ton CV passe l'offre s'il cite ces trois compétences. C'est une simulation : chaque recruteur règle son filtre à sa façon.</p></details>
+    <details><summary>Mon CV est-il enregistré ?</summary><p>Non. Le texte sert uniquement à repérer les compétences qu'il cite ; il n'est ni stocké ni conservé dans les journaux.</p></details>
+    <details><summary>Comment passer plus de filtres ?</summary><p>Reprends les mots exacts des offres pour les compétences que tu as réellement : « Google Analytics » plutôt que « outils d'analyse », « Excel » plutôt que « tableur ». Sur Emploia, « Découvrir » adapte ton CV à chaque offre sans rien inventer.</p></details>
+  </section>
+</main>
+
+<script src="/shared.js?v=a13ca95e"></script>
+<script src="/js/pages/filtre-ats.js?v=c98c9523"></script>
+</body>
+</html>
