@@ -1,5 +1,5 @@
 export const config = { runtime: 'edge', regions: ['cdg1'] };
-import { getCurrentUser, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX, htmlEscape, unsubscribeUrl } from "../_lib/auth.js";
+import { getCurrentUser, hasSessionCookie, getAllowedOrigin, checkRateLimit, kvGet, kvSet, kvSetNX, htmlEscape, unsubscribeUrl } from "../_lib/auth.js";
 
 export default async function handler(req) {
   const origin = getAllowedOrigin(req);
@@ -15,6 +15,15 @@ export default async function handler(req) {
     status: 204, headers: { ...H, "Access-Control-Allow-Methods": "GET, OPTIONS" }
   });
   if (req.method !== "GET") return new Response(JSON.stringify({ error: "Méthode non autorisée" }), { status: 405, headers: H });
+
+  // Sans cookie de session, personne ne peut être reconnu : on répond tout de
+  // suite. `shared.js` appelle /me sur CHAQUE page vue, et pour un visiteur
+  // anonyme la limite de débit ci-dessous coûtait une écriture Upstash par page
+  // pour ne protéger aucune session. La réponse est identique à celle qu'il
+  // aurait eue (401, même corps) : les 7 pages qui appellent /me testent `res.ok`.
+  if (!hasSessionCookie(req)) {
+    return new Response(JSON.stringify({ error: "Non authentifié" }), { status: 401, headers: H });
+  }
 
   // Light rate limit on /me
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
