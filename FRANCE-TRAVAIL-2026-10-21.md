@@ -1,5 +1,13 @@
 # France Travail : le chemin vérifié avant que les identifiants arrivent
 
+> **Mise à jour du 2026-11-28 — à lire avant le reste.**
+> - Identifiants posés dans Vercel (`FRANCE_TRAVAIL_CLIENT_ID` / `_SECRET`), application francetravail.io n° 30324.
+> - **L'API Offres d'emploi a quitté le libre-service** : absente du catalogue et de « Ajouter une API », accès « sous conditions » sur demande. Demande envoyée par Hugo le 2026-11-28 via le formulaire de contact. D'ici la réponse, la source `France Travail` de `/api/jobs` rend `droits_insuffisants` (déclaré dans `causesEnEchec`, pas un silence).
+> - Abonnées et branchées : **La Bonne Boite v2** (`/api/ft-entreprises`, scopes `api_labonneboitev2 search office`) et **ROMEO v2** (`/api/ft-rome`, scope `api_romeov2`). Abonnées, non branchées : ROME 4.0 Métiers (`api_rome-metiersv1 nomenclatureRome`) et Fiches métiers.
+> - Serveur d'autorisation déplacé sur `authentification-partenaire.francetravail.io` (doc 4.1 + bandeau d'incident sur l'ancien hôte).
+> - Un jeton **par API** (`SCOPES` / `CLES_JETON`) : un scope refusé fait échouer toute la demande de jeton, donc mêler les scopes d'Offres d'emploi aux autres ferait tomber La Bonne Boite avec elle.
+
+
 Relevé du 2026-10-21. Tout ce qui suit a été établi **sans identifiant**, par
 lecture de la documentation officielle de francetravail.io et par appels réels
 aux deux points d'accès.
