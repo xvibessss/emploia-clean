@@ -33,6 +33,10 @@
 // nouvel hôte. Chemin, realm, corps et `expires_in: 1499` sont inchangés.
 export const TOKEN_URL =
   'https://authentification-partenaire.francetravail.io/connexion/oauth2/access_token?realm=%2Fpartenaire';
+// Ancien hôte, gardé en secours : en production le 2026-11-28, le nouvel hôte a
+// répondu HTTP 409 sans corps OAuth avec de vrais identifiants.
+export const TOKEN_URL_SECOURS =
+  'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire';
 export const RECHERCHE_URL =
   'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search';
 
@@ -165,30 +169,55 @@ export async function obtenirJeton({
     if (typeof enCache === 'string' && enCache) return { jeton: enCache, depuisCache: true };
   }
 
-  let res;
-  try {
-    res = await avecTimeout(fetchImpl, TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope,
-      }).toString(),
-    }, timeout);
-  } catch (e) {
-    return { cause: e?.name === 'AbortError' ? 'timeout' : 'erreur_reseau' };
+  const corpsDemande = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: clientId,
+    client_secret: clientSecret,
+    scope,
+  }).toString();
+
+  // Deux hôtes, essayés dans l'ordre. Le second n'est tenté que si le premier
+  // ne répond PAS en OAuth (corps non JSON, 409, 5xx, réseau) : un refus OAuth
+  // en bonne forme (`invalid_client`, `invalid_scope`) est une réponse, pas une
+  // panne, et le rejouer ailleurs ne le changerait pas.
+  const diagnostics = [];
+  let res = null, corps = null, causeReseau = null;
+  for (const url of [TOKEN_URL, TOKEN_URL_SECOURS]) {
+    try {
+      res = await avecTimeout(fetchImpl, url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: corpsDemande,
+      }, timeout);
+    } catch (e) {
+      causeReseau = e?.name === 'AbortError' ? 'timeout' : 'erreur_reseau';
+      diagnostics.push(`${new URL(url).host} ${causeReseau}`);
+      res = null;
+      continue;
+    }
+    causeReseau = null;
+    // Le corps d'une erreur OAuth est du JSON. S'il est illisible, on ne sait
+    // pas POURQUOI le serveur a refusé : `jeton_refuse` est le mot juste.
+    let brut = '';
+    try { brut = await res.text(); } catch { brut = ''; }
+    try { corps = JSON.parse(brut); } catch { corps = null; }
+    if (res.ok) break;
+    // `diagnostic` : hôte, statut HTTP et CODE OAuth, jamais la description ni
+    // le corps. Il ne part que dans les journaux.
+    const code = typeof corps?.error === 'string' ? corps.error.slice(0, 40) : (corps === null ? 'corps_non_json' : 'sans_code');
+    // Corps non JSON : son type et un extrait court, nettoyé, pour nommer la
+    // panne (page d'erreur d'un pare-feu, d'un répartiteur…). Une réponse
+    // d'erreur ne contient pas les identifiants envoyés.
+    const extrait = corps === null
+      ? ` [${(res.headers?.get?.('content-type') || '?').slice(0, 40)}] ${brut.replace(/\s+/g, ' ').replace(/PAR_[A-Za-z0-9_]+/g, 'PAR_…').slice(0, 160)}`
+      : '';
+    diagnostics.push(`${new URL(url).host} HTTP ${res.status} ${code}${extrait}`);
+    const reponseOAuth = typeof corps?.error === 'string' && res.status < 500;
+    if (reponseOAuth) break;
   }
 
-  // Le corps d'une erreur OAuth est du JSON (`Content-Type: application/json`
-  // d'après la documentation). S'il est illisible, on ne sait pas POURQUOI le
-  // serveur a refusé : `jeton_refuse` est alors le mot juste, et non un des
-  // deux jetons précis qu'on ne pourrait pas justifier.
-  let corps = null;
-  try { corps = await res.json(); } catch { corps = null; }
-
-  if (!res.ok) return { cause: causeDErreurOAuth(corps) };
+  if (!res) return { cause: causeReseau || 'erreur_reseau', diagnostic: diagnostics.join(' ; ') };
+  if (!res.ok) return { cause: causeDErreurOAuth(corps), diagnostic: diagnostics.join(' ; ') };
 
   const jeton = corps?.access_token;
   // 200 sans `access_token` : le serveur a répondu, mais pas ce qu'on attend.
@@ -276,12 +305,12 @@ export async function collecterFranceTravail({
   // clé, en rendant `http_401` à chaque requête. La boucle se répare d'elle-
   // même en demandant un jeton neuf, cache ignoré.
   for (const tentative of [0, 1]) {
-    const { jeton, cause: causeJeton } = await obtenirJeton({
+    const { jeton, cause: causeJeton, diagnostic } = await obtenirJeton({
       clientId, clientSecret, fetchImpl, kvGet, kvSet,
       ignorerCache: tentative === 1,
     });
     if (!jeton) {
-      return { offres: [], cause: causeJeton, raison: `jeton indisponible (${causeJeton})` };
+      return { offres: [], cause: causeJeton, raison: `jeton indisponible (${causeJeton}${diagnostic ? ' — ' + diagnostic : ''})` };
     }
 
     let res;
@@ -351,11 +380,11 @@ export async function appelerApiFT(api, chemin, {
   if (!scope) return { cause: 'api_inconnue' };
 
   for (const tentative of [0, 1]) {
-    const { jeton, cause } = await obtenirJeton({
+    const { jeton, cause, diagnostic } = await obtenirJeton({
       clientId, clientSecret, fetchImpl, kvGet, kvSet,
       ignorerCache: tentative === 1, scope, cleCache: CLES_JETON[api],
     });
-    if (!jeton) return { cause };
+    if (!jeton) return { cause, diagnostic };
 
     let res;
     try {

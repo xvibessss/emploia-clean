@@ -66,14 +66,14 @@ export default async function handler(req) {
   const enCache = await kvGet(cleCache).catch(() => null);
   if (enCache) return new Response(JSON.stringify(enCache), { status: 200, headers: { ...H, 'Cache-Control': 'public, s-maxage=900' } });
 
-  const { donnees, cause } = await appelerApiFT('labonneboite', `/labonneboite/v2/recherche?${params}`, {
+  const { donnees, cause, diagnostic } = await appelerApiFT('labonneboite', `/labonneboite/v2/recherche?${params}`, {
     clientId: process.env.FRANCE_TRAVAIL_CLIENT_ID,
     clientSecret: process.env.FRANCE_TRAVAIL_CLIENT_SECRET,
     kvGet, kvSet,
   });
 
   if (cause) {
-    console.warn(`[ft-entreprises] La Bonne Boite indisponible : ${cause}`);
+    console.warn(`[ft-entreprises] La Bonne Boite indisponible : ${cause}${diagnostic ? ' — ' + diagnostic : ''}`);
     return new Response(JSON.stringify({ error: 'Source indisponible', cause, entreprises: [] }), { status: 502, headers: { ...H, 'Cache-Control': 'no-store' } });
   }
 
