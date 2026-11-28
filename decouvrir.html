@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+  <title>Découvrir — Emploia</title>
+  <meta name="description" content="Fais défiler des offres, adapte ton CV en un geste pendant que tu continues : Emploia prépare tes candidatures en arrière-plan."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#6E48BE"/>
+  <link rel="stylesheet" href="/shared.css?v=e4ce16e9"/>
+  <style>
+    .dc-page { max-width: 560px; margin: 0 auto; padding: 24px 16px 140px; }
+    .dc-head h1 { font-size: 24px; font-weight: 800; margin: 0 0 4px; letter-spacing: -.3px; }
+    .dc-head p { color: var(--slate); margin: 0 0 18px; font-size: 14px; line-height: 1.5; }
+
+    .dc-tabs { display: flex; gap: 6px; background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 4px; margin-bottom: 18px; }
+    .dc-tab { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 9px 10px; font: inherit; font-size: 14px; font-weight: 600; color: var(--slate); cursor: pointer; }
+    .dc-tab[aria-selected="true"] { background: var(--primary); color: #fff; }
+    .dc-badge { display: inline-block; min-width: 18px; padding: 0 6px; margin-left: 4px; border-radius: 9px; background: rgba(110,72,190,.14); color: var(--primary); font-size: 12px; line-height: 18px; }
+    .dc-tab[aria-selected="true"] .dc-badge { background: rgba(255,255,255,.25); color: #fff; }
+
+    .dc-box { background: var(--surface); border: 1px solid var(--hairline); border-radius: 18px; padding: 22px; }
+    .dc-box h2 { font-size: 18px; margin: 0 0 6px; }
+    .dc-box p { color: var(--slate); font-size: 14px; line-height: 1.55; margin: 0 0 14px; }
+    .dc-field { display: block; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
+    .dc-field input, .dc-field textarea { display: block; width: 100%; margin-top: 6px; box-sizing: border-box; border: 1px solid rgba(0,0,0,.12); border-radius: 10px; padding: 10px 12px; font: inherit; font-size: 14px; font-weight: 400; background: var(--canvas); }
+    .dc-field textarea { min-height: 150px; resize: vertical; }
+    .dc-row { display: flex; gap: 10px; }
+    .dc-row .dc-field { flex: 1; }
+
+    .dc-cible { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--slate); margin-bottom: 12px; }
+    .dc-cible strong { color: var(--ink); }
+    .dc-lien { border: 0; background: none; color: var(--primary); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+
+    .dc-pile { position: relative; min-height: 440px; }
+    .dc-carte { position: absolute; inset: 0; background: var(--surface); border: 1px solid var(--hairline); border-radius: 20px; box-shadow: 0 10px 30px rgba(15,23,42,.08); padding: 20px; display: flex; flex-direction: column; touch-action: pan-y; user-select: none; transition: transform .28s ease, opacity .28s ease; }
+    .dc-carte.part-gauche { transform: translateX(-120%) rotate(-12deg); opacity: 0; }
+    .dc-carte.part-droite { transform: translateX(120%) rotate(12deg); opacity: 0; }
+    .dc-carte.glisse { transition: none; }
+    .dc-entete { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .dc-logo { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #fff; flex-shrink: 0; }
+    .dc-entreprise { font-size: 13px; color: var(--slate); text-transform: uppercase; letter-spacing: .4px; font-weight: 600; }
+    .dc-titre { font-size: 20px; font-weight: 800; line-height: 1.25; margin: 0 0 8px; color: var(--ink); }
+    .dc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .dc-tag { font-size: 12px; padding: 3px 9px; border-radius: 20px; background: var(--canvas); border: 1px solid var(--hairline); color: var(--slate); }
+    .dc-desc { flex: 1; overflow: auto; font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-line; mask-image: linear-gradient(to bottom, #000 80%, transparent); }
+    .dc-voir { font-size: 13px; margin-top: 10px; }
+    .dc-tampon { position: absolute; top: 22px; padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 15px; opacity: 0; transition: opacity .15s; }
+    .dc-tampon.gauche { left: 20px; color: #64748B; border: 2px solid #94A3B8; transform: rotate(-8deg); }
+    .dc-tampon.droite { right: 20px; color: var(--primary); border: 2px solid var(--primary); transform: rotate(8deg); }
+
+    .dc-actions { display: flex; justify-content: center; gap: 16px; margin-top: 18px; }
+    .dc-btn-rond { border: 1px solid var(--hairline); background: var(--surface); border-radius: 999px; padding: 14px 22px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(15,23,42,.06); }
+    .dc-btn-rond.adapter { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .dc-btn-rond:disabled { opacity: .45; cursor: default; }
+    .dc-aide { text-align: center; font-size: 12px; color: var(--slate); margin-top: 10px; }
+
+    .dc-vide { text-align: center; padding: 40px 20px; }
+    .dc-vide .dc-emoji { font-size: 34px; margin-bottom: 8px; }
+
+    .dc-liste { display: flex; flex-direction: column; gap: 10px; }
+    .dc-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; padding: 12px 14px; font: inherit; cursor: pointer; }
+    .dc-item .dc-logo { width: 38px; height: 38px; font-size: 16px; border-radius: 10px; }
+    .dc-item-txt { flex: 1; min-width: 0; }
+    .dc-item-titre { font-weight: 700; font-size: 14px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dc-item-sous { font-size: 12px; color: var(--slate); }
+    .dc-statut { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: rgba(110,72,190,.1); color: var(--primary); white-space: nowrap; }
+    .dc-statut.postule { background: rgba(22,163,74,.1); color: #15803D; }
+
+    /* En haut : en bas, elle couvrait « Passer » et « Adapter ». */
+    .dc-file { position: fixed; left: 50%; top: 74px; transform: translateX(-50%) translateY(-12px); opacity: 0; pointer-events: none; z-index: 900; background: #0F172A; color: #fff; border-radius: 14px; padding: 11px 16px; font-size: 13px; line-height: 1.4; display: flex; align-items: center; gap: 10px; width: min(520px, calc(100% - 32px)); box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,.25); transition: all .25s; }
+    .dc-file > span:not(.dc-roue) { flex: 1; }
+    .dc-file.visible { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+    .dc-file .dc-lien { color: #C4B5FD; }
+    .dc-roue { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: dcTourne .8s linear infinite; flex-shrink: 0; }
+    @keyframes dcTourne { to { transform: rotate(360deg); } }
+
+    .dc-voile { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 950; display: none; }
+    .dc-voile.ouvert { display: block; }
+    .dc-panneau { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--canvas); z-index: 960; transform: translateX(100%); transition: transform .28s ease; overflow-y: auto; padding: 18px 18px 120px; box-sizing: border-box; }
+    .dc-panneau.ouvert { transform: none; }
+    .dc-fermer { float: right; border: 0; background: var(--surface); border-radius: 10px; width: 36px; height: 36px; font-size: 18px; cursor: pointer; }
+    .dc-section { background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px; padding: 16px; margin-top: 14px; }
+    .dc-section h3 { font-size: 14px; margin: 0 0 10px; }
+    .dc-cv { white-space: pre-wrap; font-size: 13px; line-height: 1.55; color: #1E293B; max-height: 260px; overflow: hidden; position: relative; }
+    .dc-cv.deplie { max-height: none; }
+    .dc-cv:not(.deplie)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: linear-gradient(transparent, var(--surface)); }
+    .dc-boutons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .dc-boutons button, .dc-boutons a { border: 1px solid var(--hairline); background: var(--canvas); border-radius: 10px; padding: 8px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink); text-decoration: none; }
+    .dc-mot { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 20px; background: rgba(110,72,190,.1); color: var(--primary); margin: 0 6px 6px 0; }
+    .dc-note { font-size: 12px; color: var(--slate); line-height: 1.5; margin: 8px 0 0; }
+    .dc-apreciser { white-space: pre-wrap; font-size: 13px; line-height: 1.5; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 10px 12px; color: #78350F; }
+    .dc-postuler { position: sticky; bottom: 0; margin-top: 18px; display: block; width: 100%; border: 0; border-radius: 14px; padding: 15px; font: inherit; font-size: 15px; font-weight: 800; background: var(--primary); color: #fff; cursor: pointer; box-shadow: 0 10px 24px rgba(110,72,190,.35); }
+    .dc-postuler:disabled { opacity: .5; }
+    .dc-supprimer { display: block; margin: 14px auto 0; border: 0; background: none; color: #B91C1C; font: inherit; font-size: 13px; cursor: pointer; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="emp-scroll-prog"></div>
+<div id="empToasts"></div>
+
+<nav class="emp-nav">
+  <div class="container emp-nav-inner">
+    <a href="/" class="emp-brand">
+      <span class="emp-brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><rect x="8" y="10" width="48" height="12" rx="3.5"/><rect x="8" y="26" width="34" height="12" rx="3.5"/><rect x="8" y="42" width="48" height="12" rx="3.5"/></svg></span>
+      Emploia
+    </a>
+    <div class="emp-nav-links">
+      <a href="/decouvrir" style="color:var(--primary);font-weight:600">Découvrir</a>
+      <a href="/jobs">Offres</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+    <div class="emp-nav-right">
+      <button class="emp-hamburger" id="empHamburger" data-on-click="empToggleNav" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="emp-mobile-nav" id="empMobileNav">
+  <a href="/decouvrir">Découvrir</a>
+  <a href="/jobs">Offres d'emploi</a>
+  <a href="/dashboard">Dashboard</a>
+</div>
+
+<main class="dc-page">
+  <div class="dc-head">
+    <h1>Découvrir</h1>
+    <p>Une offre à la fois. Elle te plaît ? Emploia adapte ton CV pendant que tu passes à la suivante.</p>
+  </div>
+
+  <div class="dc-tabs" role="tablist">
+    <button class="dc-tab" role="tab" id="dcOngletFlux" aria-selected="true" data-onglet="flux" data-on-click="dcOnglet">Découvrir</button>
+    <button class="dc-tab" role="tab" id="dcOngletPrets" aria-selected="false" data-onglet="prets" data-on-click="dcOnglet">Prêts à postuler <span class="dc-badge" id="dcNbPrets">0</span></button>
+  </div>
+
+  <!-- Pas connecté -->
+  <section class="dc-box" id="dcAuth" hidden>
+    <h2>Crée ton compte pour commencer</h2>
+    <p>Emploia garde ton parcours et tes CV adaptés dans ton espace. Tes 5 premières adaptations sont gratuites.</p>
+    <button class="btn btn-primary" data-on-click="dcInscription">Créer mon compte gratuit</button>
+  </section>
+
+  <!-- Parcours et cible -->
+  <section class="dc-box" id="dcReglages" hidden>
+    <h2>Ton parcours, une seule fois</h2>
+    <p>Colle ton CV ou décris ton parcours. Emploia ne garde que ce que tu écris : rien n'est inventé dans tes CV adaptés.</p>
+    <label class="dc-field">Ton parcours
+      <textarea id="dcParcours" placeholder="Ex. Camille Martin, comptable. 3 ans chez Fiducial (Lyon) : tenue de 40 dossiers, déclarations de TVA, bilans. BTS CG 2021. Excel avancé, Sage, Cegid."></textarea>
+    </label>
+    <div class="dc-row">
+      <label class="dc-field">Métier recherché <input id="dcMetier" placeholder="Comptable"/></label>
+      <label class="dc-field">Ville <input id="dcVille" placeholder="Lyon"/></label>
+    </div>
+    <button class="btn btn-primary" id="dcEnregistrer" data-on-click="dcEnregistrerReglages">Voir les offres</button>
+  </section>
+
+  <!-- Flux d'offres -->
+  <section id="dcFlux" hidden>
+    <div class="dc-cible"><span id="dcCibleTexte"></span><button class="dc-lien" data-on-click="dcModifierReglages">Modifier</button></div>
+    <div class="dc-pile" id="dcPile"></div>
+    <div class="dc-actions" id="dcActions">
+      <button class="dc-btn-rond" id="dcPasser" data-on-click="dcPasser" aria-label="Passer cette offre">✕ Passer</button>
+      <button class="dc-btn-rond adapter" id="dcAdapter" data-on-click="dcAdapter" aria-label="Adapter mon CV à cette offre">✨ Adapter mon CV</button>
+    </div>
+    <p class="dc-aide">Glisse la carte, ou utilise ← et → au clavier.</p>
+  </section>
+
+  <!-- Prêts à postuler -->
+  <section id="dcPrets" hidden>
+    <div class="dc-liste" id="dcListe"></div>
+  </section>
+</main>
+
+<div class="dc-file" id="dcFile" role="status" aria-live="polite"></div>
+<div class="dc-voile" id="dcVoile" data-on-click="dcFermer"></div>
+<aside class="dc-panneau" id="dcPanneau" aria-label="Candidature prête"></aside>
+
+<script src="/shared.js?v=a13ca95e"></script>
+<script src="/js/pages/decouvrir.js?v=4a8dfa41"></script>
+</body>
+</html>
