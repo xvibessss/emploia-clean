@@ -20,6 +20,7 @@
 import {
   contratGreenhouse, tempsGreenhouse, champMetadata, normaliserValeur,
 } from './contrat.js';
+import { competencesDe } from './competences.js';
 
 export const GREENHOUSE_BASE = 'https://boards-api.greenhouse.io/v1/boards';
 
@@ -163,6 +164,9 @@ export function normaliserOffre(j, entree) {
     // trou à combler : c'est ce que la source dit.
     salary: null,
     description: texteDeContenu(j?.content),
+    // Compétences lues dans la description COMPLÈTE : la description stockée
+    // est tronquée à 300 caractères, et c'est là que se trouvent les exigences.
+    competences: competencesDe(`${j?.title ?? ''} ${texteDeContenu(j?.content, 40000)}`, 12, entree.company),
     // L'URL de l'employeur, pas celle d'un agrégateur — c'est la raison d'être
     // de ce collecteur.
     url: String(j?.absolute_url ?? ''),

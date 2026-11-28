@@ -52,6 +52,8 @@ export default async function handler(req) {
     const i = liste.findIndex((p) => p.id === body.id);
     if (i < 0) return json({ error: 'Introuvable' }, 404);
     if (typeof body.lettre === 'string') liste[i].lettre = body.lettre.slice(0, MAX_LETTRE);
+    // CV affiné dans /adapter : même nettoyage qu'à la création.
+    if (typeof body.cv === 'string' && body.cv.trim().length >= 200) liste[i].cv = separerAPreciser(body.cv).cv.slice(0, MAX_CV);
     if (STATUTS.includes(body.statut)) {
       liste[i].statut = body.statut;
       if (body.statut === 'postule') liste[i].postuleLe = new Date().toISOString();
