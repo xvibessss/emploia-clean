@@ -40,6 +40,7 @@ const reponse = (corps, { status = 200, ok } = {}) => ({
     if (corps === undefined) throw new SyntaxError('Unexpected end of JSON input');
     return corps;
   },
+  text: async () => (corps === undefined ? '' : JSON.stringify(corps)),
 });
 
 // Un faux réseau qui répond selon l'URL appelée et consigne ce qu'il a reçu.

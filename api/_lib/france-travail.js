@@ -198,12 +198,20 @@ export async function obtenirJeton({
     causeReseau = null;
     // Le corps d'une erreur OAuth est du JSON. S'il est illisible, on ne sait
     // pas POURQUOI le serveur a refusé : `jeton_refuse` est le mot juste.
-    try { corps = await res.json(); } catch { corps = null; }
+    let brut = '';
+    try { brut = await res.text(); } catch { brut = ''; }
+    try { corps = JSON.parse(brut); } catch { corps = null; }
     if (res.ok) break;
     // `diagnostic` : hôte, statut HTTP et CODE OAuth, jamais la description ni
     // le corps. Il ne part que dans les journaux.
     const code = typeof corps?.error === 'string' ? corps.error.slice(0, 40) : (corps === null ? 'corps_non_json' : 'sans_code');
-    diagnostics.push(`${new URL(url).host} HTTP ${res.status} ${code}`);
+    // Corps non JSON : son type et un extrait court, nettoyé, pour nommer la
+    // panne (page d'erreur d'un pare-feu, d'un répartiteur…). Une réponse
+    // d'erreur ne contient pas les identifiants envoyés.
+    const extrait = corps === null
+      ? ` [${(res.headers?.get?.('content-type') || '?').slice(0, 40)}] ${brut.replace(/\s+/g, ' ').replace(/PAR_[A-Za-z0-9_]+/g, 'PAR_…').slice(0, 160)}`
+      : '';
+    diagnostics.push(`${new URL(url).host} HTTP ${res.status} ${code}${extrait}`);
     const reponseOAuth = typeof corps?.error === 'string' && res.status < 500;
     if (reponseOAuth) break;
   }
