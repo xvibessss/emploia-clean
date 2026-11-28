@@ -364,6 +364,7 @@
     { "source": "/cv-vault", "destination": "/cv-vault.html" },
     { "source": "/alerts", "destination": "/alerts.html" },
     { "source": "/apply-queue", "destination": "/apply-queue.html" },
+    { "source": "/filtre-ats", "destination": "/filtre-ats.html" },
     { "source": "/decouvrir", "destination": "/decouvrir.html" },
     { "source": "/api/push-subscribe", "destination": "/api/push-subscribe" },
     { "source": "/api/weekly-report", "destination": "/api/weekly-report" },

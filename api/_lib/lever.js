@@ -23,6 +23,7 @@
 import {
   contratLever, tempsLever, normaliserValeur,
 } from './contrat.js';
+import { competencesDe } from './competences.js';
 
 export const LEVER_BASE = 'https://api.lever.co/v0/postings';
 
@@ -201,6 +202,13 @@ export function normaliserOffre(p, entree) {
     // totalité des clés rendues. `null` est ce que la source dit.
     salary: null,
     description: texteDeContenu(p),
+    // Compétences lues dans la description COMPLÈTE : la description stockée
+    // est tronquée à 300 caractères, et c'est là que se trouvent les exigences.
+    // Chez Lever, les exigences sont dans `lists` (« Ce que nous cherchons »),
+    // à part de `descriptionPlain`.
+    competences: competencesDe([p?.text, texteDeContenu(p, 40000),
+      ...(Array.isArray(p?.lists) ? p.lists.map((l) => `${l?.text ?? ''} ${String(l?.content ?? '').replace(/<[^>]*>/g, ' ')}`) : []),
+      p?.additionalPlain].filter(Boolean).join(' '), 12, entree.company),
     // La page de candidature chez l'ATS de l'employeur, pas celle d'un
     // agrégateur — c'est la raison d'être de ce collecteur.
     url: String(p?.hostedUrl ?? p?.applyUrl ?? ''),

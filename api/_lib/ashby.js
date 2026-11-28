@@ -30,6 +30,7 @@
 import {
   contratAshby, tempsAshby, salaireAshby, normaliserValeur,
 } from './contrat.js';
+import { competencesDe } from './competences.js';
 
 export const ASHBY_BASE = 'https://api.ashbyhq.com/posting-api/job-board';
 
@@ -204,6 +205,9 @@ export function normaliserOffre(j, entree) {
     // et pas de l'equity, en euros et annuel. Tout le reste vaut null.
     salary: salaireAshby(j),
     description: texteDeContenu(j),
+    // Compétences lues dans la description COMPLÈTE : la description stockée
+    // est tronquée à 300 caractères, et c'est là que se trouvent les exigences.
+    competences: competencesDe(`${j?.title ?? ''} ${texteDeContenu(j, 40000)}`, 12, entree.company),
     // La page de candidature chez l'ATS de l'employeur. Contrairement à
     // Teamtailor, Ashby ne sert pas le domaine propre de l'entreprise.
     url: String(j?.jobUrl ?? j?.applyUrl ?? ''),
