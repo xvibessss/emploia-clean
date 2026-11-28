@@ -777,7 +777,7 @@ async function exportCV() {
     if (!window.html2pdf) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        s.src = '/vendor/html2pdf-0.10.1.bundle.min.js';
         s.onload = res; s.onerror = rej;
         document.head.appendChild(s);
       });

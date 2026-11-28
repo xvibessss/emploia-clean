@@ -508,7 +508,9 @@ try {
 console.log('\n[14] preuves sociales inventées — mécanisme et chaînes retirées');
 try {
   const visibles = walk('.').filter(
-    (p) => /\.(html|js)$/.test(p) && !p.includes('node_modules') && !p.startsWith('./scripts/'),
+    // vendor/ : bibliothèques tierces minifiées, servies telles quelles. Un
+    // « 2847 » dans le code de jsPDF n'est pas un chiffre affiché au visiteur.
+    (p) => /\.(html|js)$/.test(p) && !p.includes('node_modules') && !p.startsWith('./scripts/') && !p.startsWith('vendor/'),
   );
 
   let simules = 0;

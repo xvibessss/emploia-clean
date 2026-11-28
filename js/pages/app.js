@@ -323,7 +323,7 @@ Langues : Français natif, Anglais C1, Espagnol B1`;
     empToast('Génération du PDF…', 'info');
     try {
       if (!window.jspdf) {
-        await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+        await new Promise((res, rej) => { const s = document.createElement('script'); s.src = '/vendor/jspdf-2.5.1.umd.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
       }
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
