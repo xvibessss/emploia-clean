@@ -43,6 +43,7 @@ import {
 // U+202F insécable étroite, U+2009 fine. Une seule définition, sinon les deux
 // gardes finiraient par ne plus normaliser la même chose.
 import { norm, PAGE_ASSERTIONS } from '../smoke/assertions.mjs';
+import { pageAvecScripts } from '../lib/page.mjs';
 
 const ROOT = new URL('../../', import.meta.url);
 const lire = (rel) => fs.readFileSync(new URL(rel, ROOT), 'utf8');
@@ -144,7 +145,7 @@ const CITANTS = [
 // déjà pour exécuter ce même bloc au lieu d'une copie de sa logique.
 console.log('\n[A] Calculateur servi par /ecoles — littéraux vs déclaration');
 try {
-  const html = lire('ecoles.html');
+  const html = pageAvecScripts(lire('ecoles.html'));
   const blocs = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
   const calc = blocs.find((s) => s.includes('__ecQuote'));
   if (!calc) {

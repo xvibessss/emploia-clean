@@ -14,6 +14,7 @@ import path from 'node:path';
 import { rangerParRequete, motsPorteurs, lieuCorrespond, indiceEntreprise } from '../../api/_lib/recherche.js';
 import vm from 'node:vm';
 import { lecteurPartage } from './_lecteur-partage.mjs';
+import { pageAvecScripts } from '../lib/page.mjs';
 
 let passed = 0, failed = 0;
 function check(label, condition, detail) {
@@ -117,7 +118,7 @@ check('la neutralisation porte sur le nom entier', indiceEntreprise('Boulangerie
 console.log('\n── Requêtes des pages SEO ──');
 const racine = new URL('../../', import.meta.url);
 const lire = (dossier) => fs.readdirSync(new URL(dossier, racine)).filter(f => f.endsWith('.html')).map(f => {
-  const html = fs.readFileSync(new URL(path.posix.join(dossier, f), racine), 'utf8');
+  const html = pageAvecScripts(fs.readFileSync(new URL(path.posix.join(dossier, f), racine), 'utf8'));
   const q = /DEFAULT_QUERY\s*=\s*['"]([^'"]*)['"]/.exec(html)?.[1];
   const l = /DEFAULT_LOCATION\s*=\s*['"]([^'"]*)['"]/.exec(html)?.[1] || '';
   return { f, q, l };
