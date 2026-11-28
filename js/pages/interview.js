@@ -333,7 +333,7 @@
       if (!window.jspdf) {
         await new Promise((res, rej) => {
           const s = document.createElement('script');
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          s.src = '/vendor/jspdf-2.5.1.umd.min.js';
           s.onload = res; s.onerror = rej;
           document.head.appendChild(s);
         });
