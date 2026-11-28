@@ -11,6 +11,7 @@ import { kvIncr, kvZadd, kvZcard, kvZremrangebyrank, kvExpire } from './auth.js'
 export const SERVER_EVENTS = [
   'cv_generated', 'user_registered', 'plan_upgraded', 'ats_checked',
   'letter_generated', 'referral_code_created', 'referral_signup', 'interview_started',
+  'cv_guided_adaptation', 'ats_filter_simulated',
 ];
 export const CLIENT_EVENTS = ['paywall_viewed', 'checkout_started', 'interview_started'];
 

@@ -6,6 +6,7 @@
    fonctions sont dans EMP_H (moteur en tête de shared.js). */
 (function () {
   'use strict';
+  window.empGarderApresInscription = true; // voir empSubmitRegister dans shared.js
 
   const CLE_VUS = 'emploia_decouvrir_vus';
   const CLE_CIBLE = 'emploia_decouvrir_cible';
@@ -312,6 +313,7 @@
           <button data-on-click="dcDeplierCv" id="dcDeplier">Afficher tout</button>
           <button data-on-click="dcPdf">⬇ Télécharger en PDF</button>
           <button data-on-click="dcCopierCv">Copier</button>
+          <a href="/adapter?pret=${encodeURIComponent(p.id)}">✍️ Affiner pas à pas</a>
         </div>
       </div>
 

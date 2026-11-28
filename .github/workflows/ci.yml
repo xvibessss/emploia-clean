@@ -135,6 +135,8 @@ jobs:
         run: node scripts/smoke/prets.test.mjs
       - name: Simulateur de filtre ATS (lexique, faux positifs, calcul, vraies offres du moteur /jobs)
         run: node scripts/smoke/filtre-ats.test.mjs
+      - name: Adaptation guidée (suggestions vérifiées, rien d'inventé, crédit rendu en cas d'échec)
+        run: node scripts/smoke/adaptation.test.mjs
       - name: Extension Chrome (lecture des offres, remplissage sans écraser ni confondre)
         run: |
           npm install --no-save --no-package-lock jsdom@24
